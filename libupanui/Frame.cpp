@@ -16,28 +16,36 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include <LayerCanvas.h>
-#include <cdisplay.h>
+#include <Frame.h>
+#include <GraphicsContext.h>
 #include <CanvasBuilder.h>
+#include <Canvas.h>
 
 namespace upanui {
-  LayerCanvas::LayerCanvas() {
-    FramebufferInfo fb;
-    get_framebuffer_info(&fb);
-
-    _width = fb._width;
-    _height = fb._height;
-
-    _frameBuffer.reset(new uint32_t[_width * _height]);
+  Frame::Frame(uint32_t* frameBuffer, uint32_t width, uint32_t height)
+  : _width(width), _height(height), _frameBuffer(frameBuffer), _isDirty(false) {
   }
 
-  LayerCanvas::~LayerCanvas() noexcept {
+  Frame::~Frame() noexcept {
     for(auto c : _canvasLayers) {
       delete c;
     }
   }
 
-  void LayerCanvas::addCanvas(const CanvasBuilder& builder) {
+  void Frame::draw() {
+    if (_isDirty.get()) {
+      _isDirty.set(false);
+      for(auto c : _canvasLayers) {
+        memcpy(_frameBuffer, c->frameBuffer(), c->width() * c->height());
+      }
+    }
+  }
+
+  void Frame::touch() {
+    _isDirty.set(true);
+  }
+
+  void Frame::addCanvas(const CanvasBuilder& builder) {
     _canvasLayers.push_back(&builder.create(*this));
   }
 }
