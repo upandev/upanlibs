@@ -17,20 +17,27 @@
  */
 
 #include <ConsoleCanvas.h>
+#include <ColorPalettes.h>
 
 namespace upanui {
-  ConsoleCanvas::ConsoleCanvas(Canvas& parent) : _parent(parent) {
+  constexpr int NO_BYTES_PER_CHARACTER = 2;
+
+  ConsoleCanvas::ConsoleCanvas(Frame& parent, uint32_t maxRows, uint32_t maxColumns)
+    : upan::timer_thread(500),
+      _parent(parent), _maxRows(maxRows), _maxColumns(maxColumns), _cursorPos(0), _cursorEnabled(false) {
   }
 
-//  GraphicsConsole::GraphicsConsole(unsigned rows, unsigned columns) : Display(rows, columns),
-//                                                                      _cursorPos(0), _cursorEnabled(false) {
-//    GraphicsVideo::Create();
-//  }
-//
-//  void GraphicsConsole::StartCursorBlink() {
-//    KernelUtil::ScheduleTimedTask("xcursorblink", 500, *this);
-//    _cursorEnabled = true;
-//  }
+  void ConsoleCanvas::on_timer_trigger() {
+    upan::mutex_guard g(_cursorMutex);
+    static bool showCursor = false;
+    //PutCursor(_cursorPos, showCursor);
+    showCursor = !showCursor;
+  }
+
+  void ConsoleCanvas::StartCursorBlink() {
+    run();
+    _cursorEnabled = true;
+  }
 //
 //  void GraphicsConsole::GotoCursor() {
 //    if (_cursorEnabled) {
@@ -46,12 +53,12 @@ namespace upanui {
 //    }
 //  }
 //
-//  void GraphicsConsole::PutCursor(int pos, bool show) {
+//  void ConsoleCanvas::PutCursor(int pos, bool show) {
 //    if ((uint32_t)pos >= _maxRows * _maxColumns) {
 //      return;
 //    }
 //
-//    const auto attr = GetChar(pos * DisplayConstants::NO_BYTES_PER_CHARACTER + 1);
+//    const auto attr = GetChar(pos * NO_BYTES_PER_CHARACTER + 1);
 //    const auto color = show ? ColorPalettes::CP16::Get(attr & ColorPalettes::CP16::FG_WHITE)
 //                            : ColorPalettes::CP16::Get((attr & ColorPalettes::CP16::BG_WHITE) >> 4);
 //    const auto x = (pos % _maxColumns);
@@ -60,28 +67,19 @@ namespace upanui {
 //    GraphicsVideo::Instance()->DrawCursor(x, y, color);
 //  }
 //
-//  bool GraphicsConsole::TimerTrigger() {
-//    upan::mutex_guard g(_cursorMutex);
-//    static bool showCursor = false;
-//    PutCursor(_cursorPos, showCursor);
-//    showCursor = !showCursor;
-//    return true;
-//  }
-//
-//  void GraphicsConsole::DirectPutChar(int iPos, byte ch, byte attr)
+//  void ConsoleCanvas::DirectPutChar(int iPos, byte ch, byte attr)
 //  {
-//    const int curPos = iPos / DisplayConstants::NO_BYTES_PER_CHARACTER;
+//    const int curPos = iPos / NO_BYTES_PER_CHARACTER;
 //    const unsigned x = (curPos % _maxColumns);
 //    const unsigned y = (curPos / _maxColumns);
 //
-//    GraphicsVideo::Instance()->DrawChar(ch, x, y,
-//                                        ColorPalettes::CP16::Get(attr & ColorPalettes::CP16::FG_WHITE),
-//                                        ColorPalettes::CP16::Get((attr & ColorPalettes::CP16::BG_WHITE) >> 4));
+//    _textWriter.drawChar(_parent, ch, x, y,
+//                         ColorPalettes::CP16::Get(attr & ColorPalettes::CP16::FG_WHITE),
+//                         ColorPalettes::CP16::Get((attr & ColorPalettes::CP16::BG_WHITE) >> 4));
 //  }
-//
+
 //  void GraphicsConsole::DoScrollDown()
 //  {
 //    GraphicsVideo::Instance()->ScrollDown();
 //  }
-
 }

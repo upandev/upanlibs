@@ -18,16 +18,40 @@
 
 #pragma once
 
-#include <CanvasBuilder.h>
-#include <ConsoleCanvas.h>
-#include <GraphicsContext.h>
+#include <UIObject.h>
+#include <list.h>
+#include <atomicop.h>
 
 namespace upanui {
+  class CanvasBuilder;
+  class Canvas;
 
-  class ConsoleCanvasBuilder : public CanvasBuilder {
+  class Frame : public UIObject {
   public:
-    Canvas& create(Frame& gc) const override {
-      return *new ConsoleCanvas(parent);
+    Frame(uint32_t* frameBuffer, uint32_t width, uint32_t height);
+    ~Frame();
+
+    void draw();
+    void touch();
+    void addCanvas(const CanvasBuilder& builder);
+
+    uint32_t width() const override {
+      return _width;
     }
+
+    virtual uint32_t height() const override {
+      return _height;
+    }
+
+    virtual const uint32_t* frameBuffer() const override {
+      return _frameBuffer;
+    }
+
+  private:
+    uint32_t _width;
+    uint32_t _height;
+    uint32_t* _frameBuffer;
+    upan::atomic::integral<bool> _isDirty;
+    upan::list<Canvas*> _canvasLayers;
   };
 }

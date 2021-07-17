@@ -19,36 +19,34 @@
 #pragma once
 
 #include <Canvas.h>
+#include <Frame.h>
+#include <timer_thread.h>
+#include <libupanui/text/TextWriter.h>
 
-namespace upanui{
-    class ConsoleCanvas : public Canvas {
-    public:
-      ConsoleCanvas(Canvas& parent);
-//    ConsoleCanvas(unsigned rows, unsigned columns);
-//    void GotoCursor() override;
-//    void DirectPutChar(int iPos, byte ch, byte attr) override;
-//    void DoScrollDown() override;
-//    void PutCursor(int pos, bool show);
-//    bool TimerTrigger() override;
-//    void StartCursorBlink() override;
-//
-//    class VideoBuffer : public DisplayBuffer
-//    {
-//      public:
-//      VideoBuffer(unsigned uiDisplayMemAddr);
-//
-//      private:
-//      const unsigned _width;
-//      const unsigned _height;
-//      const unsigned _pitch;
-//      const byte     _bpp;
-//      const byte     _bytesPerPixel;
-//    };
-//    friend class Display;
-//    int _cursorPos;
-//    bool _cursorEnabled;
-//    Mutex _cursorMutex;
-    private:
-      Canvas& _parent;
-    };
+namespace upanui {
+  class ConsoleCanvas : public Canvas, public upan::timer_thread {
+  public:
+    ConsoleCanvas(Frame& parent, uint32_t maxRows, uint32_t maxColumns);
+    void on_timer_trigger() override;
+    //    void GotoCursor() override;
+    //    void DoScrollDown() override;
+    //    void PutCursor(int pos, bool show);
+    void StartCursorBlink();
+    //
+
+  private:
+    void DirectPutChar(int iPos, byte ch, byte attr);
+    //    friend class Display;
+    //    int _cursorPos;
+    //    bool _cursorEnabled;
+    //    Mutex _cursorMutex;
+  private:
+    Frame& _parent;
+    uint32_t _maxRows;
+    uint32_t _maxColumns;
+    int _cursorPos;
+    bool _cursorEnabled;
+    upan::mutex _cursorMutex;
+    TextWriter _textWriter;
+  };
 }

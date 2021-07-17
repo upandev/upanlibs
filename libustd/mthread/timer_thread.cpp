@@ -31,10 +31,22 @@ namespace upan {
     stop();
   }
 
+  class _timer_thread_termination_guard {
+  public:
+    _timer_thread_termination_guard(timer_thread* t) : _t(t) {
+    }
+    ~_timer_thread_termination_guard() {
+      _t->_state.set(timer_thread::stopped);
+    }
+  private:
+    timer_thread* _t;
+  };
+
   void timer_callback(void* obj) {
     auto t = static_cast<timer_thread*>(obj);
+    _timer_thread_termination_guard accessor(t);
     try {
-      while (t->state() != timer_thread::stopped) {
+      while (t->is_active()) {
         if (t->state() == timer_thread::running) {
           t->on_timer_trigger();
         }
@@ -43,7 +55,6 @@ namespace upan {
     } catch(const exception& e) {
       t->set_error(e.Error());
     }
-    t->stop();
   }
 
   void timer_thread::run() {
@@ -58,6 +69,8 @@ namespace upan {
         break;
       case running:
         throw exception(XLOC, "timer is already running");
+      case stopping:
+        throw exception(XLOC, "timer has stopping - can't run again");
       case stopped:
         throw exception(XLOC, "timer has stopped - can't run again");
       default:
@@ -82,8 +95,15 @@ namespace upan {
     }
   }
 
+  bool timer_thread::is_active() {
+    return _state.get() == running || _state.get() == paused;
+  }
+
   void timer_thread::stop() {
-    _state.set(stopped);
+    _state.set(stopping);
+    while(_state.get() != stopped) {
+      sleepms(10);
+    }
   }
 
   void timer_thread::set_error(const upan::error& e) {

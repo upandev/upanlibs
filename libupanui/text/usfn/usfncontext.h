@@ -19,7 +19,8 @@
 
 #include <usfntypes.h>
 
-namespace usfn {
+namespace upanui {
+  namespace usfn {
     class Context {
     public:
       Context();
@@ -54,4 +55,5 @@ namespace usfn {
       int _size;                           /* required size */
       int _line;                           /* calculate line height */
     };
+  }
 }

@@ -67,12 +67,13 @@ include_directories(${PROJECT_SOURCE_DIR}/libustd/mthread)
 #add_compile_definitions(FT_CONFIG_MODULES_H="<ftmodule.h>")
 #add_compile_definitions(FT2_BUILD_LIBRARY)
 
-include_directories(${PROJECT_SOURCE_DIR}/libusfn)
-include_directories(${PROJECT_SOURCE_DIR}/libusfn/zlib)
-
 include_directories(${PROJECT_SOURCE_DIR}/libupanui)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/image)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/canvas)
+include_directories(${PROJECT_SOURCE_DIR}/libupanui/text)
+include_directories(${PROJECT_SOURCE_DIR}/libupanui/text/usfn)
+include_directories(${PROJECT_SOURCE_DIR}/libupanui/text/usfn/zlib)
+include_directories(${PROJECT_SOURCE_DIR}/libupanui/text/default)
 
 #LIBC
 execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.c' | grep -v CMakeFile | grep -v './libc/sys/'" OUTPUT_VARIABLE LIBC_SRC)
@@ -118,11 +119,6 @@ add_library(ustd STATIC ${LIB_USTD_SRC})
 #execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libsfn -name '*.c' | grep -v CMakeFile | grep -v builds" OUTPUT_VARIABLE LIB_SFN_SRC)
 #string(REPLACE "\n" ";" LIB_SFN_SRC ${LIB_SFN_SRC})
 #add_library(sfn STATIC ${LIB_SFN_SRC})
-
-#LIBUSFN
-execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libusfn -name '*.cpp' | grep -v CMakeFile | grep -v builds" OUTPUT_VARIABLE LIB_USFN_SRC)
-string(REPLACE "\n" ";" LIB_USFN_SRC ${LIB_USFN_SRC})
-add_library(usfn STATIC ${LIB_USFN_SRC})
 
 #LIBUPANUI
 execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libupanui -name '*.cpp' | grep -v CMakeFile" OUTPUT_VARIABLE LIB_UPANUI_CPP_SRC)

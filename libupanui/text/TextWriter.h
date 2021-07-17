@@ -18,16 +18,22 @@
 
 #pragma once
 
-#include <CanvasBuilder.h>
-#include <ConsoleCanvas.h>
-#include <GraphicsContext.h>
+#include <UIObject.h>
 
 namespace upanui {
-
-  class ConsoleCanvasBuilder : public CanvasBuilder {
+  class TextWriter {
   public:
-    Canvas& create(Frame& gc) const override {
-      return *new ConsoleCanvas(parent);
+    TextWriter();
+    void setFontContext(usfn::Context* c) {
+      _usfnContext = c;
     }
+    void drawChar(UIObject& uiObject, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg);
+
+  private:
+    void drawUSFNChar(UIObject& uiObject, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg);
+
+    usfn::Context* _usfnContext;
+    uint32_t _xCharScale;
+    uint32_t _yCharScale;
   };
 }

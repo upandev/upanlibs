@@ -106,23 +106,6 @@ void SysDisplay_ClearLine(int pos)
 	__asm__ __volatile__("pop %eax") ;
 }
 
-void SysDisplay_Address(const char* szMessage, unsigned uiNumber)
-{
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-
-	__asm__ __volatile__("pushl %0" : : "rm"(uiNumber)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(szMessage)) ;
-	DO_SYS_CALL(SYS_CALL_DISPLAY_ADDRESS) ;
-	__asm__ __volatile__("pop %eax") ;
-}
-
 void SysDisplay_SetCursor(__volatile__ int iCurPos, __volatile__ bool bUpdateCursorOnScreen)
 {
 	__asm__ __volatile__("push %eax") ;

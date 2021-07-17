@@ -20,9 +20,10 @@
 
 namespace upanui {
   class Canvas;
+  class GraphicsContext;
 
   class CanvasBuilder {
   public:
-    virtual Canvas& create(Canvas& parent) const = 0;
+    virtual Canvas& create(Frame& parent) const = 0;
   };
 }

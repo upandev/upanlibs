@@ -29,11 +29,12 @@ namespace upan {
         not_running,
         running,
         paused,
+        stopping,
         stopped
       };
 
       timer_thread(uint32_t interval_ms);
-      ~timer_thread();
+      virtual ~timer_thread();
 
       virtual void on_timer_trigger() = 0;
 
@@ -48,6 +49,7 @@ namespace upan {
       void run();
       void pause();
       void stop();
+      bool is_active();
 
       void set_error(const upan::error& e);
 
@@ -64,5 +66,7 @@ namespace upan {
       atomic::integral<state_t> _state;
       mutex _timer_mutex;
       upan::option<upan::error> _error;
+
+      friend class _timer_thread_termination_guard;
     };
 }

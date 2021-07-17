@@ -19,35 +19,43 @@
 #pragma once
 
 #include <stdlib.h>
-#include <huffman.h>
 
-namespace usfn {
-  class zbuffer {
-  public:
-    zbuffer(unsigned char* buffer);
-    char* parse();
+namespace upanui {
+  namespace usfn {
+    class huffman {
+    public:
+      static constexpr int ZFAST_BITS = 9;
+      static constexpr int ZFAST_MASK = ((1 << ZFAST_BITS) - 1);
 
-  private:
-    static unsigned char ZDEFAULT_LENGTH[288], ZDEFAULT_DISTANCE[32];
+      void build(unsigned char *sizelist, int num);
 
-    unsigned char get8();
-    void fill_bits();
-    uint32_t receive(int n);
-    char* expand(char* cur_zout);
-    void parse_uncompressed_block();
-    void compute_huffman_codes();
-    int huffman_decode(huffman& z);
-    int huffman_decode_slowpath(huffman& z);
-    void parse_huffman_block();
+      uint16_t getFastAt(int i) {
+        return fast[i];
+      }
 
-    unsigned char* _buffer;
-    int num_bits;
-    uint32_t code_buffer;
+      int getMaxCodeAt(int i) {
+        return maxcode[i];
+      }
 
-    char *zout;
-    char *zout_start;
-    char *zout_end;
+      uint16_t getFirstCodeAt(int i) {
+        return firstcode[i];
+      }
 
-    huffman z_length, z_distance;
-  };
+      uint16_t getFirstSymbolAt(int i) {
+        return firstsymbol[i];
+      }
+
+      uint16_t getValueAt(int i) {
+        return value[i];
+      }
+
+    private:
+      uint16_t fast[1 << ZFAST_BITS];
+      uint16_t firstcode[16];
+      int maxcode[17];
+      uint16_t firstsymbol[16];
+      unsigned char size[288];
+      uint16_t value[288];
+    };
+  }
 }

@@ -45,7 +45,6 @@ typedef enum
 		SYS_CALL_DISPLAY_CLR_SCR,
 		SYS_CALL_DISPLAY_MOV_CURSOR,
 		SYS_CALL_DISPLAY_CLR_LINE,
-		SYS_CALL_DISPLAY_ADDRESS,
 		SYS_CALL_DISPLAY_SET_CURSOR,
 		SYS_CALL_DISPLAY_GET_CURSOR,
 		SYS_CALL_DISPLAY_RAW_CHAR,
@@ -128,7 +127,6 @@ void SysDisplay_Character(const char ch, unsigned uiAttr);
 void SysDisplay_ClearScreen();
 void SysDisplay_MoveCursor(int n);
 void SysDisplay_ClearLine(int pos);
-void SysDisplay_Address(const char* szMessage, unsigned uiNumber);
 void SysDisplay_SetCursor(__volatile__ int iCurPos, __volatile__ bool bUpdateCursorOnScreen);
 int SysDisplay_GetCursor();
 void SysDisplay_RawCharacter(__volatile__ const char ch, __volatile__ unsigned uiAttr, __volatile__ bool bUpdateCursorOnScreen);

@@ -38,6 +38,7 @@ typedef struct {
   uint32_t _width;
   uint32_t _height;
   uint32_t _bpp;
+  uint32_t* _frameBuffer;
 } FramebufferInfo;
 
 extern void	SysDisplay_MoveCursor(int n) ;

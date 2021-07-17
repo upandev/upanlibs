@@ -19,8 +19,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <usfncontext.h>
 
 namespace upanui {
+
     class UIObject {
     public:
       UIObject() {}

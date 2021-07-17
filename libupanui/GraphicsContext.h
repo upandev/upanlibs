@@ -18,16 +18,42 @@
 
 #pragma once
 
-#include <CanvasBuilder.h>
-#include <ConsoleCanvas.h>
-#include <GraphicsContext.h>
+#include <timer_thread.h>
 
 namespace upanui {
+  class Frame;
 
-  class ConsoleCanvasBuilder : public CanvasBuilder {
+  class GraphicsContext {
+  private:
+    static GraphicsContext* _instance;
+    GraphicsContext();
+    ~GraphicsContext();
   public:
-    Canvas& create(Frame& gc) const override {
-      return *new ConsoleCanvas(parent);
+    static void Init();
+    static void Destroy();
+    static GraphicsContext& Instance();
+
+    uint32_t pitch() const {
+      return _frameBufferInfo._pitch;
     }
+
+    uint32_t bytesPerPixel() const {
+      return _frameBufferInfo._bpp / 8;
+    }
+
+  private:
+    class RefreshThread : public upan::timer_thread {
+    public:
+      RefreshThread(GraphicsContext& gc);
+      void on_timer_trigger() override;
+    private:
+      GraphicsContext& _gc;
+    };
+
+  private:
+    FramebufferInfo _frameBufferInfo;
+    Frame* _frame;
+    RefreshThread* _refreshThread;
+    friend class RefreshThread;
   };
 }
