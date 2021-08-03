@@ -36,6 +36,8 @@ class queue
     bool pop_front();
     bool push_back(const T& data);
     void clear();
+    int read(T out[], int n);
+    int write(const T in[], int n);
 
   private:
     uint32_t _readEnd;
@@ -84,6 +86,26 @@ const T& queue<T>::front() const
 }
 
 template <typename T>
+int queue<T>::read(T out[], int n) {
+  if (n <= 0 || empty()) {
+    return 0;
+  }
+
+  if (n > _count) {
+    n = _count;
+  }
+
+  _count -= n;
+
+  for(int i = 0; i < n; ++i) {
+    out[i] = _buffer[_readEnd];
+    _readEnd = (_readEnd + 1) % _size;
+  }
+
+  return n;
+}
+
+template <typename T>
 bool queue<T>::pop_front()
 {
   if(empty())
@@ -91,6 +113,28 @@ bool queue<T>::pop_front()
 	_readEnd = (_readEnd + 1) % _size;
   --_count;
   return true;
+}
+
+template <typename T>
+int queue<T>::write(const T in[], int n) {
+  if (n <= 0 || full()) {
+    return 0;
+  }
+
+  auto remaining = _size - _count;
+
+  if (n > remaining) {
+    n = remaining;
+  }
+
+  _count += n;
+
+  for(int i = 0; i < n; ++i) {
+    _buffer[_writeEnd] = in[i];
+    _writeEnd = (_writeEnd + 1) % _size;
+  }
+
+  return n;
 }
 
 template <typename T>
