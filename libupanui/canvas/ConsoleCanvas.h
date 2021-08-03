@@ -19,14 +19,14 @@
 #pragma once
 
 #include <Canvas.h>
-#include <Frame.h>
+#include <FrameManager.h>
 #include <timer_thread.h>
 #include <libupanui/text/TextWriter.h>
 
 namespace upanui {
   class ConsoleCanvas : public Canvas, public upan::timer_thread {
   public:
-    ConsoleCanvas(Frame& parent, uint32_t maxRows, uint32_t maxColumns);
+    ConsoleCanvas(FrameManager& parent, uint32_t maxRows, uint32_t maxColumns);
     void on_timer_trigger() override;
     //    void GotoCursor() override;
     //    void DoScrollDown() override;
@@ -41,7 +41,7 @@ namespace upanui {
     //    bool _cursorEnabled;
     //    Mutex _cursorMutex;
   private:
-    Frame& _parent;
+    FrameManager& _parent;
     uint32_t _maxRows;
     uint32_t _maxColumns;
     int _cursorPos;

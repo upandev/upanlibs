@@ -18,26 +18,39 @@
 
 #pragma once
 
-#include <stdlib.h>
-#include <usfncontext.h>
+#include <FrameBuffer.h>
+#include <Viewport.h>
+#include <atomicop.h>
 
 namespace upanui {
-  class FrameBuffer;
-
-  class TextWriter {
+  class BaseFrame {
   public:
-    TextWriter();
-    void setFontContext(usfn::Context* c) {
-      _usfnContext = c;
+    BaseFrame(const upanui::FrameBuffer& frameBuffer, const upanui::Viewport& viewport)
+    : _frameBuffer(frameBuffer), _viewport(viewport), _isDirty(false) {}
+
+    upanui::FrameBuffer& frameBuffer() {
+      return _frameBuffer;
     }
-    void drawChar(const FrameBuffer& frameBuffer, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg);
-    void scrollDown(const FrameBuffer& frameBuffer);
+
+    upanui::Viewport& viewport() {
+      return _viewport;
+    }
+
+    bool isDirty() {
+      return _isDirty.get();
+    }
+
+    void touch() {
+      _isDirty.set(true);
+    }
+
+    void clean() {
+      _isDirty.set(false);
+    }
 
   private:
-    void drawUSFNChar(const FrameBuffer& frameBuffer, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg);
-
-    usfn::Context* _usfnContext;
-    uint32_t _xCharScale;
-    uint32_t _yCharScale;
+    upanui::FrameBuffer _frameBuffer;
+    upanui::Viewport _viewport;
+    upan::atomic::integral<bool> _isDirty;
   };
 }

@@ -1,5 +1,5 @@
 /*
- *  Upanix - An x86 based Operating System
+ *	Upanix - An x86 based Operating System
  *  Copyright (C) 2011 'Prajwala Prabhakar' 'srinivasa_prajwal@yahoo.co.in'
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -15,24 +15,32 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-#include <cdisplay.h>
-#include <stdio.h>
 
-void showprogress(int startCur, const char* msg, unsigned progNum)
-{
-  int c = get_cursor() ;
+#include <FrameManager.h>
+#include <GraphicsContext.h>
+#include <CanvasBuilder.h>
+#include <Canvas.h>
 
-  while(c > startCur)
-  {
-    movcursor(-1) ;
-    c-- ;
+namespace upanui {
+  FrameManager::FrameManager(const FrameBuffer& frameBuffer) : _isDirty(false), _frameBuffer(frameBuffer) {
   }
 
-  clrline(Display_CURSOR_CUR) ;
+  FrameManager::~FrameManager() noexcept {
+    for(auto c : _canvasLayers) {
+      delete c;
+    }
+  }
 
-  printf("%s%d", msg, progNum) ;
-}
+  void FrameManager::draw() {
+    if (isDirty()) {
+      clean();
+      for(auto c : _canvasLayers) {
+        memcpy(_frameBuffer.buffer(), c->dataBuffer(), c->width() * c->height());
+      }
+    }
+  }
 
-void get_framebuffer_info(FrameBufferInfo* frameBufferInfo) {
-  SysDisplay_GetFrameBufferInfo(frameBufferInfo);
+  void FrameManager::addCanvas(const CanvasBuilder& builder) {
+    _canvasLayers.push_back(&builder.create(*this));
+  }
 }

@@ -15,8 +15,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef _UPAN_VECTOR_H_
-#define _UPAN_VECTOR_H_
+
+#pragma once
 
 #ifdef __LOCAL_TEST__
 #include "/usr/include/string.h"
@@ -177,9 +177,7 @@ class vector
 };
 
 template <typename T>
-vector<T>::vector() : _size(0), _capacity(0), _buffer(nullptr)
-{
-  _buffer = new char[_capacity];
+vector<T>::vector() : _size(0), _capacity(0), _buffer(nullptr) {
 }
 
 template <typename T>
@@ -355,5 +353,3 @@ T& vector<T>::operator[](int index) const
 }
 
 };
-
-#endif

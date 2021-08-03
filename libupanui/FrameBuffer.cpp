@@ -1,5 +1,5 @@
 /*
- *  Upanix - An x86 based Operating System
+ *	Upanix - An x86 based Operating System
  *  Copyright (C) 2011 'Prajwala Prabhakar' 'srinivasa_prajwal@yahoo.co.in'
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -15,24 +15,4 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-#include <cdisplay.h>
-#include <stdio.h>
 
-void showprogress(int startCur, const char* msg, unsigned progNum)
-{
-  int c = get_cursor() ;
-
-  while(c > startCur)
-  {
-    movcursor(-1) ;
-    c-- ;
-  }
-
-  clrline(Display_CURSOR_CUR) ;
-
-  printf("%s%d", msg, progNum) ;
-}
-
-void get_framebuffer_info(FrameBufferInfo* frameBufferInfo) {
-  SysDisplay_GetFrameBufferInfo(frameBufferInfo);
-}

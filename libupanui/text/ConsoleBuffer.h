@@ -1,0 +1,73 @@
+/*
+ *	Upanix - An x86 based Operating System
+ *  Copyright (C) 2011 'Prajwala Prabhakar' 'srinivasa_prajwal@yahoo.co.in'
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/
+ */
+
+#pragma once
+
+#include <stdlib.h>
+#include <cdisplay.h>
+#include <CharStyle.h>
+
+namespace upanui {
+  class IConsole;
+
+  class ConsoleBuffer {
+  public:
+    static constexpr int START_CURSOR_POS = -1;
+    static constexpr int NO_BYTES_PER_CHARACTER = 2;
+
+    ConsoleBuffer(IConsole& console, byte* buffer, uint32_t rows, uint32_t columns);
+
+    unsigned getBufferSize() const { return _bufSize; }
+    unsigned maxRows() const { return _maxRows; }
+    unsigned maxColumns() const { return _maxColumns; }
+
+    int getCurPos() const { return _cursorPos; }
+    void setCurPos(int curPos, bool updateCursorOnScreen);
+
+    void message(const char* message, const CharStyle& attr);
+    void nmessage(const char* message, int n, const CharStyle& attr);
+
+    void moveCursor(int iOffSet);
+    void clearLine(int iStartPos);
+    void clear();
+    void refresh();
+
+    void rawCharacter(byte ch, const CharStyle& attr, bool updateCursorOnScreen);
+    void rawCharacterArea(const MChar* src, uint32_t rows, uint32_t cols, int curPos);
+
+  private:
+    bool putCharOnBuffer(int pos, byte val);
+    void putChar(int iPos, byte ch, byte attr);
+    void nextLine();
+    void character(char ch, const CharStyle& attr);
+
+    void scrollDown();
+
+    byte getChar(int pos) { return _buffer[pos]; }
+    int getCurBytePos() const { return _cursorPos * NO_BYTES_PER_CHARACTER; }
+    void _setCurPos(int curPos, bool updateCursorOnScreen);
+
+  private:
+    IConsole& _console;
+    byte* _buffer;
+    const unsigned _bufSize;
+    const unsigned _maxRows;
+    const unsigned _maxColumns;
+    int _cursorPos;
+  };
+}

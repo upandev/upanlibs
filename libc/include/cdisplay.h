@@ -39,14 +39,14 @@ typedef struct {
   uint32_t _height;
   uint32_t _bpp;
   uint32_t* _frameBuffer;
-} FramebufferInfo;
+} FrameBufferInfo;
 
 extern void	SysDisplay_MoveCursor(int n) ;
 extern void	SysDisplay_ClearLine(int pos) ;
 extern void	SysDisplay_SetCursor(int pos, bool bUpdateCursorOnScreen) ;
 extern int	SysDisplay_GetCursor() ;
 extern void SysDisplay_GetConsoleSize(uint32_t*, uint32_t*);
-extern void SysDisplay_GetFramebufferInfo(FramebufferInfo*);
+extern void SysDisplay_GetFrameBufferInfo(FrameBufferInfo*);
 
 #define movcursor(n)		SysDisplay_MoveCursor(n)
 #define clrline(pos)		SysDisplay_ClearLine(pos)
@@ -56,7 +56,7 @@ extern void SysDisplay_GetFramebufferInfo(FramebufferInfo*);
 #define console_size(mr, mc) SysDisplay_GetConsoleSize(mr, mc)
 
 void showprogress(int startCur, const char* msg, unsigned progNum) ;
-void get_framebuffer_info(FramebufferInfo* framebufferInfo);
+void get_framebuffer_info(FrameBufferInfo* frameBufferInfo);
 
 #if defined __cplusplus
 }

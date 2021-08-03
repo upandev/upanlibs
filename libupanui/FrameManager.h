@@ -16,36 +16,41 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include <Frame.h>
-#include <GraphicsContext.h>
-#include <CanvasBuilder.h>
-#include <Canvas.h>
+#pragma once
+
+#include <UIObject.h>
+#include <list.h>
+#include <FrameBuffer.h>
+#include <atomicop.h>
 
 namespace upanui {
-  Frame::Frame(uint32_t* frameBuffer, uint32_t width, uint32_t height)
-  : _width(width), _height(height), _frameBuffer(frameBuffer), _isDirty(false) {
-  }
+  class CanvasBuilder;
+  class Canvas;
 
-  Frame::~Frame() noexcept {
-    for(auto c : _canvasLayers) {
-      delete c;
+  class FrameManager {
+  public:
+    FrameManager(const FrameBuffer& framebuffer);
+    ~FrameManager();
+
+    void draw();
+    void addCanvas(const CanvasBuilder& builder);
+
+
+    bool isDirty() const {
+      return const_cast<FrameManager&>(*this)._isDirty.get();
     }
-  }
 
-  void Frame::draw() {
-    if (_isDirty.get()) {
+    void touch() {
+      _isDirty.set(true);
+    }
+
+    void clean() {
       _isDirty.set(false);
-      for(auto c : _canvasLayers) {
-        memcpy(_frameBuffer, c->frameBuffer(), c->width() * c->height());
-      }
     }
-  }
 
-  void Frame::touch() {
-    _isDirty.set(true);
-  }
-
-  void Frame::addCanvas(const CanvasBuilder& builder) {
-    _canvasLayers.push_back(&builder.create(*this));
-  }
+  private:
+    upan::atomic::integral<bool> _isDirty;
+    FrameBuffer _frameBuffer;
+    upan::list<Canvas*> _canvasLayers;
+  };
 }

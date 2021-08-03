@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include <Frame.h>
+#include <FrameManager.h>
 #include <GraphicsContext.h>
 #include <CanvasBuilder.h>
 #include <Canvas.h>
@@ -55,7 +55,7 @@ namespace upanui {
 
   GraphicsContext::GraphicsContext() : _frame(nullptr), _refreshThread(nullptr) {
     get_framebuffer_info(&_frameBufferInfo);
-    _frame = new Frame(_frameBufferInfo._frameBuffer, _frameBufferInfo._width, _frameBufferInfo._height);
+    _frame = new FrameManager(_frameBufferInfo);
     _refreshThread = new RefreshThread(*this);
   }
 

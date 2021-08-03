@@ -36,25 +36,6 @@ void SysDisplay_Message(const char* szMessage, unsigned uiAttr)
 	__asm__ __volatile__("pop %eax") ;
 }
 
-void SysDisplay_Character(const char ch, unsigned uiAttr)
-{
-	__volatile__ unsigned v = ch ;
-
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-
-	__asm__ __volatile__("pushl %0" : : "rm"(uiAttr)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(v)) ;
-	DO_SYS_CALL(SYS_CALL_DISPLAY_CHARACTER) ;
-	__asm__ __volatile__("pop %eax") ;
-}
-
 void SysDisplay_ClearScreen()
 {
 	__asm__ __volatile__("push %eax") ;
@@ -203,7 +184,7 @@ void SysDisplay_GetConsoleSize(unsigned* retMaxRows, unsigned* retMaxCols)
 	__asm__ __volatile__("pop %eax") ;
 }
 
-void SysDisplay_GetFramebufferInfo(FramebufferInfo* framebufferInfo) {
+void SysDisplay_GetFrameBufferInfo(FrameBufferInfo* frameBufferInfo) {
   __volatile__ int iRetStatus ;
 
   __asm__ __volatile__("push %eax") ;
@@ -216,7 +197,7 @@ void SysDisplay_GetFramebufferInfo(FramebufferInfo* framebufferInfo) {
   __asm__ __volatile__("pushl $0x20") ;
   __asm__ __volatile__("pushl $0x20") ;
 
-  __asm__ __volatile__("pushl %0" : : "rm"(framebufferInfo)) ;
+  __asm__ __volatile__("pushl %0" : : "rm"(frameBufferInfo)) ;
   DO_SYS_CALL(SYS_CALL_DISPLAY_FRAMEBUFFER_INFO) ;
 
   __asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;

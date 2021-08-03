@@ -41,7 +41,6 @@ typedef enum
 {
 	SYS_CALL_DISPLAY_START = 0,
 		SYS_CALL_DISPLAY_MESSAGE,
-		SYS_CALL_DISPLAY_CHARACTER,
 		SYS_CALL_DISPLAY_CLR_SCR,
 		SYS_CALL_DISPLAY_MOV_CURSOR,
 		SYS_CALL_DISPLAY_CLR_LINE,
@@ -72,7 +71,6 @@ typedef enum
 		SYS_CALL_FILE_STAT_FD,
 		SYS_CALL_FILE_ACCESS,
 		SYS_CALL_FILE_DUP2,
-		SYS_CALL_FILE_RESET_STD,
 	SYS_CALL_FILE_END,
 
 	SYS_CALL_MEM_START = 400,
@@ -122,8 +120,6 @@ typedef enum
 
 /************************************************************************************/
 
-void SysDisplay_Message(const char* szMessage, unsigned uiAttr);
-void SysDisplay_Character(const char ch, unsigned uiAttr);
 void SysDisplay_ClearScreen();
 void SysDisplay_MoveCursor(int n);
 void SysDisplay_ClearLine(int pos);

@@ -409,28 +409,6 @@ int SysFS_Dup2(int oldFD, int newFD)
 	return iRetStatus ;
 }
 
-int SysFS_ResetSTD(int stdfd)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-
-	__asm__ __volatile__("pushl %0" : : "rm"(stdfd)) ;
-	DO_SYS_CALL(SYS_CALL_FILE_RESET_STD) ;
-
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
-	return iRetStatus ;
-}
-
 int read(int fd, char* buf, int len)
 {
 	return SysFS_FileRead(fd, buf, len) ;
@@ -489,11 +467,6 @@ int access(const char* szFileName, int mode)
 int dup2(int oldFD, int newFD)
 {
 	return SysFS_Dup2(oldFD, newFD) ;
-}
-
-int resetstd(int stdfd)
-{
-	return SysFS_ResetSTD(stdfd) ;
 }
 
 int getcwd(char* buf, size_t size)

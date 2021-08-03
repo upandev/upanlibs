@@ -35,7 +35,7 @@ namespace upanui {
         return _height;
       }
 
-      const uint32_t* frameBuffer() const override {
+      const uint32_t* dataBuffer() const {
         return const_cast<RawImage*>(this)->_imageBuffer.get();
       }
 

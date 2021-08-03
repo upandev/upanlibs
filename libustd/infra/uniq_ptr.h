@@ -70,8 +70,13 @@ class uniq_ptr
     void disown() { _owner = false; }
 
     T* get() { return _ptr; }
+    const T* get() const { return _ptr; }
+
     T* operator->() { return get(); }
+    const T* operator->() const { return get(); }
+
     T& operator*() { return *get(); }
+    const T& operator*() const { return *get(); }
 
     T* release()
     {
@@ -124,6 +129,8 @@ class uniq_ptr<T[]>
     void disown() { _owner = false; }
 
     T* get() { return _ptr; }
+    const T* get() const { return _ptr; }
+
     T& operator[](int index) { return _ptr[index]; }
     const T& operator[](int index) const { return _ptr[index]; }
 

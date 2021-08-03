@@ -18,40 +18,46 @@
 
 #pragma once
 
-#include <UIObject.h>
-#include <list.h>
-#include <atomicop.h>
+#include <cdisplay.h>
 
 namespace upanui {
-  class CanvasBuilder;
-  class Canvas;
-
-  class Frame : public UIObject {
+  class FrameBuffer {
   public:
-    Frame(uint32_t* frameBuffer, uint32_t width, uint32_t height);
-    ~Frame();
-
-    void draw();
-    void touch();
-    void addCanvas(const CanvasBuilder& builder);
-
-    uint32_t width() const override {
-      return _width;
+    FrameBuffer(const FrameBufferInfo& frameBufferInfo) : _frameBufferInfo(frameBufferInfo) {
     }
 
-    virtual uint32_t height() const override {
-      return _height;
+    FrameBuffer(const FrameBuffer& frameBuffer) : _frameBufferInfo(frameBuffer._frameBufferInfo) {
     }
 
-    virtual const uint32_t* frameBuffer() const override {
-      return _frameBuffer;
+    uint32_t width() const {
+      return _frameBufferInfo._width;
+    }
+
+    uint32_t height() const {
+      return _frameBufferInfo._height;
+    }
+
+    uint32_t pitch() const {
+      return _frameBufferInfo._pitch;
+    }
+
+    uint32_t bpp() const {
+      return _frameBufferInfo._bpp;
+    }
+
+    uint32_t bytesPerPixel() const {
+      return _frameBufferInfo._bpp / 8;
+    }
+
+    uint32_t* buffer() const {
+      return _frameBufferInfo._frameBuffer;
+    }
+
+    void resetFrameBufferAddress(uint32_t* addr) {
+      _frameBufferInfo._frameBuffer = addr;
     }
 
   private:
-    uint32_t _width;
-    uint32_t _height;
-    uint32_t* _frameBuffer;
-    upan::atomic::integral<bool> _isDirty;
-    upan::list<Canvas*> _canvasLayers;
+    FrameBufferInfo _frameBufferInfo;
   };
 }

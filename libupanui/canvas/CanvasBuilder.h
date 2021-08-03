@@ -24,6 +24,6 @@ namespace upanui {
 
   class CanvasBuilder {
   public:
-    virtual Canvas& create(Frame& parent) const = 0;
+    virtual Canvas& create(FrameManager& parent) const = 0;
   };
 }

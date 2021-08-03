@@ -21,7 +21,7 @@
 #include <timer_thread.h>
 
 namespace upanui {
-  class Frame;
+  class FrameManager;
 
   class GraphicsContext {
   private:
@@ -51,8 +51,8 @@ namespace upanui {
     };
 
   private:
-    FramebufferInfo _frameBufferInfo;
-    Frame* _frame;
+    FrameBufferInfo _frameBufferInfo;
+    FrameManager* _frame;
     RefreshThread* _refreshThread;
     friend class RefreshThread;
   };

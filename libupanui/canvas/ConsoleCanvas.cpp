@@ -22,7 +22,7 @@
 namespace upanui {
   constexpr int NO_BYTES_PER_CHARACTER = 2;
 
-  ConsoleCanvas::ConsoleCanvas(Frame& parent, uint32_t maxRows, uint32_t maxColumns)
+  ConsoleCanvas::ConsoleCanvas(FrameManager& parent, uint32_t maxRows, uint32_t maxColumns)
     : upan::timer_thread(500),
       _parent(parent), _maxRows(maxRows), _maxColumns(maxColumns), _cursorPos(0), _cursorEnabled(false) {
   }

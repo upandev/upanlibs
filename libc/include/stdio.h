@@ -26,13 +26,10 @@ extern "C" {
 #endif
 
 extern void SysDisplay_ClearScreen() ;
-extern void SysDisplay_Character(const char ch, unsigned uiAttr) ;
-extern void SysDisplay_Message(const char* szMessage, unsigned uiAttr) ;
 
 #define __UCLIBC_HAS_FLOATS__ 1
 
 #define clrscr()			SysDisplay_ClearScreen()
-#define putchar(ch)			SysDisplay_Character(ch, Display_WHITE_ON_BLACK)
 
 #define OFFSET_TYPE	long int
 
