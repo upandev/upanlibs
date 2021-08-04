@@ -32,9 +32,11 @@ namespace upanui {
     }
     void drawChar(const FrameBuffer& frameBuffer, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg);
     void scrollDown(const FrameBuffer& frameBuffer);
+    void drawCursor(const FrameBuffer& frameBuffer, uint32_t x, uint32_t y, uint32_t color);
 
   private:
     void drawUSFNChar(const FrameBuffer& frameBuffer, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg);
+    void FillRect(const FrameBuffer& frameBuffer, uint32_t sx, uint32_t sy, uint32_t width, uint32_t height, uint32_t color);
 
     usfn::Context* _usfnContext;
     uint32_t _xCharScale;

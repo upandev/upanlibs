@@ -39,6 +39,7 @@ namespace upanui {
     int getCurPos() const { return _cursorPos; }
     void setCurPos(int curPos, bool updateCursorOnScreen);
 
+    byte getChar(int pos) { return _buffer[pos]; }
     void message(const char* message, const CharStyle& attr);
     void nmessage(const char* message, int n, const CharStyle& attr);
 
@@ -58,7 +59,6 @@ namespace upanui {
 
     void scrollDown();
 
-    byte getChar(int pos) { return _buffer[pos]; }
     int getCurBytePos() const { return _cursorPos * NO_BYTES_PER_CHARACTER; }
     void _setCurPos(int curPos, bool updateCursorOnScreen);
 

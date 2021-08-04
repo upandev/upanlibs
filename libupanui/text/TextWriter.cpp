@@ -99,4 +99,23 @@ namespace upanui {
     for(; i < maxSize; ++i)
       lfb[i] = 0xFF000000;
   }
+
+  void TextWriter::drawCursor(const FrameBuffer& frameBuffer, uint32_t x, uint32_t y, uint32_t color) {
+    x *= _xCharScale;
+    y *= _yCharScale;
+    if(y >= frameBuffer.height() || (x + _xCharScale) >= frameBuffer.width())
+      return;
+    FillRect(frameBuffer, x + 1, y + _yCharScale - 1, _xCharScale - 1, 1, color);
+   }
+
+   void TextWriter::FillRect(const FrameBuffer& frameBuffer, uint32_t sx, uint32_t sy, uint32_t width, uint32_t height, uint32_t color) {
+    uint32_t y_offset;
+    for(uint32_t y = sy; y < (sy + height) && y < frameBuffer.height(); ++y) {
+      y_offset = y * frameBuffer.pitch();
+      for(uint32_t x = sx; x < (sx + width) && x < frameBuffer.width(); ++x) {
+        auto p = (uint32_t*)((uint32_t)frameBuffer.buffer() + y_offset + x * frameBuffer.bytesPerPixel());
+        *p = (color | 0xFF000000);
+      }
+    }
+  }
 }
