@@ -25,14 +25,17 @@
 namespace upanui {
   class BaseFrame {
   public:
-    BaseFrame(const upanui::FrameBuffer& frameBuffer, const upanui::Viewport& viewport)
-    : _frameBuffer(frameBuffer), _viewport(viewport), _isDirty(false) {}
+    BaseFrame(const upanui::FrameBuffer& frameBuffer, const upanui::Viewport& viewport);
 
-    upanui::FrameBuffer& frameBuffer() {
+    void resetFrameBufferAddress(uint32_t* frameAddr);
+    void copy(const void* src, int len);
+    void fillRect(uint32_t sx, uint32_t sy, uint32_t width, uint32_t height, uint32_t color);
+
+    const upanui::FrameBuffer& frameBuffer() const {
       return _frameBuffer;
     }
 
-    upanui::Viewport& viewport() {
+    const upanui::Viewport& viewport() const {
       return _viewport;
     }
 

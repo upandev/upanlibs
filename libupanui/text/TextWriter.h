@@ -22,7 +22,7 @@
 #include <usfncontext.h>
 
 namespace upanui {
-  class FrameBuffer;
+  class BaseFrame;
 
   class TextWriter {
   public:
@@ -30,13 +30,12 @@ namespace upanui {
     void setFontContext(usfn::Context* c) {
       _usfnContext = c;
     }
-    void drawChar(const FrameBuffer& frameBuffer, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg);
-    void scrollDown(const FrameBuffer& frameBuffer);
-    void drawCursor(const FrameBuffer& frameBuffer, uint32_t x, uint32_t y, uint32_t color);
+    void drawChar(BaseFrame& frame, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg);
+    void scrollDown(BaseFrame& frame);
+    void drawCursor(BaseFrame& frame, uint32_t x, uint32_t y, uint32_t color);
 
   private:
-    void drawUSFNChar(const FrameBuffer& frameBuffer, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg);
-    void FillRect(const FrameBuffer& frameBuffer, uint32_t sx, uint32_t sy, uint32_t width, uint32_t height, uint32_t color);
+    void drawUSFNChar(BaseFrame& frame, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg);
 
     usfn::Context* _usfnContext;
     uint32_t _xCharScale;
