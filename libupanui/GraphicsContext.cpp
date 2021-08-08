@@ -17,8 +17,6 @@
  */
 
 #include <GraphicsContext.h>
-#include <Canvas.h>
-#include <TextWriter.h>
 #include <Frame.h>
 
 namespace upanui {

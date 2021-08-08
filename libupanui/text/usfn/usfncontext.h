@@ -24,6 +24,8 @@ namespace upanui {
     class Context {
     public:
       Context();
+      static const uint8_t* GetPreloadedFont(PreloadedFonts type);
+
       void Load(const uint8_t* fontData);
       void Select(int family, const char *name, int style, int size);
       void RenderCharacter(FrameBuffer& dst, uint32_t unicode);

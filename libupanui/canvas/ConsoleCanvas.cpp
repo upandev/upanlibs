@@ -28,7 +28,16 @@ namespace upanui {
       _charStyle(CharStyle::WHITE_ON_BLACK()),
       _consoleBuffer(*this, maxRows, maxColumns),
       _cursorBlinkThread(*this),
-      _readerThread(*this) {
+      _readerThread(*this),
+      _usfnContext(nullptr) {
+    try {
+      _usfnContext.reset(new upanui::usfn::Context());
+      _usfnContext->Load(upanui::usfn::Context::GetPreloadedFont(upanui::usfn::PreloadedFonts::VGA16));
+      _usfnContext->Select(upanui::usfn::FAMILY_MONOSPACE, NULL, upanui::usfn::STYLE_REGULAR, 16);
+      _textWriter.setFontContext(_usfnContext.get());
+    } catch(upan::exception& e) {
+      printf("\n Failed to load USFN font: %s", e.ErrorMsg().c_str());
+    }
     _cursorBlinkThread.start();
     _readerThread.start();
   }
@@ -103,7 +112,7 @@ namespace upanui {
   void ConsoleCanvas::Reader::run() {
     char buf[1024];
     while(is_active()) {
-      auto n = read(STDOUT_FD, buf, 1024);
+      auto n = read(STDOUT_FD, buf, 1023);
       if (n > 0) {
         buf[n] = '\0';
         _console._consoleBuffer.message(buf, _console._charStyle);

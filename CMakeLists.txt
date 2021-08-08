@@ -75,6 +75,8 @@ include_directories(${PROJECT_SOURCE_DIR}/libupanui/text/usfn)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/text/usfn/zlib)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/text/default)
 
+add_custom_target(fonts COMMAND make WORKING_DIRECTORY libupanui/text/usfn/fonts)
+
 #LIBC
 execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.c' | grep -v CMakeFile | grep -v './libc/sys/'" OUTPUT_VARIABLE LIBC_SRC)
 execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.c' | grep -v CMakeFile | grep './libc/sys/'" OUTPUT_VARIABLE LIBC_SYS_SRC)
@@ -121,8 +123,14 @@ add_library(ustd STATIC ${LIB_USTD_SRC})
 #add_library(sfn STATIC ${LIB_SFN_SRC})
 
 #LIBUPANUI
+execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ${PROJECT_SOURCE_DIR}/libupanui/text/usfn/fonts/ -name '*.sfn' -exec sh -c 'echo \${1%.sfn}.o' _ {} \;" OUTPUT_VARIABLE FONT_OBJS)
+message(${FONT_OBJS})
+string(REPLACE "\n" ";" FONT_OBJS ${FONT_OBJS})
+
 execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libupanui -name '*.cpp' | grep -v CMakeFile" OUTPUT_VARIABLE LIB_UPANUI_CPP_SRC)
 string(REPLACE "\n" ";" LIB_UPANUI_CPP_SRC ${LIB_UPANUI_CPP_SRC})
-add_library(upanui STATIC ${LIB_UPANUI_CPP_SRC})
+add_library(upanui STATIC ${FONT_OBJS} ${LIB_UPANUI_CPP_SRC})
+
+add_dependencies(upanui fonts)
 
 link_directories(${OUTPUT_DIR})

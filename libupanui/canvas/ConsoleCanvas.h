@@ -69,6 +69,7 @@ namespace upanui {
     upan::mutex _cursorMutex;
     CursorBlink _cursorBlinkThread;
     Reader _readerThread;
+    upan::uniq_ptr<upanui::usfn::Context> _usfnContext;
 
     friend class Reader;
   };

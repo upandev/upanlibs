@@ -70,6 +70,13 @@ namespace upanui {
     static const int CONTOUR_QUAD = 2;
     static const int CONTOUR_CUBIC = 3;
 
+    /* default pre-loaded fonts */
+    enum PreloadedFonts {
+      FreeSans,
+      VGA16,
+      Unifont
+    };
+
     /* main SSFN header, 32 bytes */
     typedef struct {
       uint8_t magic[4];               /* SSFN magic bytes */
