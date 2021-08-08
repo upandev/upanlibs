@@ -22,6 +22,7 @@
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include "option.h"
 
 namespace upan {
 
@@ -91,6 +92,14 @@ class uniq_ptr
       {
         destroy();
         _ptr = newPtr;
+      }
+    }
+
+    upan::option<T&> toOption() {
+      if (_ptr) {
+        return upan::option<T&>(*_ptr);
+      } else {
+        return upan::option<T&>::empty();
       }
     }
 
