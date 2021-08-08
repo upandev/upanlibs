@@ -21,12 +21,7 @@
 
 namespace upanui {
   BaseFrame::BaseFrame(const upanui::FrameBuffer& frameBuffer, const upanui::Viewport& viewport)
-  : _frameBuffer(frameBuffer), _viewport(viewport), _isDirty(false) {
-  }
-
-  void BaseFrame::resetFrameBufferAddress(uint32_t* frameAddr) {
-    _frameBuffer.resetFrameBufferAddress(frameAddr);
-    touch();
+  : _frameBuffer(frameBuffer), _viewport(viewport) {
   }
 
   void BaseFrame::copy(const void *src, int len) {

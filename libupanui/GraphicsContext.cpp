@@ -16,11 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include <FrameManager.h>
 #include <GraphicsContext.h>
-#include <CanvasBuilder.h>
 #include <Canvas.h>
-#include <libupanui/text/TextWriter.h>
+#include <TextWriter.h>
+#include <Frame.h>
 
 namespace upanui {
   GraphicsContext* GraphicsContext::_instance = nullptr;
@@ -46,21 +45,16 @@ namespace upanui {
     return *_instance;
   }
 
-  GraphicsContext::RefreshThread::RefreshThread(GraphicsContext &gc) : upan::timer_thread(50), _gc(gc) {
-  }
+  GraphicsContext::GraphicsContext() : _frame(nullptr) {
+    FrameBufferInfo frameBufferInfo;
+    init_gui(&frameBufferInfo);
 
-  void GraphicsContext::RefreshThread::on_timer_trigger() {
-    _gc._frame->draw();
-  }
+    upanui::FrameBuffer frameBuffer(frameBufferInfo);
+    upanui::Viewport viewport(0, 0, frameBufferInfo._width, frameBufferInfo._height);
 
-  GraphicsContext::GraphicsContext() : _frame(nullptr), _refreshThread(nullptr) {
-    get_framebuffer_info(&_frameBufferInfo);
-    _frame = new FrameManager(_frameBufferInfo);
-    _refreshThread = new RefreshThread(*this);
+    _frame.reset(new upanui::Frame(frameBuffer, viewport));
   }
 
   GraphicsContext::~GraphicsContext() {
-    delete _refreshThread;
-    delete _frame;
   }
 }

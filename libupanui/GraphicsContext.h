@@ -18,42 +18,26 @@
 
 #pragma once
 
-#include <timer_thread.h>
+#include <uniq_ptr.h>
+#include <BaseFrame.h>
 
 namespace upanui {
-  class FrameManager;
-
   class GraphicsContext {
   private:
     static GraphicsContext* _instance;
     GraphicsContext();
     ~GraphicsContext();
+
   public:
     static void Init();
     static void Destroy();
     static GraphicsContext& Instance();
 
-    uint32_t pitch() const {
-      return _frameBufferInfo._pitch;
-    }
-
-    uint32_t bytesPerPixel() const {
-      return _frameBufferInfo._bpp / 8;
+    BaseFrame& frame() {
+      return *_frame.get();
     }
 
   private:
-    class RefreshThread : public upan::timer_thread {
-    public:
-      RefreshThread(GraphicsContext& gc);
-      void on_timer_trigger() override;
-    private:
-      GraphicsContext& _gc;
-    };
-
-  private:
-    FrameBufferInfo _frameBufferInfo;
-    FrameManager* _frame;
-    RefreshThread* _refreshThread;
-    friend class RefreshThread;
+    upan::uniq_ptr<BaseFrame> _frame;
   };
 }

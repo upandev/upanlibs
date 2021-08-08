@@ -26,11 +26,15 @@ namespace upanui {
   class IConsole;
 
   class ConsoleBuffer {
+  private:
+    ConsoleBuffer(IConsole& console, byte* buffer, uint32_t rows, uint32_t columns, bool selfManagedBuffer);
   public:
     static constexpr int START_CURSOR_POS = -1;
     static constexpr int NO_BYTES_PER_CHARACTER = 2;
 
     ConsoleBuffer(IConsole& console, byte* buffer, uint32_t rows, uint32_t columns);
+    ConsoleBuffer(IConsole& console, unsigned rows, unsigned columns);
+    ~ConsoleBuffer();
 
     unsigned getBufferSize() const { return _bufSize; }
     unsigned maxRows() const { return _maxRows; }
@@ -65,9 +69,10 @@ namespace upanui {
   private:
     IConsole& _console;
     byte* _buffer;
+    int _cursorPos;
     const unsigned _bufSize;
     const unsigned _maxRows;
     const unsigned _maxColumns;
-    int _cursorPos;
+    const bool _selfManagedBuffer;
   };
 }

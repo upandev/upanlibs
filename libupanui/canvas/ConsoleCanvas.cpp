@@ -18,68 +18,103 @@
 
 #include <ConsoleCanvas.h>
 #include <ColorPalettes.h>
+#include <ConsoleBuffer.h>
+#include <BaseFrame.h>
+#include <fs.h>
 
 namespace upanui {
-  constexpr int NO_BYTES_PER_CHARACTER = 2;
-
-  ConsoleCanvas::ConsoleCanvas(FrameManager& parent, uint32_t maxRows, uint32_t maxColumns)
-    : upan::timer_thread(500),
-      _parent(parent), _maxRows(maxRows), _maxColumns(maxColumns), _cursorPos(0), _cursorEnabled(false) {
+  ConsoleCanvas::ConsoleCanvas(BaseFrame& frame, uint32_t maxRows, uint32_t maxColumns)
+    : _frame(frame), _cursorPos(0),
+      _charStyle(CharStyle::WHITE_ON_BLACK()),
+      _consoleBuffer(*this, maxRows, maxColumns),
+      _cursorBlinkThread(*this),
+      _readerThread(*this) {
+    _cursorBlinkThread.run();
+    _readerThread.run();
   }
 
-  void ConsoleCanvas::on_timer_trigger() {
+  ConsoleCanvas::ConsoleCanvas(BaseFrame& frame)
+    : ConsoleCanvas(frame, frame.frameBuffer().height() / 16, frame.frameBuffer().width() / 8) {
+  }
+
+  ConsoleCanvas::~ConsoleCanvas() noexcept {
+    _readerThread.stop();
+    _cursorBlinkThread.stop();
+  }
+
+  uint32_t ConsoleCanvas::width() const {
+    return _frame.frameBuffer().width();
+  }
+
+  uint32_t ConsoleCanvas::height() const {
+    return _frame.frameBuffer().height();
+  }
+
+  const uint32_t* ConsoleCanvas::dataBuffer() const {
+    return _frame.frameBuffer().buffer();
+  }
+
+  void ConsoleCanvas::setFontContext(upanui::usfn::Context* context) {
+    _textWriter.setFontContext(context);
+  }
+
+  void ConsoleCanvas::putChar(int iPos, byte ch, const upanui::CharStyle& style) {
+    const int curPos = iPos / upanui::ConsoleBuffer::NO_BYTES_PER_CHARACTER;
+    const unsigned x = (curPos % _consoleBuffer.maxColumns());
+    const unsigned y = (curPos / _consoleBuffer.maxColumns());
+
+    _textWriter.drawChar(_frame, ch, x, y,
+                         ColorPalettes::CP16::Get(style.getFGColor()),
+                         ColorPalettes::CP16::Get(style.getBGColor() >> 4));
+  }
+
+  void ConsoleCanvas::scrollDown() {
+    _textWriter.scrollDown(_frame);
+  }
+
+  void ConsoleCanvas::gotoCursor() {
     upan::mutex_guard g(_cursorMutex);
-    static bool showCursor = false;
-    //PutCursor(_cursorPos, showCursor);
-    showCursor = !showCursor;
+    int newCurPos = _consoleBuffer.getCurPos();
+    if (newCurPos != _cursorPos) {
+      //erase old cursor
+      putCursor(false);
+    }
+    //draw new cursor
+    _cursorPos = newCurPos;
+    putCursor(true);
   }
 
-  void ConsoleCanvas::StartCursorBlink() {
-    run();
-    _cursorEnabled = true;
-  }
-//
-//  void GraphicsConsole::GotoCursor() {
-//    if (_cursorEnabled) {
-//      upan::mutex_guard g(_cursorMutex);
-//      int newCurPos = GetCurrentCursorPosition();
-//      if (newCurPos != _cursorPos) {
-//        //erase old cursor
-//        PutCursor(_cursorPos, false);
-//      }
-//      //draw new cursor
-//      PutCursor(newCurPos, true);
-//      _cursorPos = newCurPos;
-//    }
-//  }
-//
-//  void ConsoleCanvas::PutCursor(int pos, bool show) {
-//    if ((uint32_t)pos >= _maxRows * _maxColumns) {
-//      return;
-//    }
-//
-//    const auto attr = GetChar(pos * NO_BYTES_PER_CHARACTER + 1);
-//    const auto color = show ? ColorPalettes::CP16::Get(attr & ColorPalettes::CP16::FG_WHITE)
-//                            : ColorPalettes::CP16::Get((attr & ColorPalettes::CP16::BG_WHITE) >> 4);
-//    const auto x = (pos % _maxColumns);
-//    const auto y = (pos / _maxColumns);
-//
-//    GraphicsVideo::Instance()->DrawCursor(x, y, color);
-//  }
-//
-//  void ConsoleCanvas::DirectPutChar(int iPos, byte ch, byte attr)
-//  {
-//    const int curPos = iPos / NO_BYTES_PER_CHARACTER;
-//    const unsigned x = (curPos % _maxColumns);
-//    const unsigned y = (curPos / _maxColumns);
-//
-//    _textWriter.drawChar(_parent, ch, x, y,
-//                         ColorPalettes::CP16::Get(attr & ColorPalettes::CP16::FG_WHITE),
-//                         ColorPalettes::CP16::Get((attr & ColorPalettes::CP16::BG_WHITE) >> 4));
-//  }
+  void ConsoleCanvas::putCursor(bool show) {
+    if ((uint32_t)_cursorPos >= _consoleBuffer.maxRows() * _consoleBuffer.maxColumns()) {
+      return;
+    }
 
-//  void GraphicsConsole::DoScrollDown()
-//  {
-//    GraphicsVideo::Instance()->ScrollDown();
-//  }
+    const upanui::CharStyle style = _consoleBuffer.getChar(_cursorPos * upanui::ConsoleBuffer::NO_BYTES_PER_CHARACTER + 1);
+    const auto color = show ? ColorPalettes::CP16::Get(style.getFGColor()) : ColorPalettes::CP16::Get(style.getBGColor() >> 4);
+    const auto x = (_cursorPos % _consoleBuffer.maxColumns());
+    const auto y = (_cursorPos / _consoleBuffer.maxColumns());
+
+    _textWriter.drawCursor(_frame, x, y, color);
+  }
+
+  ConsoleCanvas::Reader::Reader(ConsoleCanvas &console) : upan::timer_thread(50), _console(console) {
+  }
+
+  void ConsoleCanvas::Reader::on_timer_trigger() {
+    char buf[1024];
+    auto n = read(STDOUT_FD, buf, 1024);
+    if (n > 0) {
+      buf[n] = '\0';
+      _console._consoleBuffer.message(buf, _console._charStyle);
+    }
+  }
+
+  ConsoleCanvas::CursorBlink::CursorBlink(ConsoleCanvas& console) : upan::timer_thread(500), _console(console), _showCursorToggle(false) {
+  }
+
+  void ConsoleCanvas::CursorBlink::on_timer_trigger() {
+    upan::mutex_guard g(_console._cursorMutex);
+    _console.putCursor(_showCursorToggle);
+    _showCursorToggle = !_showCursorToggle;
+  }
 }

@@ -23,6 +23,6 @@
 namespace upanui {
   class Canvas : public UIObject {
   public:
-    virtual ~Canvas() = 0;
+    virtual ~Canvas() {}
   };
 }

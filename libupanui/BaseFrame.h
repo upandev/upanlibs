@@ -20,14 +20,13 @@
 
 #include <FrameBuffer.h>
 #include <Viewport.h>
-#include <atomicop.h>
 
 namespace upanui {
   class BaseFrame {
   public:
     BaseFrame(const upanui::FrameBuffer& frameBuffer, const upanui::Viewport& viewport);
+    virtual ~BaseFrame() {}
 
-    void resetFrameBufferAddress(uint32_t* frameAddr);
     void copy(const void* src, int len);
     void fillRect(uint32_t sx, uint32_t sy, uint32_t width, uint32_t height, uint32_t color);
 
@@ -39,21 +38,10 @@ namespace upanui {
       return _viewport;
     }
 
-    bool isDirty() {
-      return _isDirty.get();
-    }
-
-    void touch() {
-      _isDirty.set(true);
-    }
-
-    void clean() {
-      _isDirty.set(false);
-    }
+    virtual void touch() = 0;
 
   private:
     upanui::FrameBuffer _frameBuffer;
     upanui::Viewport _viewport;
-    upan::atomic::integral<bool> _isDirty;
   };
 }

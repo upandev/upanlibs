@@ -46,7 +46,8 @@ extern void	SysDisplay_ClearLine(int pos) ;
 extern void	SysDisplay_SetCursor(int pos, bool bUpdateCursorOnScreen) ;
 extern int	SysDisplay_GetCursor() ;
 extern void SysDisplay_GetConsoleSize(uint32_t*, uint32_t*);
-extern void SysDisplay_GetFrameBufferInfo(FrameBufferInfo*);
+extern void SysDisplay_InitGui(FrameBufferInfo*);
+extern void SysDisplay_FrameTouch();
 
 #define movcursor(n)		SysDisplay_MoveCursor(n)
 #define clrline(pos)		SysDisplay_ClearLine(pos)
@@ -56,7 +57,8 @@ extern void SysDisplay_GetFrameBufferInfo(FrameBufferInfo*);
 #define console_size(mr, mc) SysDisplay_GetConsoleSize(mr, mc)
 
 void showprogress(int startCur, const char* msg, unsigned progNum) ;
-void get_framebuffer_info(FrameBufferInfo* frameBufferInfo);
+void init_gui(FrameBufferInfo* frameBufferInfo);
+void gui_frame_touch();
 
 #if defined __cplusplus
 }

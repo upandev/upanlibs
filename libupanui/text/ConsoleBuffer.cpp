@@ -24,12 +24,27 @@
 
 namespace upanui {
 
-ConsoleBuffer::ConsoleBuffer(IConsole& console, byte* buffer, unsigned rows, unsigned columns) :
+//delegating constructor
+ConsoleBuffer::ConsoleBuffer(IConsole& console, byte* buffer, unsigned rows, unsigned columns, bool selfManagedBuffer) :
   _console(console), _buffer(buffer), _bufSize(rows * columns * ConsoleBuffer::NO_BYTES_PER_CHARACTER),
-  _maxRows(rows), _maxColumns(columns), _cursorPos(0) {
+  _maxRows(rows), _maxColumns(columns), _cursorPos(0), _selfManagedBuffer(selfManagedBuffer) {
   for(uint32_t i = 0; i < _bufSize; i += NO_BYTES_PER_CHARACTER) {
     _buffer[i] = ' ';
     _buffer[i + 1] = CharStyle::WHITE_ON_BLACK();
+  }
+}
+
+ConsoleBuffer::ConsoleBuffer(IConsole& console, byte* buffer, unsigned rows, unsigned columns) :
+  ConsoleBuffer(console, buffer, rows, columns, false) {
+}
+
+ConsoleBuffer::ConsoleBuffer(IConsole& console, unsigned rows, unsigned columns) :
+    ConsoleBuffer(console, new byte[rows * columns * ConsoleBuffer::NO_BYTES_PER_CHARACTER], rows, columns, true) {
+}
+
+ConsoleBuffer::~ConsoleBuffer() {
+  if (_selfManagedBuffer) {
+    delete[] _buffer;
   }
 }
 

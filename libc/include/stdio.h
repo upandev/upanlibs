@@ -86,9 +86,9 @@ typedef void cecho_func(char ch, void*) ;
 
 #define EOF -1
 
-#define STDIN_FILENO	1
-#define STDOUT_FILENO	2
-#define STDERR_FILENO	3
+#define STDIN_FD	0
+#define STDOUT_FD	1
+#define STDERR_FD	2
 
 #define BUFSIZ 1024
 

@@ -33,6 +33,10 @@ void showprogress(int startCur, const char* msg, unsigned progNum)
   printf("%s%d", msg, progNum) ;
 }
 
-void get_framebuffer_info(FrameBufferInfo* frameBufferInfo) {
-  SysDisplay_GetFrameBufferInfo(frameBufferInfo);
+void init_gui(FrameBufferInfo* frameBufferInfo) {
+  SysDisplay_InitGui(frameBufferInfo);
+}
+
+void gui_frame_touch() {
+  SysDisplay_FrameTouch();
 }

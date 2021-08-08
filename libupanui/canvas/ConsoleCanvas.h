@@ -19,34 +19,57 @@
 #pragma once
 
 #include <Canvas.h>
-#include <FrameManager.h>
 #include <timer_thread.h>
-#include <libupanui/text/TextWriter.h>
+#include <TextWriter.h>
+#include <IConsole.h>
+#include <ConsoleBuffer.h>
+#include <uniq_ptr.h>
 
 namespace upanui {
-  class ConsoleCanvas : public Canvas, public upan::timer_thread {
+  class ConsoleCanvas : public Canvas, public IConsole {
   public:
-    ConsoleCanvas(FrameManager& parent, uint32_t maxRows, uint32_t maxColumns);
-    void on_timer_trigger() override;
-    //    void GotoCursor() override;
-    //    void DoScrollDown() override;
-    //    void PutCursor(int pos, bool show);
-    void StartCursorBlink();
-    //
+    ConsoleCanvas(BaseFrame& frame, uint32_t maxRows, uint32_t maxColumns);
+    ConsoleCanvas(BaseFrame& frame);
+
+    ~ConsoleCanvas();
+
+    uint32_t width() const override;
+    uint32_t height() const override;
+    const uint32_t* dataBuffer() const override;
+
+    void setFontContext(upanui::usfn::Context* context);
+    void gotoCursor() override;
+    void putChar(int iPos, byte ch, const upanui::CharStyle& attr) override;
+    void scrollDown() override;
 
   private:
-    void DirectPutChar(int iPos, byte ch, byte attr);
-    //    friend class Display;
-    //    int _cursorPos;
-    //    bool _cursorEnabled;
-    //    Mutex _cursorMutex;
+    void putCursor(bool show);
+
+    class Reader : public upan::timer_thread {
+    public:
+      explicit Reader(ConsoleCanvas& console);
+      void on_timer_trigger() override;
+      ConsoleCanvas& _console;
+    };
+
+    class CursorBlink : public upan::timer_thread {
+    public:
+      explicit CursorBlink(ConsoleCanvas& console);
+      void on_timer_trigger() override;
+      ConsoleCanvas& _console;
+      bool _showCursorToggle;
+    };
+
   private:
-    FrameManager& _parent;
-    uint32_t _maxRows;
-    uint32_t _maxColumns;
+    BaseFrame& _frame;
     int _cursorPos;
-    bool _cursorEnabled;
-    upan::mutex _cursorMutex;
     TextWriter _textWriter;
+    CharStyle _charStyle;
+    ConsoleBuffer _consoleBuffer;
+    upan::mutex _cursorMutex;
+    CursorBlink _cursorBlinkThread;
+    Reader _readerThread;
+
+    friend class Reader;
   };
 }

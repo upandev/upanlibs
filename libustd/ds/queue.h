@@ -38,6 +38,9 @@ class queue
     void clear();
     int read(T out[], int n);
     int write(const T in[], int n);
+    uint32_t size() const {
+      return _size;
+    }
 
   private:
     uint32_t _readEnd;
