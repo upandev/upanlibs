@@ -29,8 +29,8 @@ namespace upanui {
       _consoleBuffer(*this, maxRows, maxColumns),
       _cursorBlinkThread(*this),
       _readerThread(*this) {
-    _cursorBlinkThread.run();
-    _readerThread.run();
+    _cursorBlinkThread.start();
+    _readerThread.start();
   }
 
   ConsoleCanvas::ConsoleCanvas(BaseFrame& frame)
@@ -97,15 +97,17 @@ namespace upanui {
     _textWriter.drawCursor(_frame, x, y, color);
   }
 
-  ConsoleCanvas::Reader::Reader(ConsoleCanvas &console) : upan::timer_thread(50), _console(console) {
+  ConsoleCanvas::Reader::Reader(ConsoleCanvas &console) : _console(console) {
   }
 
-  void ConsoleCanvas::Reader::on_timer_trigger() {
+  void ConsoleCanvas::Reader::run() {
     char buf[1024];
-    auto n = read(STDOUT_FD, buf, 1024);
-    if (n > 0) {
-      buf[n] = '\0';
-      _console._consoleBuffer.message(buf, _console._charStyle);
+    while(is_active()) {
+      auto n = read(STDOUT_FD, buf, 1024);
+      if (n > 0) {
+        buf[n] = '\0';
+        _console._consoleBuffer.message(buf, _console._charStyle);
+      }
     }
   }
 

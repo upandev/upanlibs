@@ -45,10 +45,10 @@ namespace upanui {
   private:
     void putCursor(bool show);
 
-    class Reader : public upan::timer_thread {
+    class Reader : public upan::thread {
     public:
       explicit Reader(ConsoleCanvas& console);
-      void on_timer_trigger() override;
+      void run() override;
       ConsoleCanvas& _console;
     };
 

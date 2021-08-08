@@ -18,20 +18,50 @@
 
 #pragma once
 
-#include <thread.h>
+#include <stdint.h>
+#include <mutex.h>
+#include <option.h>
 
 namespace upan {
-    class timer_thread : public thread {
+    class thread {
     public:
-      timer_thread(uint32_t interval_ms);
+      enum state_t {
+        not_running,
+        running,
+        paused,
+        stopping,
+        stopped
+      };
 
-      virtual void on_timer_trigger() = 0;
+      thread();
+      virtual ~thread();
 
-      uint32_t interval() const {
-        return _timer_interval_ms;
+      virtual void run() = 0;
+
+      state_t state() {
+        return _state.get();
       }
+
+      void start();
+      void pause();
+      void stop();
+      bool is_active();
+
+      void set_error(const upan::error& e);
+
+      bool has_error() const {
+        return _error.isEmpty();
+      }
+
+      const upan::option<upan::error>& get_error() const {
+        return _error;
+      }
+
     private:
-      void run() override;
-      const uint32_t _timer_interval_ms;
+      atomic::integral<state_t> _state;
+      mutex _t_mutex;
+      upan::option<upan::error> _error;
+
+      friend class _thread_termination_guard;
     };
 }
