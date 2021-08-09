@@ -334,3 +334,7 @@ int execvp(const char* szFileName, const char *const szArgList[])
 
 	return SysProcess_Exec(szFileName, argc, szArgList) ;
 }
+
+int SysProcess_IsKernel() {
+  return 0;
+}

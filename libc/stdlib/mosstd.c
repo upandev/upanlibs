@@ -37,6 +37,10 @@ int isprocessalive(int pid) {
   return SysProcess_IsProcessAlive(pid);
 }
 
+int iskernel() {
+  return SysProcess_IsKernel();
+}
+
 void sleep(uint32_t seconds) {
   SysProcess_Sleep(seconds * 1000);
 }

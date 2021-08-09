@@ -58,6 +58,7 @@ int execvp(const char* szFileName, const char *const szArgList[]) ;
 int exect(thread_entry_func_p entryPoint, void* arg);
 int childalive(int pid) ;
 int isprocessalive(int pid);
+int iskernel();
 int getpid();
 void yield();
 

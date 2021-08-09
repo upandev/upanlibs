@@ -59,6 +59,10 @@ namespace upan {
   }
 
   bool mutex::lock(bool bBlock) {
+    if (iskernel()) {
+      return false;
+    }
+
     __volatile__ int val;
 
     while (true) {
@@ -91,6 +95,10 @@ namespace upan {
   }
 
   bool mutex::unlock() {
+    if (iskernel()) {
+      return false;
+    }
+
     acquire();
 
     __volatile__ int pid = getpid();
@@ -108,6 +116,10 @@ namespace upan {
   }
 
   bool mutex::unlock(int pid) {
+    if (iskernel()) {
+      return false;
+    }
+
     acquire();
 
     if (_processID != pid) {

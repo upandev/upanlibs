@@ -176,6 +176,7 @@ int SysUtil_GetTimeOfDay(struct timeval* pTV);
 uint32_t SysUtil_GetTimeSinceBoot();
 
 int SysProcess_IsProcessAlive(int iProcessID);
+int SysProcess_IsKernel();
 int SysProcess_IsChildAlive(int iProcessID);
 
 #if defined __cplusplus
