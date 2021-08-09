@@ -29,8 +29,6 @@ extern void SysDisplay_ClearScreen() ;
 
 #define __UCLIBC_HAS_FLOATS__ 1
 
-#define clrscr()			SysDisplay_ClearScreen()
-
 #define OFFSET_TYPE	long int
 
 # define P_tmpdir	"/tmp"

@@ -54,12 +54,13 @@ namespace upanui {
 
     void rawCharacter(byte ch, const CharStyle& attr, bool updateCursorOnScreen);
     void rawCharacterArea(const MChar* src, uint32_t rows, uint32_t cols, int curPos);
+    void character(char ch, const CharStyle& attr);
 
   private:
     bool putCharOnBuffer(int pos, byte val);
     void putChar(int iPos, byte ch, byte attr);
     void nextLine();
-    void character(char ch, const CharStyle& attr);
+
 
     void scrollDown();
 

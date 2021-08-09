@@ -37,12 +37,21 @@ namespace upanui {
     uint32_t height() const override;
     const uint32_t* dataBuffer() const override;
 
+    void puts(const char* msg, const upanui::CharStyle& style);
+    void puts(const char* msg);
+    void putc(const char ch, const upanui::CharStyle& style);
+    void putc(const char ch);
+    void moveCursor(int pos);
+    int getCurPos() const;
+    void clearLine(int pos);
+    void clearScreen();
+
     void setFontContext(upanui::usfn::Context* context);
+
+  private:
     void gotoCursor() override;
     void putChar(int iPos, byte ch, const upanui::CharStyle& attr) override;
     void scrollDown() override;
-
-  private:
     void putCursor(bool show);
 
     class Reader : public upan::thread {

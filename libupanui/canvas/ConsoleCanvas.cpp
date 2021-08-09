@@ -67,6 +67,38 @@ namespace upanui {
     _textWriter.setFontContext(context);
   }
 
+  void ConsoleCanvas::puts(const char* msg, const upanui::CharStyle& style) {
+    _consoleBuffer.message(msg, style);
+  }
+
+  void ConsoleCanvas::puts(const char* msg) {
+    puts(msg, _charStyle);
+  }
+
+  void ConsoleCanvas::putc(const char ch, const upanui::CharStyle& style) {
+    _consoleBuffer.character(ch, style);
+  }
+
+  void ConsoleCanvas::putc(const char ch) {
+    putc(ch, _charStyle);
+  }
+
+  void ConsoleCanvas::moveCursor(int pos) {
+    _consoleBuffer.moveCursor(pos);
+  }
+
+  int ConsoleCanvas::getCurPos() const {
+    return _consoleBuffer.getCurPos();
+  }
+
+  void ConsoleCanvas::clearLine(int pos) {
+    _consoleBuffer.clearLine(pos);
+  }
+
+  void ConsoleCanvas::clearScreen() {
+    _consoleBuffer.clear();
+  }
+
   void ConsoleCanvas::putChar(int iPos, byte ch, const upanui::CharStyle& style) {
     const int curPos = iPos / upanui::ConsoleBuffer::NO_BYTES_PER_CHARACTER;
     const unsigned x = (curPos % _consoleBuffer.maxColumns());

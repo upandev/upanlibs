@@ -26,8 +26,8 @@ namespace upanui {
 
 //delegating constructor
 ConsoleBuffer::ConsoleBuffer(IConsole& console, byte* buffer, unsigned rows, unsigned columns, bool selfManagedBuffer) :
-  _console(console), _buffer(buffer), _bufSize(rows * columns * ConsoleBuffer::NO_BYTES_PER_CHARACTER),
-  _maxRows(rows), _maxColumns(columns), _cursorPos(0), _selfManagedBuffer(selfManagedBuffer) {
+  _console(console), _buffer(buffer), _cursorPos(0), _bufSize(rows * columns * ConsoleBuffer::NO_BYTES_PER_CHARACTER),
+  _maxRows(rows), _maxColumns(columns), _selfManagedBuffer(selfManagedBuffer) {
   for(uint32_t i = 0; i < _bufSize; i += NO_BYTES_PER_CHARACTER) {
     _buffer[i] = ' ';
     _buffer[i + 1] = CharStyle::WHITE_ON_BLACK();
