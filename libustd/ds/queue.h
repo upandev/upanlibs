@@ -19,6 +19,7 @@
 #define _QUEUE_H_
 
 #include <exception.h>
+#include <atomicop.h>
 
 namespace upan {
 
@@ -46,7 +47,7 @@ class queue
     uint32_t _readEnd;
     uint32_t _writeEnd;
     uint32_t _size;
-    uint32_t _count;
+    atomic::integral<uint32_t> _count;
     T*       _buffer;
 };
 
@@ -65,13 +66,13 @@ queue<T>::~queue()
 template <typename T>
 bool queue<T>::empty() const
 {
-  return _count == 0;
+  return const_cast<queue<T>&>(*this)._count.get() == 0;
 }
 
 template <typename T>
 bool queue<T>::full() const
 {
-  return _count == _size;
+  return const_cast<queue<T>&>(*this)._count.get() == _size;
 }
 
 template <typename T>
@@ -94,16 +95,16 @@ int queue<T>::read(T out[], int n) {
     return 0;
   }
 
-  if (n > _count) {
-    n = _count;
+  if (n > _count.get()) {
+    n = _count.get();
   }
-
-  _count -= n;
 
   for(int i = 0; i < n; ++i) {
     out[i] = _buffer[_readEnd];
     _readEnd = (_readEnd + 1) % _size;
   }
+
+  _count.add(-n);
 
   return n;
 }
@@ -114,7 +115,7 @@ bool queue<T>::pop_front()
   if(empty())
     return false;
 	_readEnd = (_readEnd + 1) % _size;
-  --_count;
+  _count.dec();
   return true;
 }
 
@@ -124,19 +125,18 @@ int queue<T>::write(const T in[], int n) {
     return 0;
   }
 
-  auto remaining = _size - _count;
+  auto remaining = _size - _count.get();
 
   if (n > remaining) {
     n = remaining;
   }
-
-  _count += n;
 
   for(int i = 0; i < n; ++i) {
     _buffer[_writeEnd] = in[i];
     _writeEnd = (_writeEnd + 1) % _size;
   }
 
+  _count.add(n);
   return n;
 }
 
@@ -147,7 +147,7 @@ bool queue<T>::push_back(const T& data)
     return false;
 	_buffer[_writeEnd] = data;	
 	_writeEnd = (_writeEnd + 1) % _size;
-  ++_count;
+  _count.inc();
 	return true;
 }
 
