@@ -40,3 +40,7 @@ void init_gui(FrameBufferInfo* frameBufferInfo) {
 void gui_frame_touch() {
   SysDisplay_FrameTouch();
 }
+
+void init_term_console() {
+  SysDisplay_InitTermConsole();
+}

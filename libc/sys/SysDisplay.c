@@ -223,3 +223,23 @@ void SysDisplay_FrameTouch() {
   __asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
   __asm__ __volatile__("pop %eax") ;
 }
+
+void SysDisplay_InitTermConsole() {
+	__volatile__ int iRetStatus ;
+
+	__asm__ __volatile__("push %eax") ;
+	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("pushl $0x20") ;
+
+	DO_SYS_CALL(SYS_CALL_DISPLAY_INIT_TERM_CONSOLE) ;
+
+	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %eax") ;
+}
