@@ -36,13 +36,18 @@ namespace upanui {
     uint32_t width() const override;
     uint32_t height() const override;
     const uint32_t* dataBuffer() const override;
+    uint32_t maxRows() const;
+    uint32_t maxColumns() const;
 
+    void rawputc(byte ch, const CharStyle& style, bool updateCursorOnScreen);
+    void rawputa(const MChar* src, uint32_t rows, uint32_t columns, int curPos);
     void puts(const char* msg, const upanui::CharStyle& style);
     void puts(const char* msg);
     void putc(const char ch, const upanui::CharStyle& style);
     void putc(const char ch);
     void moveCursor(int pos);
     int getCurPos() const;
+    void setCurPos(int pos);
     void clearLine(int pos);
     void clearScreen();
 
@@ -53,13 +58,6 @@ namespace upanui {
     void putChar(int iPos, byte ch, const upanui::CharStyle& attr) override;
     void scrollDown() override;
     void putCursor(bool show);
-
-    class Reader : public upan::thread {
-    public:
-      explicit Reader(ConsoleCanvas& console);
-      void run() override;
-      ConsoleCanvas& _console;
-    };
 
     class CursorBlink : public upan::timer_thread {
     public:
@@ -77,9 +75,6 @@ namespace upanui {
     ConsoleBuffer _consoleBuffer;
     upan::mutex _cursorMutex;
     CursorBlink _cursorBlinkThread;
-    Reader _readerThread;
     upan::uniq_ptr<upanui::usfn::Context> _usfnContext;
-
-    friend class Reader;
   };
 }

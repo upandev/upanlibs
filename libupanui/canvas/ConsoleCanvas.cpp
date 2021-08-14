@@ -28,7 +28,6 @@ namespace upanui {
       _charStyle(CharStyle::WHITE_ON_BLACK()),
       _consoleBuffer(*this, maxRows, maxColumns),
       _cursorBlinkThread(*this),
-      _readerThread(*this),
       _usfnContext(nullptr) {
     try {
       _usfnContext.reset(new upanui::usfn::Context());
@@ -39,7 +38,6 @@ namespace upanui {
       printf("\n Failed to load USFN font: %s", e.ErrorMsg().c_str());
     }
     _cursorBlinkThread.start();
-    _readerThread.start();
   }
 
   ConsoleCanvas::ConsoleCanvas(BaseFrame& frame)
@@ -47,7 +45,6 @@ namespace upanui {
   }
 
   ConsoleCanvas::~ConsoleCanvas() noexcept {
-    _readerThread.stop();
     _cursorBlinkThread.stop();
   }
 
@@ -63,8 +60,24 @@ namespace upanui {
     return _frame.frameBuffer().buffer();
   }
 
+  uint32_t ConsoleCanvas::maxRows() const {
+    return _consoleBuffer.maxRows();
+  }
+
+  uint32_t ConsoleCanvas::maxColumns() const {
+    return _consoleBuffer.maxColumns();
+  }
+
   void ConsoleCanvas::setFontContext(upanui::usfn::Context* context) {
     _textWriter.setFontContext(context);
+  }
+
+  void ConsoleCanvas::rawputc(byte ch, const CharStyle& style, bool updateCursorOnScreen) {
+    _consoleBuffer.rawCharacter(ch, style, updateCursorOnScreen);
+  }
+
+  void ConsoleCanvas::rawputa(const MChar* src, uint32_t rows, uint32_t columns, int curPos) {
+    _consoleBuffer.rawCharacterArea(src, rows, columns, curPos);
   }
 
   void ConsoleCanvas::puts(const char* msg, const upanui::CharStyle& style) {
@@ -89,6 +102,10 @@ namespace upanui {
 
   int ConsoleCanvas::getCurPos() const {
     return _consoleBuffer.getCurPos();
+  }
+
+  void ConsoleCanvas::setCurPos(int pos) {
+    _consoleBuffer.setCurPos(pos, true);
   }
 
   void ConsoleCanvas::clearLine(int pos) {
@@ -136,20 +153,6 @@ namespace upanui {
     const auto y = (_cursorPos / _consoleBuffer.maxColumns());
 
     _textWriter.drawCursor(_frame, x, y, color);
-  }
-
-  ConsoleCanvas::Reader::Reader(ConsoleCanvas &console) : _console(console) {
-  }
-
-  void ConsoleCanvas::Reader::run() {
-    char buf[1024];
-    while(is_active()) {
-      auto n = read(STDOUT_FD, buf, 1023);
-      if (n > 0) {
-        buf[n] = '\0';
-        _console._consoleBuffer.message(buf, _console._charStyle);
-      }
-    }
   }
 
   ConsoleCanvas::CursorBlink::CursorBlink(ConsoleCanvas& console) : upan::timer_thread(500), _console(console), _showCursorToggle(false) {
