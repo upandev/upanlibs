@@ -68,7 +68,9 @@ typedef enum
 	O_APPEND = 8,
 	O_CREAT = 16,
 	O_EXCL = 32,
-	O_TRUNC = 64
+	O_TRUNC = 64,
+	O_RD_NONBLOCK = 128,
+	O_WR_NONBLOCK = 256
 } FileModes ;
 
 typedef struct

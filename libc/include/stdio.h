@@ -166,6 +166,7 @@ int setvbuf(register FILE * __restrict stream, register char * __restrict buf, i
 FILE *fdopen(int filedes, const char *mode) ;
 void uiwritec(const char ch, unsigned uiAttr, bool bUpdateCursorOnScreen);
 void uiwritea(const MChar* src, uint32_t rows, uint32_t cols, int curPos);
+int getchar();
 
 #if defined __cplusplus
 }
