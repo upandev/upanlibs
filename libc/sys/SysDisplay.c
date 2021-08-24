@@ -184,7 +184,7 @@ void SysDisplay_GetConsoleSize(unsigned* retMaxRows, unsigned* retMaxCols)
 	__asm__ __volatile__("pop %eax") ;
 }
 
-void SysDisplay_InitGui(FrameBufferInfo* frameBufferInfo) {
+void SysDisplay_InitGuiFrame(FrameBufferInfo* frameBufferInfo) {
   __volatile__ int iRetStatus ;
 
   __asm__ __volatile__("push %eax") ;
@@ -198,7 +198,7 @@ void SysDisplay_InitGui(FrameBufferInfo* frameBufferInfo) {
   __asm__ __volatile__("pushl $0x20") ;
 
   __asm__ __volatile__("pushl %0" : : "rm"(frameBufferInfo)) ;
-  DO_SYS_CALL(SYS_CALL_DISPLAY_INIT_GUI) ;
+  DO_SYS_CALL(SYS_CALL_DISPLAY_INIT_GUI_FRAME) ;
 
   __asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
   __asm__ __volatile__("pop %eax") ;
@@ -218,7 +218,7 @@ void SysDisplay_FrameTouch() {
   __asm__ __volatile__("pushl $0x20") ;
   __asm__ __volatile__("pushl $0x20") ;
 
-  DO_SYS_CALL(SYS_CALL_DISPLAY_FRAME_TOUCH) ;
+  DO_SYS_CALL(SYS_CALL_DISPLAY_GUI_FRAME_TOUCH) ;
 
   __asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
   __asm__ __volatile__("pop %eax") ;
@@ -242,4 +242,26 @@ void SysDisplay_InitTermConsole() {
 
 	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
 	__asm__ __volatile__("pop %eax") ;
+}
+
+int SysDisplay_InitGuiEventStream() {
+  __volatile__ int iRetStatus ;
+
+  __asm__ __volatile__("push %eax") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+
+  DO_SYS_CALL(SYS_CALL_DISPLAY_INIT_GUI_EVENT_STREAM) ;
+
+  __asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
+  __asm__ __volatile__("pop %eax") ;
+
+  return iRetStatus;
 }

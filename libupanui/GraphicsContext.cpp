@@ -45,7 +45,7 @@ namespace upanui {
 
   GraphicsContext::GraphicsContext() : _frame(nullptr) {
     FrameBufferInfo frameBufferInfo;
-    init_gui(&frameBufferInfo);
+    init_gui_frame(&frameBufferInfo);
 
     upanui::FrameBuffer frameBuffer(frameBufferInfo);
     upanui::Viewport viewport(0, 0, frameBufferInfo._width, frameBufferInfo._height);
