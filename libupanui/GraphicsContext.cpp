@@ -43,7 +43,7 @@ namespace upanui {
     return *_instance;
   }
 
-  GraphicsContext::GraphicsContext() : _frame(nullptr) {
+  GraphicsContext::GraphicsContext() : _frame(nullptr), _evenManager(nullptr), _focusedUIObject(nullptr) {
     FrameBufferInfo frameBufferInfo;
     init_gui_frame(&frameBufferInfo);
 
@@ -54,5 +54,20 @@ namespace upanui {
   }
 
   GraphicsContext::~GraphicsContext() {
+  }
+
+  EventManager& GraphicsContext::initEventManager() {
+    if (_evenManager.get() != nullptr) {
+      throw upan::exception(XLOC, "EventManager is already initialized!");
+    }
+    _evenManager.reset(new EventManager());
+    return *_evenManager;
+  }
+
+  EventManager& GraphicsContext::eventManager() {
+    if (_evenManager.get() == nullptr) {
+      throw upan::exception(XLOC, "EventManager is not initialized!");
+    }
+    return *_evenManager;
   }
 }

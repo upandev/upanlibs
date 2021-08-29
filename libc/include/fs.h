@@ -20,6 +20,7 @@
 
 # include <dtime.h>
 # include <stdlib.h>
+#include "mosstd.h"
 
 #define ATTR_DIR_DEFAULT	0x01ED  //0000 0001 1110 1101 => 0000(Rsv) 000(Dir) 111(u:rwx) 101(g:r-x) 101(o:r-x)
 //#define ATTR_FILE_DEFAULT	0x03A4  //0000(Rsv) 001(File) 110(u:rw-) 100(g:r--) 100(o:r--)
@@ -116,6 +117,7 @@ extern int SysFS_FileOpen(const char* szFileName, byte bMode) ;
 extern int SysFS_FileClose(int fd) ;
 extern int SysFS_FileRead(int fd, char* buf, int len) ;
 extern int SysFS_FileWrite(int fd, const char* buf, int len) ;
+extern void SysFS_FileSelect(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors);
 
 #define chdir(dir_path) SysFS_ChangeDirectory(dir_path)
 #define getpwd(pwd_addr) SysFS_PWD(pwd_addr)
@@ -129,6 +131,7 @@ int close(int fd) ;
 
 int read(int fd, char* buf, int len) ;
 int write(int fd, const char* buf, int len) ;
+void select(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors);
 int lseek(int fd, int offset, int seekType) ;
 unsigned tell(int fd) ;
 int stat(const char* szFileName, struct stat* pFileStat) ;

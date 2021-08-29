@@ -215,6 +215,7 @@ vector<T>& vector<T>::operator=(const vector<T>& rhs)
 {
   vector<T> temp(rhs);
   this->swap(temp);
+  return *this;
 }
 
 template <typename T>

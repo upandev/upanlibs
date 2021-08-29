@@ -49,7 +49,7 @@ extern void SysDisplay_GetConsoleSize(uint32_t*, uint32_t*);
 extern void SysDisplay_InitGuiFrame(FrameBufferInfo*);
 extern void SysDisplay_FrameTouch();
 extern void SysDisplay_InitTermConsole();
-extern int SysDisplay_InitGuiEventStream();
+extern void SysDisplay_InitGuiEventStream(int fdList[]);
 
 #define movcursor(n)		SysDisplay_MoveCursor(n)
 #define clrline(pos)		SysDisplay_ClearLine(pos)
@@ -63,7 +63,7 @@ void showprogress(int startCur, const char* msg, unsigned progNum) ;
 void init_gui_frame(FrameBufferInfo* frameBufferInfo);
 void gui_frame_touch();
 void init_term_console();
-int init_gui_event_stream();
+void init_gui_event_stream(int fdList[]);
 
 #if defined __cplusplus
 }

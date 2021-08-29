@@ -255,6 +255,26 @@ int SysFS_FileWrite(int fd, const char* buf, int len)
 	return iRetStatus ;
 }
 
+void SysFS_FileSelect(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors) {
+	__volatile__ int iRetStatus ;
+
+	__asm__ __volatile__("push %eax") ;
+	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("pushl $0x20") ;
+
+	__asm__ __volatile__("pushl %0" : : "rm"(readyIODescriptors)) ;
+	__asm__ __volatile__("pushl %0" : : "rm"(waitIODescriptors)) ;
+	DO_SYS_CALL(SYS_CALL_FILE_SELECT) ;
+
+	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %eax") ;
+}
+
 int SysFS_FileSeek(int fd, int offSet, int seekType)
 {
 	__volatile__ int iRetStatus ;
@@ -417,6 +437,10 @@ int read(int fd, char* buf, int len)
 int write(int fd, const char* buf, int len)
 {
 	return SysFS_FileWrite(fd, buf, len) ;
+}
+
+void select(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors) {
+	return SysFS_FileSelect(waitIODescriptors, readyIODescriptors);
 }
 
 int lseek(int fd, int offset, int seekType)

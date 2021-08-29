@@ -34,11 +34,21 @@ typedef enum
 	WAIT_RESOURCE,
 	WAIT_KERNEL_SERVICE,
   WAIT_EVENT,
-  WAIT_IO,
+  WAIT_IO_DESCRIPTORS,
 	TERMINATED,
 	RELEASED,
   TOTAL_PROC_STATUS
 } PROCESS_STATUS ;
+
+typedef enum {
+  IO_Read,
+  IO_Write
+} IO_OP_TYPES ;
+
+typedef struct {
+  int _fd;
+  IO_OP_TYPES _ioType;
+} io_descriptor;
 
 typedef struct
 {

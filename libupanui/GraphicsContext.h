@@ -20,6 +20,7 @@
 
 #include <uniq_ptr.h>
 #include <BaseFrame.h>
+#include <EventManager.h>
 
 namespace upanui {
   class GraphicsContext {
@@ -37,7 +38,20 @@ namespace upanui {
       return *_frame.get();
     }
 
+    EventManager& initEventManager();
+    EventManager& eventManager();
+
+    void setFocus(UIObject* uiObject) {
+      _focusedUIObject = uiObject;
+    }
+
+    bool isFocused(UIObject* uiObject) {
+      return _focusedUIObject == uiObject;
+    }
+
   private:
     upan::uniq_ptr<BaseFrame> _frame;
+    upan::uniq_ptr<EventManager> _evenManager;
+    UIObject* _focusedUIObject;
   };
 }

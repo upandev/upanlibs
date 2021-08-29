@@ -1,5 +1,5 @@
 /*
- *  Upanix - An x86 based Operating System
+ *	Upanix - An x86 based Operating System
  *  Copyright (C) 2011 'Prajwala Prabhakar' 'srinivasa_prajwal@yahoo.co.in'
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -15,36 +15,37 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-#include <cdisplay.h>
-#include <stdio.h>
 
-void showprogress(int startCur, const char* msg, unsigned progNum)
-{
-  int c = get_cursor() ;
+#pragma once
 
-  while(c > startCur)
-  {
-    movcursor(-1) ;
-    c-- ;
-  }
+#include <map.h>
+#include <list.h>
+#include <EventTypes.h>
 
-  clrline(Display_CURSOR_CUR) ;
+namespace upanui {
+class KeyboardEventHandler;
+class MouseEventHandler;
+class EventHandler;
+class UIObject;
 
-  printf("%s%d", msg, progNum) ;
-}
+class EventManager {
+private:
+  EventManager();
 
-void init_gui_frame(FrameBufferInfo* frameBufferInfo) {
-  SysDisplay_InitGuiFrame(frameBufferInfo);
-}
+public:
+  void startEventLoop();
+  void registerKeyboardEventHandler(KeyboardEventHandler& handler);
+  void registerMouseEventHandler(MouseEventHandler& handler);
+  int getch();
 
-void gui_frame_touch() {
-  SysDisplay_FrameTouch();
-}
+private:
+  void handleKeyboardEvent(int fd);
 
-void init_term_console() {
-  SysDisplay_InitTermConsole();
-}
+private:
+  typedef upan::map<EventTypes, upan::list<EventHandler*>> EventHandlerMap;
+  EventHandlerMap _eventHandlers;
+  int _eventStreamFDs[2];
 
-void init_gui_event_stream(int fdList[]) {
-  SysDisplay_InitGuiEventStream(fdList);
+  friend class GraphicsContext;
+};
 }
