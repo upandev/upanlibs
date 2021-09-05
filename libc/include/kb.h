@@ -24,8 +24,7 @@
 extern "C" {
 #endif
 
-typedef enum
-{
+typedef enum {
   Keyboard_CTRL_AT = 0,
   Keyboard_CTRL_A,
   Keyboard_CTRL_B,

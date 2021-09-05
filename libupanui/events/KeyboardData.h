@@ -18,8 +18,41 @@
 
 #pragma once
 
+#include <kb.h>
+
 namespace upanui {
-  struct RawKeyboardData {
-    int _data;
+  class KeyboardData {
+  public:
+    KeyboardData(uint8_t ch,  bool isShiftPressed, bool isAltPressed, bool isCtrlPressed) :
+    _ch(ch), _padding(0),
+    _isShiftPressed(isShiftPressed), _isAltPressed(isAltPressed),
+    _isCtrlPressed(isCtrlPressed) {
+    }
+
+    KeyboardData() : KeyboardData((uint8_t)Keyboard_NA_CHAR, false, false, false) {
+    }
+
+    uint8_t getCh() const {
+      return _ch;
+    }
+
+    bool isAltPressed() const {
+      return _isAltPressed;
+    }
+
+    bool isShiftPressed() const {
+      return _isShiftPressed;
+    }
+
+    bool isCtrlPressed() const {
+      return _isCtrlPressed;
+    }
+
+  private:
+    uint8_t _ch;
+    uint8_t _padding:5;
+    uint8_t _isShiftPressed:1;
+    uint8_t _isAltPressed:1;
+    uint8_t _isCtrlPressed:1;
   } PACKED;
 }

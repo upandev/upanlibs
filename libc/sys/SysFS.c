@@ -211,7 +211,7 @@ int SysFS_FileClose(int fd)
 	return iRetStatus ;
 }
 
-int SysFS_FileRead(int fd, char* buf, int len)
+int SysFS_FileRead(int fd, void* buf, int len)
 {
 	__volatile__ int iRetStatus ;
 
@@ -233,7 +233,7 @@ int SysFS_FileRead(int fd, char* buf, int len)
 	return iRetStatus ;
 }
 
-int SysFS_FileWrite(int fd, const char* buf, int len)
+int SysFS_FileWrite(int fd, const void* buf, int len)
 {
 	__volatile__ int iRetStatus ;
 
@@ -429,12 +429,12 @@ int SysFS_Dup2(int oldFD, int newFD)
 	return iRetStatus ;
 }
 
-int read(int fd, char* buf, int len)
+int read(int fd, void* buf, int len)
 {
 	return SysFS_FileRead(fd, buf, len) ;
 }
 
-int write(int fd, const char* buf, int len)
+int write(int fd, const void* buf, int len)
 {
 	return SysFS_FileWrite(fd, buf, len) ;
 }

@@ -21,6 +21,7 @@
 #include <map.h>
 #include <list.h>
 #include <EventTypes.h>
+#include <KeyboardData.h>
 
 namespace upanui {
 class KeyboardEventHandler;
@@ -36,7 +37,7 @@ public:
   void startEventLoop();
   void registerKeyboardEventHandler(KeyboardEventHandler& handler);
   void registerMouseEventHandler(MouseEventHandler& handler);
-  int getch();
+  KeyboardData getCh();
 
 private:
   void handleKeyboardEvent(int fd);

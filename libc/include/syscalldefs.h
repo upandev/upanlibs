@@ -146,8 +146,8 @@ int SysFS_GetDirContent(const char* szDirPath, FS_Node** pDirList, int* iListSiz
 int SysFS_CreateFile(const char* szDirPath, unsigned short usAttribute);
 int SysFS_FileOpen(const char* szFileName, byte bMode);
 int SysFS_FileClose(int fd);
-int SysFS_FileRead(int fd, char* buf, int len);
-int SysFS_FileWrite(int fd, const char* buf, int len);
+int SysFS_FileRead(int fd, void* buf, int len);
+int SysFS_FileWrite(int fd, const void* buf, int len);
 int SysFS_FileSeek(int fd, int offSet, int seekType);
 int SysFS_FileTell(int fd);
 int SysFS_FileOpenMode(int fd);

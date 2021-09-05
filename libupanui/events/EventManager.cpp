@@ -19,7 +19,6 @@
 #include <EventManager.h>
 #include <KeyboardEventHandler.h>
 #include <MouseEventHandler.h>
-#include <RawKeyboardData.h>
 #include <fs.h>
 #include <mosstd.h>
 
@@ -69,7 +68,7 @@ namespace upanui {
     }
   }
 
-  int EventManager::getch() {
+  KeyboardData EventManager::getCh() {
     io_descriptor waitFDs[2];
     waitFDs[0]._fd = _eventStreamFDs[0];
     waitFDs[0]._ioType = IO_OP_TYPES::IO_Read;
@@ -81,27 +80,27 @@ namespace upanui {
 
     select(waitFDs, readyFDs);
 
-    RawKeyboardData rawKeyboardData;
-    auto n = read(_eventStreamFDs[0], (char*)&rawKeyboardData, sizeof(RawKeyboardData));
-    if (n != sizeof(RawKeyboardData)) {
-      throw upan::exception(XLOC, "read event data size (%d) < RawKeyboardData size (%d)", n, sizeof(RawKeyboardData));
+    KeyboardData data;
+    auto n = read(_eventStreamFDs[0], (void*)&data, sizeof(KeyboardData));
+    if (n != sizeof(KeyboardData)) {
+      throw upan::exception(XLOC, "read event data size (%d) < RawKeyboardData size (%d)", n, sizeof(KeyboardData));
     }
 
-    return rawKeyboardData._data;
+    return data;
   }
 
   void EventManager::handleKeyboardEvent(int fd) {
     while(true) {
-      RawKeyboardData rawKeyboardData;
-      auto n = read(fd, (char*)&rawKeyboardData, sizeof(RawKeyboardData));
+      KeyboardData data;
+      auto n = read(fd, (void*)&data, sizeof(KeyboardData));
       if (n == 0) {
         return;
       }
-      if (n != sizeof(RawKeyboardData)) {
-        throw upan::exception(XLOC, "read event data size (%d) < RawKeyboardData size (%d)", n, sizeof(RawKeyboardData));
+      if (n != sizeof(KeyboardData)) {
+        throw upan::exception(XLOC, "read event data size (%d) < RawKeyboardData size (%d)", n, sizeof(KeyboardData));
       }
 
-      KeyboardEvent keyboardEvent(rawKeyboardData._data);
+      KeyboardEvent keyboardEvent(data);
 
       for(auto handler : _eventHandlers[Keyboard]) {
         if (handler->isFocused()) {

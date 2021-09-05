@@ -115,8 +115,8 @@ extern int SysFS_GetDirContent(const char* szDirPath, FS_Node** pDirList, int* i
 extern int SysFS_CreateFile(const char* szDirPath, unsigned short usAttribute) ;
 extern int SysFS_FileOpen(const char* szFileName, byte bMode) ;
 extern int SysFS_FileClose(int fd) ;
-extern int SysFS_FileRead(int fd, char* buf, int len) ;
-extern int SysFS_FileWrite(int fd, const char* buf, int len) ;
+extern int SysFS_FileRead(int fd, void* buf, int len) ;
+extern int SysFS_FileWrite(int fd, const void* buf, int len) ;
 extern void SysFS_FileSelect(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors);
 
 #define chdir(dir_path) SysFS_ChangeDirectory(dir_path)
@@ -129,8 +129,8 @@ int create(const char* file_path, unsigned short file_attr) ;
 int open(const char* file_name, byte mode) ;
 int close(int fd) ;
 
-int read(int fd, char* buf, int len) ;
-int write(int fd, const char* buf, int len) ;
+int read(int fd, void* buf, int len) ;
+int write(int fd, const void* buf, int len) ;
 void select(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors);
 int lseek(int fd, int offset, int seekType) ;
 unsigned tell(int fd) ;

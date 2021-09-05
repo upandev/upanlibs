@@ -19,18 +19,19 @@
 #pragma once
 
 #include <Event.h>
+#include <KeyboardData.h>
 
 namespace upanui {
 class KeyboardEvent : public Event {
 public:
-  KeyboardEvent(int data) : _data(data) {
+  KeyboardEvent(const KeyboardData& data) : _data(data) {
   }
 
-  int getData() const {
+  KeyboardData getData() const {
     return _data;
   }
 
 private:
-  const int _data;
+  const KeyboardData _data;
 };
 }
