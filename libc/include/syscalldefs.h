@@ -101,7 +101,6 @@ typedef enum
 	SYS_CALL_PROC_END,
 
 	SYS_CALL_KB_START = 800,
-		SYS_CALL_KB_READ,
 	SYS_CALL_KB_END,
 
 	SYS_CALL_DRIVE_START = 900,
@@ -154,8 +153,6 @@ int SysFS_FileTell(int fd);
 int SysFS_FileOpenMode(int fd);
 int SysFS_FileStat(const char* szFileName, struct stat* pFileStat);
 int SysFS_FileStatFD(int iFD, struct stat* pFileStat);
-
-void SysKB_GetWait(int* ch);
 
 int SysMemory_Alloc(void** addr, unsigned uiSizeInBytes);
 int SysMemory_Free(void* uiAddress);

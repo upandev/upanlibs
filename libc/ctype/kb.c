@@ -18,30 +18,6 @@
 # include <kb.h>
 # include <ctype.h>
 
-bool is_special_char(char ch)
-{
-	switch(ch)
-	{	
-		case Keyboard_LEFT_ALT:
-		case Keyboard_LEFT_CTRL:
-		case Keyboard_F1:
-		case Keyboard_F2:
-		case Keyboard_F3:
-		case Keyboard_F4:
-		case Keyboard_F5:
-		case Keyboard_F6:
-		case Keyboard_F7:
-		case Keyboard_F8:
-		case Keyboard_F9:
-		case Keyboard_F10:
-		case Keyboard_CAPS_LOCK:
-		case Keyboard_BACKSPACE:
-		case Keyboard_LEFT_SHIFT:
-		case Keyboard_RIGHT_SHIFT:
-		case Keyboard_ESC:
-		case Keyboard_ENTER:
-			return true ;
-	}
-
-	return false ;
+bool is_command_key(int ch) {
+  return ch < Keyboard_SPACE || ch > Keyboard_TILDE;
 }

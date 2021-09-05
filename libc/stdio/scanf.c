@@ -2256,8 +2256,8 @@ void read_input_till_char(cecho_func* cechoFunc, void* private_data, char* in_bu
 
 	while(true)
 	{
-		kb_get_ch_wait(&ch) ;
-		
+	  ch = getchar();
+
 		if(ch == end_ch)
 		{
 			in_buf[cur_read_pos] = '\0' ;
