@@ -52,3 +52,11 @@ void init_term_console() {
 void init_gui_event_stream(int fdList[]) {
   SysDisplay_InitGuiEventStream(fdList);
 }
+
+void set_viewport(const ViewportInfo* viewportInfo) {
+  SysDisplay_SetViewport(viewportInfo);
+}
+
+void get_viewport(ViewportInfo* viewportInfo) {
+  SysDisplay_GetViewport(viewportInfo);
+}

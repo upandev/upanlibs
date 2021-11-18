@@ -45,6 +45,13 @@ typedef struct {
   uint32_t* _frameBuffer;
 } FrameBufferInfo;
 
+typedef struct {
+  int _x;
+  int _y;
+  uint32_t _width;
+  uint32_t _height;
+} ViewportInfo;
+
 extern void	SysDisplay_MoveCursor(int n) ;
 extern void	SysDisplay_ClearLine(int pos) ;
 extern void	SysDisplay_SetCursor(int pos, bool bUpdateCursorOnScreen) ;
@@ -54,6 +61,8 @@ extern void SysDisplay_InitGuiFrame(FrameBufferInfo*);
 extern void SysDisplay_FrameTouch();
 extern void SysDisplay_InitTermConsole();
 extern void SysDisplay_InitGuiEventStream(int fdList[]);
+extern void SysDisplay_SetViewport(const ViewportInfo*);
+extern void SysDisplay_GetViewport(ViewportInfo*);
 
 #define movcursor(n)		SysDisplay_MoveCursor(n)
 #define clrline(pos)		SysDisplay_ClearLine(pos)
@@ -68,6 +77,8 @@ void init_gui_frame(FrameBufferInfo* frameBufferInfo);
 void gui_frame_touch();
 void init_term_console();
 void init_gui_event_stream(int fdList[]);
+void set_viewport(const ViewportInfo*);
+void get_viewport(ViewportInfo*);
 
 #if defined __cplusplus
 }

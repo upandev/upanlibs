@@ -53,6 +53,8 @@ namespace upanui {
       return _focusedUIObject == uiObject;
     }
 
+    void updateViewport(int x, int y, uint32_t width, uint32_t height);
+
   private:
     upan::uniq_ptr<BaseFrame> _frame;
     upan::uniq_ptr<EventManager> _evenManager;

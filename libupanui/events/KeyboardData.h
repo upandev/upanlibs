@@ -27,7 +27,7 @@
 namespace upanui {
   class KeyboardData {
   public:
-    KeyboardData(uint8_t ch,  bool isShiftPressed, bool isAltPressed, bool isCtrlPressed) :
+    KeyboardData(uint8_t ch, bool isShiftPressed, bool isAltPressed, bool isCtrlPressed) :
     _ch(ch), _padding(0),
     _isShiftPressed(isShiftPressed), _isAltPressed(isAltPressed),
     _isCtrlPressed(isCtrlPressed) {

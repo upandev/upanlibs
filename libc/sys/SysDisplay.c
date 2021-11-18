@@ -267,3 +267,43 @@ void SysDisplay_InitGuiEventStream(int fdList[]) {
   __asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
   __asm__ __volatile__("pop %eax") ;
 }
+
+void SysDisplay_SetViewport(const ViewportInfo* viewportInfo) {
+  __volatile__ int iRetStatus ;
+
+  __asm__ __volatile__("push %eax") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+
+  __asm__ __volatile__("pushl %0" : : "rm"(viewportInfo)) ;
+  DO_SYS_CALL(SYS_CALL_DISPLAY_SET_VIEWPORT) ;
+
+  __asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
+  __asm__ __volatile__("pop %eax") ;
+}
+
+void SysDisplay_GetViewport(ViewportInfo* viewportInfo) {
+  __volatile__ int iRetStatus ;
+
+  __asm__ __volatile__("push %eax") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+
+  __asm__ __volatile__("pushl %0" : : "rm"(viewportInfo)) ;
+  DO_SYS_CALL(SYS_CALL_DISPLAY_GET_VIEWPORT) ;
+
+  __asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
+  __asm__ __volatile__("pop %eax") ;
+}

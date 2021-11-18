@@ -52,12 +52,24 @@ namespace upanui {
     init_gui_frame(&frameBufferInfo);
 
     upanui::FrameBuffer frameBuffer(frameBufferInfo);
-    upanui::Viewport viewport(0, 0, frameBufferInfo._width, frameBufferInfo._height);
+    ViewportInfo viewportInfo;
+    get_viewport(&viewportInfo);
+    upanui::Viewport viewport(viewportInfo);
 
     _frame.reset(new upanui::Frame(frameBuffer, viewport));
   }
 
   GraphicsContext::~GraphicsContext() {
+  }
+
+  void GraphicsContext::updateViewport(int x, int y, uint32_t width, uint32_t height) {
+    ViewportInfo viewportInfo;
+    viewportInfo._x = x;
+    viewportInfo._y = y;
+    viewportInfo._width = width;
+    viewportInfo._height = height;
+    _frame->updateViewport(viewportInfo);
+    set_viewport(&viewportInfo);
   }
 
   EventManager& GraphicsContext::initEventManager() {

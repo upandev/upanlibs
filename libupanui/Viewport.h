@@ -22,22 +22,35 @@
 
 #pragma once
 
+#include <cdisplay.h>
+
 namespace upanui {
   class Viewport {
   public:
-    Viewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) : _x(x), _y(y), _width(width), _height(height) {}
+    Viewport(int x, int y, uint32_t width, uint32_t height) : _x(x), _y(y), _width(width), _height(height) {}
+    Viewport(const ViewportInfo& viewportInfo) : _x(viewportInfo._x), _y(viewportInfo._y), _width(viewportInfo._width), _height(viewportInfo._height) {}
 
-    uint32_t x() const {
+    int x1() const {
       return _x;
     }
-    void x(uint32_t val) {
+
+    int x2() const {
+      return _x + _width - 1;
+    }
+
+    int y1() const {
+      return _y;
+    }
+
+    int y2() const {
+      return _y + _height - 1;
+    }
+
+    void x1(uint32_t val) {
       _x = val;
     }
 
-    uint32_t y() const {
-      return _y;
-    }
-    void y(uint32_t val) {
+    void y1(uint32_t val) {
       _y = val;
     }
 
@@ -56,8 +69,8 @@ namespace upanui {
     }
 
   private:
-    uint32_t _x;
-    uint32_t _y;
+    int _x;
+    int _y;
     uint32_t _width;
     uint32_t _height;
   };

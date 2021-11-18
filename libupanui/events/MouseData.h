@@ -20,33 +20,45 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include <BaseFrame.h>
-#include <string.h>
+#pragma once
 
 namespace upanui {
-  BaseFrame::BaseFrame(const upanui::FrameBuffer& frameBuffer, const upanui::Viewport& viewport)
-  : _frameBuffer(frameBuffer), _viewport(viewport) {
-  }
-
-  void BaseFrame::copy(const void *src, int len) {
-    memcpy(_frameBuffer.buffer(), src, len);
-    touch();
-  }
-
-  void BaseFrame::fillRect(uint32_t sx, uint32_t sy, uint32_t width, uint32_t height, uint32_t color) {
-    uint32_t y_offset;
-    bool changed = false;
-    for(uint32_t y = sy; y < (sy + height) && y < _viewport.height(); ++y) {
-      y_offset = y * _frameBuffer.pitch();
-      for(uint32_t x = sx; x < (sx + width) && x < _viewport.width(); ++x) {
-        auto p = (uint32_t*)((uint32_t)_frameBuffer.buffer() + y_offset + x * _frameBuffer.bytesPerPixel());
-        *p = (color | 0xFF000000);
-        changed = true;
-      }
+  class MouseData {
+  public:
+    MouseData(uint32_t x, uint32_t y, bool isMiddlePressed, bool isRightPressed, bool isLeftPressed) :
+    _x(x), _y(y), _padding(0),
+    _isMiddlePressed(isMiddlePressed), _isRightPressed(isRightPressed), _isLeftPressed(isLeftPressed) {
     }
 
-    if (changed) {
-      touch();
+    MouseData() : MouseData(0, 0, false, false, false) {
     }
-  }
+
+    uint32_t x() const {
+      return _x;
+    }
+
+    uint32_t y() const {
+      return _y;
+    }
+
+    bool isMiddlePressed() const {
+      return _isMiddlePressed;
+    }
+
+    bool isRightPressed() const {
+      return _isRightPressed;
+    }
+
+    bool isLeftPressed() const {
+      return _isLeftPressed;
+    }
+
+  private:
+    uint16_t _x;
+    uint16_t _y;
+    uint8_t  _padding:5;
+    uint8_t  _isMiddlePressed:1;
+    uint8_t  _isRightPressed:1;
+    uint8_t  _isLeftPressed:1;
+  } PACKED;
 }
