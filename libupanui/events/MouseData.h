@@ -53,6 +53,14 @@ namespace upanui {
       return _isLeftPressed;
     }
 
+    bool anyButtonPressed() const {
+      return _isMiddlePressed || _isRightPressed || _isLeftPressed;
+    }
+
+    bool operator==(const MouseData& r) const {
+      return _x == r._x && _y == r._y && _isMiddlePressed == r._isMiddlePressed && _isRightPressed == r._isRightPressed && _isLeftPressed == r._isLeftPressed;
+    }
+
   private:
     uint16_t _x;
     uint16_t _y;
