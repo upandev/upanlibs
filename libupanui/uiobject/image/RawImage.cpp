@@ -28,7 +28,7 @@ namespace upanui {
     _height = image.height();
     auto size = _width * _height;
     _imageBuffer.reset(new uint32_t[size]);
-    memcpy(_imageBuffer.get(), image.dataBuffer(), size);
+    memcpy(_imageBuffer.get(), image.data(), size);
   }
 
   int dcompare(double a, double b) {
@@ -61,7 +61,7 @@ namespace upanui {
 
     const double fa = 1.0 / (fx * fy);
 
-    const auto srcImgBuffer = image.dataBuffer();
+    const auto srcImgBuffer = image.data();
     auto destImgBuffer = _imageBuffer.get();
 
     for(uint32_t y = 0; y < _height; ++y) {

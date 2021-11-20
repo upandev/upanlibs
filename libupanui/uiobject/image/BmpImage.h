@@ -76,7 +76,7 @@ namespace upanui {
         return _infoHeader._height;
       }
 
-      const uint32_t* dataBuffer() const override {
+      const uint32_t* data() const override {
         return const_cast<BmpImage*>(this)->_imageBuffer.get();
       }
 

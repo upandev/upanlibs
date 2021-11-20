@@ -39,7 +39,6 @@ namespace upanui {
 
     uint32_t width() const override;
     uint32_t height() const override;
-    const uint32_t* dataBuffer() const override;
     uint32_t maxRows() const;
     uint32_t maxColumns() const;
 

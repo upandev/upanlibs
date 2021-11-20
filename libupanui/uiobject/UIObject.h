@@ -26,16 +26,14 @@
 #include <usfncontext.h>
 
 namespace upanui {
+  class UIObject {
+  public:
+    UIObject() {}
+    UIObject(const UIObject&) = delete;
+    UIObject& operator=(const UIObject&) = delete;
+    virtual ~UIObject() {}
 
-    class UIObject {
-    public:
-      UIObject() {}
-      UIObject(const UIObject&) = delete;
-      UIObject& operator=(const UIObject&) = delete;
-      virtual ~UIObject() {}
-
-      virtual uint32_t width() const = 0;
-      virtual uint32_t height() const = 0;
-      virtual const uint32_t* dataBuffer() const = 0;
-    };
+    virtual uint32_t width() const = 0;
+    virtual uint32_t height() const = 0;
+  };
 }

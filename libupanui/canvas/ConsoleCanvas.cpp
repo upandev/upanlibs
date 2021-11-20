@@ -60,10 +60,6 @@ namespace upanui {
     return _frame.frameBuffer().height();
   }
 
-  const uint32_t* ConsoleCanvas::dataBuffer() const {
-    return _frame.frameBuffer().buffer();
-  }
-
   uint32_t ConsoleCanvas::maxRows() const {
     return _consoleBuffer.maxRows();
   }
