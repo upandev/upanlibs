@@ -24,27 +24,16 @@
 #include <Frame.h>
 
 namespace upanui {
-  GraphicsContext* GraphicsContext::_instance = nullptr;
-
   void GraphicsContext::Init() {
-    if (_instance) {
-      throw upan::exception(XLOC, "GraphicsContext is already created!");
-    }
-    _instance = new GraphicsContext();
+    interop::graphics_context::init();
   }
 
   void GraphicsContext::Destroy() {
-    if (_instance) {
-      delete _instance;
-      _instance = nullptr;
-    }
+    interop::graphics_context::destroy();
   }
 
   GraphicsContext& GraphicsContext::Instance() {
-    if (!_instance) {
-      throw upan::exception(XLOC, "GraphicsContext is not initialized yet!");
-    }
-    return *_instance;
+    return interop::graphics_context::instance();
   }
 
   GraphicsContext::GraphicsContext() : _frame(nullptr), _evenManager(nullptr), _focusedUIObject(nullptr) {

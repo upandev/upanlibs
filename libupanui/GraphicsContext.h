@@ -25,11 +25,11 @@
 #include <uniq_ptr.h>
 #include <BaseFrame.h>
 #include <EventManager.h>
+#include <graphics_context.h>
 
 namespace upanui {
   class GraphicsContext {
   private:
-    static GraphicsContext* _instance;
     GraphicsContext();
     ~GraphicsContext();
 
@@ -59,5 +59,7 @@ namespace upanui {
     upan::uniq_ptr<BaseFrame> _frame;
     upan::uniq_ptr<EventManager> _evenManager;
     UIObject* _focusedUIObject;
+
+    friend class interop::graphics_context;
   };
 }
