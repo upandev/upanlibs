@@ -21,24 +21,38 @@
  */
 #pragma once
 
-#include <Image.h>
-#include <uniq_ptr.h>
+#include <map.h>
+#include <set.h>
+#include <mutex.h>
+
+class GraphicsVideo;
 
 namespace upanui {
-    class RawImage : public Image {
-    protected:
-      ~RawImage();
+  class UIObject;
+  class RootCanvas;
 
-    public:
-      RawImage(const Image& image);
-      RawImage(const Image& image, uint32_t newWidth, uint32_t newHeight);
+  class UIObjectManager {
+  private:
+    UIObjectManager(RootCanvas& rootCanvas);
 
-      const uint32_t* data() const override {
-        return const_cast<RawImage*>(this)->_imageBuffer.get();
-      }
+    upan::option<UIObject&> parent(UIObject& child);
+    const upan::set<UIObject*>& children(UIObject& parent);
+    void add(UIObject& parent, UIObject& child);
+    void remove(UIObject& child);
+    void destroy(UIObject& parent);
+    static void directDelete(UIObject& uiObject);
 
-    private:
-      //assuming 4 bytes per pixel
-      upan::uniq_ptr<uint32_t> _imageBuffer;
-    };
+  private:
+    typedef upan::map<UIObject*, upan::set<UIObject*>> ParentChildMap;
+    typedef upan::map<UIObject*, UIObject*> ChildParentMap;
+    ParentChildMap _parentChildMap;
+    ChildParentMap _childParentMap;
+    RootCanvas& _rootCanvas;
+
+    upan::mutex _managerMutex;
+
+    friend class GraphicsContext;
+    friend class UIObject;
+    friend class ::GraphicsVideo;
+  };
 }

@@ -32,5 +32,6 @@ namespace upanui {
   public:
     Frame(const FrameBuffer& frameBuffer, const Viewport& viewport);
     void touch() override;
+    void updateViewport(int x, int y, uint32_t width, uint32_t height);
   };
 }

@@ -26,6 +26,9 @@
 #include <BaseFrame.h>
 #include <EventManager.h>
 #include <graphics_context.h>
+#include <UIObjectManager.h>
+#include <RootCanvas.h>
+#include <Frame.h>
 
 namespace upanui {
   class GraphicsContext {
@@ -38,12 +41,17 @@ namespace upanui {
     static void Destroy();
     static GraphicsContext& Instance();
 
-    BaseFrame& frame() {
+    Frame& frame() {
       return *_frame.get();
     }
 
+    RootCanvas& initRootCanvas();
+    RootCanvas& initRootCanvas(const int x, const int y, const uint32_t width, const uint32_t height);
+
     EventManager& initEventManager();
     EventManager& eventManager();
+
+    UIObjectManager& uiObjectManager();
 
     void setFocus(UIObject* uiObject) {
       _focusedUIObject = uiObject;
@@ -53,11 +61,11 @@ namespace upanui {
       return _focusedUIObject == uiObject;
     }
 
-    void updateViewport(int x, int y, uint32_t width, uint32_t height);
-
   private:
-    upan::uniq_ptr<BaseFrame> _frame;
+    upan::uniq_ptr<Frame> _frame;
     upan::uniq_ptr<EventManager> _evenManager;
+    upan::uniq_ptr<RootCanvas> _rootCanvas;
+    upan::uniq_ptr<UIObjectManager> _uiObjectManager;
     UIObject* _focusedUIObject;
 
     friend class interop::graphics_context;

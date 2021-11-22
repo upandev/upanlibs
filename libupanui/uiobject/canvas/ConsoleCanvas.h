@@ -31,14 +31,12 @@
 
 namespace upanui {
   class ConsoleCanvas : public Canvas, public IConsole {
-  public:
-    ConsoleCanvas(BaseFrame& frame, uint32_t maxRows, uint32_t maxColumns);
-    ConsoleCanvas(BaseFrame& frame);
-
+  protected:
     ~ConsoleCanvas();
+  public:
+    ConsoleCanvas(uint32_t maxRows, uint32_t maxColumns);
+    ConsoleCanvas();
 
-    uint32_t width() const override;
-    uint32_t height() const override;
     uint32_t maxRows() const;
     uint32_t maxColumns() const;
 

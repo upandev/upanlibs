@@ -26,13 +26,9 @@
 
 namespace upanui {
     class BmpImage : public Image {
-    public:
-      BmpImage(const void* imageData);
-      BmpImage(const void* imageData, const uint32_t transparentColor);
+    protected:
       ~BmpImage();
-
-    private:
-      void load(const void* imageData, const uint32_t transparentColor);
+    public:
       typedef struct {
         uint8_t _signature[2];
         uint32_t _fileSize;
@@ -67,15 +63,14 @@ namespace upanui {
         }
       } PACKED InfoHeader;
 
+      BmpImage(upan::uniq_ptr<uint32_t>&& imageBuffer, const Header& header, const InfoHeader& infoHeader, const int x, const int y);
+
+      static BmpImage& create(const void* imageData, const int x, const int y, const uint32_t transparentColor);
+      static BmpImage& create(const void* imageData, const int x, const int y) {
+        return create(imageData, x, y, 0);
+      }
+
     public:
-      uint32_t width() const override {
-        return _infoHeader._width;
-      }
-
-      uint32_t height() const override {
-        return _infoHeader._height;
-      }
-
       const uint32_t* data() const override {
         return const_cast<BmpImage*>(this)->_imageBuffer.get();
       }
@@ -84,7 +79,7 @@ namespace upanui {
     private:
       //assuming 4 bytes per pixel
       upan::uniq_ptr<uint32_t> _imageBuffer;
-      Header _header;
-      InfoHeader _infoHeader;
+      const Header _header;
+      const InfoHeader _infoHeader;
     };
 }

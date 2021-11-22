@@ -93,7 +93,7 @@ class error
       _msg = buf;
     }
 
-    error(upan::string& msg) : _msg(msg) {}
+    error(const upan::string& msg) : _msg(msg) {}
 
     const upan::string& Msg() const { return _msg; }
 

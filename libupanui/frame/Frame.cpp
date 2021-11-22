@@ -29,4 +29,16 @@ namespace upanui {
   void Frame::touch() {
     gui_frame_touch();
   }
+
+  void Frame::updateViewport(int x, int y, uint32_t width, uint32_t height) {
+    if (BaseFrame::_updateViewport(x, y, width, height)) {
+      ViewportInfo viewportInfo;
+      viewportInfo._x = x;
+      viewportInfo._y = y;
+      viewportInfo._width = width;
+      viewportInfo._height = height;
+      set_viewport(&viewportInfo);
+      touch();
+    }
+  }
 }

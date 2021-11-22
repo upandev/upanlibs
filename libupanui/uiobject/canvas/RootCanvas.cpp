@@ -19,26 +19,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-#pragma once
 
-#include <Image.h>
-#include <uniq_ptr.h>
+#include <RootCanvas.h>
+#include <GraphicsContext.h>
 
 namespace upanui {
-    class RawImage : public Image {
-    protected:
-      ~RawImage();
-
-    public:
-      RawImage(const Image& image);
-      RawImage(const Image& image, uint32_t newWidth, uint32_t newHeight);
-
-      const uint32_t* data() const override {
-        return const_cast<RawImage*>(this)->_imageBuffer.get();
-      }
-
-    private:
-      //assuming 4 bytes per pixel
-      upan::uniq_ptr<uint32_t> _imageBuffer;
-    };
+  RootCanvas::RootCanvas(const int x, const int y, const uint32_t width, const uint32_t height) : Canvas(x, y, width, height) {
+    GraphicsContext::Instance().frame().updateViewport(x, y, width, height);
+  }
 }

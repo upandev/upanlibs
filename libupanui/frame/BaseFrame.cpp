@@ -49,4 +49,15 @@ namespace upanui {
       touch();
     }
   }
+
+  bool BaseFrame::_updateViewport(int x, int y, uint32_t width, uint32_t height) {
+    if (_viewport.x1() != x || _viewport.y1() != y || _viewport.width() != width || _viewport.height() != height) {
+      _viewport.x1(x);
+      _viewport.y1(y);
+      _viewport.width(width);
+      _viewport.height(height);
+      return true;
+    }
+    return false;
+  }
 }

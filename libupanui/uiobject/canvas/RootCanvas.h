@@ -22,11 +22,13 @@
 
 #pragma once
 
-#include <UIObject.h>
+#include <Canvas.h>
 
 namespace upanui {
-  class Canvas : public UIObject {
-  public:
-    virtual ~Canvas() {}
+  class RootCanvas : public Canvas {
+  private:
+    RootCanvas(const int x, const int y, const uint32_t width, const uint32_t height);
+
+    friend class GraphicsContext;
   };
 }

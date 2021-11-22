@@ -22,6 +22,7 @@
 
 #include <GraphicsContext.h>
 #include <Frame.h>
+#include <RootCanvas.h>
 
 namespace upanui {
   void GraphicsContext::Init() {
@@ -51,14 +52,14 @@ namespace upanui {
   GraphicsContext::~GraphicsContext() {
   }
 
-  void GraphicsContext::updateViewport(int x, int y, uint32_t width, uint32_t height) {
-    ViewportInfo viewportInfo;
-    viewportInfo._x = x;
-    viewportInfo._y = y;
-    viewportInfo._width = width;
-    viewportInfo._height = height;
-    _frame->updateViewport(viewportInfo);
-    set_viewport(&viewportInfo);
+  RootCanvas& GraphicsContext::initRootCanvas() {
+    return initRootCanvas(_frame->viewport().x1(), _frame->viewport().y1(), _frame->viewport().width(), _frame->viewport().height());
+  }
+
+  RootCanvas& GraphicsContext::initRootCanvas(const int x, const int y, const uint32_t width, const uint32_t height) {
+    _rootCanvas.reset(new RootCanvas(x, y, width, height));
+    _uiObjectManager.reset(new UIObjectManager(*_rootCanvas));
+    return *_rootCanvas;
   }
 
   EventManager& GraphicsContext::initEventManager() {
@@ -74,5 +75,12 @@ namespace upanui {
       throw upan::exception(XLOC, "EventManager is not initialized!");
     }
     return *_evenManager;
+  }
+
+  UIObjectManager& GraphicsContext::uiObjectManager() {
+    if (_uiObjectManager.get() == nullptr) {
+      throw upan::exception(XLOC, "UIObjectManager is not initialized!");
+    }
+    return *_uiObjectManager;
   }
 }

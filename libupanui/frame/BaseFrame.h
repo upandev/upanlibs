@@ -42,21 +42,10 @@ namespace upanui {
       return _viewport;
     }
 
-    void updateViewport(const ViewportInfo& viewportInfo) {
-      _viewport.x1(viewportInfo._x);
-      _viewport.y1(viewportInfo._y);
-      _viewport.width(viewportInfo._width);
-      _viewport.height(viewportInfo._height);
-    }
-
-    void updateViewport(int x, int y, uint32_t width, uint32_t height) {
-      _viewport.x1(x);
-      _viewport.y1(y);
-      _viewport.width(width);
-      _viewport.height(height);
-    }
-
     virtual void touch() = 0;
+
+  protected:
+    bool _updateViewport(int x, int y, uint32_t width, uint32_t height);
 
   private:
     upanui::FrameBuffer _frameBuffer;

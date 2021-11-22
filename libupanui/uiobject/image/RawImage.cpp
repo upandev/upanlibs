@@ -23,10 +23,8 @@
 #include <RawImage.h>
 
 namespace upanui {
-  RawImage::RawImage(const Image& image) : _imageBuffer(nullptr) {
-    _width = image.width();
-    _height = image.height();
-    auto size = _width * _height;
+  RawImage::RawImage(const Image& image) : Image(image), _imageBuffer(nullptr) {
+    auto size = width() * height();
     _imageBuffer.reset(new uint32_t[size]);
     memcpy(_imageBuffer.get(), image.data(), size);
   }
@@ -47,25 +45,24 @@ namespace upanui {
     }
   }
 
-  RawImage::RawImage(const Image& image, uint32_t newWidth, uint32_t newHeight) : _imageBuffer(nullptr) {
-    _width = newWidth;
-    _height = newHeight;
-    auto size = _width * _height;
+  RawImage::RawImage(const Image& image, uint32_t newWidth, uint32_t newHeight)
+    : Image(image.x(), image.y(), newWidth, newHeight), _imageBuffer(nullptr) {
+    auto size = width() * height();
     _imageBuffer.reset(new uint32_t[size]);
 
     const auto srcWidth = image.width();
     const auto srcHeight = image.height();
 
-    const double fx = srcWidth * 1.0 / _width;
-    const double fy = srcHeight * 1.0 / _height;
+    const double fx = srcWidth * 1.0 / width();
+    const double fy = srcHeight * 1.0 / height();
 
     const double fa = 1.0 / (fx * fy);
 
     const auto srcImgBuffer = image.data();
     auto destImgBuffer = _imageBuffer.get();
 
-    for(uint32_t y = 0; y < _height; ++y) {
-      for(uint32_t x = 0; x < _width; ++x) {
+    for(uint32_t y = 0; y < height(); ++y) {
+      for(uint32_t x = 0; x < width(); ++x) {
         double dr = 0;
         double dg = 0;
         double db = 0;
@@ -119,7 +116,7 @@ namespace upanui {
             db += (srcRGB & 0xFF) * ipf;
           }
         }
-        destImgBuffer[x + y * _width] = dround(dr) << 16 | dround(dg) << 8 | dround(db) | dround(da) << 24; //0xFF000000;
+        destImgBuffer[x + y * width()] = dround(dr) << 16 | dround(dg) << 8 | dround(db) | dround(da) << 24; //0xFF000000;
       }
     }
   }

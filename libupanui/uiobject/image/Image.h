@@ -25,7 +25,13 @@
 
 namespace upanui {
   class Image : public UIObject {
+  protected:
+    ~Image() {}
   public:
+    Image(const int x, const int y, const uint32_t width, const uint32_t height) : UIObject(x, y, width, height) {
+    }
+    Image(const Image& image) : UIObject(image.x(), image.y(), image.width(), image.height()) {
+    }
     virtual const uint32_t* data() const = 0;
   };
 }

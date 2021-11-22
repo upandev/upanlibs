@@ -106,12 +106,19 @@ class _tree
     int height() const { return height(_root); }
 
   protected:
-    _tree() : _root(nullptr), _size(0) 
-    {
+    _tree() : _root(nullptr), _size(0) {
     }
 
-    ~_tree() 
-    {
+    _tree(const _tree<_c_type>& other) : _root(nullptr), _size(0) {
+      for(auto i = other.begin(); i != other.end(); ++i) {
+        insert(value_type(*i));
+      }
+    }
+
+    _tree(const _tree<_c_type>&& other) noexcept : _root(other._root), _size(other._size) {
+    }
+
+    ~_tree() {
       clear();
     }
 

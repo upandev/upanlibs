@@ -24,16 +24,69 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <usfncontext.h>
+#include <option.h>
+#include <set.h>
+#include <atomicop.h>
 
 namespace upanui {
+
   class UIObject {
-  public:
-    UIObject() {}
-    UIObject(const UIObject&) = delete;
-    UIObject& operator=(const UIObject&) = delete;
+  protected:
     virtual ~UIObject() {}
 
-    virtual uint32_t width() const = 0;
-    virtual uint32_t height() const = 0;
+  public:
+    UIObject(const int x, const int y, const uint32_t width, const uint32_t height);
+
+    UIObject(const UIObject&) = delete;
+    UIObject& operator=(const UIObject&) = delete;
+
+
+    int x() const { return _x; }
+    int y() const { return _y; }
+    uint32_t width() const { return _width; }
+    uint32_t height() const { return _height; }
+
+    void x(const int);
+    void y(const int);
+    void width(const uint32_t);
+    void height(const uint32_t);
+
+    upan::option<UIObject&> parent();
+    const upan::set<UIObject*>& children();
+    void add(UIObject& child);
+    void remove();
+
+    bool positionChanged() {
+      return _positionChanged.get();
+    }
+    void positionChanged(bool v) {
+      _positionChanged.set(v);
+    }
+
+    bool sizeChanged() {
+      return _sizeChanged.get();
+    }
+    void sizeChanged(bool v) {
+      _sizeChanged.set(v);
+    }
+
+    bool contentChanged() {
+      return _contentChanged.get();
+    }
+    void contentChanged(bool v) {
+      _contentChanged.set(v);
+    }
+
+  private:
+    int _x;
+    int _y;
+    uint32_t _width;
+    uint32_t _height;
+
+    upan::atomic::integral<bool> _positionChanged;
+    upan::atomic::integral<bool> _sizeChanged;
+    upan::atomic::integral<bool> _contentChanged;
+
+    friend class UIObjectManager;
   };
 }

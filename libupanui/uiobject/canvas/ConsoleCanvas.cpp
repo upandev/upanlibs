@@ -24,11 +24,12 @@
 #include <ColorPalettes.h>
 #include <ConsoleBuffer.h>
 #include <BaseFrame.h>
-#include <fs.h>
+#include <GraphicsContext.h>
 
 namespace upanui {
-  ConsoleCanvas::ConsoleCanvas(BaseFrame& frame, uint32_t maxRows, uint32_t maxColumns)
-    : _frame(frame), _cursorPos(0),
+  ConsoleCanvas::ConsoleCanvas(uint32_t maxRows, uint32_t maxColumns)
+    : Canvas(0, 0, GraphicsContext::Instance().frame().frameBuffer().width(), GraphicsContext::Instance().frame().frameBuffer().height()),
+      _frame(GraphicsContext::Instance().frame()), _cursorPos(0),
       _charStyle(CharStyle::WHITE_ON_BLACK()),
       _consoleBuffer(*this, maxRows, maxColumns),
       _cursorBlinkThread(*this),
@@ -44,20 +45,13 @@ namespace upanui {
     _cursorBlinkThread.start();
   }
 
-  ConsoleCanvas::ConsoleCanvas(BaseFrame& frame)
-    : ConsoleCanvas(frame, frame.frameBuffer().height() / 16, frame.frameBuffer().width() / 8) {
+  ConsoleCanvas::ConsoleCanvas()
+    : ConsoleCanvas(GraphicsContext::Instance().frame().frameBuffer().height() / 16,
+                    GraphicsContext::Instance().frame().frameBuffer().width() / 8) {
   }
 
   ConsoleCanvas::~ConsoleCanvas() noexcept {
     _cursorBlinkThread.stop();
-  }
-
-  uint32_t ConsoleCanvas::width() const {
-    return _frame.frameBuffer().width();
-  }
-
-  uint32_t ConsoleCanvas::height() const {
-    return _frame.frameBuffer().height();
   }
 
   uint32_t ConsoleCanvas::maxRows() const {
