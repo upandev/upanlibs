@@ -21,6 +21,7 @@
  */
 
 #include <RawImage.h>
+#include <ImageAlgo.h>
 
 namespace upanui {
   RawImage::RawImage(const Image& image) : Image(image), _imageBuffer(nullptr) {
@@ -29,98 +30,14 @@ namespace upanui {
     memcpy(_imageBuffer.get(), image.data(), size);
   }
 
-  int dcompare(double a, double b) {
-    const int32_t ai = a * 100;
-    const int32_t  bi = b * 100;
-    return ai < bi ? -1 : ai > bi ? 1 : 0;
-  }
-
-  uint32_t dround(double v) {
-    const uint32_t a = v * 100;
-    auto m = a % 100;
-    if (m < 50) {
-      return v;
-    } else {
-      return (uint32_t)v + 1;
-    }
-  }
-
   RawImage::RawImage(const Image& image, uint32_t newWidth, uint32_t newHeight)
     : Image(image.x(), image.y(), newWidth, newHeight), _imageBuffer(nullptr) {
-    auto size = width() * height();
-    _imageBuffer.reset(new uint32_t[size]);
-
-    const auto srcWidth = image.width();
-    const auto srcHeight = image.height();
-
-    const double fx = srcWidth * 1.0 / width();
-    const double fy = srcHeight * 1.0 / height();
-
-    const double fa = 1.0 / (fx * fy);
-
-    const auto srcImgBuffer = image.data();
-    auto destImgBuffer = _imageBuffer.get();
-
-    for(uint32_t y = 0; y < height(); ++y) {
-      for(uint32_t x = 0; x < width(); ++x) {
-        double dr = 0;
-        double dg = 0;
-        double db = 0;
-        double da = 0;
-
-        uint32_t sy = y * fy;
-        double scy = y * fy;
-
-        for(double sfy = fy; dcompare(sfy, 0.0) != 0 && sy < srcHeight;) {
-          auto dy = sy + 1 - scy;
-          const auto pycmp = dcompare(dy, sfy);
-          if (pycmp < 0) {
-            ++sy;
-            scy = sy;
-            sfy -= dy;
-          } else if(pycmp == 0) {
-            ++sy;
-            scy = sy;
-            sfy = 0;
-          } else {
-            dy = sfy;
-            scy += dy;
-            sfy = 0;
-          }
-
-          uint32_t sx = x * fx;
-          double scx = x * fx;
-          for (double sfx = fx; dcompare(sfx, 0.0) != 0 && sx < srcWidth;) {
-            auto dx = sx + 1 - scx;
-            const auto pxcmp = dcompare(dx, sfx);
-            if (pxcmp < 0) {
-              ++sx;
-              scx = sx;
-              sfx -= dx;
-            } else if(pxcmp == 0) {
-              ++sx;
-              scx = sx;
-              sfx = 0;
-            } else {
-              dx = sfx;
-              scx += dx;
-              sfx = 0;
-            }
-
-            double ipf = dx * dy * fa;
-            uint32_t srcRGB = srcImgBuffer[sx + sy * srcWidth];
-
-            da += ((srcRGB >> 24) & 0xFF) * ipf;
-            dr += ((srcRGB >> 16) & 0xFF) * ipf;
-            dg += ((srcRGB >> 8) & 0xFF) * ipf;
-            db += (srcRGB & 0xFF) * ipf;
-          }
-        }
-        destImgBuffer[x + y * width()] = dround(dr) << 16 | dround(dg) << 8 | dround(db) | dround(da) << 24; //0xFF000000;
-      }
-    }
+    _imageBuffer.reset(ImageAlgo::resize(image.data(), image.width(), image.height(), newWidth, newHeight));
   }
 
   RawImage::~RawImage() noexcept {
+  }
+
+  void RawImage::draw() {
   }
 }

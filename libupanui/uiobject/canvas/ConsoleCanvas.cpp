@@ -29,7 +29,7 @@
 namespace upanui {
   ConsoleCanvas::ConsoleCanvas(uint32_t maxRows, uint32_t maxColumns)
     : Canvas(0, 0, GraphicsContext::Instance().frame().frameBuffer().width(), GraphicsContext::Instance().frame().frameBuffer().height()),
-      _frame(GraphicsContext::Instance().frame()), _cursorPos(0),
+      _cursorPos(0),
       _charStyle(CharStyle::WHITE_ON_BLACK()),
       _consoleBuffer(*this, maxRows, maxColumns),
       _cursorBlinkThread(*this),
@@ -115,13 +115,13 @@ namespace upanui {
     const unsigned x = (curPos % _consoleBuffer.maxColumns());
     const unsigned y = (curPos / _consoleBuffer.maxColumns());
 
-    _textWriter.drawChar(_frame, ch, x, y,
+    _textWriter.drawChar(gc().frame(), ch, x, y,
                          ColorPalettes::CP16::Get(style.getFGColor()),
                          ColorPalettes::CP16::Get(style.getBGColor() >> 4));
   }
 
   void ConsoleCanvas::scrollDown() {
-    _textWriter.scrollDown(_frame);
+    _textWriter.scrollDown(gc().frame());
   }
 
   void ConsoleCanvas::gotoCursor() {
@@ -146,7 +146,7 @@ namespace upanui {
     const auto x = (_cursorPos % _consoleBuffer.maxColumns());
     const auto y = (_cursorPos / _consoleBuffer.maxColumns());
 
-    _textWriter.drawCursor(_frame, x, y, color);
+    _textWriter.drawCursor(gc().frame(), x, y, color);
   }
 
   ConsoleCanvas::CursorBlink::CursorBlink(ConsoleCanvas& console) : upan::timer_thread(500), _console(console), _showCursorToggle(false) {

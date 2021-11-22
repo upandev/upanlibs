@@ -25,19 +25,19 @@
 namespace upanui {
   class MouseData {
   public:
-    MouseData(uint32_t x, uint32_t y, bool isMiddlePressed, bool isRightPressed, bool isLeftPressed) :
-    _x(x), _y(y), _padding(0),
-    _isMiddlePressed(isMiddlePressed), _isRightPressed(isRightPressed), _isLeftPressed(isLeftPressed) {
+    MouseData(uint32_t x, uint32_t y, bool isMiddlePressed, bool isRightPressed, bool isLeftPressed)
+    : _x(x), _y(y), _padding(0),
+      _isMiddlePressed(isMiddlePressed), _isRightPressed(isRightPressed), _isLeftPressed(isLeftPressed) {
     }
 
     MouseData() : MouseData(0, 0, false, false, false) {
     }
 
-    uint32_t x() const {
+    int x() const {
       return _x;
     }
 
-    uint32_t y() const {
+    int y() const {
       return _y;
     }
 
@@ -62,11 +62,11 @@ namespace upanui {
     }
 
   private:
-    uint16_t _x;
-    uint16_t _y;
-    uint8_t  _padding:5;
-    uint8_t  _isMiddlePressed:1;
-    uint8_t  _isRightPressed:1;
-    uint8_t  _isLeftPressed:1;
+    int16_t _x;
+    int16_t _y;
+    uint8_t _padding:5;
+    uint8_t _isMiddlePressed:1;
+    uint8_t _isRightPressed:1;
+    uint8_t _isLeftPressed:1;
   } PACKED;
 }

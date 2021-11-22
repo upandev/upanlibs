@@ -25,42 +25,70 @@
 
 namespace upanui {
   UIObject::UIObject(const int x, const int y, const uint32_t width, const uint32_t height)
-    : _x(x), _y(y), _width(width), _height(height), _positionChanged(false), _sizeChanged(false), _contentChanged(false) {
+    : _x(x), _y(y), _width(width), _height(height), _gc(GraphicsContext::Instance()) {
   }
 
   void UIObject::x(const int x) {
-    _x = x;
-    positionChanged(true);
+    if (_x != x) {
+      _x = x;
+      positionChanged();
+    }
   }
 
   void UIObject::y(const int y) {
-    _y = y;
-    positionChanged(true);
+    if (_y != y) {
+      _y = y;
+      positionChanged();
+    }
   }
 
   void UIObject::width(const uint32_t width) {
-    _width = width;
-    sizeChanged(true);
+    if (_width != width) {
+      _width = width;
+      sizeChanged();
+    }
   }
 
   void UIObject::height(const uint32_t height) {
-    _height = height;
-    sizeChanged(true);
+    if (_height != height) {
+      _height = height;
+      sizeChanged();
+    }
   }
 
   upan::option<UIObject&> UIObject::parent() {
-    return GraphicsContext::Instance().uiObjectManager().parent(*this);
+    return _gc.uiObjectManager().parent(*this);
   }
 
   const upan::set<UIObject*>& UIObject::children() {
-    return GraphicsContext::Instance().uiObjectManager().children(*this);
+    return _gc.uiObjectManager().children(*this);
   }
 
   void UIObject::add(UIObject& child) {
-    GraphicsContext::Instance().uiObjectManager().add(*this, child);
+    _gc.uiObjectManager().add(*this, child);
   }
 
   void UIObject::remove() {
-    GraphicsContext::Instance().uiObjectManager().remove(*this);
+    _gc.uiObjectManager().remove(*this);
+  }
+
+  void UIObject::redraw() {
+    _gc.uiObjectManager().queueForRedraw(*this);
+  }
+
+  void UIObject::positionChanged() {
+    if (parent().isEmpty()) {
+      _gc.frame().touch();
+    } else {
+      parent().value().redraw();
+    }
+  }
+
+  void UIObject::sizeChanged() {
+    parent().valueOrElse(*this).redraw();
+  }
+
+  void UIObject::contentChanged() {
+    redraw();
   }
 }

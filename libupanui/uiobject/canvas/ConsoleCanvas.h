@@ -33,6 +33,8 @@ namespace upanui {
   class ConsoleCanvas : public Canvas, public IConsole {
   protected:
     ~ConsoleCanvas();
+    void draw() override {}
+
   public:
     ConsoleCanvas(uint32_t maxRows, uint32_t maxColumns);
     ConsoleCanvas();
@@ -69,7 +71,6 @@ namespace upanui {
     };
 
   private:
-    BaseFrame& _frame;
     int _cursorPos;
     TextWriter _textWriter;
     CharStyle _charStyle;

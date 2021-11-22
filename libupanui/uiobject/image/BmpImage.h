@@ -28,6 +28,8 @@ namespace upanui {
     class BmpImage : public Image {
     protected:
       ~BmpImage();
+      void draw() override;
+
     public:
       typedef struct {
         uint8_t _signature[2];
@@ -65,6 +67,7 @@ namespace upanui {
 
       BmpImage(upan::uniq_ptr<uint32_t>&& imageBuffer, const Header& header, const InfoHeader& infoHeader, const int x, const int y);
 
+      static uint32_t* parse(const void* imageData, Header& header, InfoHeader& infoHeader, const uint32_t transparentColor);
       static BmpImage& create(const void* imageData, const int x, const int y, const uint32_t transparentColor);
       static BmpImage& create(const void* imageData, const int x, const int y) {
         return create(imageData, x, y, 0);

@@ -26,20 +26,21 @@
 #include <usfncontext.h>
 #include <option.h>
 #include <set.h>
-#include <atomicop.h>
 
 namespace upanui {
+  class GraphicsContext;
 
   class UIObject {
   protected:
     virtual ~UIObject() {}
+
+    virtual void draw() = 0;
 
   public:
     UIObject(const int x, const int y, const uint32_t width, const uint32_t height);
 
     UIObject(const UIObject&) = delete;
     UIObject& operator=(const UIObject&) = delete;
-
 
     int x() const { return _x; }
     int y() const { return _y; }
@@ -55,26 +56,14 @@ namespace upanui {
     const upan::set<UIObject*>& children();
     void add(UIObject& child);
     void remove();
+    void redraw();
 
-    bool positionChanged() {
-      return _positionChanged.get();
-    }
-    void positionChanged(bool v) {
-      _positionChanged.set(v);
-    }
+    void positionChanged();
+    void sizeChanged();
+    void contentChanged();
 
-    bool sizeChanged() {
-      return _sizeChanged.get();
-    }
-    void sizeChanged(bool v) {
-      _sizeChanged.set(v);
-    }
-
-    bool contentChanged() {
-      return _contentChanged.get();
-    }
-    void contentChanged(bool v) {
-      _contentChanged.set(v);
+    GraphicsContext& gc() {
+      return _gc;
     }
 
   private:
@@ -82,10 +71,7 @@ namespace upanui {
     int _y;
     uint32_t _width;
     uint32_t _height;
-
-    upan::atomic::integral<bool> _positionChanged;
-    upan::atomic::integral<bool> _sizeChanged;
-    upan::atomic::integral<bool> _contentChanged;
+    GraphicsContext& _gc;
 
     friend class UIObjectManager;
   };

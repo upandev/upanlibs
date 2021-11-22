@@ -40,13 +40,10 @@ namespace upanui {
     _infoHeader.DebugPrint();
   }
 
-  BmpImage& BmpImage::create(const void* imageData, const int x, const int y, const uint32_t transparentColor) {
+  uint32_t* BmpImage::parse(const void* imageData, Header& header, InfoHeader& infoHeader, const uint32_t transparentColor) {
     if (imageData == nullptr) {
       throw upan::exception(XLOC, "imageData can't be null");
     }
-
-    Header header;
-    InfoHeader infoHeader;
 
     memcpy(&header, imageData, sizeof(Header));
     if (header._signature[0] != 'B' || header._signature[1] != 'M') {
@@ -99,7 +96,7 @@ namespace upanui {
           scanLinePadding = (4 - delta) * 2;
         }
       }
-        break;
+      break;
       case 8: {
         //1 pixel per byte
         int delta = infoHeader._width % 4;
@@ -107,7 +104,7 @@ namespace upanui {
           scanLinePadding = 4 - delta;
         }
       }
-        break;
+      break;
       case 24: {
         //1 pixel = 3 bytes
         int delta = (3 * infoHeader._width) % 4;
@@ -115,7 +112,7 @@ namespace upanui {
           scanLinePadding = 4 - delta;
         }
       }
-        break;
+      break;
     }
 
     auto applyTransparencyFilter = [transparentColor](const uint32_t color) -> uint32_t  {
@@ -134,14 +131,14 @@ namespace upanui {
             *p = applyTransparencyFilter(colorTable[colorCode]);
             ++dataIndex;
           }
-            break;
+          break;
 
           case 8: {
             const auto colorCode = pixelData[dataIndex] & 0xFF;
             *p = applyTransparencyFilter(colorTable[colorCode]);
             ++dataIndex;
           }
-            break;
+          break;
 
           case 24: {
             const uint32_t b = pixelData[dataIndex++] & 0xFF;
@@ -150,7 +147,7 @@ namespace upanui {
             const uint32_t color = ((r << 16) & 0x00FF0000) | ((g << 8) & 0x0000FF00) | (b & 0x000000FF);
             *p = applyTransparencyFilter(color);
           }
-            break;
+          break;
 
           default:
             throw upan::exception(XLOC, "unsupported BMP resolution: %d", infoHeader._bitsPerPixel);
@@ -158,6 +155,16 @@ namespace upanui {
       }
       dataIndex += scanLinePadding;
     }
+    return imageBuffer.release();
+  }
+
+  BmpImage& BmpImage::create(const void* imageData, const int x, const int y, const uint32_t transparentColor) {
+    Header header;
+    InfoHeader infoHeader;
+    upan::uniq_ptr<uint32_t> imageBuffer(parse(imageData, header, infoHeader, transparentColor));
     return *new BmpImage(upan::move(imageBuffer), header, infoHeader, x, y);
+  }
+
+  void BmpImage::draw() {
   }
 }

@@ -22,9 +22,22 @@
 
 #include <RootCanvas.h>
 #include <GraphicsContext.h>
+#include <ColorPalettes.h>
 
 namespace upanui {
-  RootCanvas::RootCanvas(const int x, const int y, const uint32_t width, const uint32_t height) : Canvas(x, y, width, height) {
-    GraphicsContext::Instance().frame().updateViewport(x, y, width, height);
+  RootCanvas::RootCanvas(const int x, const int y, const uint32_t width, const uint32_t height)
+    : Canvas(x, y, width, height),
+      _bgColor(ColorPalettes::CP16::Get(ColorPalettes::CP16::FG_WHITE)) {
+    gc().frame().updateViewport(x, y, width, height);
+  }
+
+  void RootCanvas::draw() {
+    gc().frame().fillRect(0, 0, width(), height(), _bgColor);
+    gc().frame().touch();
+  }
+
+  void RootCanvas::backgroundColor(const uint32_t color) {
+    _bgColor = color;
+    contentChanged();
   }
 }

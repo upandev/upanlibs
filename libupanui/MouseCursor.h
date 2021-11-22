@@ -19,26 +19,47 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-
 #pragma once
 
-#include <Canvas.h>
-
 namespace upanui {
-  class RootCanvas : public Canvas {
+  class MouseCursor {
   public:
-    uint32_t backgroundColor() const {
-      return _bgColor;
+    MouseCursor(const uint32_t* imageBuffer, const int x, const int y, const uint32_t width, const uint32_t height)
+    : _imageBuffer(imageBuffer), _x(x), _y(y), _width(width), _height(height) {
     }
-    void backgroundColor(const uint32_t);
+
+    int x() const {
+      return _x;
+    }
+    void x(const int x) {
+      _x = x;
+    }
+
+    int y() const {
+      return _y;
+    }
+    void y(const int y) {
+      _y = y;
+    }
+
+    uint32_t width() const {
+      return _width;
+    }
+
+    uint32_t height() const {
+      return _height;
+    }
+
+    const uint32_t* data() const {
+      return const_cast<MouseCursor*>(this)->_imageBuffer.get();
+    }
 
   private:
-    RootCanvas(const int x, const int y, const uint32_t width, const uint32_t height);
-    void draw() override;
-
-  private:
-    uint32_t _bgColor;
-
-    friend class GraphicsContext;
+    //assuming 4 bytes per pixel
+    upan::uniq_ptr<const uint32_t> _imageBuffer;
+    int _x;
+    int _y;
+    uint32_t _width;
+    uint32_t _height;
   };
 }

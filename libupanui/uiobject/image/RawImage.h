@@ -25,20 +25,21 @@
 #include <uniq_ptr.h>
 
 namespace upanui {
-    class RawImage : public Image {
-    protected:
-      ~RawImage();
+  class RawImage : public Image {
+  protected:
+    ~RawImage();
+    void draw() override;
 
-    public:
-      RawImage(const Image& image);
-      RawImage(const Image& image, uint32_t newWidth, uint32_t newHeight);
+  public:
+    RawImage(const Image& image);
+    RawImage(const Image& image, uint32_t newWidth, uint32_t newHeight);
 
-      const uint32_t* data() const override {
-        return const_cast<RawImage*>(this)->_imageBuffer.get();
-      }
+    const uint32_t* data() const override {
+      return const_cast<RawImage*>(this)->_imageBuffer.get();
+    }
 
-    private:
-      //assuming 4 bytes per pixel
-      upan::uniq_ptr<uint32_t> _imageBuffer;
-    };
+  private:
+    //assuming 4 bytes per pixel
+    upan::uniq_ptr<uint32_t> _imageBuffer;
+  };
 }

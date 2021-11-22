@@ -19,26 +19,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-
 #pragma once
 
-#include <Canvas.h>
+#include <stdint.h>
 
 namespace upanui {
-  class RootCanvas : public Canvas {
+  class ImageAlgo {
   public:
-    uint32_t backgroundColor() const {
-      return _bgColor;
-    }
-    void backgroundColor(const uint32_t);
-
-  private:
-    RootCanvas(const int x, const int y, const uint32_t width, const uint32_t height);
-    void draw() override;
-
-  private:
-    uint32_t _bgColor;
-
-    friend class GraphicsContext;
+    static uint32_t* resize(const uint32_t* srcImgBuffer, const uint32_t srcWidth, const uint32_t srcHeight, const uint32_t destWidth, const uint32_t destHeight);
   };
 }

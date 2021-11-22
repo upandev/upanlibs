@@ -24,14 +24,17 @@
 #include <map.h>
 #include <set.h>
 #include <mutex.h>
-
-class GraphicsVideo;
+#include <timer_thread.h>
+#include <queue.h>
 
 namespace upanui {
   class UIObject;
   class RootCanvas;
 
   class UIObjectManager {
+  public:
+    ~UIObjectManager();
+
   private:
     UIObjectManager(RootCanvas& rootCanvas);
 
@@ -40,7 +43,17 @@ namespace upanui {
     void add(UIObject& parent, UIObject& child);
     void remove(UIObject& child);
     void destroy(UIObject& parent);
-    static void directDelete(UIObject& uiObject);
+
+    void queueForRedraw(UIObject& uiObject);
+    void draw();
+
+    class DrawTimerThread : public upan::timer_thread {
+    public:
+      DrawTimerThread(UIObjectManager&);
+      void on_timer_trigger() override;
+    private:
+      UIObjectManager& _uiObjectManager;
+    };
 
   private:
     typedef upan::map<UIObject*, upan::set<UIObject*>> ParentChildMap;
@@ -49,10 +62,14 @@ namespace upanui {
     ChildParentMap _childParentMap;
     RootCanvas& _rootCanvas;
 
-    upan::mutex _managerMutex;
+    upan::mutex _uiObjectTreeMutex;
+    upan::mutex _uiObjectQueueMutex;
+
+    const int MAX_OBJECTS_UPDATE_QUEUE = 20;
+    upan::set<UIObject*> _modifiedUIObjects;
+    DrawTimerThread _drawTimerThread;
 
     friend class GraphicsContext;
     friend class UIObject;
-    friend class ::GraphicsVideo;
   };
 }
