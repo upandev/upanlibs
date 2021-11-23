@@ -96,9 +96,11 @@ namespace upan {
   }
 
   void thread::stop() {
-    _state.set(stopping);
-    while(_state.get() != stopped) {
-      sleepms(10);
+    if (_state.get() != not_running && _state.get() != stopped) {
+      _state.set(stopping);
+      while(_state.get() != stopped) {
+        sleepms(10);
+      }
     }
   }
 
