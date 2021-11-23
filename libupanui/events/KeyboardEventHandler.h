@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include <EventHandler.h>
 #include <exception.h>
 #include <typeinfo.h>
 #include <KeyboardEvent.h>
@@ -31,19 +30,8 @@ namespace upanui {
 class Event;
 class KeyboardEvent;
 
-class KeyboardEventHandler : public EventHandler {
+class KeyboardEventHandler {
 public:
-  KeyboardEventHandler(UIObject& uiObject) : EventHandler(uiObject) {}
-
-  virtual void onEvent(KeyboardEvent& event) = 0;
-
-private:
-  void dispatch(Event& event) override {
-    auto e = dynamic_cast<KeyboardEvent*>(&event);
-    if (e == nullptr) {
-      throw upan::exception(XLOC, "Event is not KeyboardEvent. It's: %s", typeid(&event).name());
-    }
-    onEvent(*e);
-  }
+  virtual void onEvent(UIObject& uiObject, const KeyboardEvent& event) = 0;
 };
 }

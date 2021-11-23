@@ -26,17 +26,21 @@
 #include <mutex.h>
 #include <timer_thread.h>
 #include <queue.h>
+#include <KeyboardEvent.h>
+#include <MouseEvent.h>
 
 namespace upanui {
   class UIObject;
   class RootCanvas;
+  class KeyboardEvent;
+  class MouseEvent;
 
   class UIObjectManager {
   public:
     ~UIObjectManager();
 
   private:
-    UIObjectManager(RootCanvas& rootCanvas);
+    UIObjectManager(RootCanvas& rootCanvas, const bool autoRefresh);
 
     upan::option<UIObject&> parent(UIObject& child);
     const upan::set<UIObject*>& children(UIObject& parent);
@@ -47,13 +51,26 @@ namespace upanui {
     void queueForRedraw(UIObject& uiObject);
     void draw();
 
-    class DrawTimerThread : public upan::timer_thread {
+    class AutoRefreshHandler : public upan::timer_thread {
     public:
-      DrawTimerThread(UIObjectManager&);
+      AutoRefreshHandler(UIObjectManager&);
       void on_timer_trigger() override;
     private:
       UIObjectManager& _uiObjectManager;
     };
+
+    upan::option<UIObject&> setFocus(UIObject& uiObject) {
+      auto prev = _focusedUIObject;
+      _focusedUIObject = upan::option<UIObject&>(uiObject);
+      return prev;
+    }
+
+    upan::option<UIObject&> focusedUIObject() {
+      return _focusedUIObject;
+    }
+
+    void dispatch(const KeyboardEvent& event);
+    void dispatch(const MouseEvent& event);
 
   private:
     typedef upan::map<UIObject*, upan::set<UIObject*>> ParentChildMap;
@@ -61,15 +78,17 @@ namespace upanui {
     ParentChildMap _parentChildMap;
     ChildParentMap _childParentMap;
     RootCanvas& _rootCanvas;
+    upan::option<UIObject&> _focusedUIObject;
 
     upan::mutex _uiObjectTreeMutex;
     upan::mutex _uiObjectQueueMutex;
 
     const int MAX_OBJECTS_UPDATE_QUEUE = 20;
     upan::set<UIObject*> _modifiedUIObjects;
-    DrawTimerThread _drawTimerThread;
+    AutoRefreshHandler _autoRefreshHandler;
 
     friend class GraphicsContext;
     friend class UIObject;
+    friend class EventManager;
   };
 }

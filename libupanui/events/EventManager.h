@@ -39,16 +39,13 @@ private:
 
 public:
   void startEventLoop();
-  void registerKeyboardEventHandler(KeyboardEventHandler& handler);
-  void registerMouseEventHandler(MouseEventHandler& handler);
   KeyboardData getCh();
 
 private:
   void handleKeyboardEvent(int fd);
+  void handleMouseEvent(int fd);
 
 private:
-  typedef upan::map<EventTypes, upan::list<EventHandler*>> EventHandlerMap;
-  EventHandlerMap _eventHandlers;
   int _eventStreamFDs[2];
 
   friend class GraphicsContext;

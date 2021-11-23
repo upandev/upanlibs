@@ -21,6 +21,8 @@
  */
 
 #include <UIObject.h>
+#include <KeyboardEventHandler.h>
+#include <MouseEventHandler.h>
 #include <GraphicsContext.h>
 
 namespace upanui {
@@ -90,5 +92,17 @@ namespace upanui {
 
   void UIObject::contentChanged() {
     redraw();
+  }
+
+  void UIObject::onKeyboardEvent(const KeyboardEvent& event) {
+    for(auto handler : _keyboardEventHandlers) {
+      handler->onEvent(*this, event);
+    }
+  }
+
+  void UIObject::onMouseEvent(const MouseEvent& event) {
+    for(auto handler : _mouseEventHandlers) {
+      handler->onEvent(*this, event);
+    }
   }
 }

@@ -22,24 +22,12 @@
 
 #pragma once
 
-#include <EventHandler.h>
 #include <exception.h>
 #include <MouseEvent.h>
 
 namespace upanui {
-class MouseEventHandler : public EventHandler {
+class MouseEventHandler {
 public:
-  MouseEventHandler(UIObject& uiObject) : EventHandler(uiObject) {}
-
-  virtual void onEvent(MouseEvent& event) = 0;
-
-private:
-  void dispatch(Event& event) override {
-    auto e = dynamic_cast<MouseEvent*>(&event);
-    if (e == nullptr) {
-      throw upan::exception(XLOC, "Event is not MouseEvent. It's: %s", typeid(&event).name());
-    }
-    onEvent(*e);
-  }
+  virtual void onEvent(UIObject& uiObject, const MouseEvent& event) = 0;
 };
 }

@@ -37,7 +37,7 @@ namespace upanui {
     return interop::graphics_context::instance();
   }
 
-  GraphicsContext::GraphicsContext() : _frame(nullptr), _evenManager(nullptr), _focusedUIObject(nullptr) {
+  GraphicsContext::GraphicsContext() : _frame(nullptr), _evenManager(nullptr) {
     FrameBufferInfo frameBufferInfo;
     init_gui_frame(&frameBufferInfo);
 
@@ -53,12 +53,20 @@ namespace upanui {
   }
 
   RootCanvas& GraphicsContext::initRootCanvas() {
-    return initRootCanvas(_frame->viewport().x1(), _frame->viewport().y1(), _frame->viewport().width(), _frame->viewport().height());
+    return initRootCanvas(_frame->viewport().x1(), _frame->viewport().y1(), _frame->viewport().width(), _frame->viewport().height(), true);
   }
 
-  RootCanvas& GraphicsContext::initRootCanvas(const int x, const int y, const uint32_t width, const uint32_t height) {
+  RootCanvas& GraphicsContext::initRootCanvasWithoutAutoRefresh() {
+    return initRootCanvas(_frame->viewport().x1(), _frame->viewport().y1(), _frame->viewport().width(), _frame->viewport().height(), false);
+  }
+
+  RootCanvas& GraphicsContext::initRootCanvas(const int x, const int y, const uint32_t width, const uint32_t height, const bool autoRefresh) {
+    if (_rootCanvas.get() != nullptr) {
+      throw upan::exception(XLOC, "RootCanvas is already initialized!");
+    }
     _rootCanvas.reset(new RootCanvas(x, y, width, height));
-    _uiObjectManager.reset(new UIObjectManager(*_rootCanvas));
+    _uiObjectManager.reset(new UIObjectManager(*_rootCanvas, autoRefresh));
+    initEventManager();
     return *_rootCanvas;
   }
 
@@ -75,6 +83,10 @@ namespace upanui {
       throw upan::exception(XLOC, "EventManager is not initialized!");
     }
     return *_evenManager;
+  }
+
+  upan::option<UIObject&> GraphicsContext::setFocus(UIObject& uiObject) {
+    return _uiObjectManager->setFocus(uiObject);
   }
 
   UIObjectManager& GraphicsContext::uiObjectManager() {

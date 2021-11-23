@@ -46,27 +46,20 @@ namespace upanui {
     }
 
     RootCanvas& initRootCanvas();
-    RootCanvas& initRootCanvas(const int x, const int y, const uint32_t width, const uint32_t height);
+    RootCanvas& initRootCanvasWithoutAutoRefresh();
+    RootCanvas& initRootCanvas(const int x, const int y, const uint32_t width, const uint32_t height, const bool autoRefresh);
 
     EventManager& initEventManager();
     EventManager& eventManager();
 
+    upan::option<UIObject&> setFocus(UIObject&);
     UIObjectManager& uiObjectManager();
-
-    void setFocus(UIObject* uiObject) {
-      _focusedUIObject = uiObject;
-    }
-
-    bool isFocused(UIObject* uiObject) {
-      return _focusedUIObject == uiObject;
-    }
 
   private:
     upan::uniq_ptr<Frame> _frame;
     upan::uniq_ptr<EventManager> _evenManager;
     upan::uniq_ptr<RootCanvas> _rootCanvas;
     upan::uniq_ptr<UIObjectManager> _uiObjectManager;
-    UIObject* _focusedUIObject;
 
     friend class interop::graphics_context;
   };

@@ -23,16 +23,20 @@
 #include <UIObjectManager.h>
 #include <UIObject.h>
 #include <RootCanvas.h>
+#include <GraphicsContext.h>
 
 namespace upanui {
-  UIObjectManager::UIObjectManager(RootCanvas& rootCanvas) : _rootCanvas(rootCanvas), _drawTimerThread(*this) {
+  UIObjectManager::UIObjectManager(RootCanvas& rootCanvas, const bool autoRefresh)
+    : _rootCanvas(rootCanvas), _focusedUIObject(rootCanvas), _autoRefreshHandler(*this) {
     _parentChildMap.insert(ParentChildMap::value_type(&_rootCanvas, upan::set<UIObject*>()));
-    _drawTimerThread.start();
-    queueForRedraw(_rootCanvas);
+    if (autoRefresh) {
+      _autoRefreshHandler.start();
+      queueForRedraw(_rootCanvas);
+    }
   }
 
   UIObjectManager::~UIObjectManager() {
-    _drawTimerThread.stop();
+    _autoRefreshHandler.stop();
     destroy(_rootCanvas);
   }
 
@@ -90,6 +94,12 @@ namespace upanui {
     upan::mutex_guard g1(_uiObjectQueueMutex);
     _modifiedUIObjects.erase(&uiObject);
 
+    if (!_focusedUIObject.isEmpty()) {
+      if (&_focusedUIObject.value() == &uiObject) {
+        _focusedUIObject = upan::option<UIObject&>::empty();
+      }
+    }
+
     delete &uiObject;
   }
 
@@ -121,12 +131,28 @@ namespace upanui {
     for(int i = 0; i < count; ++i) {
       modifiedUIObjects[i]->draw();
     }
+    if (count > 0) {
+      GraphicsContext::Instance().frame().touch();
+    }
   }
 
-  UIObjectManager::DrawTimerThread::DrawTimerThread(UIObjectManager& uiObjectManager) : upan::timer_thread(50), _uiObjectManager(uiObjectManager) {
+  UIObjectManager::AutoRefreshHandler::AutoRefreshHandler(UIObjectManager& uiObjectManager) : upan::timer_thread(50), _uiObjectManager(uiObjectManager) {
   }
 
-  void UIObjectManager::DrawTimerThread::on_timer_trigger() {
+  void UIObjectManager::AutoRefreshHandler::on_timer_trigger() {
     _uiObjectManager.draw();
+  }
+
+  void UIObjectManager::dispatch(const KeyboardEvent& event) {
+    _focusedUIObject.ifPresent([&event](UIObject& uiObject) {
+      uiObject.onKeyboardEvent(event);
+    });
+  }
+
+  void UIObjectManager::dispatch(const MouseEvent& event) {
+    //TODO: get focus to clicked object. Dispatch event to object under mouse x,y
+    _focusedUIObject.ifPresent([&event](UIObject& uiObject) {
+      uiObject.onMouseEvent(event);
+    });
   }
 }

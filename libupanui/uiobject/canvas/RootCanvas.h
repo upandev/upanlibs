@@ -27,9 +27,10 @@
 namespace upanui {
   class RootCanvas : public Canvas {
   public:
-    uint32_t backgroundColor() const {
+    upan::option<uint32_t> backgroundColor() const {
       return _bgColor;
     }
+    void noBackgroundColor();
     void backgroundColor(const uint32_t);
 
   private:
@@ -37,7 +38,7 @@ namespace upanui {
     void draw() override;
 
   private:
-    uint32_t _bgColor;
+    upan::option<uint32_t> _bgColor;
 
     friend class GraphicsContext;
   };

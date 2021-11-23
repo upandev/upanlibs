@@ -29,13 +29,12 @@
 
 namespace upanui {
   class GraphicsContext;
+  class KeyboardEventHandler;
+  class MouseEventHandler;
+  class KeyboardEvent;
+  class MouseEvent;
 
   class UIObject {
-  protected:
-    virtual ~UIObject() {}
-
-    virtual void draw() = 0;
-
   public:
     UIObject(const int x, const int y, const uint32_t width, const uint32_t height);
 
@@ -66,11 +65,38 @@ namespace upanui {
       return _gc;
     }
 
+    void addKeyboardEventHandler(KeyboardEventHandler& handler) {
+      _keyboardEventHandlers.insert(&handler);
+    }
+    void removeKeyboardEventHandler(KeyboardEventHandler& handler) {
+      _keyboardEventHandlers.erase(&handler);
+    }
+
+    void addMouseEventHandler(MouseEventHandler& handler) {
+      _mouseEventHandlers.insert(&handler);
+    }
+
+    void removeMouseEventHandler(MouseEventHandler& handler) {
+      _mouseEventHandlers.erase(&handler);
+    }
+
+    virtual void draw() = 0;
+
+  protected:
+    virtual ~UIObject() {}
+
+    virtual void onKeyboardEvent(const KeyboardEvent& event);
+    virtual void onMouseEvent(const MouseEvent& event);
+
   private:
     int _x;
     int _y;
     uint32_t _width;
     uint32_t _height;
+
+    upan::set<KeyboardEventHandler*> _keyboardEventHandlers;
+    upan::set<MouseEventHandler*> _mouseEventHandlers;
+
     GraphicsContext& _gc;
 
     friend class UIObjectManager;

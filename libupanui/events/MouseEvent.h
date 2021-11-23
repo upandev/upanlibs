@@ -23,18 +23,19 @@
 #pragma once
 
 #include <Event.h>
+#include <MouseData.h>
 
 namespace upanui {
 class MouseEvent : public Event {
 public:
-  MouseEvent(int data) : _data(data) {
+  MouseEvent(const MouseData& data) : _data(data) {
   }
 
-  int getData() const {
+  MouseData getData() const {
     return _data;
   }
 
 private:
-  const int _data;
+  const MouseData _data;
 };
 }

@@ -23,21 +23,13 @@
 #include <EventManager.h>
 #include <KeyboardEventHandler.h>
 #include <MouseEventHandler.h>
+#include <GraphicsContext.h>
 #include <fs.h>
 #include <mosstd.h>
+#include <MouseData.h>
 
 namespace upanui {
   EventManager::EventManager() {
-    _eventHandlers.insert(EventHandlerMap::value_type(Keyboard, upan::list<EventHandler*>()));
-    _eventHandlers.insert(EventHandlerMap::value_type(Mouse, upan::list<EventHandler*>()));
-  }
-
-  void EventManager::registerKeyboardEventHandler(KeyboardEventHandler& handler) {
-    _eventHandlers[Keyboard].push_back(&handler);
-  }
-
-  void EventManager::registerMouseEventHandler(MouseEventHandler &handler) {
-    _eventHandlers[Keyboard].push_back(&handler);
   }
 
   void EventManager::startEventLoop() {
@@ -63,7 +55,7 @@ namespace upanui {
           if (readyFDs[i]._fd == _eventStreamFDs[0]) { //Keyboard
             handleKeyboardEvent(_eventStreamFDs[0]);
           } else if (readyFDs[i]._fd == _eventStreamFDs[1]) { //Mouse
-
+            handleMouseEvent(_eventStreamFDs[1]);
           }
         }
       }
@@ -101,16 +93,27 @@ namespace upanui {
         return;
       }
       if (n != sizeof(KeyboardData)) {
-        throw upan::exception(XLOC, "read event data size (%d) < RawKeyboardData size (%d)", n, sizeof(KeyboardData));
+        throw upan::exception(XLOC, "read event data size (%d) < KeyboardData size (%d)", n, sizeof(KeyboardData));
       }
 
       KeyboardEvent keyboardEvent(data);
+      GraphicsContext::Instance().uiObjectManager().dispatch(keyboardEvent);
+    }
+  }
 
-      for(auto handler : _eventHandlers[Keyboard]) {
-        if (handler->isFocused()) {
-          handler->dispatch(keyboardEvent);
-        }
+  void EventManager::handleMouseEvent(int fd) {
+    while(true) {
+      MouseData data;
+      auto n = read(fd, (void*)&data, sizeof(MouseData));
+      if (n == 0) {
+        return;
       }
+      if (n != sizeof(MouseData)) {
+        throw upan::exception(XLOC, "read event data size (%d) < MouseData size (%d)", n, sizeof(MouseData));
+      }
+
+      MouseEvent mouseEvent(data);
+      GraphicsContext::Instance().uiObjectManager().dispatch(mouseEvent);
     }
   }
 }
