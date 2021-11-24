@@ -80,14 +80,19 @@ namespace upanui {
 
   void UIObject::positionChanged() {
     if (parent().isEmpty()) {
-      _gc.frame().touch();
+      _gc.frame().updateViewport(_x, _y, _width, _height);
     } else {
       parent().value().redraw();
     }
   }
 
   void UIObject::sizeChanged() {
-    parent().valueOrElse(*this).redraw();
+    if (parent().isEmpty()) {
+      _gc.frame().updateViewport(_x, _y, _width, _height);
+      redraw();
+    } else {
+      parent().value().redraw();
+    }
   }
 
   void UIObject::contentChanged() {
