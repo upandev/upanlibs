@@ -22,7 +22,6 @@
 
 #include <GraphicsContext.h>
 #include <Frame.h>
-#include <RootCanvas.h>
 
 namespace upanui {
   void GraphicsContext::Init() {
@@ -52,19 +51,19 @@ namespace upanui {
   GraphicsContext::~GraphicsContext() {
   }
 
-  RootCanvas& GraphicsContext::initRootCanvas() {
-    return initRootCanvas(_frame->viewport().x1(), _frame->viewport().y1(), _frame->viewport().width(), _frame->viewport().height(), true);
+  UIRoot& GraphicsContext::initUIRoot() {
+    return initUIRoot(_frame->viewport().x1(), _frame->viewport().y1(), _frame->viewport().width(), _frame->viewport().height(), true);
   }
 
-  RootCanvas& GraphicsContext::initRootCanvasWithoutAutoRefresh() {
-    return initRootCanvas(_frame->viewport().x1(), _frame->viewport().y1(), _frame->viewport().width(), _frame->viewport().height(), false);
+  UIRoot& GraphicsContext::initUIRootWithoutAutoRefresh() {
+    return initUIRoot(_frame->viewport().x1(), _frame->viewport().y1(), _frame->viewport().width(), _frame->viewport().height(), false);
   }
 
-  RootCanvas& GraphicsContext::initRootCanvas(const int x, const int y, const uint32_t width, const uint32_t height, const bool autoRefresh) {
+  UIRoot& GraphicsContext::initUIRoot(const int x, const int y, const uint32_t width, const uint32_t height, const bool autoRefresh) {
     if (_rootCanvas.get() != nullptr) {
-      throw upan::exception(XLOC, "RootCanvas is already initialized!");
+      throw upan::exception(XLOC, "UIRoot is already initialized!");
     }
-    _rootCanvas.reset(new RootCanvas(x, y, width, height));
+    _rootCanvas.reset(new UIRoot(x, y, width, height));
     _uiObjectManager.reset(new UIObjectManager(*_rootCanvas, autoRefresh));
     initEventManager();
     return *_rootCanvas;

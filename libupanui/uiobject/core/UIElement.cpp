@@ -20,42 +20,30 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#pragma once
+#include <UIElement.h>
 
-#include <stdint.h>
-#include <atomicop.h>
+namespace upanui {
+  UIElement::UIElement(const int x, const int y, const uint32_t width, const uint32_t height)
+    : UIObjectImpl(x, y, width, height) {
+  }
 
-namespace upan{
-    class mutex {
-      private:
-      atomic::integral<uint32_t> _lock;
-      __volatile__ int _processID;
+  int UIElement::drawX() const {
+    return parent().drawX() + x();
+  }
 
-      static const int FREE_MUTEX = -999;
-    public:
-      mutex();
-      ~mutex();
+  int UIElement::drawY() const {
+    return parent().drawY() + y();
+  }
 
-      bool lock(bool bBlock = true);
-      bool unlock();
-      bool unlock(int pid);
+  void UIElement::positionChanged() {
+    parent().redraw();
+  }
 
-    private:
-      void acquire();
-      void release();
-    };
+  void UIElement::sizeChanged() {
+    parent().redraw();
+  }
 
-    class mutex_guard {
-    public:
-      mutex_guard(mutex& m) : _m(m) {
-        _m.lock();
-      }
-      mutex_guard(const mutex& m) : mutex_guard(const_cast<mutex&>(m)) {
-      }
-      ~mutex_guard() {
-        _m.unlock();
-      }
-    private:
-      mutex& _m;
-    };
+  void UIElement::contentChanged() {
+    redraw();
+  }
 }

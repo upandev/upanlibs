@@ -26,88 +26,87 @@
 #include <GraphicsContext.h>
 
 namespace upanui {
-  UIObject::UIObject(const int x, const int y, const uint32_t width, const uint32_t height)
+  UIObjectImpl::UIObjectImpl(const int x, const int y, const uint32_t width, const uint32_t height)
     : _x(x), _y(y), _width(width), _height(height), _gc(GraphicsContext::Instance()) {
   }
 
-  void UIObject::x(const int x) {
+  void UIObjectImpl::x(const int x) {
     if (_x != x) {
       _x = x;
       positionChanged();
     }
   }
 
-  void UIObject::y(const int y) {
+  void UIObjectImpl::y(const int y) {
     if (_y != y) {
       _y = y;
       positionChanged();
     }
   }
 
-  void UIObject::width(const uint32_t width) {
+  void UIObjectImpl::width(const uint32_t width) {
     if (_width != width) {
       _width = width;
       sizeChanged();
     }
   }
 
-  void UIObject::height(const uint32_t height) {
+  void UIObjectImpl::height(const uint32_t height) {
     if (_height != height) {
       _height = height;
       sizeChanged();
     }
   }
 
-  upan::option<UIObject&> UIObject::parent() {
+  UIObject& UIObjectImpl::parent() const {
     return _gc.uiObjectManager().parent(*this);
   }
 
-  const upan::set<UIObject*>& UIObject::children() {
+  const upan::set<UIObject*>& UIObjectImpl::children() {
     return _gc.uiObjectManager().children(*this);
   }
 
-  void UIObject::add(UIObject& child) {
+  void UIObjectImpl::add(UIObject& child) {
     _gc.uiObjectManager().add(*this, child);
   }
 
-  void UIObject::remove() {
+  void UIObjectImpl::remove() {
     _gc.uiObjectManager().remove(*this);
   }
 
-  void UIObject::redraw() {
+  void UIObjectImpl::redraw() {
     _gc.uiObjectManager().queueForRedraw(*this);
   }
 
-  void UIObject::positionChanged() {
-    if (parent().isEmpty()) {
-      _gc.frame().updateViewport(_x, _y, _width, _height);
-    } else {
-      parent().value().redraw();
-    }
-  }
-
-  void UIObject::sizeChanged() {
-    if (parent().isEmpty()) {
-      _gc.frame().updateViewport(_x, _y, _width, _height);
-      redraw();
-    } else {
-      parent().value().redraw();
-    }
-  }
-
-  void UIObject::contentChanged() {
-    redraw();
-  }
-
-  void UIObject::onKeyboardEvent(const KeyboardEvent& event) {
+  void UIObjectImpl::onKeyboardEvent(const KeyboardEvent& event) {
     for(auto handler : _keyboardEventHandlers) {
       handler->onEvent(*this, event);
     }
   }
 
-  void UIObject::onMouseEvent(const MouseEvent& event) {
+  void UIObjectImpl::onMouseEvent(const MouseEvent& event) {
     for(auto handler : _mouseEventHandlers) {
       handler->onEvent(*this, event);
+    }
+  }
+
+  bool UIObjectImpl::inside(const int x, const int y) const {
+    const int objX = drawX();
+    const int objY = drawY();
+    return x >= objX && x < (int)(objX + _width) && y >= objY && y <= (int)(objY + _height);
+  }
+
+  upan::option<UIObject&> UIObjectImpl::uiObjectUnderCursor(const int x, const int y) {
+    if (inside(x, y)) {
+      for(auto& child : children()) {
+        const upan::option<UIObject&> o = child->uiObjectUnderCursor(x, y);
+        if (!o.isEmpty()) {
+          return o;
+        }
+      }
+      return upan::option<UIObject&>(this);
+    } else {
+      return upan::option<UIObject&>::empty();
     }
   }
 }

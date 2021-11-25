@@ -19,32 +19,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
+#pragma once
 
-#include <RootCanvas.h>
-#include <GraphicsContext.h>
+#include <stdlib.h>
+#include <UIObjectImpl.h>
 
 namespace upanui {
-  RootCanvas::RootCanvas(const int x, const int y, const uint32_t width, const uint32_t height)
-    : Canvas(x, y, width, height), _bgColor(upan::option<uint32_t>::empty()) {
-    gc().frame().updateViewport(x, y, width, height);
-  }
+  class UIElement : public UIObjectImpl {
+  protected:
+    UIElement(const int x, const int y, const uint32_t width, const uint32_t height);
 
-  void RootCanvas::draw() {
-    if (!_bgColor.isEmpty()) {
-      gc().frame().fillRect(0, 0, width(), height(), _bgColor.value());
-    }
-    for(auto& child : children()) {
-      child->draw();
-    }
-  }
+    int drawX() const override;
+    int drawY() const override;
 
-  void RootCanvas::noBackgroundColor() {
-    _bgColor = upan::option<uint32_t>::empty();
-    contentChanged();
-  }
-
-  void RootCanvas::backgroundColor(const uint32_t color) {
-    _bgColor = color;
-    contentChanged();
-  }
+    void positionChanged() override;
+    void sizeChanged() override;
+    void contentChanged() override;
+  };
 }

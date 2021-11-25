@@ -35,7 +35,7 @@ namespace upanui {
     }
 
     int x2() const {
-      return _x + _width - 1;
+      return _x + _width;
     }
 
     int y1() const {
@@ -43,7 +43,7 @@ namespace upanui {
     }
 
     int y2() const {
-      return _y + _height - 1;
+      return _y + _height;
     }
 
     void x1(uint32_t val) {

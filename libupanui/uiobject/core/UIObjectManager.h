@@ -28,10 +28,12 @@
 #include <queue.h>
 #include <KeyboardEvent.h>
 #include <MouseEvent.h>
+#include <UIObject.h>
+#include <uniq_ptr.h>
+#include <UIProxyParent.h>
 
 namespace upanui {
-  class UIObject;
-  class RootCanvas;
+  class UIRoot;
   class KeyboardEvent;
   class MouseEvent;
 
@@ -40,9 +42,9 @@ namespace upanui {
     ~UIObjectManager();
 
   private:
-    UIObjectManager(RootCanvas& rootCanvas, const bool autoRefresh);
+    UIObjectManager(UIRoot& rootCanvas, const bool autoRefresh);
 
-    upan::option<UIObject&> parent(UIObject& child);
+    UIObject& parent(const UIObject& child) const;
     const upan::set<UIObject*>& children(UIObject& parent);
     void add(UIObject& parent, UIObject& child);
     void remove(UIObject& child);
@@ -74,10 +76,10 @@ namespace upanui {
 
   private:
     typedef upan::map<UIObject*, upan::set<UIObject*>> ParentChildMap;
-    typedef upan::map<UIObject*, UIObject*> ChildParentMap;
+    typedef upan::map<const UIObject*, UIObject*> ChildParentMap;
     ParentChildMap _parentChildMap;
     ChildParentMap _childParentMap;
-    RootCanvas& _rootCanvas;
+    UIObject& _rootCanvas;
     upan::option<UIObject&> _focusedUIObject;
 
     upan::mutex _uiObjectTreeMutex;
@@ -86,9 +88,10 @@ namespace upanui {
     const int MAX_OBJECTS_UPDATE_QUEUE = 20;
     upan::set<UIObject*> _modifiedUIObjects;
     AutoRefreshHandler _autoRefreshHandler;
+    upan::uniq_ptr<UIProxyParent> _proxyParent;
 
     friend class GraphicsContext;
-    friend class UIObject;
+    friend class UIObjectImpl;
     friend class EventManager;
   };
 }

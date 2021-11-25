@@ -22,12 +22,14 @@
 
 #include <UIObjectManager.h>
 #include <UIObject.h>
-#include <RootCanvas.h>
+#include <UIRoot.h>
 #include <GraphicsContext.h>
 
 namespace upanui {
-  UIObjectManager::UIObjectManager(RootCanvas& rootCanvas, const bool autoRefresh)
+  UIObjectManager::UIObjectManager(UIRoot& rootCanvas, const bool autoRefresh)
     : _rootCanvas(rootCanvas), _focusedUIObject(rootCanvas), _autoRefreshHandler(*this) {
+    _proxyParent.reset(new UIProxyParent());
+    add(*_proxyParent, rootCanvas);
     _parentChildMap.insert(ParentChildMap::value_type(&_rootCanvas, upan::set<UIObject*>()));
     if (autoRefresh) {
       _autoRefreshHandler.start();
@@ -40,15 +42,14 @@ namespace upanui {
     destroy(_rootCanvas);
   }
 
-  upan::option<UIObject&> UIObjectManager::parent(UIObject& child) {
+  UIObject& UIObjectManager::parent(const UIObject& child) const {
     upan::mutex_guard g(_uiObjectTreeMutex);
 
     auto i = _childParentMap.find(&child);
     if (i == _childParentMap.end()) {
-      return upan::option<UIObject&>::empty();
-    } else {
-      return upan::option<UIObject&>(*i->second);
+      throw upan::exception(XLOC, "there is no parent UIObject for this child");
     }
+    return *i->second;
   }
 
   const upan::set<UIObject*>& UIObjectManager::children(UIObject& parent) {
@@ -58,10 +59,6 @@ namespace upanui {
 
   void UIObjectManager::add(UIObject& parent, UIObject& child) {
     upan::mutex_guard g(_uiObjectTreeMutex);
-
-    if (&child == &_rootCanvas) {
-      throw upan::exception(XLOC, "RootCanvas can't be a child UIObject");
-    }
 
     if (&parent == &child) {
       throw upan::exception(XLOC, "parent and child can't be same");
@@ -77,9 +74,7 @@ namespace upanui {
 
   void UIObjectManager::remove(UIObject& child) {
     upan::mutex_guard g(_uiObjectTreeMutex);
-    parent(child).ifPresent([&](UIObject& parent) {
-      _parentChildMap[&parent].erase(&child);
-    });
+    _parentChildMap[&parent(child)].erase(&child);
   }
 
   void UIObjectManager::destroy(UIObject& uiObject) {
@@ -151,7 +146,20 @@ namespace upanui {
 
   void UIObjectManager::dispatch(const MouseEvent& event) {
     //TODO: get focus to clicked object. Dispatch event to object under mouse x,y
-    _focusedUIObject.ifPresent([&event](UIObject& uiObject) {
+    upan::mutex_guard g(_uiObjectTreeMutex);
+
+    const MouseData& data = event.getData();
+    upan::option<UIObject&> eventObject = _focusedUIObject;
+
+    if (!data.anyButtonHeld()) {
+      _rootCanvas.uiObjectUnderCursor(data.x(), data.y()).ifPresent([&](UIObject& o) {
+        if (data.anyButtonPressed()) {
+          _focusedUIObject = upan::option<UIObject&>(o);
+        }
+        eventObject = upan::option<UIObject&>(o);
+      });
+    }
+    eventObject.ifPresent([&event](UIObject& uiObject) {
       uiObject.onMouseEvent(event);
     });
   }

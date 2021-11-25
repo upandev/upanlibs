@@ -19,43 +19,35 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-
 #pragma once
 
-#include <stdint.h>
-#include <atomicop.h>
+#include <stdlib.h>
+#include <UIObjectImpl.h>
 
-namespace upan{
-    class mutex {
-      private:
-      atomic::integral<uint32_t> _lock;
-      __volatile__ int _processID;
+namespace upanui {
+  class UIRoot : public UIObjectImpl {
+  private:
+    UIRoot(const int x, const int y, const uint32_t width, const uint32_t height);
 
-      static const int FREE_MUTEX = -999;
-    public:
-      mutex();
-      ~mutex();
+  public:
+    upan::option<uint32_t> backgroundColor() const {
+      return _bgColor;
+    }
+    void noBackgroundColor();
+    void backgroundColor(const uint32_t);
 
-      bool lock(bool bBlock = true);
-      bool unlock();
-      bool unlock(int pid);
+  protected:
+    int drawX() const override;
+    int drawY() const override;
+    void draw() override;
 
-    private:
-      void acquire();
-      void release();
-    };
+    void positionChanged() override;
+    void sizeChanged() override;
+    void contentChanged() override;
 
-    class mutex_guard {
-    public:
-      mutex_guard(mutex& m) : _m(m) {
-        _m.lock();
-      }
-      mutex_guard(const mutex& m) : mutex_guard(const_cast<mutex&>(m)) {
-      }
-      ~mutex_guard() {
-        _m.unlock();
-      }
-    private:
-      mutex& _m;
-    };
+  private:
+    upan::option<uint32_t> _bgColor;
+
+    friend class GraphicsContext;
+  };
 }

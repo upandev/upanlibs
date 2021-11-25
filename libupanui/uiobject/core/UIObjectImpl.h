@@ -26,6 +26,7 @@
 #include <usfncontext.h>
 #include <option.h>
 #include <set.h>
+#include <UIObject.h>
 
 namespace upanui {
   class GraphicsContext;
@@ -34,59 +35,54 @@ namespace upanui {
   class KeyboardEvent;
   class MouseEvent;
 
-  class UIObject {
+  class UIObjectImpl : public UIObject {
+  protected:
+    UIObjectImpl(const int x, const int y, const uint32_t width, const uint32_t height);
+
   public:
-    UIObject(const int x, const int y, const uint32_t width, const uint32_t height);
+    int x() const override { return _x; }
+    int y() const override { return _y; }
+    uint32_t width() const override { return _width; }
+    uint32_t height() const override { return _height; }
 
-    UIObject(const UIObject&) = delete;
-    UIObject& operator=(const UIObject&) = delete;
+    void x(const int) override;
+    void y(const int) override;
+    void width(const uint32_t) override;
+    void height(const uint32_t) override;
 
-    int x() const { return _x; }
-    int y() const { return _y; }
-    uint32_t width() const { return _width; }
-    uint32_t height() const { return _height; }
+    UIObject& parent() const override;
+    const upan::set<UIObject*>& children() override;
 
-    void x(const int);
-    void y(const int);
-    void width(const uint32_t);
-    void height(const uint32_t);
-
-    upan::option<UIObject&> parent();
-    const upan::set<UIObject*>& children();
-    void add(UIObject& child);
-    void remove();
-    void redraw();
-
-    void positionChanged();
-    void sizeChanged();
-    void contentChanged();
+    void add(UIObject& child) override;
+    void remove() override;
+    void redraw() override;
 
     GraphicsContext& gc() {
       return _gc;
     }
 
-    void addKeyboardEventHandler(KeyboardEventHandler& handler) {
+    void addKeyboardEventHandler(KeyboardEventHandler& handler) override {
       _keyboardEventHandlers.insert(&handler);
     }
-    void removeKeyboardEventHandler(KeyboardEventHandler& handler) {
+    void removeKeyboardEventHandler(KeyboardEventHandler& handler) override {
       _keyboardEventHandlers.erase(&handler);
     }
 
-    void addMouseEventHandler(MouseEventHandler& handler) {
+    void addMouseEventHandler(MouseEventHandler& handler) override {
       _mouseEventHandlers.insert(&handler);
     }
 
-    void removeMouseEventHandler(MouseEventHandler& handler) {
+    void removeMouseEventHandler(MouseEventHandler& handler) override {
       _mouseEventHandlers.erase(&handler);
     }
 
-    virtual void draw() = 0;
+    upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) override;
 
   protected:
-    virtual ~UIObject() {}
+    void onKeyboardEvent(const KeyboardEvent& event) override;
+    void onMouseEvent(const MouseEvent& event) override;
 
-    virtual void onKeyboardEvent(const KeyboardEvent& event);
-    virtual void onMouseEvent(const MouseEvent& event);
+    bool inside(const int x, const int y) const;
 
   private:
     int _x;
@@ -98,7 +94,5 @@ namespace upanui {
     upan::set<MouseEventHandler*> _mouseEventHandlers;
 
     GraphicsContext& _gc;
-
-    friend class UIObjectManager;
   };
 }

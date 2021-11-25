@@ -27,7 +27,7 @@
 #include <EventManager.h>
 #include <graphics_context.h>
 #include <UIObjectManager.h>
-#include <RootCanvas.h>
+#include <UIRoot.h>
 #include <Frame.h>
 
 namespace upanui {
@@ -45,9 +45,9 @@ namespace upanui {
       return *_frame.get();
     }
 
-    RootCanvas& initRootCanvas();
-    RootCanvas& initRootCanvasWithoutAutoRefresh();
-    RootCanvas& initRootCanvas(const int x, const int y, const uint32_t width, const uint32_t height, const bool autoRefresh);
+    UIRoot& initUIRoot();
+    UIRoot& initUIRootWithoutAutoRefresh();
+    UIRoot& initUIRoot(const int x, const int y, const uint32_t width, const uint32_t height, const bool autoRefresh);
 
     EventManager& initEventManager();
     EventManager& eventManager();
@@ -58,7 +58,7 @@ namespace upanui {
   private:
     upan::uniq_ptr<Frame> _frame;
     upan::uniq_ptr<EventManager> _evenManager;
-    upan::uniq_ptr<RootCanvas> _rootCanvas;
+    upan::uniq_ptr<UIRoot> _rootCanvas;
     upan::uniq_ptr<UIObjectManager> _uiObjectManager;
 
     friend class interop::graphics_context;

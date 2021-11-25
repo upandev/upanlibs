@@ -20,26 +20,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#pragma once
-
-#include <Canvas.h>
+#include <UIProxyParent.h>
+#include <GraphicsContext.h>
 
 namespace upanui {
-  class RootCanvas : public Canvas {
-  public:
-    upan::option<uint32_t> backgroundColor() const {
-      return _bgColor;
-    }
-    void noBackgroundColor();
-    void backgroundColor(const uint32_t);
-
-  private:
-    RootCanvas(const int x, const int y, const uint32_t width, const uint32_t height);
-    void draw() override;
-
-  private:
-    upan::option<uint32_t> _bgColor;
-
-    friend class GraphicsContext;
-  };
+  uint32_t UIProxyParent::width() const {
+    return GraphicsContext::Instance().frame().frameBuffer().width();
+  }
+  uint32_t UIProxyParent::height() const {
+    return GraphicsContext::Instance().frame().frameBuffer().height();
+  }
 }

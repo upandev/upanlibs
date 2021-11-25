@@ -22,14 +22,14 @@
 
 #pragma once
 
-#include <UIObject.h>
+#include <UIElement.h>
 
 namespace upanui {
-  class Canvas : public UIObject {
+  class Canvas : public UIElement {
   protected:
     virtual ~Canvas() {}
 
   public:
-    Canvas(const int x, const int y, const uint32_t width, const uint32_t height) : UIObject(x, y, width, height) {}
+    Canvas(const int x, const int y, const uint32_t width, const uint32_t height) : UIElement(x, y, width, height) {}
   };
 }
