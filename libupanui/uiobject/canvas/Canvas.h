@@ -25,11 +25,26 @@
 #include <UIElement.h>
 
 namespace upanui {
+  class FrameBuffer;
+
   class Canvas : public UIElement {
   protected:
     virtual ~Canvas() {}
+    Canvas(const int x, const int y, const uint32_t width, const uint32_t height);
 
   public:
-    Canvas(const int x, const int y, const uint32_t width, const uint32_t height) : UIElement(x, y, width, height) {}
+    void backgroundColor(const uint32_t);
+    uint32_t backgroundColor() const {
+      return _bgColor;
+    }
+
+  protected:
+    virtual void doDraw(const FrameBuffer& frameBuffer, const int baseX, const int baseY) {}
+
+  private:
+    void draw() override;
+
+  private:
+    uint32_t _bgColor;
   };
 }

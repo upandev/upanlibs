@@ -32,9 +32,9 @@ namespace upanui {
     virtual ~BaseFrame() {}
 
     void copy(const void* src, int len);
-    void fillRect(uint32_t sx, uint32_t sy, uint32_t width, uint32_t height, uint32_t color);
+    void fillRect(int sx, int sy, uint32_t width, uint32_t height, uint32_t color);
 
-    const upanui::FrameBuffer& frameBuffer() const {
+    upanui::FrameBuffer& frameBuffer() {
       return _frameBuffer;
     }
 

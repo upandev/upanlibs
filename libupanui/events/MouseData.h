@@ -93,6 +93,7 @@ namespace upanui {
         case PRESSED:
         case HOLD: return pressed ? HOLD : RELEASED;
         case RELEASED: return pressed ? PRESSED : NORMAL;
+        default: return NORMAL;
       }
     }
 

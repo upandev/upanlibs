@@ -150,9 +150,11 @@ namespace upanui {
 
     const MouseData& data = event.getData();
     upan::option<UIObject&> eventObject = _focusedUIObject;
+    const int viewportX = data.x() - _rootCanvas.x();
+    const int viewportY = data.y() - _rootCanvas.y();
 
     if (!data.anyButtonHeld()) {
-      _rootCanvas.uiObjectUnderCursor(data.x(), data.y()).ifPresent([&](UIObject& o) {
+      _rootCanvas.uiObjectUnderCursor(viewportX, viewportY).ifPresent([&](UIObject& o) {
         if (data.anyButtonPressed()) {
           _focusedUIObject = upan::option<UIObject&>(o);
         }

@@ -30,7 +30,7 @@
 #include <uniq_ptr.h>
 
 namespace upanui {
-  class ConsoleCanvas : public Canvas, public IConsole {
+  class ConsoleCanvas : public UIElement, public IConsole {
   protected:
     ~ConsoleCanvas();
     void draw() override {}

@@ -22,6 +22,9 @@
 
 #include <BaseFrame.h>
 #include <string.h>
+#include <mosstd.h>
+#include <algorithm.h>
+#include <Rectangle.h>
 
 namespace upanui {
   BaseFrame::BaseFrame(const upanui::FrameBuffer& frameBuffer, const upanui::Viewport& viewport)
@@ -29,25 +32,13 @@ namespace upanui {
   }
 
   void BaseFrame::copy(const void *src, int len) {
-    memcpy(_frameBuffer.buffer(), src, len);
-    touch();
+    optimized_memcpy((uint32_t)_frameBuffer.buffer(), (uint32_t)src, len);
   }
 
-  void BaseFrame::fillRect(uint32_t sx, uint32_t sy, uint32_t width, uint32_t height, uint32_t color) {
-    uint32_t y_offset;
-    bool changed = false;
-    for(uint32_t y = sy; y < (sy + height) && y < _viewport.height(); ++y) {
-      y_offset = y * _frameBuffer.pitch();
-      for(uint32_t x = sx; x < (sx + width) && x < _viewport.width(); ++x) {
-        auto p = (uint32_t*)((uint32_t)_frameBuffer.buffer() + y_offset + x * _frameBuffer.bytesPerPixel());
-        *p = (color | 0xFF000000);
-        changed = true;
-      }
-    }
-
-    if (changed) {
-      touch();
-    }
+  void BaseFrame::fillRect(int sx, int sy, uint32_t width, uint32_t height, uint32_t color) {
+    int ex = upan::min(_viewport.width(), sx + width) - 1;
+    int ey = upan::min(_viewport.height(), sy + height) - 1;
+    Rectangle::fill(_frameBuffer, sx, sy, ex, ey, color);
   }
 
   bool BaseFrame::_updateViewport(int x, int y, uint32_t width, uint32_t height) {

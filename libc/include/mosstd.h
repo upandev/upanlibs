@@ -22,6 +22,8 @@
 #ifndef _UPANIX_STD_H_
 #define _UPANIX_STD_H_
 
+#include <stdint.h>
+
 #define pid_t int
 
 #if defined __cplusplus
@@ -75,6 +77,7 @@ int isprocessalive(int pid);
 int iskernel();
 int getpid();
 void yield();
+void optimized_memcpy(uint32_t dest, uint32_t src, int len);
 
 extern void SysProcess_WaitPID(int iProcessID) ;
 extern void SysProcess_Exit(int iExitStatus) ;

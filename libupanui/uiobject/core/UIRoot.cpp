@@ -22,6 +22,8 @@
 
 #include <UIRoot.h>
 #include <GraphicsContext.h>
+#include <Button.h>
+#include <Rectangle.h>
 
 namespace upanui {
   UIRoot::UIRoot(const int x, const int y, const uint32_t width, const uint32_t height)
@@ -31,8 +33,8 @@ namespace upanui {
 
   void UIRoot::draw() {
     if (!_bgColor.isEmpty()) {
-      gc().frame().fillRect(drawX(), drawY(), width() - 50, height(), _bgColor.value());
-      gc().frame().fillRect(drawX() + 50, drawY(), width() - 50, height(), _bgColor.value() + 200);
+      Rectangle::fill(gc().frame().frameBuffer(), drawX(), drawY(), 50 -1, height() - 1, _bgColor.value());
+      Rectangle::fill(gc().frame().frameBuffer(), drawX() + 50, drawY(), width() - 1, height() - 1, _bgColor.value() + 150);
     }
     for(auto& child : children()) {
       child->draw();
