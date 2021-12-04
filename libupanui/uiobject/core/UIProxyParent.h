@@ -62,19 +62,6 @@ namespace upanui {
     void remove() override {}
     void redraw() override {}
 
-    void addKeyboardEventHandler(KeyboardEventHandler& handler) override {
-      throw upan::exception(XLOC, "unsupported addKeyboardEventHandler for UIProxyParent");
-    }
-    void removeKeyboardEventHandler(KeyboardEventHandler& handler) override {
-      throw upan::exception(XLOC, "unsupported removeKeyboardEventHandler for UIProxyParent");
-    }
-    void addMouseEventHandler(MouseEventHandler& handler) override {
-      throw upan::exception(XLOC, "unsupported addMouseEventHandler for UIProxyParent");
-    }
-    void removeMouseEventHandler(MouseEventHandler& handler) override {
-      throw upan::exception(XLOC, "unsupported removeMouseEventHandler for UIProxyParent");
-    }
-
     upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) override {
       throw upan::exception(XLOC, "unsupported uiObjectUnderCursor for UIProxyParent");
     }
@@ -86,6 +73,8 @@ namespace upanui {
     void onMouseEvent(const MouseEvent& event) override {
       throw upan::exception(XLOC, "unsupported onMouseEvent for UIProxyParent");
     }
+    void onMouseFocus() override {}
+    void onLoseMouseFocus() override {}
 
     friend class UIObjectManager;
   };

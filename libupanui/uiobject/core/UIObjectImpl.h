@@ -30,8 +30,6 @@
 
 namespace upanui {
   class GraphicsContext;
-  class KeyboardEventHandler;
-  class MouseEventHandler;
   class KeyboardEvent;
   class MouseEvent;
 
@@ -61,26 +59,13 @@ namespace upanui {
       return _gc;
     }
 
-    void addKeyboardEventHandler(KeyboardEventHandler& handler) override {
-      _keyboardEventHandlers.insert(&handler);
-    }
-    void removeKeyboardEventHandler(KeyboardEventHandler& handler) override {
-      _keyboardEventHandlers.erase(&handler);
-    }
-
-    void addMouseEventHandler(MouseEventHandler& handler) override {
-      _mouseEventHandlers.insert(&handler);
-    }
-
-    void removeMouseEventHandler(MouseEventHandler& handler) override {
-      _mouseEventHandlers.erase(&handler);
-    }
-
     upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) override;
 
   protected:
-    void onKeyboardEvent(const KeyboardEvent& event) override;
-    void onMouseEvent(const MouseEvent& event) override;
+    void onKeyboardEvent(const KeyboardEvent& event) override {}
+    void onMouseEvent(const MouseEvent& event) override {}
+    void onMouseFocus() override {}
+    void onLoseMouseFocus() override {}
 
     bool inside(const int x, const int y) const;
 
@@ -89,9 +74,6 @@ namespace upanui {
     int _y;
     uint32_t _width;
     uint32_t _height;
-
-    upan::set<KeyboardEventHandler*> _keyboardEventHandlers;
-    upan::set<MouseEventHandler*> _mouseEventHandlers;
 
     GraphicsContext& _gc;
   };

@@ -25,6 +25,8 @@
 #include <UIObjectImpl.h>
 
 namespace upanui {
+  class MouseEventHandler;
+
   class UIRoot : public UIObjectImpl {
   private:
     UIRoot(const int x, const int y, const uint32_t width, const uint32_t height);
@@ -36,7 +38,13 @@ namespace upanui {
     void noBackgroundColor();
     void backgroundColor(const uint32_t);
 
+    void onDrag(MouseEventHandler& handler) {
+      _onDragHandler = upan::option<MouseEventHandler&>(handler);
+    }
+
   protected:
+    void onMouseEvent(const MouseEvent& event) override;
+
     int drawX() const override;
     int drawY() const override;
     void draw() override;
@@ -47,6 +55,7 @@ namespace upanui {
 
   private:
     upan::option<uint32_t> _bgColor;
+    upan::option<MouseEventHandler&> _onDragHandler;
 
     friend class GraphicsContext;
   };

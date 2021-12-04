@@ -27,7 +27,10 @@
 
 namespace upanui {
   UIObjectManager::UIObjectManager(UIRoot& rootCanvas, const bool autoRefresh)
-    : _rootCanvas(rootCanvas), _focusedUIObject(rootCanvas), _autoRefreshHandler(*this) {
+    : _rootCanvas(rootCanvas),
+      _focusedUIObject(rootCanvas),
+      _mouseFocusedObject(upan::option<UIObject&>::empty()),
+      _autoRefreshHandler(*this) {
     _proxyParent.reset(new UIProxyParent());
     add(*_proxyParent, rootCanvas);
     _parentChildMap.insert(ParentChildMap::value_type(&_rootCanvas, upan::set<UIObject*>()));
@@ -92,6 +95,12 @@ namespace upanui {
     if (!_focusedUIObject.isEmpty()) {
       if (&_focusedUIObject.value() == &uiObject) {
         _focusedUIObject = upan::option<UIObject&>::empty();
+      }
+    }
+
+    if (!_mouseFocusedObject.isEmpty()) {
+      if (&_mouseFocusedObject.value() == &uiObject) {
+        _mouseFocusedObject = upan::option<UIObject&>::empty();
       }
     }
 
@@ -161,7 +170,17 @@ namespace upanui {
         eventObject = upan::option<UIObject&>(o);
       });
     }
-    eventObject.ifPresent([&event](UIObject& uiObject) {
+
+    eventObject.ifPresent([&](UIObject& uiObject) {
+      if (_mouseFocusedObject.isEmpty()) {
+        _mouseFocusedObject = eventObject;
+        _mouseFocusedObject.value().onMouseFocus();
+      } else if (&_mouseFocusedObject.value() != &uiObject) {
+        _mouseFocusedObject.value().onLoseMouseFocus();
+        _mouseFocusedObject = eventObject;
+        _mouseFocusedObject.value().onMouseFocus();
+      }
+
       uiObject.onMouseEvent(event);
     });
   }

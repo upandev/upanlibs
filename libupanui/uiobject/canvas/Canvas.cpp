@@ -30,6 +30,7 @@ namespace upanui {
 
   void Canvas::backgroundColor(const uint32_t color) {
     _bgColor = color;
+    onBackgroundColorChange();
     contentChanged();
   }
 
@@ -51,10 +52,11 @@ namespace upanui {
       return;
     }
 
+    const auto bgColorForDraw = backgroundColorForDraw();
     // UI element is within the visible area
     if (dx1 >= bx1 && dx2 <= bx2 && dy1 >= by1 && dy2 <= by2) {
       const FrameBuffer& frameBuffer = gc().frame().frameBuffer();
-      Rectangle::fill(frameBuffer, dx1, dy1, dx2, dy2, _bgColor);
+      Rectangle::fill(frameBuffer, dx1, dy1, dx2, dy2, bgColorForDraw);
       doDraw(frameBuffer, dx1, dy1);
     }
     // UI element is partially within the visible area
@@ -69,7 +71,7 @@ namespace upanui {
       tempFBInfo._frameBuffer = tempBuffer.get();
       FrameBuffer tempFrameBuffer(tempFBInfo);
 
-      Rectangle::fill(tempFrameBuffer, 0, 0, width() - 1, height() - 1, _bgColor);
+      Rectangle::fill(tempFrameBuffer, 0, 0, width() - 1, height() - 1, bgColorForDraw);
       doDraw(tempFrameBuffer, 0, 0);
 
       const int srcX1 = dx1 >= bx1 ? 0 : bx1 - dx1;

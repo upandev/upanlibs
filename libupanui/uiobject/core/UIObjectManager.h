@@ -81,6 +81,7 @@ namespace upanui {
     ChildParentMap _childParentMap;
     UIObject& _rootCanvas;
     upan::option<UIObject&> _focusedUIObject;
+    upan::option<UIObject&> _mouseFocusedObject;
 
     upan::mutex _uiObjectTreeMutex;
     upan::mutex _uiObjectQueueMutex;

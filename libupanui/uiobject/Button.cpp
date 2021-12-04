@@ -20,33 +20,46 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#pragma once
-
-#include <Canvas.h>
+#include <Button.h>
+#include <MouseEventHandler.h>
 
 namespace upanui {
-  class Button : public Canvas {
-  public:
-    uint32_t hoverColor() const {
-      return _hoverColor;
-    }
+  Button::Button(const int x, const int y, const uint32_t width, const uint32_t height) : Canvas(x, y, width, height) {
+    Button::onBackgroundColorChange();
+  }
 
-  protected:
-    virtual ~Button() {}
-    Button(const int x, const int y, const uint32_t width, const uint32_t height);
+  void Button::onBackgroundColorChange() {
+    auto bgColor = backgroundColor();
 
-    void onBackgroundColorChange() override;
-    uint32_t backgroundColorForDraw() override;
+    auto b = bgColor & 0xFF;
+    b += upan::min(0xFF - b, 8u);
 
-    void onKeyboardEvent(const KeyboardEvent& event) override;
-    void onMouseEvent(const MouseEvent& event) override;
-    void onMouseFocus() override;
-    void onLoseMouseFocus() override;
+    auto g = (bgColor & 0xFF00) >> 8;
+    g += upan::min(0xFF - g, 8u);
 
-  private:
-    uint32_t _hoverColor;
-    bool _hover;
+    auto r = (bgColor & 0xFF0000) >> 16;
+    r += upan::min(0xFF - r, 8u);
 
-    friend class UIObjectFactory;
-  };
+    _hoverColor = (bgColor & 0xFF000000) | r << 16 | g << 8 | b;
+  }
+
+  uint32_t Button::backgroundColorForDraw() {
+    return _hover ? _hoverColor : backgroundColor();
+  }
+
+  void Button::onKeyboardEvent(const KeyboardEvent& event) {
+  }
+
+  void Button::onMouseEvent(const MouseEvent& event) {
+  }
+
+  void Button::onMouseFocus() {
+    _hover = true;
+    contentChanged();
+  }
+
+  void Button::onLoseMouseFocus() {
+    _hover = false;
+    contentChanged();
+  }
 }

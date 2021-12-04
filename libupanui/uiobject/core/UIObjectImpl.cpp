@@ -78,18 +78,6 @@ namespace upanui {
     _gc.uiObjectManager().queueForRedraw(*this);
   }
 
-  void UIObjectImpl::onKeyboardEvent(const KeyboardEvent& event) {
-    for(auto handler : _keyboardEventHandlers) {
-      handler->onEvent(*this, event);
-    }
-  }
-
-  void UIObjectImpl::onMouseEvent(const MouseEvent& event) {
-    for(auto handler : _mouseEventHandlers) {
-      handler->onEvent(*this, event);
-    }
-  }
-
   bool UIObjectImpl::inside(const int x, const int y) const {
     const int objX = drawX();
     const int objY = drawY();

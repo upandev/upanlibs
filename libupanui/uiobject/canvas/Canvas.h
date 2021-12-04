@@ -39,6 +39,10 @@ namespace upanui {
     }
 
   protected:
+    virtual void onBackgroundColorChange() {}
+    virtual uint32_t backgroundColorForDraw() {
+      return backgroundColor();
+    }
     virtual void doDraw(const FrameBuffer& frameBuffer, const int baseX, const int baseY) {}
 
   private:

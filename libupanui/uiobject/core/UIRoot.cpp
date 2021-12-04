@@ -24,10 +24,13 @@
 #include <GraphicsContext.h>
 #include <Button.h>
 #include <Rectangle.h>
+#include <MouseEventHandler.h>
 
 namespace upanui {
   UIRoot::UIRoot(const int x, const int y, const uint32_t width, const uint32_t height)
-  : UIObjectImpl(x, y, width, height), _bgColor(upan::option<uint32_t>::empty()) {
+  : UIObjectImpl(x, y, width, height),
+    _bgColor(upan::option<uint32_t>::empty()),
+    _onDragHandler(upan::option<MouseEventHandler&>::empty()) {
     gc().frame().updateViewport(x, y, width, height);
   }
 
@@ -70,5 +73,13 @@ namespace upanui {
 
   void UIRoot::contentChanged() {
     redraw();
+  }
+
+  void UIRoot::onMouseEvent(const MouseEvent &event) {
+    if (event.getData().leftButtonState() == MouseData::HOLD) {
+      _onDragHandler.ifPresent([&](MouseEventHandler& handler) {
+        handler.onEvent(*this, event);
+      });
+    }
   }
 }

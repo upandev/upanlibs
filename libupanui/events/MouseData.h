@@ -63,6 +63,14 @@ namespace upanui {
       return static_cast<State>(_middleButtonState);
     }
 
+    bool isNormalMove() const {
+      return leftButtonState() == NORMAL || rightButtonState() == NORMAL || middleButtonState() == NORMAL;
+    }
+
+    bool anyButtonReleased() const {
+      return leftButtonState() == RELEASED || rightButtonState() == RELEASED || middleButtonState() == RELEASED;
+    }
+
     bool anyButtonPressed() const {
       return leftButtonState() == PRESSED || rightButtonState() == PRESSED || middleButtonState() == PRESSED;
     }

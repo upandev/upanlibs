@@ -41,8 +41,7 @@ class option
     }
     bool isEmpty() const { return _isEmpty; }
 
-    const T& value() const
-    {
+    const T& value() const {
       if(_isEmpty)
         throw exception(XLOC, "Option is empty");
       return _value;
@@ -64,23 +63,20 @@ class option
       return mapLambda(*_value);
     }
 
-  const T& valueOrThrow(const upan::string& fileName, unsigned lineNo, const upan::error& error) const
-    {
+    const T& valueOrThrow(const upan::string& fileName, unsigned lineNo, const upan::error& error) const {
       if(_isEmpty)
         throw upan::exception(fileName, lineNo, error);
       return _value;
     }
 
-    const T& valueOrElse(const T& defaultValue) const
-    {
+    const T& valueOrElse(const T& defaultValue) const {
       if(_isEmpty)
         return defaultValue;
       return _value;
     }
 
     template <typename LAMBDA>
-    bool ifPresent(const LAMBDA& lambdaf)
-    {
+    bool ifPresent(const LAMBDA& lambdaf) {
       if(isEmpty())
         return false;
       lambdaf(_value);

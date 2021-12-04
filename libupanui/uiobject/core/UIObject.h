@@ -29,8 +29,6 @@
 
 namespace upanui {
   class GraphicsContext;
-  class KeyboardEventHandler;
-  class MouseEventHandler;
   class KeyboardEvent;
   class MouseEvent;
 
@@ -66,11 +64,6 @@ namespace upanui {
     virtual void remove() = 0;
     virtual void redraw() = 0;
 
-    virtual void addKeyboardEventHandler(KeyboardEventHandler& handler) = 0;
-    virtual void removeKeyboardEventHandler(KeyboardEventHandler& handler) = 0;
-    virtual void addMouseEventHandler(MouseEventHandler& handler) = 0;
-    virtual void removeMouseEventHandler(MouseEventHandler& handler) = 0;
-
     virtual upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) = 0;
 
   protected:
@@ -78,6 +71,8 @@ namespace upanui {
 
     virtual void onKeyboardEvent(const KeyboardEvent& event) = 0;
     virtual void onMouseEvent(const MouseEvent& event) = 0;
+    virtual void onMouseFocus() = 0;
+    virtual void onLoseMouseFocus() = 0;
 
     friend class UIObjectManager;
   };
