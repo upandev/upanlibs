@@ -37,6 +37,10 @@ namespace upanui {
     uint32_t backgroundColor() const {
       return _bgColor;
     }
+    void backgroundColorAlpha(const uint32_t);
+    uint32_t  backgroundColorAlpha() const {
+      return _bgAlpha;
+    }
 
   protected:
     virtual void onBackgroundColorChange() {}
@@ -44,11 +48,13 @@ namespace upanui {
       return backgroundColor();
     }
     virtual void doDraw(const FrameBuffer& frameBuffer, const int baseX, const int baseY) {}
+    void fill(const FrameBuffer& framebuffer, int x1, int y1, int x2, int y2, uint32_t color, uint32_t alpha);
 
   private:
     void draw() override;
 
   private:
     uint32_t _bgColor;
+    uint32_t _bgAlpha;
   };
 }

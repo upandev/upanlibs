@@ -22,35 +22,45 @@
 
 #include <UIRoot.h>
 #include <GraphicsContext.h>
-#include <Button.h>
-#include <Rectangle.h>
 #include <MouseEventHandler.h>
 
 namespace upanui {
   UIRoot::UIRoot(const int x, const int y, const uint32_t width, const uint32_t height)
   : UIObjectImpl(x, y, width, height),
-    _bgColor(upan::option<uint32_t>::empty()),
+    _bgColor(0),
+    _bgAlpha(0xFF),
     _onDragHandler(upan::option<MouseEventHandler&>::empty()) {
     gc().frame().updateViewport(x, y, width, height);
   }
 
   void UIRoot::draw() {
-    if (!_bgColor.isEmpty()) {
-      Rectangle::fill(gc().frame().frameBuffer(), drawX(), drawY(), 50 -1, height() - 1, _bgColor.value());
-      Rectangle::fill(gc().frame().frameBuffer(), drawX() + 50, drawY(), width() - 1, height() - 1, _bgColor.value() + 150);
-    }
+    fill(drawX(), drawY(), 50 -1, height() - 1, _bgColor, _bgAlpha);
+    fill(drawX() + 50, drawY(), width() - 1, height() - 1, _bgColor + 150, _bgAlpha);
     for(auto& child : children()) {
       child->draw();
     }
   }
 
-  void UIRoot::noBackgroundColor() {
-    _bgColor = upan::option<uint32_t>::empty();
-    contentChanged();
+  void UIRoot::fill(int x1, int y1, int x2, int y2, uint32_t color, uint32_t alpha) {
+    const auto& framebuffer = gc().frame().frameBuffer();
+    color = (color & ~0xFF000000) | (alpha << 24);
+    uint32_t y_offset;
+    for(uint32_t y = y1; y <= y2; ++y) {
+      y_offset = y * framebuffer.pitch();
+      for(uint32_t x = x1; x <= x2; ++x) {
+        auto p = (uint32_t*)((uint32_t)framebuffer.buffer() + y_offset + x * framebuffer.bytesPerPixel());
+        *p = color;
+      }
+    }
   }
 
   void UIRoot::backgroundColor(const uint32_t color) {
     _bgColor = color;
+    contentChanged();
+  }
+
+  void UIRoot::backgroundColorAlpha(const uint32_t alpha) {
+    _bgAlpha = alpha;
     contentChanged();
   }
 

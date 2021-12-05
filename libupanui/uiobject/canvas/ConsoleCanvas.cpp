@@ -33,7 +33,8 @@ namespace upanui {
       _charStyle(CharStyle::WHITE_ON_BLACK()),
       _consoleBuffer(*this, maxRows, maxColumns),
       _cursorBlinkThread(*this),
-      _usfnContext(nullptr) {
+      _usfnContext(nullptr),
+      _keyboardHandler(upan::option<KeyboardEventHandler&>::empty()) {
     try {
       _usfnContext.reset(new upanui::usfn::Context());
       _usfnContext->Load(upanui::usfn::Context::GetPreloadedFont(upanui::usfn::PreloadedFonts::VGA16));
@@ -147,6 +148,16 @@ namespace upanui {
     const auto y = (_cursorPos / _consoleBuffer.maxColumns());
 
     _textWriter.drawCursor(gc().frame(), x, y, color);
+  }
+
+  void ConsoleCanvas::onKeyPress(KeyboardEventHandler& h) {
+    _keyboardHandler = upan::option<KeyboardEventHandler&>(h);
+  }
+
+  void ConsoleCanvas::onKeyboardEvent(const KeyboardEvent& event) {
+    _keyboardHandler.ifPresent([&](KeyboardEventHandler& handler) {
+      handler.onEvent(*this, event);
+    });
   }
 
   ConsoleCanvas::CursorBlink::CursorBlink(ConsoleCanvas& console) : upan::timer_thread(500), _console(console), _showCursorToggle(false) {

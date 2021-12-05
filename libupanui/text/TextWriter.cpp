@@ -108,7 +108,7 @@ namespace upanui {
   void TextWriter::drawCursor(BaseFrame& frame, uint32_t x, uint32_t y, uint32_t color) {
     x *= _xCharScale;
     y *= _yCharScale;
-    frame.fillRect(x + 1, y + _yCharScale - 1, _xCharScale - 1, 1, color);
+    frame.fillRect(x + 1, y + _yCharScale - 1, _xCharScale - 1, 1, color | 0xFF000000);
     frame.touch();
   }
 }

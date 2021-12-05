@@ -22,16 +22,34 @@
 
 #include <Canvas.h>
 #include <GraphicsContext.h>
-#include <Rectangle.h>
 
 namespace upanui {
-  Canvas::Canvas(const int x, const int y, const uint32_t width, const uint32_t height) : UIElement(x, y, width, height), _bgColor(0) {
+  Canvas::Canvas(const int x, const int y, const uint32_t width, const uint32_t height) : UIElement(x, y, width, height),
+    _bgColor(0), _bgAlpha(0xFF) {
   }
 
   void Canvas::backgroundColor(const uint32_t color) {
     _bgColor = color;
     onBackgroundColorChange();
     contentChanged();
+  }
+
+  void Canvas::backgroundColorAlpha(const uint32_t alpha) {
+    _bgAlpha = alpha;
+    onBackgroundColorChange();
+    contentChanged();
+  }
+
+  void Canvas::fill(const FrameBuffer& framebuffer, int x1, int y1, int x2, int y2, uint32_t color, uint32_t alpha) {
+    if (alpha > 0) {
+      color = (color & ~0xFF000000) | (alpha << 24);
+      for(auto y = y1; y <= y2; ++y) {
+        auto yOffset = y * framebuffer.width();
+        for(auto x = x1; x <= x2; ++x) {
+          framebuffer.buffer()[x + yOffset] = color;
+        }
+      }
+    }
   }
 
   void Canvas::draw() {
@@ -56,7 +74,7 @@ namespace upanui {
     // UI element is within the visible area
     if (dx1 >= bx1 && dx2 <= bx2 && dy1 >= by1 && dy2 <= by2) {
       const FrameBuffer& frameBuffer = gc().frame().frameBuffer();
-      Rectangle::fill(frameBuffer, dx1, dy1, dx2, dy2, bgColorForDraw);
+      fill(frameBuffer, dx1, dy1, dx2, dy2, bgColorForDraw, backgroundColorAlpha());
       doDraw(frameBuffer, dx1, dy1);
     }
     // UI element is partially within the visible area
@@ -71,7 +89,7 @@ namespace upanui {
       tempFBInfo._frameBuffer = tempBuffer.get();
       FrameBuffer tempFrameBuffer(tempFBInfo);
 
-      Rectangle::fill(tempFrameBuffer, 0, 0, width() - 1, height() - 1, bgColorForDraw);
+      fill(tempFrameBuffer, 0, 0, width() - 1, height() - 1, bgColorForDraw, backgroundColorAlpha());
       doDraw(tempFrameBuffer, 0, 0);
 
       const int srcX1 = dx1 >= bx1 ? 0 : bx1 - dx1;

@@ -28,6 +28,7 @@
 #include <IConsole.h>
 #include <ConsoleBuffer.h>
 #include <uniq_ptr.h>
+#include <KeyboardEventHandler.h>
 
 namespace upanui {
   class ConsoleCanvas : public UIElement, public IConsole {
@@ -55,8 +56,10 @@ namespace upanui {
     void clearScreen();
 
     void setFontContext(upanui::usfn::Context* context);
+    void onKeyPress(KeyboardEventHandler& h);
 
   private:
+    void onKeyboardEvent(const KeyboardEvent& event) override;
     void gotoCursor() override;
     void putChar(int iPos, byte ch, const upanui::CharStyle& attr) override;
     void scrollDown() override;
@@ -78,5 +81,6 @@ namespace upanui {
     upan::mutex _cursorMutex;
     CursorBlink _cursorBlinkThread;
     upan::uniq_ptr<upanui::usfn::Context> _usfnContext;
+    upan::option<KeyboardEventHandler&> _keyboardHandler;
   };
 }

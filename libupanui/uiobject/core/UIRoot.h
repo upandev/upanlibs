@@ -32,11 +32,14 @@ namespace upanui {
     UIRoot(const int x, const int y, const uint32_t width, const uint32_t height);
 
   public:
-    upan::option<uint32_t> backgroundColor() const {
+    uint32_t backgroundColor() const {
       return _bgColor;
     }
-    void noBackgroundColor();
     void backgroundColor(const uint32_t);
+    uint32_t backgroundColorAlpha() const {
+      return _bgAlpha;
+    }
+    void backgroundColorAlpha(const uint32_t);
 
     void onDrag(MouseEventHandler& handler) {
       _onDragHandler = upan::option<MouseEventHandler&>(handler);
@@ -54,7 +57,11 @@ namespace upanui {
     void contentChanged() override;
 
   private:
-    upan::option<uint32_t> _bgColor;
+    void fill(int x1, int y1, int x2, int y2, uint32_t color, uint32_t alpha);
+
+  private:
+    uint32_t _bgColor;
+    uint32_t _bgAlpha;
     upan::option<MouseEventHandler&> _onDragHandler;
 
     friend class GraphicsContext;

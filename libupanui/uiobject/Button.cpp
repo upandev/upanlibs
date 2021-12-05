@@ -29,16 +29,17 @@ namespace upanui {
   }
 
   void Button::onBackgroundColorChange() {
+    const static auto lightness = 10u;
     auto bgColor = backgroundColor();
 
     auto b = bgColor & 0xFF;
-    b += upan::min(0xFF - b, 8u);
+    b += upan::min(0xFF - b, lightness);
 
     auto g = (bgColor & 0xFF00) >> 8;
-    g += upan::min(0xFF - g, 8u);
+    g += upan::min(0xFF - g, lightness);
 
     auto r = (bgColor & 0xFF0000) >> 16;
-    r += upan::min(0xFF - r, 8u);
+    r += upan::min(0xFF - r, lightness);
 
     _hoverColor = (bgColor & 0xFF000000) | r << 16 | g << 8 | b;
   }
