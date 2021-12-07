@@ -44,12 +44,10 @@ namespace upanui {
   void UIRoot::fill(int x1, int y1, int x2, int y2, uint32_t color, uint32_t alpha) {
     const auto& framebuffer = gc().frame().frameBuffer();
     color = (color & ~0xFF000000) | (alpha << 24);
-    uint32_t y_offset;
-    for(uint32_t y = y1; y <= y2; ++y) {
-      y_offset = y * framebuffer.pitch();
-      for(uint32_t x = x1; x <= x2; ++x) {
-        auto p = (uint32_t*)((uint32_t)framebuffer.buffer() + y_offset + x * framebuffer.bytesPerPixel());
-        *p = color;
+    for(auto y = y1; y <= y2; ++y) {
+      const auto yOffset = y * framebuffer.width();
+      for(auto x = x1; x <= x2; ++x) {
+        framebuffer.buffer()[x + yOffset] = color;
       }
     }
   }
