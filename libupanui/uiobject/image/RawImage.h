@@ -29,6 +29,8 @@ namespace upanui {
   protected:
     ~RawImage();
     void draw() override;
+    void drawTopDown() override;
+    void drawToTop() override;
 
   public:
     RawImage(const Image& image);

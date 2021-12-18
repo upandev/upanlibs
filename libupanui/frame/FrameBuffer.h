@@ -33,6 +33,14 @@ namespace upanui {
     FrameBuffer(const FrameBuffer& frameBuffer) : _frameBufferInfo(frameBuffer._frameBufferInfo) {
     }
 
+    FrameBuffer(uint32_t* buffer, uint32_t width, uint32_t height) {
+      _frameBufferInfo._width = width;
+      _frameBufferInfo._height = height;
+      _frameBufferInfo._frameBuffer = buffer;
+      _frameBufferInfo._bpp = 32;
+      _frameBufferInfo._pitch = width * 4;
+    }
+
     uint32_t width() const {
       return _frameBufferInfo._width;
     }
@@ -59,6 +67,10 @@ namespace upanui {
 
     void resetFrameBufferAddress(uint32_t* addr) {
       _frameBufferInfo._frameBuffer = addr;
+    }
+
+    const FrameBufferInfo& frameBufferInfo() const {
+      return _frameBufferInfo;
     }
 
   private:

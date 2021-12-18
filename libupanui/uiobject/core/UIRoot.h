@@ -51,6 +51,8 @@ namespace upanui {
     int drawX() const override;
     int drawY() const override;
     void draw() override;
+    void drawTopDown() override;
+    void drawToTop() override;
 
     void positionChanged() override;
     void sizeChanged() override;
@@ -58,6 +60,7 @@ namespace upanui {
 
   private:
     void fill(int x1, int y1, int x2, int y2, uint32_t color, uint32_t alpha);
+    FrameBuffer& drawBuffer() override;
 
   private:
     uint32_t _bgColor;

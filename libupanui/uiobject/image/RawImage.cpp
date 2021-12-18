@@ -40,4 +40,10 @@ namespace upanui {
 
   void RawImage::draw() {
   }
+
+  void RawImage::drawTopDown() {
+  }
+
+  void RawImage::drawToTop() {
+  }
 }

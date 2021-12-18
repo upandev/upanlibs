@@ -167,4 +167,10 @@ namespace upanui {
 
   void BmpImage::draw() {
   }
+
+  void BmpImage::drawTopDown() {
+  }
+
+  void BmpImage::drawToTop() {
+  }
 }

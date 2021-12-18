@@ -67,6 +67,9 @@ namespace upanui {
     void onMouseFocus() override {}
     void onLoseMouseFocus() override {}
 
+    BoundaryCheckResult checkBoundary(UIObject& child) override;
+    void drawChild(UIObject& child) override;
+
     bool inside(const int x, const int y) const;
 
   private:

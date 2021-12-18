@@ -29,4 +29,10 @@ namespace upanui {
     parent.add(button);
     return button;
   }
+
+  Canvas& UIObjectFactory::createCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
+    auto& canvas = *new Canvas(x, y, width, height);
+    parent.add(canvas);
+    return canvas;
+  }
 }

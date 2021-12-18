@@ -23,11 +23,13 @@
 
 #include <stdlib.h>
 #include <UIObjectImpl.h>
+#include <FrameBuffer.h>
 
 namespace upanui {
   class UIElement : public UIObjectImpl {
   protected:
     UIElement(const int x, const int y, const uint32_t width, const uint32_t height);
+    ~UIElement();
 
     int drawX() const override;
     int drawY() const override;
@@ -35,5 +37,21 @@ namespace upanui {
     void positionChanged() override;
     void sizeChanged() override;
     void contentChanged() override;
+
+    FrameBuffer& drawBuffer() override {
+      return _drawBuffer;
+    }
+    void setupDrawBuffer(const UIObject::BoundaryCheckResult boundaryCheckResult);
+    BoundaryCheckResult getCurrentBoundaryCheckResult() const {
+      return _currentBoundaryCheckResult;
+    }
+    void setCurrentBoundaryCheckResult(BoundaryCheckResult r) {
+      _currentBoundaryCheckResult = r;
+    }
+
+  private:
+    FrameBuffer _drawBuffer;
+    uint32_t* _localBuffer;
+    BoundaryCheckResult _currentBoundaryCheckResult;
   };
 }

@@ -24,7 +24,7 @@
 #include <MouseEventHandler.h>
 
 namespace upanui {
-  Button::Button(const int x, const int y, const uint32_t width, const uint32_t height) : Canvas(x, y, width, height) {
+  Button::Button(const int x, const int y, const uint32_t width, const uint32_t height) : Canvas(x, y, width, height), _hover(false) {
     Button::onBackgroundColorChange();
   }
 

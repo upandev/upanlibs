@@ -22,6 +22,7 @@
 #pragma once
 
 #include <UIObject.h>
+#include "FrameBuffer.h"
 
 namespace upanui {
   class UIProxyParent : public UIObject {
@@ -42,6 +43,12 @@ namespace upanui {
     int drawY() const override { return 0; }
     void draw() override {
       throw upan::exception(XLOC, "draw is not applicable for UIProxyParent");
+    }
+    void drawTopDown() override {
+      throw upan::exception(XLOC, "drawTopDown is not applicable for UIProxyParent");
+    }
+    void drawToTop() override {
+      throw upan::exception(XLOC, "drawToTop is not applicable for UIProxyParent");
     }
 
     void positionChanged() override {}
@@ -64,6 +71,18 @@ namespace upanui {
 
     upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) override {
       throw upan::exception(XLOC, "unsupported uiObjectUnderCursor for UIProxyParent");
+    }
+
+    BoundaryCheckResult checkBoundary(UIObject& child) override {
+      throw upan::exception(XLOC, "unsupported checkBoundary for UIProxyParent");
+    }
+
+    FrameBuffer& drawBuffer() override {
+      throw upan::exception(XLOC, "unsupported drawBuffer for UIProxyParent");
+    }
+
+    void drawChild(UIObject&) override {
+      throw upan::exception(XLOC, "unsupported drawChild for UIProxyParent");
     }
 
   protected:

@@ -24,7 +24,11 @@
 
 namespace upanui {
   UIElement::UIElement(const int x, const int y, const uint32_t width, const uint32_t height)
-    : UIObjectImpl(x, y, width, height) {
+    : UIObjectImpl(x, y, width, height), _drawBuffer(nullptr, 0, 0), _localBuffer(nullptr), _currentBoundaryCheckResult(Outside) {
+  }
+
+  UIElement::~UIElement() noexcept {
+    delete _localBuffer;
   }
 
   int UIElement::drawX() const {
@@ -45,5 +49,36 @@ namespace upanui {
 
   void UIElement::contentChanged() {
     redraw();
+  }
+
+  void UIElement::setupDrawBuffer(const UIObject::BoundaryCheckResult boundaryCheckResult) {
+    if (boundaryCheckResult == BoundaryCheckResult::Outside) {
+      if (_localBuffer) {
+        delete _localBuffer;
+        _localBuffer = nullptr;
+      }
+      _drawBuffer = FrameBuffer(nullptr, 0, 0);
+    } else if (boundaryCheckResult == BoundaryCheckResult::Inside) {
+      if (_localBuffer) {
+        delete _localBuffer;
+        _localBuffer = nullptr;
+      }
+
+      auto& parentDrawBuffer = parent().drawBuffer();
+      FrameBufferInfo frameBufferInfo = parent().drawBuffer().frameBufferInfo();
+      frameBufferInfo._frameBuffer = parentDrawBuffer.buffer() + x() + y() * parentDrawBuffer.width();
+      _drawBuffer = FrameBuffer(frameBufferInfo);
+    } else if (boundaryCheckResult == BoundaryCheckResult::PartiallyInside) {
+      if (_localBuffer != nullptr && (_drawBuffer.width() != width() || _drawBuffer.height() != height())) {
+        delete _localBuffer;
+        _localBuffer = nullptr;
+      }
+      if (_localBuffer == nullptr) {
+        _localBuffer = new uint32_t[width() * height()];
+        _drawBuffer = FrameBuffer(_localBuffer, width(), height());
+      }
+    } else {
+      throw upan::exception(XLOC, "Unsupported BoundaryCheckResult: %d", boundaryCheckResult);
+    }
   }
 }

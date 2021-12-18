@@ -97,4 +97,50 @@ namespace upanui {
       return upan::option<UIObject&>::empty();
     }
   }
+
+  UIObject::BoundaryCheckResult UIObjectImpl::checkBoundary(UIObject& child) {
+    const auto cx1 = child.x();
+    const auto cy1 = child.y();
+    const auto cx2 = cx1 + child.width() - 1;
+    const auto cy2 = cy1 + child.height() - 1;
+
+    if (cx1 > 0 && cx2 < width() && cy1 > 0 && cy2 < height()) {
+      return BoundaryCheckResult::Inside;
+    }
+
+    if ((cx1 < 0 && cx2 < 0) ||
+        (cy1 < 0 && cy2 < 0) ||
+        (cx1 >= width() && cx2 >= width()) ||
+        (cy1 >= height() && cy2 >= height())) {
+      return BoundaryCheckResult::Outside;
+    }
+
+    return BoundaryCheckResult::PartiallyInside;
+  }
+
+  void UIObjectImpl::drawChild(UIObject& child) {
+    auto& childDrawBuffer = child.drawBuffer();
+    auto& parentDrawBuffer = drawBuffer();
+
+    const int sx1 = child.x() >= 0 ? 0 : 0 - child.x();
+    const int sy1 = child.y() >= 0 ? 0 : 0 - child.y();
+
+    const int dx1 = child.x() >= 0 ? child.x() : 0;
+    const int dy1 = child.y() >= 0 ? child.y() : 0;
+
+    const int w = (child.width() - sx1) <= (width() - dx1) ? child.width() - sx1 : width() - dx1;
+    const int h = (child.height() - sy1) <= (height() - dy1) ? child.height() - sy1 : height() - dy1;
+
+    const int srcXOffset = sx1 * childDrawBuffer.bytesPerPixel();
+    const int destXOffset = dx1 * parentDrawBuffer.bytesPerPixel();
+    const int copyWidth = w * childDrawBuffer.bytesPerPixel();
+
+    //printf("\n%d, %d, %d, %d, %d, %d, %d, %d, %d\n", srcX1, srcY1, destX1, destY1, w, h, srcXOffset, destXOffset, copyWidth);
+
+    for(int y = 0; y < h; ++y) {
+      int srcOffet = srcXOffset + (sy1 + y) * childDrawBuffer.pitch();
+      int destOffset = destXOffset + (dy1 + y) * parentDrawBuffer.pitch();
+      memcpy((void*)((uint32_t)parentDrawBuffer.buffer() + destOffset), (void*)((uint32_t)childDrawBuffer.buffer() + srcOffet), copyWidth);
+    }
+  }
 }

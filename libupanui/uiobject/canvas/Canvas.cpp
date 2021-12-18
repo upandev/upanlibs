@@ -40,12 +40,12 @@ namespace upanui {
     contentChanged();
   }
 
-  void Canvas::fill(const FrameBuffer& framebuffer, int x1, int y1, int x2, int y2, uint32_t color, uint32_t alpha) {
+  void Canvas::fill(const FrameBuffer& framebuffer, int dx, int dy, int width, int height, uint32_t color, uint32_t alpha) {
     if (alpha > 0) {
       color = (color & ~0xFF000000) | (alpha << 24);
-      for(auto y = y1; y <= y2; ++y) {
+      for(auto y = dy; y < height; ++y) {
         auto yOffset = y * framebuffer.width();
-        for(auto x = x1; x <= x2; ++x) {
+        for(auto x = dx; x < width; ++x) {
           framebuffer.buffer()[x + yOffset] = color;
         }
       }
@@ -53,69 +53,51 @@ namespace upanui {
   }
 
   void Canvas::draw() {
-    int dx1 = drawX();
-    int dx2 = dx1 + width() - 1;
+    drawTopDown();
 
-    int dy1 = drawY();
-    int dy2 = dy1 + height() - 1;
+    if (getCurrentBoundaryCheckResult() != Outside) {
+      parent().drawToTop();
+    }
+  }
 
-    int bx1 = upan::max(0, parent().drawX());
-    int bx2 = upan::min(gc().frame().viewport().width(), parent().drawX() +parent().width()) - 1;
+  void Canvas::drawToTop() {
+    if (getCurrentBoundaryCheckResult() == PartiallyInside) {
+      parent().drawChild(*this);
+    }
 
-    int by1 = upan::max(0, parent().drawY());
-    int by2 = upan::min(gc().frame().viewport().height(), parent().drawY() + parent().height()) - 1;
+    if (getCurrentBoundaryCheckResult() != Outside) {
+      parent().drawToTop();
+    }
+  }
 
-    // UI element is not in visible area
-    if ((dx2 < bx1) || (dy2 < by1) || (dx1 > bx2) || (dy1 > dy2)) {
+  void Canvas::drawTopDown() {
+    //1. do boundary check
+    //2. if child is outside then no need to draw
+    //3. if child is inside then child's buffer is same as parent's buffer
+    //4. if child id partially-inside then create your separate buffer
+    //5. Draw inside the buffer
+    //6. Draw all children
+    //7. if using parent buffer then end the draw
+    //8. if using your own buffer then ask parent to copy the child buffer into it's buffer
+
+    auto boundaryCheckResult = parent().checkBoundary(*this);
+    setCurrentBoundaryCheckResult(boundaryCheckResult);
+
+    setupDrawBuffer(boundaryCheckResult);
+
+    if (boundaryCheckResult == BoundaryCheckResult::Outside) {
       return;
     }
 
-    const auto bgColorForDraw = backgroundColorForDraw();
-    // UI element is within the visible area
-    if (dx1 >= bx1 && dx2 <= bx2 && dy1 >= by1 && dy2 <= by2) {
-      const FrameBuffer& frameBuffer = gc().frame().frameBuffer();
-      fill(frameBuffer, dx1, dy1, dx2, dy2, bgColorForDraw, backgroundColorAlpha());
-      doDraw(frameBuffer, dx1, dy1);
-    }
-    // UI element is partially within the visible area
-    else {
-      const FrameBuffer& frameBuffer = gc().frame().frameBuffer();
-      upan::uniq_ptr<uint32_t> tempBuffer(new uint32_t[width() * height()]);
-      FrameBufferInfo tempFBInfo;
-      tempFBInfo._width = width();
-      tempFBInfo._height = height();
-      tempFBInfo._pitch = width() * frameBuffer.bytesPerPixel();
-      tempFBInfo._bpp = frameBuffer.bpp();
-      tempFBInfo._frameBuffer = tempBuffer.get();
-      FrameBuffer tempFrameBuffer(tempFBInfo);
-
-      fill(tempFrameBuffer, 0, 0, width() - 1, height() - 1, bgColorForDraw, backgroundColorAlpha());
-      doDraw(tempFrameBuffer, 0, 0);
-
-      const int srcX1 = dx1 >= bx1 ? 0 : bx1 - dx1;
-      const int srcY1 = dy1 >= by1 ? 0 : by1 - dy1;
-
-      const int destX1 = dx1 >= bx1 ? dx1 : bx1;
-      const int destY1 = dy1 >= by1 ? dy1 : by1;
-
-      const int w = (dx2 <= bx2 ? width() : width() - (dx2 - bx2)) - srcX1;
-      const int h = (dy2 <= by2 ? height() : height() - (dy2 - by2)) - srcY1;
-
-      const int srcXOffset = srcX1 * frameBuffer.bytesPerPixel();
-      const int destXOffset = destX1 * frameBuffer.bytesPerPixel();
-      const int copyWidth = w * frameBuffer.bytesPerPixel();
-
-      //printf("\n%d, %d, %d, %d, %d, %d, %d, %d, %d\n", srcX1, srcY1, destX1, destY1, w, h, srcXOffset, destXOffset, copyWidth);
-
-      for(int y = 0; y < h; ++y) {
-        int srcOffet = srcXOffset + (srcY1 + y) * width() * frameBuffer.bytesPerPixel();
-        int destOffset = destXOffset + (destY1 + y) * frameBuffer.pitch();
-        memcpy((void*)((uint32_t)frameBuffer.buffer() + destOffset), (void*)((uint32_t)tempFrameBuffer.buffer() + srcOffet), copyWidth);
-      }
+    auto& drawBuf = drawBuffer();
+    fill(drawBuf, 0, 0, width(), height(), backgroundColorForDraw(), backgroundColorAlpha());
+    doDraw(drawBuf);
+    for(auto child : children()) {
+      child->drawTopDown();
     }
 
-    for(auto& child : children()) {
-      child->draw();
+    if (boundaryCheckResult == BoundaryCheckResult::PartiallyInside) {
+      parent().drawChild(*this);
     }
   }
 }

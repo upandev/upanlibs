@@ -35,6 +35,8 @@ namespace upanui {
   protected:
     ~ConsoleCanvas();
     void draw() override {}
+    void drawTopDown() override {}
+    void drawToTop() override {}
 
   public:
     ConsoleCanvas(uint32_t maxRows, uint32_t maxColumns);

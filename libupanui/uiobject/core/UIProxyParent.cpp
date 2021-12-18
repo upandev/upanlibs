@@ -27,6 +27,7 @@ namespace upanui {
   uint32_t UIProxyParent::width() const {
     return GraphicsContext::Instance().frame().frameBuffer().width();
   }
+
   uint32_t UIProxyParent::height() const {
     return GraphicsContext::Instance().frame().frameBuffer().height();
   }

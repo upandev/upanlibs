@@ -31,6 +31,7 @@ namespace upanui {
   class GraphicsContext;
   class KeyboardEvent;
   class MouseEvent;
+  class FrameBuffer;
 
   class UIObject {
   protected:
@@ -39,6 +40,8 @@ namespace upanui {
     UIObject& operator=(const UIObject&) = delete;
 
   public:
+    enum BoundaryCheckResult { Inside, PartiallyInside, Outside };
+
     virtual int x() const = 0;
     virtual int y() const = 0;
     virtual uint32_t width() const = 0;
@@ -52,6 +55,8 @@ namespace upanui {
     virtual int drawX() const = 0;
     virtual int drawY() const = 0;
     virtual void draw() = 0;
+    virtual void drawTopDown() = 0;
+    virtual void drawToTop() = 0;
 
     virtual void positionChanged() = 0;
     virtual void sizeChanged() = 0;
@@ -65,6 +70,10 @@ namespace upanui {
     virtual void redraw() = 0;
 
     virtual upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) = 0;
+
+    virtual BoundaryCheckResult checkBoundary(UIObject& child) = 0;
+    virtual FrameBuffer& drawBuffer() = 0;
+    virtual void drawChild(UIObject&) = 0;
 
   protected:
     virtual ~UIObject() {}

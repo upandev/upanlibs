@@ -41,6 +41,14 @@ namespace upanui {
     }
   }
 
+  void UIRoot::drawTopDown() {
+    throw upan::exception(XLOC, "unsupport drawTopDown because UIRoot can't be a child elemenet");
+  }
+
+  void UIRoot::drawToTop() {
+    //no-op
+  }
+
   void UIRoot::fill(int x1, int y1, int x2, int y2, uint32_t color, uint32_t alpha) {
     const auto& framebuffer = gc().frame().frameBuffer();
     color = (color & ~0xFF000000) | (alpha << 24);
@@ -81,6 +89,10 @@ namespace upanui {
 
   void UIRoot::contentChanged() {
     redraw();
+  }
+
+  FrameBuffer& UIRoot::drawBuffer() {
+    return gc().frame().frameBuffer();
   }
 
   void UIRoot::onMouseEvent(const MouseEvent &event) {

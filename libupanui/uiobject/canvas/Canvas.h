@@ -28,11 +28,10 @@ namespace upanui {
   class FrameBuffer;
 
   class Canvas : public UIElement {
-  protected:
-    virtual ~Canvas() {}
-    Canvas(const int x, const int y, const uint32_t width, const uint32_t height);
-
   public:
+    Canvas(const int x, const int y, const uint32_t width, const uint32_t height);
+    virtual ~Canvas() {}
+
     void backgroundColor(const uint32_t);
     uint32_t backgroundColor() const {
       return _bgColor;
@@ -47,11 +46,13 @@ namespace upanui {
     virtual uint32_t backgroundColorForDraw() {
       return backgroundColor();
     }
-    virtual void doDraw(const FrameBuffer& frameBuffer, const int baseX, const int baseY) {}
+    virtual void doDraw(const FrameBuffer& frameBuffer) {}
     void fill(const FrameBuffer& framebuffer, int x1, int y1, int x2, int y2, uint32_t color, uint32_t alpha);
 
   private:
     void draw() override;
+    void drawTopDown() override;
+    void drawToTop() override;
 
   private:
     uint32_t _bgColor;

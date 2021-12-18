@@ -29,6 +29,8 @@ namespace upanui {
     protected:
       ~BmpImage();
       void draw() override;
+      void drawTopDown() override;
+      void drawToTop() override;
 
     public:
       typedef struct {
