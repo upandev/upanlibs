@@ -36,10 +36,10 @@ namespace upanui {
       return _bgColor;
     }
     void backgroundColor(const uint32_t);
-    uint32_t backgroundColorAlpha() const {
+    uint8_t backgroundColorAlpha() const {
       return _bgAlpha;
     }
-    void backgroundColorAlpha(const uint32_t);
+    void backgroundColorAlpha(const uint8_t);
 
     void onDrag(MouseEventHandler& handler) {
       _onDragHandler = upan::option<MouseEventHandler&>(handler);
@@ -64,7 +64,7 @@ namespace upanui {
 
   private:
     uint32_t _bgColor;
-    uint32_t _bgAlpha;
+    uint8_t _bgAlpha;
     upan::option<MouseEventHandler&> _onDragHandler;
 
     friend class GraphicsContext;

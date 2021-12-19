@@ -26,11 +26,13 @@
 namespace upanui {
   class UIObject;
   class Button;
-  class Canvas;
+  class RectangleCanvas;
+  class RoundCanvas;
 
   class UIObjectFactory {
   public:
     static Button& createButton(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height);
-    static Canvas& createCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height);
+    static RectangleCanvas& createRectangleCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height);
+    static RoundCanvas& createRoundCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height);
   };
 }

@@ -25,6 +25,7 @@
 #include <GraphicsFont.h>
 #include <FrameBuffer.h>
 #include <BaseFrame.h>
+#include <GCoreFunctions.h>
 
 namespace upanui {
   TextWriter::TextWriter() : _usfnContext(nullptr) {
@@ -46,8 +47,6 @@ namespace upanui {
     y *= _yCharScale;
     if((y + _yCharScale) >= frame.frameBuffer().height() || (x + _xCharScale) >= frame.frameBuffer().width())
       return;
-    fg |= 0xFF000000;
-    bg |= 0xFF000000;
     const byte* font_data = GraphicsFont::Get(ch);
     bool yr = false;
     const auto pitch = frame.frameBuffer().pitch();
@@ -81,8 +80,8 @@ namespace upanui {
         .p = (uint16_t)frame.frameBuffer().pitch(),    /* bytes per line */
         .x = (int16_t)x,                                       /* pen position */
         .y = (int16_t)y,
-        .fg = 0xFF000000 | fg,
-        .bg = 0xFF000000 | bg
+        .fg = fg | GCoreFunctions::ALPHA_MASK,
+        .bg = bg | GCoreFunctions::ALPHA_MASK
     };
 
     //    const char s[2] = { (const char)ch, '\0' };
@@ -101,14 +100,14 @@ namespace upanui {
     frame.copy((void*)((uint32_t)frame.frameBuffer().buffer() + oneLine * frame.frameBuffer().bytesPerPixel()),
                (maxSize - oneLine) * frame.frameBuffer().bytesPerPixel());
 
-    frame.fillRect(0, frame.frameBuffer().height() - _yCharScale, frame.frameBuffer().width(), _yCharScale, 0xFF000000);
+    frame.fillRect(0, frame.frameBuffer().height() - _yCharScale, frame.frameBuffer().width(), _yCharScale, GCoreFunctions::ALPHA_MASK);
     frame.touch();
   }
 
   void TextWriter::drawCursor(BaseFrame& frame, uint32_t x, uint32_t y, uint32_t color) {
     x *= _xCharScale;
     y *= _yCharScale;
-    frame.fillRect(x + 1, y + _yCharScale - 1, _xCharScale - 1, 1, color | 0xFF000000);
+    frame.fillRect(x + 1, y + _yCharScale - 1, _xCharScale - 1, 1, color | GCoreFunctions::ALPHA_MASK);
     frame.touch();
   }
 }

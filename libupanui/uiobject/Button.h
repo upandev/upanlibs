@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include <Canvas.h>
+#include <RectangleCanvas.h>
 
 namespace upanui {
-  class Button : public Canvas {
+  class Button : public RectangleCanvas {
   public:
     uint32_t hoverColor() const {
       return _hoverColor;

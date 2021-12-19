@@ -20,30 +20,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include <RawImage.h>
+#include <RectangleCanvas.h>
+#include <GraphicsContext.h>
 #include <GCoreFunctions.h>
 
 namespace upanui {
-  RawImage::RawImage(const Image& image) : Image(image), _imageBuffer(nullptr) {
-    auto size = width() * height();
-    _imageBuffer.reset(new uint32_t[size]);
-    memcpy(_imageBuffer.get(), image.data(), size);
+  RectangleCanvas::RectangleCanvas(const int x, const int y, const uint32_t width, const uint32_t height) : Canvas(x, y, width, height) {
   }
 
-  RawImage::RawImage(const Image& image, uint32_t newWidth, uint32_t newHeight)
-    : Image(image.x(), image.y(), newWidth, newHeight), _imageBuffer(nullptr) {
-    _imageBuffer.reset(GCoreFunctions::resize(image.data(), image.width(), image.height(), newWidth, newHeight));
-  }
+  void RectangleCanvas::fill() {
+    const auto alpha = backgroundColorAlpha();
+    if (alpha == 0) {
+      return;
+    }
 
-  RawImage::~RawImage() noexcept {
-  }
+    const auto& framebuffer = drawBuffer();
+    const auto color = (backgroundColorForDraw() & ~GCoreFunctions::ALPHA_MASK) | (alpha << 24);
 
-  void RawImage::draw() {
-  }
-
-  void RawImage::drawTopDown() {
-  }
-
-  void RawImage::drawToTop() {
+    for(auto y = 0u; y < height(); ++y) {
+      auto yOffset = y * framebuffer.width();
+      for(auto x = 0u; x < width(); ++x) {
+        GCoreFunctions::setPixel(framebuffer.buffer()[x + yOffset], color);
+      }
+    }
   }
 }

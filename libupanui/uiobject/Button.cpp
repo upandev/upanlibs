@@ -22,9 +22,10 @@
 
 #include <Button.h>
 #include <MouseEventHandler.h>
+#include "GCoreFunctions.h"
 
 namespace upanui {
-  Button::Button(const int x, const int y, const uint32_t width, const uint32_t height) : Canvas(x, y, width, height), _hover(false) {
+  Button::Button(const int x, const int y, const uint32_t width, const uint32_t height) : RectangleCanvas(x, y, width, height), _hover(false) {
     Button::onBackgroundColorChange();
   }
 
@@ -41,7 +42,7 @@ namespace upanui {
     auto r = (bgColor & 0xFF0000) >> 16;
     r += upan::min(0xFF - r, lightness);
 
-    _hoverColor = (bgColor & 0xFF000000) | r << 16 | g << 8 | b;
+    _hoverColor = (bgColor & GCoreFunctions::ALPHA_MASK) | r << 16 | g << 8 | b;
   }
 
   uint32_t Button::backgroundColorForDraw() {

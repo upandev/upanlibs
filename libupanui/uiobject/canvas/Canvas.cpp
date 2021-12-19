@@ -24,39 +24,34 @@
 #include <GraphicsContext.h>
 
 namespace upanui {
-  Canvas::Canvas(const int x, const int y, const uint32_t width, const uint32_t height) : UIElement(x, y, width, height),
-    _bgColor(0), _bgAlpha(0xFF) {
+  Canvas::Canvas(const int x, const int y, const uint32_t width, const uint32_t height)
+    : UIElement(x, y, width, height), _bgColor(0), _bgAlpha(100) {
   }
 
-  void Canvas::backgroundColor(const uint32_t color) {
+ void Canvas::backgroundColor(const uint32_t color) {
     _bgColor = color;
     onBackgroundColorChange();
     contentChanged();
   }
 
-  void Canvas::backgroundColorAlpha(const uint32_t alpha) {
+  void Canvas::backgroundColorAlpha(const uint8_t alpha) {
+    if (alpha > 100) {
+      throw upan::exception(XLOC, "alpha must be a value between 0 to 100");
+    }
     _bgAlpha = alpha;
     onBackgroundColorChange();
     contentChanged();
   }
 
-  void Canvas::fill(const FrameBuffer& framebuffer, int dx, int dy, int width, int height, uint32_t color, uint32_t alpha) {
-    if (alpha > 0) {
-      color = (color & ~0xFF000000) | (alpha << 24);
-      for(auto y = dy; y < height; ++y) {
-        auto yOffset = y * framebuffer.width();
-        for(auto x = dx; x < width; ++x) {
-          framebuffer.buffer()[x + yOffset] = color;
-        }
-      }
-    }
-  }
-
   void Canvas::draw() {
-    drawTopDown();
+    if (backgroundColorAlpha() != 100) {
+      parent().draw();
+    } else {
+      drawTopDown();
 
-    if (getCurrentBoundaryCheckResult() != Outside) {
-      parent().drawToTop();
+      if (getCurrentBoundaryCheckResult() != Outside) {
+        parent().drawToTop();
+      }
     }
   }
 
@@ -90,7 +85,7 @@ namespace upanui {
     }
 
     auto& drawBuf = drawBuffer();
-    fill(drawBuf, 0, 0, width(), height(), backgroundColorForDraw(), backgroundColorAlpha());
+    fill();
     doDraw(drawBuf);
     for(auto child : children()) {
       child->drawTopDown();

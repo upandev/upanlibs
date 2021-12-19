@@ -23,6 +23,7 @@
 #include <BmpImage.h>
 #include <exception.h>
 #include <ColorPalettes.h>
+#include <GCoreFunctions.h>
 
 namespace upanui {
   BmpImage::BmpImage(upan::uniq_ptr<uint32_t>&& imageBuffer, const Header& header, const InfoHeader& infoHeader, const int x, const int y)
@@ -116,7 +117,7 @@ namespace upanui {
     }
 
     auto applyTransparencyFilter = [transparentColor](const uint32_t color) -> uint32_t  {
-      return color == transparentColor ? color & 0x00FFFFFF : color | 0xFF000000;
+      return color == transparentColor ? color & ~GCoreFunctions::ALPHA_MASK : color | GCoreFunctions::ALPHA_MASK;
     };
 
     int dataIndex = 0;

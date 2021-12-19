@@ -24,6 +24,10 @@
 #ifndef	_MATH_H
 #define	_MATH_H	1
 
+#if defined __cplusplus
+extern "C" {
+#endif
+
 #define __USE_SVID
 
 #include <features.h>
@@ -405,6 +409,10 @@ extern int matherr (struct exception *__exc);
       fpclassify (__u) == FP_NAN || fpclassify (__v) == FP_NAN; }))
 # endif
 
+#endif
+
+#if defined __cplusplus
+}
 #endif
 
 #endif /* math.h  */

@@ -20,30 +20,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include <RawImage.h>
-#include <GCoreFunctions.h>
+#pragma once
+
+#include <Canvas.h>
 
 namespace upanui {
-  RawImage::RawImage(const Image& image) : Image(image), _imageBuffer(nullptr) {
-    auto size = width() * height();
-    _imageBuffer.reset(new uint32_t[size]);
-    memcpy(_imageBuffer.get(), image.data(), size);
-  }
+  class FrameBuffer;
 
-  RawImage::RawImage(const Image& image, uint32_t newWidth, uint32_t newHeight)
-    : Image(image.x(), image.y(), newWidth, newHeight), _imageBuffer(nullptr) {
-    _imageBuffer.reset(GCoreFunctions::resize(image.data(), image.width(), image.height(), newWidth, newHeight));
-  }
+  class RectangleCanvas : public Canvas {
+  public:
+    RectangleCanvas(const int x, const int y, const uint32_t width, const uint32_t height);
+    virtual ~RectangleCanvas() {}
 
-  RawImage::~RawImage() noexcept {
-  }
-
-  void RawImage::draw() {
-  }
-
-  void RawImage::drawTopDown() {
-  }
-
-  void RawImage::drawToTop() {
-  }
+  protected:
+    void fill() override;
+  };
 }

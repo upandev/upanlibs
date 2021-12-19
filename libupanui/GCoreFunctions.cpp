@@ -20,8 +20,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include <ImageAlgo.h>
+#include <GCoreFunctions.h>
 #include <uniq_ptr.h>
+#include <math.h>
+#include "algorithm.h"
 
 namespace upanui {
   static int dcompare(double a, double b) {
@@ -40,10 +42,33 @@ namespace upanui {
     }
   }
 
-  uint32_t* ImageAlgo::resize(const uint32_t* srcImgBuffer, const uint32_t srcWidth, const uint32_t srcHeight, const uint32_t destWidth, const uint32_t destHeight) {
+  void GCoreFunctions::setPixel(uint32_t& pixel, uint32_t color) {
+    const uint32_t ia = (color >> 24) & 0xFF;
+    if (ia == 100) {
+      pixel = color;
+    } else if (ia > 0) {
+      const uint32_t ir = (color >> 16) & 0xFF;
+      const uint32_t ig = (color >> 8) & 0xFF;
+      const uint32_t ib = color & 0xFF;
+
+      const uint32_t cb = pixel & 0xFF;
+      const uint32_t cg = (pixel >> 8) & 0xFF;
+      const uint32_t cr = (pixel >> 16) & 0xFF;
+      const uint32_t ca = (pixel >> 24) & 0xFF;
+
+      const uint32_t caf = (100 - ia);
+
+      pixel = (uint8_t)upan::min(ia + (ca * caf) / 100, 100u) << 24
+          | (uint8_t)upan::min((ir * ia + cr * caf) / 100, 0xFFu) << 16
+          | (uint8_t)upan::min((ig * ia + cg * caf) / 100, 0xFFu) << 8
+          | (uint8_t)upan::min((ib * ia + cb * caf) / 100, 0xFFu);
+    }
+  }
+
+  uint32_t* GCoreFunctions::resize(const uint32_t* srcBuffer, const uint32_t srcWidth, const uint32_t srcHeight, const uint32_t destWidth, const uint32_t destHeight) {
     auto destSize = destWidth * destHeight;
-    upan::uniq_ptr<uint32_t> destImageBuffer(new uint32_t[destSize]);
-    auto destImgBuffer = destImageBuffer.get();
+    upan::uniq_ptr<uint32_t> destBufferU(new uint32_t[destSize]);
+    auto destBuffer = destBufferU.get();
 
     const double fx = srcWidth * 1.0 / destWidth;
     const double fy = srcHeight * 1.0 / destHeight;
@@ -97,7 +122,7 @@ namespace upanui {
             }
 
             double ipf = dx * dy * fa;
-            uint32_t srcRGB = srcImgBuffer[sx + sy * srcWidth];
+            uint32_t srcRGB = srcBuffer[sx + sy * srcWidth];
 
             da += ((srcRGB >> 24) & 0xFF) * ipf;
             dr += ((srcRGB >> 16) & 0xFF) * ipf;
@@ -105,9 +130,9 @@ namespace upanui {
             db += (srcRGB & 0xFF) * ipf;
           }
         }
-        destImgBuffer[x + y * destWidth] = dround(dr) << 16 | dround(dg) << 8 | dround(db) | dround(da) << 24; //0xFF000000;
+        destBuffer[x + y * destWidth] = dround(dr) << 16 | dround(dg) << 8 | dround(db) | dround(da) << 24; //0xFF000000;
       }
     }
-    return destImageBuffer.release();
+    return destBufferU.release();
   }
 }

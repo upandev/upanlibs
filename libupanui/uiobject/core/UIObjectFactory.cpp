@@ -22,6 +22,7 @@
 
 #include <UIObjectFactory.h>
 #include <Button.h>
+#include <RoundCanvas.h>
 
 namespace upanui {
   Button& UIObjectFactory::createButton(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
@@ -30,8 +31,14 @@ namespace upanui {
     return button;
   }
 
-  Canvas& UIObjectFactory::createCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
-    auto& canvas = *new Canvas(x, y, width, height);
+  RectangleCanvas& UIObjectFactory::createRectangleCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
+    auto& canvas = *new RectangleCanvas(x, y, width, height);
+    parent.add(canvas);
+    return canvas;
+  }
+
+  RoundCanvas& UIObjectFactory::createRoundCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
+    auto& canvas = *new RoundCanvas(x, y, width, height);
     parent.add(canvas);
     return canvas;
   }

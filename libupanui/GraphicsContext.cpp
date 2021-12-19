@@ -22,6 +22,7 @@
 
 #include <GraphicsContext.h>
 #include <Frame.h>
+#include "GCoreFunctions.h"
 
 namespace upanui {
   void GraphicsContext::Init() {
@@ -46,7 +47,7 @@ namespace upanui {
     upanui::Viewport viewport(viewportInfo);
 
     _frame.reset(new upanui::Frame(frameBuffer, viewport));
-    _frame->fillRect(0, 0, _frame->viewport().width(), _frame->viewport().height(), 0xFF000000);
+    _frame->fillRect(0, 0, _frame->viewport().width(), _frame->viewport().height(), GCoreFunctions::ALPHA_MASK);
   }
 
   GraphicsContext::~GraphicsContext() {

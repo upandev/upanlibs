@@ -29,25 +29,27 @@ namespace upanui {
 
   class Canvas : public UIElement {
   public:
-    Canvas(const int x, const int y, const uint32_t width, const uint32_t height);
-    virtual ~Canvas() {}
-
     void backgroundColor(const uint32_t);
     uint32_t backgroundColor() const {
       return _bgColor;
     }
-    void backgroundColorAlpha(const uint32_t);
-    uint32_t  backgroundColorAlpha() const {
+    void backgroundColorAlpha(const uint8_t);
+    uint8_t  backgroundColorAlpha() const {
       return _bgAlpha;
     }
 
   protected:
+    Canvas(const int x, const int y, const uint32_t width, const uint32_t height);
+    virtual ~Canvas() {}
+
+  protected:
+    virtual void doDraw(const FrameBuffer& frameBuffer) {}
+    virtual void fill() = 0;
+
     virtual void onBackgroundColorChange() {}
     virtual uint32_t backgroundColorForDraw() {
       return backgroundColor();
     }
-    virtual void doDraw(const FrameBuffer& frameBuffer) {}
-    void fill(const FrameBuffer& framebuffer, int x1, int y1, int x2, int y2, uint32_t color, uint32_t alpha);
 
   private:
     void draw() override;
@@ -56,6 +58,6 @@ namespace upanui {
 
   private:
     uint32_t _bgColor;
-    uint32_t _bgAlpha;
+    uint8_t _bgAlpha;
   };
 }

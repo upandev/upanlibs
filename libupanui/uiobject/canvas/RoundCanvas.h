@@ -19,13 +19,20 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
+
 #pragma once
 
-#include <stdint.h>
+#include <Canvas.h>
 
 namespace upanui {
-  class ImageAlgo {
+  class FrameBuffer;
+
+  class RoundCanvas : public Canvas {
   public:
-    static uint32_t* resize(const uint32_t* srcImgBuffer, const uint32_t srcWidth, const uint32_t srcHeight, const uint32_t destWidth, const uint32_t destHeight);
+    RoundCanvas(const int x, const int y, const uint32_t width, const uint32_t height);
+    virtual ~RoundCanvas() {}
+
+  protected:
+    void fill() override;
   };
 }
