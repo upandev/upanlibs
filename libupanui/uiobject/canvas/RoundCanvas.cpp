@@ -28,6 +28,36 @@ namespace upanui {
   RoundCanvas::RoundCanvas(const int x, const int y, const uint32_t width, const uint32_t height) : Canvas(x, y, width, height) {
   }
 
+  static void plot(int x, int y, int r, const FrameBuffer& framebuffer, uint32_t color) {
+    int sx1 = -x + r;
+    int sx2 = x + r;
+    int sy = r - y;
+    int yoffset = sy * framebuffer.width();
+    for (int i = sx1; i <= sx2; ++i) {
+      GCoreFunctions::setPixel(framebuffer.buffer()[i + yoffset], color);
+    }
+
+    sy = r + y;
+    yoffset = sy * framebuffer.width();
+    for (int i = sx1; i <= sx2; ++i) {
+      GCoreFunctions::setPixel(framebuffer.buffer()[i + yoffset], color);
+    }
+
+    sy = x + r;
+    sx1 = r - y;
+    sx2 = r + y;
+    yoffset = sy * framebuffer.width();
+    for (int i = sx1; i <= sx2; ++i) {
+      GCoreFunctions::setPixel(framebuffer.buffer()[i + yoffset], color);
+    }
+
+    sy = -x + r;
+    yoffset = sy * framebuffer.width();
+    for (int i = sx1; i <= sx2; ++i) {
+      GCoreFunctions::setPixel(framebuffer.buffer()[i + yoffset], color);
+    }
+  }
+
   void RoundCanvas::fill() {
     const auto alpha = backgroundColorAlpha();
     if (alpha == 0) {
@@ -38,34 +68,20 @@ namespace upanui {
     const auto color = (backgroundColorForDraw() & ~GCoreFunctions::ALPHA_MASK) | (alpha << 24);
 
     const int r = width() / 2;
-    const int r2 = r * r;
+    int x = 0;
+    int y = r;
+    int d = 3 - 2 * r;
 
-    int sx = r;
+    while(x <= y) {
+      plot(x, y, r, framebuffer, color);
 
-    for(int sy = 0; sy < height() && sx >= 0;) {
-      int ex = sx + (r - sx) * 2;
-      int y1Offset = sy * framebuffer.width();
-      int y2Offset = (height() - sy - 1) * framebuffer.width();
-
-      for(int x = sx; x <= ex; ++x) {
-        framebuffer.buffer()[x + y1Offset] = color;
-        if (y1Offset < y2Offset) {
-          framebuffer.buffer()[x + y2Offset] = color;
-        }
-      }
-
-      --sx;
-      if (sx < 0) {
-        break;
-      }
-      int sx2 = (sx - r) * (sx - r);
-      int sy2 = (sy - r) * (sy - r);
-      if ((sx2 + sy2) > r2) {
-        ++sy;
-        sy2 = (sy - r) * (sy - r);
-        if ((sx2 + sy2) > r2) {
-          ++sx;
-        }
+      if (d < 0) {
+        d += 4 * x + 6;
+        ++x;
+      } else {
+        d += 4 * (x - y) + 10;
+        ++x;
+        --y;
       }
     }
   }
