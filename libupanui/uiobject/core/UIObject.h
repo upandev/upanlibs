@@ -82,8 +82,8 @@ namespace upanui {
     virtual upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) = 0;
 
     virtual Layout& layout() = 0;
-    virtual void setPixel(uint32_t& pixel, uint32_t color) = 0;
     virtual FrameBuffer& drawBuffer() = 0;
+    virtual bool isLocalDrawBuffer() const = 0;
 
   protected:
     virtual ~UIObject() {}

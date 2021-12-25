@@ -48,10 +48,6 @@ namespace upanui {
     //no-op
   }
 
-  void UIRoot::setPixel(uint32_t& pixel, uint32_t color) {
-    pixel = color;
-  }
-
   int UIRoot::drawX() const {
     return 0;
   }

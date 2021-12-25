@@ -65,16 +65,15 @@ namespace upanui {
     const int w = (child.width() - sx1) <= (pwidth - dx1) ? child.width() - sx1 : pwidth - dx1;
     const int h = (child.height() - sy1) <= (pheight - dy1) ? child.height() - sy1 : pheight - dy1;
 
-    const int srcXOffset = sx1 * childDrawBuffer.bytesPerPixel();
-    const int destXOffset = dx1 * parentDrawBuffer.bytesPerPixel();
-    const int copyWidth = w * childDrawBuffer.bytesPerPixel();
-
     //printf("\n%d, %d, %d, %d, %d, %d, %d, %d, %d\n", srcX1, srcY1, destX1, destY1, w, h, srcXOffset, destXOffset, copyWidth);
 
     for(int y = 0; y < h; ++y) {
-      int srcOffet = srcXOffset + (sy1 + y) * childDrawBuffer.pitch();
-      int destOffset = destXOffset + (dy1 + y) * parentDrawBuffer.pitch();
-      memcpy((void*)((uint32_t)parentDrawBuffer.buffer() + destOffset), (void*)((uint32_t)childDrawBuffer.buffer() + srcOffet), copyWidth);
+      int srcOffet = sx1 + (sy1 + y) * childDrawBuffer.width();
+      int destOffset = dx1 + (dy1 + y) * parentDrawBuffer.width();
+      for(int x = 0; x < w; ++x) {
+        GCoreFunctions::setPixel(parentDrawBuffer.buffer()[x + destOffset], childDrawBuffer.buffer()[x + srcOffet], false);
+      }
+      //memcpy((void*)((uint32_t)parentDrawBuffer.buffer() + destOffset), (void*)((uint32_t)childDrawBuffer.buffer() + srcOffet), copyWidth);
     }
   }
 
@@ -92,17 +91,17 @@ namespace upanui {
       auto yOffset = y * framebuffer.width();
       if (y < parent().borderThickness() || (parent().height() - y) <= parent().borderThickness()) {
         for(auto x = 0u; x < parent().width(); ++x) {
-          parent().setPixel(framebuffer.buffer()[x + yOffset], brColor);
+          GCoreFunctions::setPixel(framebuffer.buffer()[x + yOffset], brColor, parent().isLocalDrawBuffer());
         }
       } else {
         for(auto x = 0u; x < parent().borderThickness(); ++x) {
-          parent().setPixel(framebuffer.buffer()[x + yOffset], brColor);
+          GCoreFunctions::setPixel(framebuffer.buffer()[x + yOffset], brColor, parent().isLocalDrawBuffer());
         }
         for(auto x = parent().borderThickness(); x < parent().width() - parent().borderThickness(); ++x) {
-          parent().setPixel(framebuffer.buffer()[x + yOffset], bgColor);
+          GCoreFunctions::setPixel(framebuffer.buffer()[x + yOffset], bgColor, parent().isLocalDrawBuffer());
         }
         for(auto x = (parent().width() - parent().borderThickness()); x < parent().width(); ++x) {
-          parent().setPixel(framebuffer.buffer()[x + yOffset], brColor);
+          GCoreFunctions::setPixel(framebuffer.buffer()[x + yOffset], brColor, parent().isLocalDrawBuffer());
         }
       }
     }

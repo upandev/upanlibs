@@ -54,8 +54,8 @@ namespace upanui {
     Layout& layout() override {
       return _layout;
     }
-    void setPixel(uint32_t& pixel, uint32_t color) override;
     FrameBuffer& drawBuffer() override;
+    bool isLocalDrawBuffer() const override { return true; }
 
   private:
     upan::option<MouseEventHandler&> _onDragHandler;

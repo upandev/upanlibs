@@ -39,11 +39,11 @@ namespace upanui {
     void sizeChanged() override;
     void contentChanged() override;
 
-    void setPixel(uint32_t& pixel, uint32_t color) override;
-
     FrameBuffer& drawBuffer() override {
       return _drawBuffer;
     }
+    bool isLocalDrawBuffer() const override { return _localBuffer != nullptr; }
+
     void setupDrawBuffer(const Layout::BoundaryCheckResult boundaryCheckResult);
     Layout::BoundaryCheckResult getCurrentBoundaryCheckResult() const {
       return _currentBoundaryCheckResult;

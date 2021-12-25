@@ -18,13 +18,13 @@ namespace upanui {
     int sy = r - y;
     int yoffset = sy * framebuffer.width();
     for (int i = sx1; i <= sx2; ++i) {
-      parent().setPixel(framebuffer.buffer()[i + yoffset], color);
+      GCoreFunctions::setPixel(framebuffer.buffer()[i + yoffset], color, parent().isLocalDrawBuffer());
     }
 
     sy = r + y;
     yoffset = sy * framebuffer.width();
     for (int i = sx1; i <= sx2; ++i) {
-      parent().setPixel(framebuffer.buffer()[i + yoffset], color);
+      GCoreFunctions::setPixel(framebuffer.buffer()[i + yoffset], color, parent().isLocalDrawBuffer());
     }
 
     sy = x + r;
@@ -32,13 +32,13 @@ namespace upanui {
     sx2 = r + y;
     yoffset = sy * framebuffer.width();
     for (int i = sx1; i <= sx2; ++i) {
-      parent().setPixel(framebuffer.buffer()[i + yoffset], color);
+      GCoreFunctions::setPixel(framebuffer.buffer()[i + yoffset], color, parent().isLocalDrawBuffer());
     }
 
     sy = -x + r;
     yoffset = sy * framebuffer.width();
     for (int i = sx1; i <= sx2; ++i) {
-      GCoreFunctions::setPixel(framebuffer.buffer()[i + yoffset], color);
+      GCoreFunctions::setPixel(framebuffer.buffer()[i + yoffset], color, parent().isLocalDrawBuffer());
     }
   }
 
@@ -47,25 +47,25 @@ namespace upanui {
     int sx2 = x + r;
     int sy = r - y;
     int yoffset = sy * framebuffer.width();
-    parent().setPixel(framebuffer.buffer()[sx1 + yoffset], color);
-    parent().setPixel(framebuffer.buffer()[sx2 + yoffset], color);
+    GCoreFunctions::setPixel(framebuffer.buffer()[sx1 + yoffset], color, parent().isLocalDrawBuffer());
+    GCoreFunctions::setPixel(framebuffer.buffer()[sx2 + yoffset], color, parent().isLocalDrawBuffer());
 
     sy = r + y;
     yoffset = sy * framebuffer.width();
-    parent().setPixel(framebuffer.buffer()[sx1 + yoffset], color);
-    parent().setPixel(framebuffer.buffer()[sx2 + yoffset], color);
+    GCoreFunctions::setPixel(framebuffer.buffer()[sx1 + yoffset], color, parent().isLocalDrawBuffer());
+    GCoreFunctions::setPixel(framebuffer.buffer()[sx2 + yoffset], color, parent().isLocalDrawBuffer());
 
     sy = x + r;
     sx1 = r - y;
     sx2 = r + y;
     yoffset = sy * framebuffer.width();
-    GCoreFunctions::setPixel(framebuffer.buffer()[sx1 + yoffset], color);
-    GCoreFunctions::setPixel(framebuffer.buffer()[sx2 + yoffset], color);
+    GCoreFunctions::setPixel(framebuffer.buffer()[sx1 + yoffset], color, parent().isLocalDrawBuffer());
+    GCoreFunctions::setPixel(framebuffer.buffer()[sx2 + yoffset], color, parent().isLocalDrawBuffer());
 
     sy = -x + r;
     yoffset = sy * framebuffer.width();
-    GCoreFunctions::setPixel(framebuffer.buffer()[sx1 + yoffset], color);
-    GCoreFunctions::setPixel(framebuffer.buffer()[sx2 + yoffset], color);
+    GCoreFunctions::setPixel(framebuffer.buffer()[sx1 + yoffset], color, parent().isLocalDrawBuffer());
+    GCoreFunctions::setPixel(framebuffer.buffer()[sx2 + yoffset], color, parent().isLocalDrawBuffer());
   }
 
   void CircularLayout::fill() {

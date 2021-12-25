@@ -28,7 +28,7 @@ namespace upanui {
   public:
     static constexpr uint32_t ALPHA_MASK = (100 << 24);
 
-    static void setPixel(uint32_t& pixel, uint32_t color);
+    static void setPixel(uint32_t& pixel, uint32_t color, bool isDirectSet);
     static uint32_t* resize(const uint32_t* srcBuffer, const uint32_t srcWidth, const uint32_t srcHeight, const uint32_t destWidth, const uint32_t destHeight);
   };
 }

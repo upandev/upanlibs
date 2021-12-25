@@ -53,10 +53,6 @@ namespace upanui {
     redraw();
   }
 
-  void UIElement::setPixel(uint32_t& pixel, uint32_t color) {
-    GCoreFunctions::setPixel(pixel, color);
-  }
-
   void UIElement::setupDrawBuffer(const Layout::BoundaryCheckResult boundaryCheckResult) {
     if (boundaryCheckResult == Layout::Outside) {
       if (_localBuffer) {
@@ -82,7 +78,9 @@ namespace upanui {
         _localBuffer = nullptr;
       }
       if (_localBuffer == nullptr) {
+        const auto bufSize = width() * height();
         _localBuffer = new uint32_t[width() * height()];
+        memset(_localBuffer, 0, bufSize * sizeof(uint32_t));
         _drawBuffer = FrameBuffer(_localBuffer, width(), height());
       }
     } else {
