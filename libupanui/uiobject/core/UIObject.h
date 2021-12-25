@@ -32,6 +32,7 @@ namespace upanui {
   class KeyboardEvent;
   class MouseEvent;
   class FrameBuffer;
+  class Layout;
 
   class UIObject {
   protected:
@@ -40,18 +41,25 @@ namespace upanui {
     UIObject& operator=(const UIObject&) = delete;
 
   public:
-    enum BoundaryCheckResult { Inside, PartiallyInside, Outside };
-
     virtual int x() const = 0;
     virtual int y() const = 0;
     virtual uint32_t width() const = 0;
     virtual uint32_t height() const = 0;
+    virtual uint32_t backgroundColor() const = 0;
+    virtual uint32_t backgroundColorForDraw() const = 0;
+    virtual uint8_t  backgroundColorAlpha() const = 0;
+    virtual uint32_t borderColor() const = 0;
+    virtual uint8_t borderColorAlpha() const = 0;
     virtual uint32_t borderThickness() const = 0;
 
     virtual void x(const int) = 0;
     virtual void y(const int) = 0;
     virtual void width(const uint32_t) = 0;
     virtual void height(const uint32_t) = 0;
+    virtual void backgroundColor(const uint32_t color) = 0;
+    virtual void backgroundColorAlpha(const uint8_t) = 0;
+    virtual void borderColor(const uint32_t) = 0;
+    virtual void borderColorAlpha(const uint8_t) = 0;
     virtual void borderThickness(const uint32_t) = 0;
 
     virtual int drawX() const = 0;
@@ -73,9 +81,9 @@ namespace upanui {
 
     virtual upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) = 0;
 
-    virtual BoundaryCheckResult checkBoundary(UIObject& child) = 0;
+    virtual Layout& layout() = 0;
+    virtual void setPixel(uint32_t& pixel, uint32_t color) = 0;
     virtual FrameBuffer& drawBuffer() = 0;
-    virtual void drawChild(UIObject&) = 0;
 
   protected:
     virtual ~UIObject() {}

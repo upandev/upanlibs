@@ -27,7 +27,8 @@
 
 namespace upanui {
   UIObjectImpl::UIObjectImpl(const int x, const int y, const uint32_t width, const uint32_t height)
-    : _x(x), _y(y), _width(width), _height(height), _borderThickness(0), _gc(GraphicsContext::Instance()) {
+    : _x(x), _y(y), _width(width), _height(height),
+      _bgColor(0), _bgAlpha(100), _brColor(0xFFFFFF), _brAlpha(100), _borderThickness(0), _gc(GraphicsContext::Instance()) {
   }
 
   void UIObjectImpl::x(const int x) {
@@ -55,6 +56,42 @@ namespace upanui {
     if (_height != height) {
       _height = height;
       sizeChanged();
+    }
+  }
+
+  void UIObjectImpl::backgroundColor(const uint32_t color) {
+    if (_bgColor != color) {
+      _bgColor = color;
+      onBackgroundColorChange();
+      contentChanged();
+    }
+  }
+
+  void UIObjectImpl::backgroundColorAlpha(const uint8_t alpha) {
+    if (_bgAlpha != alpha) {
+      if (alpha > 100) {
+        throw upan::exception(XLOC, "alpha must be a value between 0 to 100");
+      }
+      _bgAlpha = alpha;
+      onBackgroundColorChange();
+      contentChanged();
+    }
+  }
+
+  void UIObjectImpl::borderColor(const uint32_t color) {
+    if (_brColor != color) {
+      _brColor = color;
+      contentChanged();
+    }
+  }
+
+  void UIObjectImpl::borderColorAlpha(const uint8_t alpha) {
+    if (_brAlpha != alpha) {
+      if (alpha > 100) {
+        throw upan::exception(XLOC, "alpha must be a value between 0 to 100");
+      }
+      _brAlpha = alpha;
+      contentChanged();
     }
   }
 
@@ -102,58 +139,6 @@ namespace upanui {
       return upan::option<UIObject&>(this);
     } else {
       return upan::option<UIObject&>::empty();
-    }
-  }
-
-  UIObject::BoundaryCheckResult UIObjectImpl::checkBoundary(UIObject& child) {
-    const auto cx1 = child.x();
-    const auto cy1 = child.y();
-    const auto cx2 = cx1 + child.width() - 1;
-    const auto cy2 = cy1 + child.height() - 1;
-
-    const auto pwidth = width() - 2 * borderThickness();
-    const auto pheight = height() - 2 * borderThickness();
-
-    if (cx1 >= 0 && cx2 < pwidth && cy1 >= 0 && cy2 < pheight) {
-      return BoundaryCheckResult::Inside;
-    }
-
-    if ((cx1 < 0 && cx2 < 0) ||
-        (cy1 < 0 && cy2 < 0) ||
-        (cx1 >= pwidth && cx2 >= pwidth) ||
-        (cy1 >= pheight && cy2 >= pheight)) {
-      return BoundaryCheckResult::Outside;
-    }
-
-    return BoundaryCheckResult::PartiallyInside;
-  }
-
-  void UIObjectImpl::drawChild(UIObject& child) {
-    auto& childDrawBuffer = child.drawBuffer();
-    auto& parentDrawBuffer = drawBuffer();
-
-    const auto pwidth = width() - borderThickness();
-    const auto pheight = height() - borderThickness();
-
-    const int sx1 = child.x() >= 0 ? 0 : 0 - child.x();
-    const int sy1 = child.y() >= 0 ? 0 : 0 - child.y();
-
-    const int dx1 = (child.x() >= 0 ? child.x() : 0) + borderThickness();
-    const int dy1 = (child.y() >= 0 ? child.y() : 0) + borderThickness();
-
-    const int w = (child.width() - sx1) <= (pwidth - dx1) ? child.width() - sx1 : pwidth - dx1;
-    const int h = (child.height() - sy1) <= (pheight - dy1) ? child.height() - sy1 : pheight - dy1;
-
-    const int srcXOffset = sx1 * childDrawBuffer.bytesPerPixel();
-    const int destXOffset = dx1 * parentDrawBuffer.bytesPerPixel();
-    const int copyWidth = w * childDrawBuffer.bytesPerPixel();
-
-    //printf("\n%d, %d, %d, %d, %d, %d, %d, %d, %d\n", srcX1, srcY1, destX1, destY1, w, h, srcXOffset, destXOffset, copyWidth);
-
-    for(int y = 0; y < h; ++y) {
-      int srcOffet = srcXOffset + (sy1 + y) * childDrawBuffer.pitch();
-      int destOffset = destXOffset + (dy1 + y) * parentDrawBuffer.pitch();
-      memcpy((void*)((uint32_t)parentDrawBuffer.buffer() + destOffset), (void*)((uint32_t)childDrawBuffer.buffer() + srcOffet), copyWidth);
     }
   }
 }

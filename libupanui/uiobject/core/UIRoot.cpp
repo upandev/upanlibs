@@ -28,15 +28,13 @@
 namespace upanui {
   UIRoot::UIRoot(const int x, const int y, const uint32_t width, const uint32_t height)
   : UIObjectImpl(x, y, width, height),
-    _bgColor(0),
-    _bgAlpha(100),
-    _onDragHandler(upan::option<MouseEventHandler&>::empty()) {
+    _onDragHandler(upan::option<MouseEventHandler&>::empty()),
+    _layout(*this) {
     gc().frame().updateViewport(x, y, width, height);
   }
 
   void UIRoot::draw() {
-    fill(drawX(), drawY(), 50 -1, height() - 1, _bgColor, _bgAlpha);
-    fill(drawX() + 50, drawY(), width() - 1, height() - 1, _bgColor + 150, _bgAlpha);
+    layout().fill();
     for(auto& child : children()) {
       child->drawTopDown();
     }
@@ -50,28 +48,8 @@ namespace upanui {
     //no-op
   }
 
-  void UIRoot::fill(int x1, int y1, int x2, int y2, uint32_t color, uint32_t alpha) {
-    const auto& framebuffer = gc().frame().frameBuffer();
-    color = (color & ~GCoreFunctions::ALPHA_MASK) | (alpha << 24);
-    for(auto y = y1; y <= y2; ++y) {
-      const auto yOffset = y * framebuffer.width();
-      for(auto x = x1; x <= x2; ++x) {
-        framebuffer.buffer()[x + yOffset] = color;
-      }
-    }
-  }
-
-  void UIRoot::backgroundColor(const uint32_t color) {
-    _bgColor = color;
-    contentChanged();
-  }
-
-  void UIRoot::backgroundColorAlpha(const uint8_t alpha) {
-    if (alpha > 100) {
-      throw upan::exception(XLOC, "alpha must be a value between 0 to 100");
-    }
-    _bgAlpha = alpha;
-    contentChanged();
+  void UIRoot::setPixel(uint32_t& pixel, uint32_t color) {
+    pixel = color;
   }
 
   int UIRoot::drawX() const {

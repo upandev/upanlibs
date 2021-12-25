@@ -23,6 +23,7 @@
 #pragma once
 
 #include <Canvas.h>
+#include <RectangularLayout.h>
 
 namespace upanui {
   class FrameBuffer;
@@ -33,6 +34,11 @@ namespace upanui {
     virtual ~RectangleCanvas() {}
 
   protected:
-    void fill() override;
+    Layout& layout() override {
+      return _layout;
+    }
+
+  private:
+    RectangularLayout _layout;
   };
 }

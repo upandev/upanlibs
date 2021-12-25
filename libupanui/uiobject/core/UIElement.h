@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <UIObjectImpl.h>
 #include <FrameBuffer.h>
+#include <Layout.h>
 
 namespace upanui {
   class UIElement : public UIObjectImpl {
@@ -38,20 +39,22 @@ namespace upanui {
     void sizeChanged() override;
     void contentChanged() override;
 
+    void setPixel(uint32_t& pixel, uint32_t color) override;
+
     FrameBuffer& drawBuffer() override {
       return _drawBuffer;
     }
-    void setupDrawBuffer(const UIObject::BoundaryCheckResult boundaryCheckResult);
-    BoundaryCheckResult getCurrentBoundaryCheckResult() const {
+    void setupDrawBuffer(const Layout::BoundaryCheckResult boundaryCheckResult);
+    Layout::BoundaryCheckResult getCurrentBoundaryCheckResult() const {
       return _currentBoundaryCheckResult;
     }
-    void setCurrentBoundaryCheckResult(BoundaryCheckResult r) {
+    void setCurrentBoundaryCheckResult(Layout::BoundaryCheckResult r) {
       _currentBoundaryCheckResult = r;
     }
 
   private:
     FrameBuffer _drawBuffer;
     uint32_t* _localBuffer;
-    BoundaryCheckResult _currentBoundaryCheckResult;
+    Layout::BoundaryCheckResult _currentBoundaryCheckResult;
   };
 }

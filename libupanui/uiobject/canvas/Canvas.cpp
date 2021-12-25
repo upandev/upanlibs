@@ -22,46 +22,11 @@
 
 #include <Canvas.h>
 #include <GraphicsContext.h>
+#include <Layout.h>
 
 namespace upanui {
   Canvas::Canvas(const int x, const int y, const uint32_t width, const uint32_t height)
-    : UIElement(x, y, width, height), _bgColor(0), _bgAlpha(100), _brColor(0xFFFFFF), _brAlpha(100) {
-  }
-
- void Canvas::backgroundColor(const uint32_t color) {
-    if (_bgColor != color) {
-      _bgColor = color;
-      onBackgroundColorChange();
-      contentChanged();
-    }
-  }
-
-  void Canvas::backgroundColorAlpha(const uint8_t alpha) {
-    if (_bgAlpha != alpha) {
-      if (alpha > 100) {
-        throw upan::exception(XLOC, "alpha must be a value between 0 to 100");
-      }
-      _bgAlpha = alpha;
-      onBackgroundColorChange();
-      contentChanged();
-    }
-  }
-
-  void Canvas::borderColor(const uint32_t color) {
-    if (_brColor != color) {
-      _brColor = color;
-      contentChanged();
-    }
-  }
-
-  void Canvas::borderColorAlpha(const uint8_t alpha) {
-    if (_brAlpha != alpha) {
-      if (alpha > 100) {
-        throw upan::exception(XLOC, "alpha must be a value between 0 to 100");
-      }
-      _brAlpha = alpha;
-      contentChanged();
-    }
+    : UIElement(x, y, width, height) {
   }
 
   void Canvas::draw() {
@@ -70,18 +35,18 @@ namespace upanui {
     } else {
       drawTopDown();
 
-      if (getCurrentBoundaryCheckResult() != Outside) {
+      if (getCurrentBoundaryCheckResult() != Layout::Outside) {
         parent().drawToTop();
       }
     }
   }
 
   void Canvas::drawToTop() {
-    if (getCurrentBoundaryCheckResult() == PartiallyInside) {
-      parent().drawChild(*this);
+    if (getCurrentBoundaryCheckResult() == Layout::PartiallyInside) {
+      parent().layout().draw(*this);
     }
 
-    if (getCurrentBoundaryCheckResult() != Outside) {
+    if (getCurrentBoundaryCheckResult() != Layout::Outside) {
       parent().drawToTop();
     }
   }
@@ -96,24 +61,24 @@ namespace upanui {
     //7. if using parent buffer then end the draw
     //8. if using your own buffer then ask parent to copy the child buffer into it's buffer
 
-    auto boundaryCheckResult = parent().checkBoundary(*this);
+    auto boundaryCheckResult = parent().layout().checkBoundary(*this);
     setCurrentBoundaryCheckResult(boundaryCheckResult);
 
     setupDrawBuffer(boundaryCheckResult);
 
-    if (boundaryCheckResult == BoundaryCheckResult::Outside) {
+    if (boundaryCheckResult == Layout::Outside) {
       return;
     }
 
     auto& drawBuf = drawBuffer();
-    fill();
+    layout().fill();
     doDraw(drawBuf);
     for(auto child : children()) {
       child->drawTopDown();
     }
 
-    if (boundaryCheckResult == BoundaryCheckResult::PartiallyInside) {
-      parent().drawChild(*this);
+    if (boundaryCheckResult == Layout::PartiallyInside) {
+      parent().layout().draw(*this);
     }
   }
 }

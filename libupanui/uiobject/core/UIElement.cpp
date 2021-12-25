@@ -21,10 +21,12 @@
  */
 
 #include <UIElement.h>
+#include <Layout.h>
+#include "GCoreFunctions.h"
 
 namespace upanui {
   UIElement::UIElement(const int x, const int y, const uint32_t width, const uint32_t height)
-    : UIObjectImpl(x, y, width, height), _drawBuffer(nullptr, 0, 0), _localBuffer(nullptr), _currentBoundaryCheckResult(Outside) {
+    : UIObjectImpl(x, y, width, height), _drawBuffer(nullptr, 0, 0), _localBuffer(nullptr), _currentBoundaryCheckResult(Layout::Outside) {
   }
 
   UIElement::~UIElement() noexcept {
@@ -51,14 +53,18 @@ namespace upanui {
     redraw();
   }
 
-  void UIElement::setupDrawBuffer(const UIObject::BoundaryCheckResult boundaryCheckResult) {
-    if (boundaryCheckResult == BoundaryCheckResult::Outside) {
+  void UIElement::setPixel(uint32_t& pixel, uint32_t color) {
+    GCoreFunctions::setPixel(pixel, color);
+  }
+
+  void UIElement::setupDrawBuffer(const Layout::BoundaryCheckResult boundaryCheckResult) {
+    if (boundaryCheckResult == Layout::Outside) {
       if (_localBuffer) {
         delete _localBuffer;
         _localBuffer = nullptr;
       }
       _drawBuffer = FrameBuffer(nullptr, 0, 0);
-    } else if (boundaryCheckResult == BoundaryCheckResult::Inside) {
+    } else if (boundaryCheckResult == Layout::Inside) {
       if (_localBuffer) {
         delete _localBuffer;
         _localBuffer = nullptr;
@@ -70,7 +76,7 @@ namespace upanui {
       FrameBufferInfo frameBufferInfo = parent().drawBuffer().frameBufferInfo();
       frameBufferInfo._frameBuffer = parentDrawBuffer.buffer() + cx + cy * parentDrawBuffer.width();
       _drawBuffer = FrameBuffer(frameBufferInfo);
-    } else if (boundaryCheckResult == BoundaryCheckResult::PartiallyInside) {
+    } else if (boundaryCheckResult == Layout::PartiallyInside) {
       if (_localBuffer != nullptr && (_drawBuffer.width() != width() || _drawBuffer.height() != height())) {
         delete _localBuffer;
         _localBuffer = nullptr;

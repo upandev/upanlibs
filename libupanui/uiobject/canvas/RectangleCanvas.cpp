@@ -25,36 +25,7 @@
 #include <GCoreFunctions.h>
 
 namespace upanui {
-  RectangleCanvas::RectangleCanvas(const int x, const int y, const uint32_t width, const uint32_t height) : Canvas(x, y, width, height) {
-  }
-
-  void RectangleCanvas::fill() {
-    const auto alpha = backgroundColorAlpha();
-    if (alpha == 0) {
-      return;
-    }
-
-    const auto& framebuffer = drawBuffer();
-    const auto bgColor = (backgroundColorForDraw() & ~GCoreFunctions::ALPHA_MASK) | (alpha << 24);
-    const auto brColor = (borderColor() & ~GCoreFunctions::ALPHA_MASK) | (borderColorAlpha() << 24);
-
-    for(auto y = 0u; y < height(); ++y) {
-      auto yOffset = y * framebuffer.width();
-      if (y < borderThickness() || (height() - y) <= borderThickness()) {
-        for(auto x = 0u; x < width(); ++x) {
-          GCoreFunctions::setPixel(framebuffer.buffer()[x + yOffset], brColor);
-        }
-      } else {
-        for(auto x = 0u; x < borderThickness(); ++x) {
-          GCoreFunctions::setPixel(framebuffer.buffer()[x + yOffset], brColor);
-        }
-        for(auto x = borderThickness(); x < width() - borderThickness(); ++x) {
-          GCoreFunctions::setPixel(framebuffer.buffer()[x + yOffset], bgColor);
-        }
-        for(auto x = (width() - borderThickness()); x < width(); ++x) {
-          GCoreFunctions::setPixel(framebuffer.buffer()[x + yOffset], brColor);
-        }
-      }
-    }
+  RectangleCanvas::RectangleCanvas(const int x, const int y, const uint32_t width, const uint32_t height)
+  : Canvas(x, y, width, height), _layout(*this) {
   }
 }

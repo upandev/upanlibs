@@ -42,12 +42,21 @@ namespace upanui {
     int y() const override { return _y; }
     uint32_t width() const override { return _width; }
     uint32_t height() const override { return _height; }
+    uint32_t backgroundColor() const override { return _bgColor; }
+    uint32_t backgroundColorForDraw() const override { return _bgColor; }
+    uint8_t  backgroundColorAlpha() const override { return _bgAlpha; }
+    uint32_t borderColor() const override { return _brColor; }
+    uint8_t  borderColorAlpha() const { return _brAlpha; }
     uint32_t borderThickness() const override { return _borderThickness; }
 
     void x(const int) override;
     void y(const int) override;
     void width(const uint32_t) override;
     void height(const uint32_t) override;
+    void backgroundColor(const uint32_t color) override;
+    void backgroundColorAlpha(const uint8_t) override;
+    void borderColor(const uint32_t) override;
+    void borderColorAlpha(const uint8_t) override;
     void borderThickness(const uint32_t) override;
 
     UIObject& parent() const override;
@@ -64,13 +73,11 @@ namespace upanui {
     upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) override;
 
   protected:
+    virtual void onBackgroundColorChange() {}
     void onKeyboardEvent(const KeyboardEvent& event) override {}
     void onMouseEvent(const MouseEvent& event) override {}
     void onMouseFocus() override {}
     void onLoseMouseFocus() override {}
-
-    BoundaryCheckResult checkBoundary(UIObject& child) override;
-    void drawChild(UIObject& child) override;
 
     bool inside(const int x, const int y) const;
 
@@ -79,6 +86,10 @@ namespace upanui {
     int _y;
     uint32_t _width;
     uint32_t _height;
+    uint32_t _bgColor;
+    uint8_t _bgAlpha;
+    uint32_t _brColor;
+    uint8_t _brAlpha;
     uint32_t _borderThickness;
 
     GraphicsContext& _gc;

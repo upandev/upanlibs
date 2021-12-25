@@ -45,7 +45,7 @@ namespace upanui {
     _hoverColor = (bgColor & GCoreFunctions::ALPHA_MASK) | r << 16 | g << 8 | b;
   }
 
-  uint32_t Button::backgroundColorForDraw() {
+  uint32_t Button::backgroundColorForDraw() const {
     return _hover ? _hoverColor : backgroundColor();
   }
 

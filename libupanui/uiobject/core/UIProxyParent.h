@@ -33,12 +33,21 @@ namespace upanui {
     int y() const override { return 0; }
     uint32_t width() const override;
     uint32_t height() const override;
+    uint32_t backgroundColor() const override { return 0; }
+    uint32_t backgroundColorForDraw() const override { return 0; }
+    uint8_t  backgroundColorAlpha() const override { return 0; }
+    uint32_t borderColor() const override { return 0; }
+    uint8_t  borderColorAlpha() const { return 0; }
     uint32_t borderThickness() const override { return 0; }
 
     void x(const int) override {}
     void y(const int) override {}
     void width(const uint32_t) override {}
     void height(const uint32_t) override {}
+    void backgroundColor(const uint32_t color) override {}
+    void backgroundColorAlpha(const uint8_t) override {}
+    void borderColor(const uint32_t) override {}
+    void borderColorAlpha(const uint8_t) override {}
     void borderThickness(const uint32_t) override {}
 
     int drawX() const override { return 0; }
@@ -75,16 +84,16 @@ namespace upanui {
       throw upan::exception(XLOC, "unsupported uiObjectUnderCursor for UIProxyParent");
     }
 
-    BoundaryCheckResult checkBoundary(UIObject& child) override {
-      throw upan::exception(XLOC, "unsupported checkBoundary for UIProxyParent");
+    Layout& layout() override {
+      throw upan::exception(XLOC, "unsupported layout for UIProxyParent");
+    }
+
+    void setPixel(uint32_t& pixel, uint32_t color) override {
+      throw upan::exception(XLOC, "unsupported setPixel for UIProxyParent");
     }
 
     FrameBuffer& drawBuffer() override {
       throw upan::exception(XLOC, "unsupported drawBuffer for UIProxyParent");
-    }
-
-    void drawChild(UIObject&) override {
-      throw upan::exception(XLOC, "unsupported drawChild for UIProxyParent");
     }
 
   protected:

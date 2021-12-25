@@ -32,6 +32,11 @@ namespace upanui {
     }
     Image(const Image& image) : UIElement(image.x(), image.y(), image.width(), image.height()) {
     }
+
+    Layout& layout() override {
+      throw upan::exception(XLOC, "unsupport layot for Image");
+    }
+
     virtual const uint32_t* data() const = 0;
   };
 }

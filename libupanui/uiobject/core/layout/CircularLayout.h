@@ -19,26 +19,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-
 #pragma once
 
-#include <Canvas.h>
-#include <CircularLayout.h>
+#include <Layout.h>
+#include <stdlib.h>
 
 namespace upanui {
   class FrameBuffer;
 
-  class RoundCanvas : public Canvas {
+  class CircularLayout : public Layout {
   public:
-    RoundCanvas(const int x, const int y, const uint32_t width, const uint32_t height);
-    virtual ~RoundCanvas() {}
-
-  protected:
-    Layout& layout() override {
-      return _layout;
-    }
-
+    CircularLayout(UIObject& parent) : Layout(parent) {}
+    BoundaryCheckResult checkBoundary(UIObject& child) override;
+    void draw(UIObject& child) override;
+    void fill() override;
   private:
-    CircularLayout _layout;
+    void plotLine(int x, int y, int r, const FrameBuffer& framebuffer, uint32_t color);
+    void plotPixel(int x, int y, int r, const FrameBuffer& framebuffer, uint32_t color);
   };
 }

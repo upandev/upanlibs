@@ -23,6 +23,7 @@
 
 #include <stdlib.h>
 #include <UIObjectImpl.h>
+#include <RectangularLayout.h>
 
 namespace upanui {
   class MouseEventHandler;
@@ -32,15 +33,6 @@ namespace upanui {
     UIRoot(const int x, const int y, const uint32_t width, const uint32_t height);
 
   public:
-    uint32_t backgroundColor() const {
-      return _bgColor;
-    }
-    void backgroundColor(const uint32_t);
-    uint8_t backgroundColorAlpha() const {
-      return _bgAlpha;
-    }
-    void backgroundColorAlpha(const uint8_t);
-
     void onDrag(MouseEventHandler& handler) {
       _onDragHandler = upan::option<MouseEventHandler&>(handler);
     }
@@ -59,13 +51,15 @@ namespace upanui {
     void contentChanged() override;
 
   private:
-    void fill(int x1, int y1, int x2, int y2, uint32_t color, uint32_t alpha);
+    Layout& layout() override {
+      return _layout;
+    }
+    void setPixel(uint32_t& pixel, uint32_t color) override;
     FrameBuffer& drawBuffer() override;
 
   private:
-    uint32_t _bgColor;
-    uint8_t _bgAlpha;
     upan::option<MouseEventHandler&> _onDragHandler;
+    RectangularLayout _layout;
 
     friend class GraphicsContext;
   };

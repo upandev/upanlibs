@@ -36,7 +36,7 @@ namespace upanui {
     Button(const int x, const int y, const uint32_t width, const uint32_t height);
 
     void onBackgroundColorChange() override;
-    uint32_t backgroundColorForDraw() override;
+    uint32_t backgroundColorForDraw() const override;
 
     void onKeyboardEvent(const KeyboardEvent& event) override;
     void onMouseEvent(const MouseEvent& event) override;
