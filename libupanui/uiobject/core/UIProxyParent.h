@@ -33,11 +33,13 @@ namespace upanui {
     int y() const override { return 0; }
     uint32_t width() const override;
     uint32_t height() const override;
+    uint32_t borderThickness() const override { return 0; }
 
     void x(const int) override {}
     void y(const int) override {}
     void width(const uint32_t) override {}
     void height(const uint32_t) override {}
+    void borderThickness(const uint32_t) override {}
 
     int drawX() const override { return 0; }
     int drawY() const override { return 0; }

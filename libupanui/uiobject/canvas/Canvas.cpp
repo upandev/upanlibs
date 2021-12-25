@@ -25,22 +25,43 @@
 
 namespace upanui {
   Canvas::Canvas(const int x, const int y, const uint32_t width, const uint32_t height)
-    : UIElement(x, y, width, height), _bgColor(0), _bgAlpha(100) {
+    : UIElement(x, y, width, height), _bgColor(0), _bgAlpha(100), _brColor(0xFFFFFF), _brAlpha(100) {
   }
 
  void Canvas::backgroundColor(const uint32_t color) {
-    _bgColor = color;
-    onBackgroundColorChange();
-    contentChanged();
+    if (_bgColor != color) {
+      _bgColor = color;
+      onBackgroundColorChange();
+      contentChanged();
+    }
   }
 
   void Canvas::backgroundColorAlpha(const uint8_t alpha) {
-    if (alpha > 100) {
-      throw upan::exception(XLOC, "alpha must be a value between 0 to 100");
+    if (_bgAlpha != alpha) {
+      if (alpha > 100) {
+        throw upan::exception(XLOC, "alpha must be a value between 0 to 100");
+      }
+      _bgAlpha = alpha;
+      onBackgroundColorChange();
+      contentChanged();
     }
-    _bgAlpha = alpha;
-    onBackgroundColorChange();
-    contentChanged();
+  }
+
+  void Canvas::borderColor(const uint32_t color) {
+    if (_brColor != color) {
+      _brColor = color;
+      contentChanged();
+    }
+  }
+
+  void Canvas::borderColorAlpha(const uint8_t alpha) {
+    if (_brAlpha != alpha) {
+      if (alpha > 100) {
+        throw upan::exception(XLOC, "alpha must be a value between 0 to 100");
+      }
+      _brAlpha = alpha;
+      contentChanged();
+    }
   }
 
   void Canvas::draw() {

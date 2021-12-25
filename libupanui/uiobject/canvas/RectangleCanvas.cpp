@@ -35,12 +35,25 @@ namespace upanui {
     }
 
     const auto& framebuffer = drawBuffer();
-    const auto color = (backgroundColorForDraw() & ~GCoreFunctions::ALPHA_MASK) | (alpha << 24);
+    const auto bgColor = (backgroundColorForDraw() & ~GCoreFunctions::ALPHA_MASK) | (alpha << 24);
+    const auto brColor = (borderColor() & ~GCoreFunctions::ALPHA_MASK) | (borderColorAlpha() << 24);
 
     for(auto y = 0u; y < height(); ++y) {
       auto yOffset = y * framebuffer.width();
-      for(auto x = 0u; x < width(); ++x) {
-        GCoreFunctions::setPixel(framebuffer.buffer()[x + yOffset], color);
+      if (y < borderThickness() || (height() - y) <= borderThickness()) {
+        for(auto x = 0u; x < width(); ++x) {
+          GCoreFunctions::setPixel(framebuffer.buffer()[x + yOffset], brColor);
+        }
+      } else {
+        for(auto x = 0u; x < borderThickness(); ++x) {
+          GCoreFunctions::setPixel(framebuffer.buffer()[x + yOffset], brColor);
+        }
+        for(auto x = borderThickness(); x < width() - borderThickness(); ++x) {
+          GCoreFunctions::setPixel(framebuffer.buffer()[x + yOffset], bgColor);
+        }
+        for(auto x = (width() - borderThickness()); x < width(); ++x) {
+          GCoreFunctions::setPixel(framebuffer.buffer()[x + yOffset], brColor);
+        }
       }
     }
   }

@@ -46,11 +46,13 @@ namespace upanui {
     virtual int y() const = 0;
     virtual uint32_t width() const = 0;
     virtual uint32_t height() const = 0;
+    virtual uint32_t borderThickness() const = 0;
 
     virtual void x(const int) = 0;
     virtual void y(const int) = 0;
     virtual void width(const uint32_t) = 0;
     virtual void height(const uint32_t) = 0;
+    virtual void borderThickness(const uint32_t) = 0;
 
     virtual int drawX() const = 0;
     virtual int drawY() const = 0;

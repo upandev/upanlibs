@@ -42,11 +42,13 @@ namespace upanui {
     int y() const override { return _y; }
     uint32_t width() const override { return _width; }
     uint32_t height() const override { return _height; }
+    uint32_t borderThickness() const override { return _borderThickness; }
 
     void x(const int) override;
     void y(const int) override;
     void width(const uint32_t) override;
     void height(const uint32_t) override;
+    void borderThickness(const uint32_t) override;
 
     UIObject& parent() const override;
     const upan::set<UIObject*>& children() override;
@@ -77,6 +79,7 @@ namespace upanui {
     int _y;
     uint32_t _width;
     uint32_t _height;
+    uint32_t _borderThickness;
 
     GraphicsContext& _gc;
   };

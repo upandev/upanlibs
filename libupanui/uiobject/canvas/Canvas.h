@@ -33,9 +33,20 @@ namespace upanui {
     uint32_t backgroundColor() const {
       return _bgColor;
     }
+
     void backgroundColorAlpha(const uint8_t);
     uint8_t  backgroundColorAlpha() const {
       return _bgAlpha;
+    }
+
+    void borderColor(const uint32_t);
+    uint32_t borderColor() const {
+      return _brColor;
+    }
+
+    void borderColorAlpha(const uint8_t);
+    uint8_t  borderColorAlpha() const {
+      return _brAlpha;
     }
 
   protected:
@@ -59,5 +70,7 @@ namespace upanui {
   private:
     uint32_t _bgColor;
     uint8_t _bgAlpha;
+    uint32_t _brColor;
+    uint8_t _brAlpha;
   };
 }

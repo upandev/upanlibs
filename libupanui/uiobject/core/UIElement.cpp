@@ -65,8 +65,10 @@ namespace upanui {
       }
 
       auto& parentDrawBuffer = parent().drawBuffer();
+      const auto cx = x() + parent().borderThickness();
+      const auto cy = y() + parent().borderThickness();
       FrameBufferInfo frameBufferInfo = parent().drawBuffer().frameBufferInfo();
-      frameBufferInfo._frameBuffer = parentDrawBuffer.buffer() + x() + y() * parentDrawBuffer.width();
+      frameBufferInfo._frameBuffer = parentDrawBuffer.buffer() + cx + cy * parentDrawBuffer.width();
       _drawBuffer = FrameBuffer(frameBufferInfo);
     } else if (boundaryCheckResult == BoundaryCheckResult::PartiallyInside) {
       if (_localBuffer != nullptr && (_drawBuffer.width() != width() || _drawBuffer.height() != height())) {

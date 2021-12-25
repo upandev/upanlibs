@@ -27,7 +27,7 @@
 
 namespace upanui {
   UIObjectImpl::UIObjectImpl(const int x, const int y, const uint32_t width, const uint32_t height)
-    : _x(x), _y(y), _width(width), _height(height), _gc(GraphicsContext::Instance()) {
+    : _x(x), _y(y), _width(width), _height(height), _borderThickness(0), _gc(GraphicsContext::Instance()) {
   }
 
   void UIObjectImpl::x(const int x) {
@@ -55,6 +55,13 @@ namespace upanui {
     if (_height != height) {
       _height = height;
       sizeChanged();
+    }
+  }
+
+  void UIObjectImpl::borderThickness(const uint32_t thickness) {
+    if (_borderThickness != thickness) {
+      _borderThickness = thickness;
+      contentChanged();
     }
   }
 
@@ -104,14 +111,17 @@ namespace upanui {
     const auto cx2 = cx1 + child.width() - 1;
     const auto cy2 = cy1 + child.height() - 1;
 
-    if (cx1 > 0 && cx2 < width() && cy1 > 0 && cy2 < height()) {
+    const auto pwidth = width() - 2 * borderThickness();
+    const auto pheight = height() - 2 * borderThickness();
+
+    if (cx1 >= 0 && cx2 < pwidth && cy1 >= 0 && cy2 < pheight) {
       return BoundaryCheckResult::Inside;
     }
 
     if ((cx1 < 0 && cx2 < 0) ||
         (cy1 < 0 && cy2 < 0) ||
-        (cx1 >= width() && cx2 >= width()) ||
-        (cy1 >= height() && cy2 >= height())) {
+        (cx1 >= pwidth && cx2 >= pwidth) ||
+        (cy1 >= pheight && cy2 >= pheight)) {
       return BoundaryCheckResult::Outside;
     }
 
@@ -122,14 +132,17 @@ namespace upanui {
     auto& childDrawBuffer = child.drawBuffer();
     auto& parentDrawBuffer = drawBuffer();
 
+    const auto pwidth = width() - borderThickness();
+    const auto pheight = height() - borderThickness();
+
     const int sx1 = child.x() >= 0 ? 0 : 0 - child.x();
     const int sy1 = child.y() >= 0 ? 0 : 0 - child.y();
 
-    const int dx1 = child.x() >= 0 ? child.x() : 0;
-    const int dy1 = child.y() >= 0 ? child.y() : 0;
+    const int dx1 = (child.x() >= 0 ? child.x() : 0) + borderThickness();
+    const int dy1 = (child.y() >= 0 ? child.y() : 0) + borderThickness();
 
-    const int w = (child.width() - sx1) <= (width() - dx1) ? child.width() - sx1 : width() - dx1;
-    const int h = (child.height() - sy1) <= (height() - dy1) ? child.height() - sy1 : height() - dy1;
+    const int w = (child.width() - sx1) <= (pwidth - dx1) ? child.width() - sx1 : pwidth - dx1;
+    const int h = (child.height() - sy1) <= (pheight - dy1) ? child.height() - sy1 : pheight - dy1;
 
     const int srcXOffset = sx1 * childDrawBuffer.bytesPerPixel();
     const int destXOffset = dx1 * parentDrawBuffer.bytesPerPixel();
