@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <UIObjectImpl.h>
 #include <RectangularLayout.h>
+#include <DrawBuffer.h>
 
 namespace upanui {
   class MouseEventHandler;
@@ -54,10 +55,12 @@ namespace upanui {
     Layout& layout() override {
       return _layout;
     }
-    FrameBuffer& drawBuffer() override;
-    bool isLocalDrawBuffer() const override { return true; }
+    DrawBuffer& drawBuffer() override {
+      return _drawBuffer;
+    }
 
   private:
+    DrawBuffer _drawBuffer;
     upan::option<MouseEventHandler&> _onDragHandler;
     RectangularLayout _layout;
 

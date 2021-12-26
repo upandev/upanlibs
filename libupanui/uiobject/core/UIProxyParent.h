@@ -88,10 +88,9 @@ namespace upanui {
       throw upan::exception(XLOC, "unsupported layout for UIProxyParent");
     }
 
-    FrameBuffer& drawBuffer() override {
+    DrawBuffer& drawBuffer() override {
       throw upan::exception(XLOC, "unsupported drawBuffer for UIProxyParent");
     }
-    bool isLocalDrawBuffer() const override { return true; }
 
   protected:
     void onKeyboardEvent(const KeyboardEvent& event) override {

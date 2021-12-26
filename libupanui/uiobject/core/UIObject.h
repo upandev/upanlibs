@@ -31,7 +31,7 @@ namespace upanui {
   class GraphicsContext;
   class KeyboardEvent;
   class MouseEvent;
-  class FrameBuffer;
+  class DrawBuffer;
   class Layout;
 
   class UIObject {
@@ -82,8 +82,7 @@ namespace upanui {
     virtual upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) = 0;
 
     virtual Layout& layout() = 0;
-    virtual FrameBuffer& drawBuffer() = 0;
-    virtual bool isLocalDrawBuffer() const = 0;
+    virtual DrawBuffer& drawBuffer() = 0;
 
   protected:
     virtual ~UIObject() {}

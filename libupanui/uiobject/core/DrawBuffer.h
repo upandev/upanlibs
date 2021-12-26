@@ -21,18 +21,32 @@
  */
 #pragma once
 
-#include <Layout.h>
 #include <stdlib.h>
 
 namespace upanui {
-  class CircularLayout : public Layout {
+  class FrameBuffer;
+
+  class DrawBuffer {
   public:
-    CircularLayout(UIObject& parent) : Layout(parent) {}
-    BoundaryCheckResult checkBoundary(UIObject& child) override;
-    void draw(UIObject& child) override;
-    void fill() override;
+    DrawBuffer();
+    ~DrawBuffer();
+
+    void clear();
+    void initFrom(const DrawBuffer& parent, const int xOffset, const int yOffset);
+    void initLocal(const uint32_t width, const uint32_t height);
+    void initLocal(const FrameBuffer& frameBuffer);
+
+    uint32_t width() const { return _width; }
+    uint32_t height() const { return _height; }
+    bool isLocal() const { return _type == BufferType::Local || _type == BufferType::ForceLocal; }
+    bool isNull() const { return _type == BufferType::Null; }
+    uint32_t* buffer() const { return _buffer; }
+
   private:
-    void plotLine(int x, int y, int r, uint32_t color);
-    void plotPixel(int x, int y, int r, uint32_t color);
+    enum BufferType { Null, Local, ForceLocal, Derived };
+    BufferType _type;
+    uint32_t* _buffer;
+    uint32_t _width;
+    uint32_t _height;
   };
 }

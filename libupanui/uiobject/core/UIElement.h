@@ -23,7 +23,7 @@
 
 #include <stdlib.h>
 #include <UIObjectImpl.h>
-#include <FrameBuffer.h>
+#include <DrawBuffer.h>
 #include <Layout.h>
 
 namespace upanui {
@@ -39,10 +39,9 @@ namespace upanui {
     void sizeChanged() override;
     void contentChanged() override;
 
-    FrameBuffer& drawBuffer() override {
+    DrawBuffer& drawBuffer() override {
       return _drawBuffer;
     }
-    bool isLocalDrawBuffer() const override { return _localBuffer != nullptr; }
 
     void setupDrawBuffer(const Layout::BoundaryCheckResult boundaryCheckResult);
     Layout::BoundaryCheckResult getCurrentBoundaryCheckResult() const {
@@ -53,8 +52,7 @@ namespace upanui {
     }
 
   private:
-    FrameBuffer _drawBuffer;
-    uint32_t* _localBuffer;
+    DrawBuffer _drawBuffer;
     Layout::BoundaryCheckResult _currentBoundaryCheckResult;
   };
 }

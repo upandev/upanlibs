@@ -31,6 +31,7 @@ namespace upanui {
     _onDragHandler(upan::option<MouseEventHandler&>::empty()),
     _layout(*this) {
     gc().frame().updateViewport(x, y, width, height);
+    _drawBuffer.initLocal(gc().frame().frameBuffer());
   }
 
   void UIRoot::draw() {
@@ -67,10 +68,6 @@ namespace upanui {
 
   void UIRoot::contentChanged() {
     redraw();
-  }
-
-  FrameBuffer& UIRoot::drawBuffer() {
-    return gc().frame().frameBuffer();
   }
 
   void UIRoot::onMouseEvent(const MouseEvent &event) {

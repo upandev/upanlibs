@@ -25,7 +25,7 @@
 #include <UIElement.h>
 
 namespace upanui {
-  class FrameBuffer;
+  class DrawBuffer;
 
   class Canvas : public UIElement {
   public:
@@ -34,7 +34,7 @@ namespace upanui {
     virtual ~Canvas() {}
 
   protected:
-    virtual void doDraw(const FrameBuffer& frameBuffer) {}
+    virtual void doDraw(const DrawBuffer& frameBuffer) {}
 
   private:
     void draw() override;

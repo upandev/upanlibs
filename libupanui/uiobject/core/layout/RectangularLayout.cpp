@@ -22,7 +22,7 @@
 
 #include <RectangularLayout.h>
 #include <UIObject.h>
-#include <FrameBuffer.h>
+#include <DrawBuffer.h>
 #include <GCoreFunctions.h>
 
 namespace upanui {
@@ -83,25 +83,25 @@ namespace upanui {
       return;
     }
 
-    const auto& framebuffer = parent().drawBuffer();
+    const auto& drawBuffer = parent().drawBuffer();
     const auto bgColor = (parent().backgroundColorForDraw() & ~GCoreFunctions::ALPHA_MASK) | (alpha << 24);
     const auto brColor = (parent().borderColor() & ~GCoreFunctions::ALPHA_MASK) | (parent().borderColorAlpha() << 24);
 
     for(auto y = 0u; y < parent().height(); ++y) {
-      auto yOffset = y * framebuffer.width();
+      auto yOffset = y * drawBuffer.width();
       if (y < parent().borderThickness() || (parent().height() - y) <= parent().borderThickness()) {
         for(auto x = 0u; x < parent().width(); ++x) {
-          GCoreFunctions::setPixel(framebuffer.buffer()[x + yOffset], brColor, parent().isLocalDrawBuffer());
+          GCoreFunctions::setPixel(drawBuffer.buffer()[x + yOffset], brColor, drawBuffer.isLocal());
         }
       } else {
         for(auto x = 0u; x < parent().borderThickness(); ++x) {
-          GCoreFunctions::setPixel(framebuffer.buffer()[x + yOffset], brColor, parent().isLocalDrawBuffer());
+          GCoreFunctions::setPixel(drawBuffer.buffer()[x + yOffset], brColor, drawBuffer.isLocal());
         }
         for(auto x = parent().borderThickness(); x < parent().width() - parent().borderThickness(); ++x) {
-          GCoreFunctions::setPixel(framebuffer.buffer()[x + yOffset], bgColor, parent().isLocalDrawBuffer());
+          GCoreFunctions::setPixel(drawBuffer.buffer()[x + yOffset], bgColor, drawBuffer.isLocal());
         }
         for(auto x = (parent().width() - parent().borderThickness()); x < parent().width(); ++x) {
-          GCoreFunctions::setPixel(framebuffer.buffer()[x + yOffset], brColor, parent().isLocalDrawBuffer());
+          GCoreFunctions::setPixel(drawBuffer.buffer()[x + yOffset], brColor, drawBuffer.isLocal());
         }
       }
     }

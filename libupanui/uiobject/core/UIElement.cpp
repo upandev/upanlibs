@@ -26,11 +26,10 @@
 
 namespace upanui {
   UIElement::UIElement(const int x, const int y, const uint32_t width, const uint32_t height)
-    : UIObjectImpl(x, y, width, height), _drawBuffer(nullptr, 0, 0), _localBuffer(nullptr), _currentBoundaryCheckResult(Layout::Outside) {
+    : UIObjectImpl(x, y, width, height), _currentBoundaryCheckResult(Layout::Outside) {
   }
 
   UIElement::~UIElement() noexcept {
-    delete _localBuffer;
   }
 
   int UIElement::drawX() const {
@@ -55,34 +54,13 @@ namespace upanui {
 
   void UIElement::setupDrawBuffer(const Layout::BoundaryCheckResult boundaryCheckResult) {
     if (boundaryCheckResult == Layout::Outside) {
-      if (_localBuffer) {
-        delete _localBuffer;
-        _localBuffer = nullptr;
-      }
-      _drawBuffer = FrameBuffer(nullptr, 0, 0);
+      _drawBuffer.clear();
     } else if (boundaryCheckResult == Layout::Inside) {
-      if (_localBuffer) {
-        delete _localBuffer;
-        _localBuffer = nullptr;
-      }
-
-      auto& parentDrawBuffer = parent().drawBuffer();
       const auto cx = x() + parent().borderThickness();
       const auto cy = y() + parent().borderThickness();
-      FrameBufferInfo frameBufferInfo = parent().drawBuffer().frameBufferInfo();
-      frameBufferInfo._frameBuffer = parentDrawBuffer.buffer() + cx + cy * parentDrawBuffer.width();
-      _drawBuffer = FrameBuffer(frameBufferInfo);
+      _drawBuffer.initFrom(parent().drawBuffer(), cx, cy);
     } else if (boundaryCheckResult == Layout::PartiallyInside) {
-      if (_localBuffer != nullptr && (_drawBuffer.width() != width() || _drawBuffer.height() != height())) {
-        delete _localBuffer;
-        _localBuffer = nullptr;
-      }
-      if (_localBuffer == nullptr) {
-        const auto bufSize = width() * height();
-        _localBuffer = new uint32_t[width() * height()];
-        memset(_localBuffer, 0, bufSize * sizeof(uint32_t));
-        _drawBuffer = FrameBuffer(_localBuffer, width(), height());
-      }
+      _drawBuffer.initLocal(width(), height());
     } else {
       throw upan::exception(XLOC, "Unsupported BoundaryCheckResult: %d", boundaryCheckResult);
     }

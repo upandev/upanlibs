@@ -1,6 +1,6 @@
 #include <CircularLayout.h>
 #include <UIObject.h>
-#include <FrameBuffer.h>
+#include <DrawBuffer.h>
 #include <GCoreFunctions.h>
 #include <math.h>
 
@@ -12,60 +12,64 @@ namespace upanui {
   void CircularLayout::draw(UIObject& child) {
   }
 
-  void CircularLayout::plotLine(int x, int y, int r, const FrameBuffer& framebuffer, uint32_t color) {
+  void CircularLayout::plotLine(int x, int y, int r, uint32_t color) {
+    const DrawBuffer& drawBuffer = parent().drawBuffer();
+
     int sx1 = -x + r;
     int sx2 = x + r;
     int sy = r - y;
-    int yoffset = sy * framebuffer.width();
+    int yoffset = sy * drawBuffer.width();
     for (int i = sx1; i <= sx2; ++i) {
-      GCoreFunctions::setPixel(framebuffer.buffer()[i + yoffset], color, parent().isLocalDrawBuffer());
+      GCoreFunctions::setPixel(drawBuffer.buffer()[i + yoffset], color, drawBuffer.isLocal());
     }
 
     sy = r + y;
-    yoffset = sy * framebuffer.width();
+    yoffset = sy * drawBuffer.width();
     for (int i = sx1; i <= sx2; ++i) {
-      GCoreFunctions::setPixel(framebuffer.buffer()[i + yoffset], color, parent().isLocalDrawBuffer());
+      GCoreFunctions::setPixel(drawBuffer.buffer()[i + yoffset], color, drawBuffer.isLocal());
     }
 
     sy = x + r;
     sx1 = r - y;
     sx2 = r + y;
-    yoffset = sy * framebuffer.width();
+    yoffset = sy * drawBuffer.width();
     for (int i = sx1; i <= sx2; ++i) {
-      GCoreFunctions::setPixel(framebuffer.buffer()[i + yoffset], color, parent().isLocalDrawBuffer());
+      GCoreFunctions::setPixel(drawBuffer.buffer()[i + yoffset], color, drawBuffer.isLocal());
     }
 
     sy = -x + r;
-    yoffset = sy * framebuffer.width();
+    yoffset = sy * drawBuffer.width();
     for (int i = sx1; i <= sx2; ++i) {
-      GCoreFunctions::setPixel(framebuffer.buffer()[i + yoffset], color, parent().isLocalDrawBuffer());
+      GCoreFunctions::setPixel(drawBuffer.buffer()[i + yoffset], color, drawBuffer.isLocal());
     }
   }
 
-  void CircularLayout::plotPixel(int x, int y, int r, const FrameBuffer& framebuffer, uint32_t color) {
+  void CircularLayout::plotPixel(int x, int y, int r, uint32_t color) {
+    const DrawBuffer& drawBuffer = parent().drawBuffer();
+
     int sx1 = -x + r;
     int sx2 = x + r;
     int sy = r - y;
-    int yoffset = sy * framebuffer.width();
-    GCoreFunctions::setPixel(framebuffer.buffer()[sx1 + yoffset], color, parent().isLocalDrawBuffer());
-    GCoreFunctions::setPixel(framebuffer.buffer()[sx2 + yoffset], color, parent().isLocalDrawBuffer());
+    int yoffset = sy * drawBuffer.width();
+    GCoreFunctions::setPixel(drawBuffer.buffer()[sx1 + yoffset], color, drawBuffer.isLocal());
+    GCoreFunctions::setPixel(drawBuffer.buffer()[sx2 + yoffset], color, drawBuffer.isLocal());
 
     sy = r + y;
-    yoffset = sy * framebuffer.width();
-    GCoreFunctions::setPixel(framebuffer.buffer()[sx1 + yoffset], color, parent().isLocalDrawBuffer());
-    GCoreFunctions::setPixel(framebuffer.buffer()[sx2 + yoffset], color, parent().isLocalDrawBuffer());
+    yoffset = sy * drawBuffer.width();
+    GCoreFunctions::setPixel(drawBuffer.buffer()[sx1 + yoffset], color, drawBuffer.isLocal());
+    GCoreFunctions::setPixel(drawBuffer.buffer()[sx2 + yoffset], color, drawBuffer.isLocal());
 
     sy = x + r;
     sx1 = r - y;
     sx2 = r + y;
-    yoffset = sy * framebuffer.width();
-    GCoreFunctions::setPixel(framebuffer.buffer()[sx1 + yoffset], color, parent().isLocalDrawBuffer());
-    GCoreFunctions::setPixel(framebuffer.buffer()[sx2 + yoffset], color, parent().isLocalDrawBuffer());
+    yoffset = sy * drawBuffer.width();
+    GCoreFunctions::setPixel(drawBuffer.buffer()[sx1 + yoffset], color, drawBuffer.isLocal());
+    GCoreFunctions::setPixel(drawBuffer.buffer()[sx2 + yoffset], color, drawBuffer.isLocal());
 
     sy = -x + r;
-    yoffset = sy * framebuffer.width();
-    GCoreFunctions::setPixel(framebuffer.buffer()[sx1 + yoffset], color, parent().isLocalDrawBuffer());
-    GCoreFunctions::setPixel(framebuffer.buffer()[sx2 + yoffset], color, parent().isLocalDrawBuffer());
+    yoffset = sy * drawBuffer.width();
+    GCoreFunctions::setPixel(drawBuffer.buffer()[sx1 + yoffset], color, drawBuffer.isLocal());
+    GCoreFunctions::setPixel(drawBuffer.buffer()[sx2 + yoffset], color, drawBuffer.isLocal());
   }
 
   void CircularLayout::fill() {
@@ -74,7 +78,6 @@ namespace upanui {
       return;
     }
 
-    const auto &framebuffer = parent().drawBuffer();
     const auto rawColor = (parent().backgroundColorForDraw() & ~GCoreFunctions::ALPHA_MASK);
     const auto color = rawColor | (alpha << 24);
 
@@ -85,7 +88,7 @@ namespace upanui {
     const int r2 = r * r;
 
     while (x <= y) {
-      plotLine(x, y, r, framebuffer, color);
+      plotLine(x, y, r, color);
 
       if (d < 0) {
         d += 4 * x + 6;
@@ -104,7 +107,7 @@ namespace upanui {
 
       if (e > 0 && e < 1) {
         const auto antialiasPixelColor = rawColor | ((int) (alpha * e)) << 24;
-        plotPixel(x, y + 1, r, framebuffer, antialiasPixelColor);
+        plotPixel(x, y + 1, r, antialiasPixelColor);
       }
     }
   }
