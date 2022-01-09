@@ -32,7 +32,8 @@ namespace upanui {
     void draw(UIObject& child) override;
     void fill() override;
   private:
-    void plotLine(int x, int y, int r, uint32_t color);
-    void plotPixel(int x, int y, int r, uint32_t color);
+    void plotLine(int x, int y, int r, int shift, uint32_t color);
+    void plotPixel(int x, int y, int r, int shift, uint32_t color, bool directSet);
+    void fill(uint32_t alpha, uint32_t color, int shift, int r);
   };
 }

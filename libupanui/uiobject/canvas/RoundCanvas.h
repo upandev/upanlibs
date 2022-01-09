@@ -38,6 +38,8 @@ namespace upanui {
       return _layout;
     }
 
+    bool needLocalDrawBuffer() override;
+
   private:
     CircularLayout _layout;
   };

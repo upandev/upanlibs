@@ -22,7 +22,6 @@
 
 #include <GCoreFunctions.h>
 #include <uniq_ptr.h>
-#include <math.h>
 #include "algorithm.h"
 
 namespace upanui {
@@ -61,7 +60,7 @@ namespace upanui {
 
         const uint32_t caf = (100 - ia);
 
-        pixel = (uint8_t) upan::min(ia + (ca * caf) / 100, 100u) << 24
+        pixel = (uint8_t) upan::min((100 * ia + ca * caf) / 100, 100u) << 24
                 | (uint8_t) upan::min((ir * ia + cr * caf) / 100, 0xFFu) << 16
                 | (uint8_t) upan::min((ig * ia + cg * caf) / 100, 0xFFu) << 8
                 | (uint8_t) upan::min((ib * ia + cb * caf) / 100, 0xFFu);

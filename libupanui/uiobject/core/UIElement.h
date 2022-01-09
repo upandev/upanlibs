@@ -43,16 +43,13 @@ namespace upanui {
       return _drawBuffer;
     }
 
-    void setupDrawBuffer(const Layout::BoundaryCheckResult boundaryCheckResult);
-    Layout::BoundaryCheckResult getCurrentBoundaryCheckResult() const {
-      return _currentBoundaryCheckResult;
-    }
-    void setCurrentBoundaryCheckResult(Layout::BoundaryCheckResult r) {
-      _currentBoundaryCheckResult = r;
-    }
+    void setupDrawBuffer();
 
+  protected:
+    virtual bool needLocalDrawBuffer() {
+      return false;
+    }
   private:
     DrawBuffer _drawBuffer;
-    Layout::BoundaryCheckResult _currentBoundaryCheckResult;
   };
 }

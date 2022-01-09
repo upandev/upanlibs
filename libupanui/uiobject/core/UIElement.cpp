@@ -26,7 +26,7 @@
 
 namespace upanui {
   UIElement::UIElement(const int x, const int y, const uint32_t width, const uint32_t height)
-    : UIObjectImpl(x, y, width, height), _currentBoundaryCheckResult(Layout::Outside) {
+    : UIObjectImpl(x, y, width, height) {
   }
 
   UIElement::~UIElement() noexcept {
@@ -52,17 +52,22 @@ namespace upanui {
     redraw();
   }
 
-  void UIElement::setupDrawBuffer(const Layout::BoundaryCheckResult boundaryCheckResult) {
-    if (boundaryCheckResult == Layout::Outside) {
-      _drawBuffer.clear();
-    } else if (boundaryCheckResult == Layout::Inside) {
-      const auto cx = x() + parent().borderThickness();
-      const auto cy = y() + parent().borderThickness();
-      _drawBuffer.initFrom(parent().drawBuffer(), cx, cy);
-    } else if (boundaryCheckResult == Layout::PartiallyInside) {
+  void UIElement::setupDrawBuffer() {
+    if (needLocalDrawBuffer()) {
       _drawBuffer.initLocal(width(), height());
     } else {
-      throw upan::exception(XLOC, "Unsupported BoundaryCheckResult: %d", boundaryCheckResult);
+      const auto boundaryCheckResult = parent().layout().checkBoundary(*this);
+      if (boundaryCheckResult == Layout::Outside) {
+        _drawBuffer.clear();
+      } else if (boundaryCheckResult == Layout::Inside) {
+        const auto cx = x() + parent().borderThickness();
+        const auto cy = y() + parent().borderThickness();
+        _drawBuffer.initFrom(parent().drawBuffer(), cx, cy);
+      } else if (boundaryCheckResult == Layout::PartiallyInside) {
+        _drawBuffer.initLocal(width(), height());
+      } else {
+        throw upan::exception(XLOC, "Unsupported BoundaryCheckResult: %d", boundaryCheckResult);
+      }
     }
   }
 }

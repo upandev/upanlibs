@@ -35,18 +35,18 @@ namespace upanui {
     } else {
       drawTopDown();
 
-      if (getCurrentBoundaryCheckResult() != Layout::Outside) {
+      if (!drawBuffer().isNull()) {
         parent().drawToTop();
       }
     }
   }
 
   void Canvas::drawToTop() {
-    if (getCurrentBoundaryCheckResult() == Layout::PartiallyInside) {
+    if (drawBuffer().isLocal()) {
       parent().layout().draw(*this);
     }
 
-    if (getCurrentBoundaryCheckResult() != Layout::Outside) {
+    if (!drawBuffer().isNull()) {
       parent().drawToTop();
     }
   }
@@ -61,24 +61,19 @@ namespace upanui {
     //7. if using parent buffer then end the draw
     //8. if using your own buffer then ask parent to copy the child buffer into it's buffer
 
-    auto boundaryCheckResult = parent().layout().checkBoundary(*this);
-    setCurrentBoundaryCheckResult(boundaryCheckResult);
-
-    setupDrawBuffer(boundaryCheckResult);
-
-    if (boundaryCheckResult == Layout::Outside) {
-      return;
-    }
+    setupDrawBuffer();
 
     auto& drawBuf = drawBuffer();
-    layout().fill();
-    doDraw(drawBuf);
-    for(auto child : children()) {
-      child->drawTopDown();
-    }
+    if (!drawBuf.isNull()) {
+      layout().fill();
+      doDraw(drawBuf);
+      for (auto child: children()) {
+        child->drawTopDown();
+      }
 
-    if (boundaryCheckResult == Layout::PartiallyInside) {
-      parent().layout().draw(*this);
+      if (drawBuf.isLocal()) {
+        parent().layout().draw(*this);
+      }
     }
   }
 }

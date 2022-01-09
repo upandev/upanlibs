@@ -73,7 +73,6 @@ namespace upanui {
       for(int x = 0; x < w; ++x) {
         GCoreFunctions::setPixel(parentDrawBuffer.buffer()[x + destOffset], childDrawBuffer.buffer()[x + srcOffet], false);
       }
-      //memcpy((void*)((uint32_t)parentDrawBuffer.buffer() + destOffset), (void*)((uint32_t)childDrawBuffer.buffer() + srcOffet), copyWidth);
     }
   }
 
