@@ -146,5 +146,6 @@ add_library(upanui STATIC ${FONT_OBJS} ${LIB_UPANUI_CPP_SRC} ${LIB_UPANUI_INTERO
 add_library(upanui_interop STATIC ${FONT_OBJS} ${LIB_UPANUI_CPP_SRC})
 
 add_dependencies(upanui fonts)
+add_dependencies(upanui_interop fonts)
 
 link_directories(${OUTPUT_DIR})
