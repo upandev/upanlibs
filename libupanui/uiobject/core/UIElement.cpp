@@ -21,7 +21,6 @@
  */
 
 #include <UIElement.h>
-#include <Layout.h>
 #include "GCoreFunctions.h"
 
 namespace upanui {
@@ -50,24 +49,5 @@ namespace upanui {
 
   void UIElement::contentChanged() {
     redraw();
-  }
-
-  void UIElement::setupDrawBuffer() {
-    if (needLocalDrawBuffer()) {
-      _drawBuffer.initLocal(width(), height());
-    } else {
-      const auto boundaryCheckResult = parent().layout().checkBoundary(*this);
-      if (boundaryCheckResult == Layout::Outside) {
-        _drawBuffer.clear();
-      } else if (boundaryCheckResult == Layout::Inside) {
-        const auto cx = x() + parent().borderThickness();
-        const auto cy = y() + parent().borderThickness();
-        _drawBuffer.initFrom(parent().drawBuffer(), cx, cy);
-      } else if (boundaryCheckResult == Layout::PartiallyInside) {
-        _drawBuffer.initLocal(width(), height());
-      } else {
-        throw upan::exception(XLOC, "Unsupported BoundaryCheckResult: %d", boundaryCheckResult);
-      }
-    }
   }
 }

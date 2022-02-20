@@ -34,7 +34,7 @@ namespace upanui {
     }
 
     Layout& layout() override {
-      throw upan::exception(XLOC, "unsupport layot for Image");
+      throw upan::exception(XLOC, "unsupported layout for Image");
     }
 
     virtual const uint32_t* data() const = 0;

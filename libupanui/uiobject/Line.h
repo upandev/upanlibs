@@ -22,25 +22,28 @@
 
 #pragma once
 
-#include <Canvas.h>
-#include <RectangularLayout.h>
+#include <UILeafElement.h>
 
 namespace upanui {
-  class FrameBuffer;
-
-  class RectangleCanvas : public Canvas {
-  public:
-    RectangleCanvas(const int x, const int y, const uint32_t width, const uint32_t height);
-    virtual ~RectangleCanvas() {}
-
+  class Line : public UILeafElement {
   protected:
-    Layout& layout() override {
-      return _layout;
-    }
+    virtual ~Line() {}
+    Line(const int x1, const int y1, const int x2, const int y2);
 
-    bool intersect(int x, int y) const;
+    void doDraw() override;
 
   private:
-    RectangularLayout _layout;
+    void plot(int x, int y, uint32_t color);
+    void drawLine(int x1, int y1, int x2, int y2, uint32_t thickness, uint32_t color, bool fillLines);
+    void drawLineWithLowSlope(int sx, int sy, int ex, int ey, uint32_t thickness, uint32_t color, bool fillLines);
+    void drawLineWithHighSlope(int sx, int sy, int ex, int ey, uint32_t thickness, uint32_t color, bool fillLines);
+    void calculatePxPy(int& px, int& py, int dx, int dy, int sx, int sy, uint32_t thickness);
+
+  private:
+    const int _x1;
+    const int _y1;
+    const int _x2;
+    const int _y2;
+    friend class UIObjectFactory;
   };
 }

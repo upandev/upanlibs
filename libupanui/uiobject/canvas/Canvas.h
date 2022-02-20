@@ -34,11 +34,21 @@ namespace upanui {
     virtual ~Canvas() {}
 
   protected:
-    virtual void doDraw(const DrawBuffer& frameBuffer) {}
+    void setupDrawBuffer();
+    DrawBuffer& drawBuffer() override {
+      return _drawBuffer;
+    }
+    virtual bool needLocalDrawBuffer() {
+      return false;
+    }
+    virtual void doDraw(const DrawBuffer& frameBuffer) {
+    }
 
   private:
     void draw() override;
     void drawTopDown() override;
     void drawToTop() override;
+
+    DrawBuffer _drawBuffer;
   };
 }

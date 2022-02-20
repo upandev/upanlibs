@@ -49,6 +49,14 @@ namespace upanui {
     _type = BufferType::Derived;
   }
 
+  void DrawBuffer::initFrom(uint32_t* buffer, const uint32_t width, const uint32_t height) {
+    clear();
+    _buffer = buffer;
+    _width = width;
+    _height = height;
+    _type = BufferType::Derived;
+  }
+
   void DrawBuffer::initLocal(const uint32_t width, const uint32_t height) {
     if (_type == BufferType::Local && _width == width && _height == height) {
       return;
@@ -68,5 +76,13 @@ namespace upanui {
     _height = parent.width();
     _buffer = parent.buffer();
     _type = BufferType::ForceLocal;
+  }
+
+  uint32_t& DrawBuffer::at(const int x, const int y) const {
+    return _buffer[ x + y * width() ];
+  }
+
+  uint32_t& DrawBuffer::at(const int offset) const {
+    return _buffer[ offset ];
   }
 }

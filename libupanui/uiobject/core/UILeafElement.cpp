@@ -20,27 +20,30 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#pragma once
-
-#include <Canvas.h>
-#include <RectangularLayout.h>
+#include <UILeafElement.h>
+#include "GCoreFunctions.h"
 
 namespace upanui {
-  class FrameBuffer;
+  UILeafElement::UILeafElement(const int x, const int y, const uint32_t width, const uint32_t height)
+    : UIElement(x, y, width, height) {
+  }
 
-  class RectangleCanvas : public Canvas {
-  public:
-    RectangleCanvas(const int x, const int y, const uint32_t width, const uint32_t height);
-    virtual ~RectangleCanvas() {}
+  UILeafElement::~UILeafElement() noexcept {
+  }
 
-  protected:
-    Layout& layout() override {
-      return _layout;
-    }
+  DrawBuffer& UILeafElement::drawBuffer() {
+    return parent().drawBuffer();
+  }
 
-    bool intersect(int x, int y) const;
+  void UILeafElement::draw() {
+    drawTopDown();
+  }
 
-  private:
-    RectangularLayout _layout;
-  };
+  void UILeafElement::drawTopDown() {
+    doDraw();
+  }
+
+  void UILeafElement::drawToTop() {
+    parent().drawToTop();
+  }
 }

@@ -23,6 +23,7 @@
 #include <UIObjectFactory.h>
 #include <Button.h>
 #include <RoundCanvas.h>
+#include <Line.h>
 
 namespace upanui {
   Button& UIObjectFactory::createButton(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
@@ -41,5 +42,11 @@ namespace upanui {
     auto& canvas = *new RoundCanvas(x, y, width, height);
     parent.add(canvas);
     return canvas;
+  }
+
+  Line& UIObjectFactory::createLine(UIObject& parent, const int x1, const int y1, const int x2, const int y2) {
+    auto& line = *new Line(x1, y1, x2, y2);
+    parent.add(line);
+    return line;
   }
 }

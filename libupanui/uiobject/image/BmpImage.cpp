@@ -31,6 +31,7 @@ namespace upanui {
       _imageBuffer(upan::move(imageBuffer)),
       _header(header),
       _infoHeader(infoHeader) {
+    _drawBuffer.initFrom(_imageBuffer.get(), infoHeader._width, infoHeader._height);
   }
 
   BmpImage::~BmpImage() noexcept {

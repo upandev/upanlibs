@@ -20,10 +20,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
+#include <math.h>
 #include <RoundCanvas.h>
 #include <GraphicsContext.h>
 #include "GCoreFunctions.h"
-#include <math.h>
 
 namespace upanui {
   RoundCanvas::RoundCanvas(const int x, const int y, const uint32_t width, const uint32_t height)
@@ -32,5 +32,34 @@ namespace upanui {
 
   bool RoundCanvas::needLocalDrawBuffer() {
     return (backgroundColorAlpha() != 100 || (borderThickness() > 0 && borderColorAlpha() != 100));
+  }
+
+  bool RoundCanvas::intersect(int x, int y) const {
+    const auto bgAlpha = backgroundColorAlpha();
+    const auto brAlpha = borderColorAlpha();
+
+    if (bgAlpha == 0 && brAlpha == 0) {
+      return false;
+    }
+
+    const auto outerRadius = (width() / 2) - 1;
+    const auto innerRadius = outerRadius - borderThickness();
+
+    const int cx = drawX() + outerRadius;
+    const int cy = drawY() + outerRadius;
+
+    const int dx = cx - x;
+    const int dy = cy - y;
+    const int d = sqrt(dx * dx + dy * dy);
+
+    if (d > outerRadius) {
+      return false;
+    }
+
+    if (d > innerRadius) {
+      return brAlpha != 0;
+    }
+
+    return bgAlpha != 0;
   }
 }

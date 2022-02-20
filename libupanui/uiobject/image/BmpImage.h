@@ -81,9 +81,16 @@ namespace upanui {
       }
 
       void DebugPrint() const;
+
+    private:
+      DrawBuffer& drawBuffer() override {
+        return _drawBuffer;
+      }
+
     private:
       //assuming 4 bytes per pixel
       upan::uniq_ptr<uint32_t> _imageBuffer;
+      DrawBuffer _drawBuffer;
       const Header _header;
       const InfoHeader _infoHeader;
     };

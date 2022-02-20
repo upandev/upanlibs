@@ -71,14 +71,14 @@ namespace upanui {
       int srcOffet = sx1 + (sy1 + y) * childDrawBuffer.width();
       int destOffset = dx1 + (dy1 + y) * parentDrawBuffer.width();
       for(int x = 0; x < w; ++x) {
-        GCoreFunctions::setPixel(parentDrawBuffer.buffer()[x + destOffset], childDrawBuffer.buffer()[x + srcOffet], false);
+        GCoreFunctions::setPixel(parentDrawBuffer.at(x + destOffset), childDrawBuffer.at(x + srcOffet), false);
       }
     }
   }
 
   void RectangularLayout::fill() {
     const auto alpha = parent().backgroundColorAlpha();
-    if (alpha == 0) {
+    if (alpha == 0 && parent().borderThickness() == 0) {
       return;
     }
 
@@ -90,17 +90,17 @@ namespace upanui {
       auto yOffset = y * drawBuffer.width();
       if (y < parent().borderThickness() || (parent().height() - y) <= parent().borderThickness()) {
         for(auto x = 0u; x < parent().width(); ++x) {
-          GCoreFunctions::setPixel(drawBuffer.buffer()[x + yOffset], brColor, drawBuffer.isLocal());
+          GCoreFunctions::setPixel(drawBuffer.at(x + yOffset), brColor, drawBuffer.isLocal());
         }
       } else {
         for(auto x = 0u; x < parent().borderThickness(); ++x) {
-          GCoreFunctions::setPixel(drawBuffer.buffer()[x + yOffset], brColor, drawBuffer.isLocal());
+          GCoreFunctions::setPixel(drawBuffer.at(x + yOffset), brColor, drawBuffer.isLocal());
         }
         for(auto x = parent().borderThickness(); x < parent().width() - parent().borderThickness(); ++x) {
-          GCoreFunctions::setPixel(drawBuffer.buffer()[x + yOffset], bgColor, drawBuffer.isLocal());
+          GCoreFunctions::setPixel(drawBuffer.at(x + yOffset), bgColor, drawBuffer.isLocal());
         }
         for(auto x = (parent().width() - parent().borderThickness()); x < parent().width(); ++x) {
-          GCoreFunctions::setPixel(drawBuffer.buffer()[x + yOffset], brColor, drawBuffer.isLocal());
+          GCoreFunctions::setPixel(drawBuffer.at(x + yOffset), brColor, drawBuffer.isLocal());
         }
       }
     }

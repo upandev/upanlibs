@@ -20,13 +20,13 @@ namespace upanui {
     int sy = r - y + shift;
     int yoffset = sy * drawBuffer.width();
     for (int i = sx1; i <= sx2; ++i) {
-      GCoreFunctions::setPixel(drawBuffer.buffer()[i + yoffset], color, drawBuffer.isLocal());
+      GCoreFunctions::setPixel(drawBuffer.at(i + yoffset), color, drawBuffer.isLocal());
     }
 
     sy = r + y + shift;
     yoffset = sy * drawBuffer.width();
     for (int i = sx1; i <= sx2; ++i) {
-      GCoreFunctions::setPixel(drawBuffer.buffer()[i + yoffset], color, drawBuffer.isLocal());
+      GCoreFunctions::setPixel(drawBuffer.at(i + yoffset), color, drawBuffer.isLocal());
     }
 
     sy = x + r + shift;
@@ -34,13 +34,13 @@ namespace upanui {
     sx2 = r + y + shift;
     yoffset = sy * drawBuffer.width();
     for (int i = sx1; i <= sx2; ++i) {
-      GCoreFunctions::setPixel(drawBuffer.buffer()[i + yoffset], color, drawBuffer.isLocal());
+      GCoreFunctions::setPixel(drawBuffer.at(i + yoffset), color, drawBuffer.isLocal());
     }
 
     sy = -x + r + shift;
     yoffset = sy * drawBuffer.width();
     for (int i = sx1; i <= sx2; ++i) {
-      GCoreFunctions::setPixel(drawBuffer.buffer()[i + yoffset], color, drawBuffer.isLocal());
+      GCoreFunctions::setPixel(drawBuffer.at(i + yoffset), color, drawBuffer.isLocal());
     }
   }
 
@@ -51,29 +51,29 @@ namespace upanui {
     int sx2 = x + r + shift;
     int sy = r - y + shift;
     int yoffset = sy * drawBuffer.width();
-    GCoreFunctions::setPixel(drawBuffer.buffer()[sx1 + yoffset], color, directSet);
-    GCoreFunctions::setPixel(drawBuffer.buffer()[sx2 + yoffset], color, directSet);
+    GCoreFunctions::setPixel(drawBuffer.at(sx1 + yoffset), color, directSet);
+    GCoreFunctions::setPixel(drawBuffer.at(sx2 + yoffset), color, directSet);
 
     sy = r + y + shift;
     yoffset = sy * drawBuffer.width();
-    GCoreFunctions::setPixel(drawBuffer.buffer()[sx1 + yoffset], color, directSet);
-    GCoreFunctions::setPixel(drawBuffer.buffer()[sx2 + yoffset], color, directSet);
+    GCoreFunctions::setPixel(drawBuffer.at(sx1 + yoffset), color, directSet);
+    GCoreFunctions::setPixel(drawBuffer.at(sx2 + yoffset), color, directSet);
 
     sy = x + r + shift;
     sx1 = r - y + shift;
     sx2 = r + y + shift;
     yoffset = sy * drawBuffer.width();
-    GCoreFunctions::setPixel(drawBuffer.buffer()[sx1 + yoffset], color, directSet);
-    GCoreFunctions::setPixel(drawBuffer.buffer()[sx2 + yoffset], color, directSet);
+    GCoreFunctions::setPixel(drawBuffer.at(sx1 + yoffset), color, directSet);
+    GCoreFunctions::setPixel(drawBuffer.at(sx2 + yoffset), color, directSet);
 
     sy = -x + r + shift;
     yoffset = sy * drawBuffer.width();
-    GCoreFunctions::setPixel(drawBuffer.buffer()[sx1 + yoffset], color, directSet);
-    GCoreFunctions::setPixel(drawBuffer.buffer()[sx2 + yoffset], color, directSet);
+    GCoreFunctions::setPixel(drawBuffer.at(sx1 + yoffset), color, directSet);
+    GCoreFunctions::setPixel(drawBuffer.at(sx2 + yoffset), color, directSet);
   }
 
   void CircularLayout::fill(uint32_t alpha, uint32_t rawColor, int shift, int r) {
-    if (alpha == 0) {
+    if (alpha == 0 && parent().borderThickness() == 0) {
       return;
     }
     rawColor &= ~GCoreFunctions::ALPHA_MASK;
@@ -111,8 +111,7 @@ namespace upanui {
         } else {
           const int sx1 = -x + r + shift;
           const int sy = r - y + shift;
-          const int offset = sx1 + sy * parent().drawBuffer().width();
-          auto cpixel = parent().drawBuffer().buffer()[offset];
+          auto cpixel = parent().drawBuffer().at(sx1, sy);
           const uint32_t calpha_e = (cpixel >> 24) * (1 - e) + 1;
           //cpixel = (cpixel & 0xFFFFFF) | calpha_e << 24;
           GCoreFunctions::setPixel(cpixel, antialiasPixelColor, false);

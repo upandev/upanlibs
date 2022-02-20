@@ -19,28 +19,30 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-
 #pragma once
 
-#include <Canvas.h>
-#include <RectangularLayout.h>
+#include <stdlib.h>
+#include <UIElement.h>
+#include <DrawBuffer.h>
 
 namespace upanui {
-  class FrameBuffer;
-
-  class RectangleCanvas : public Canvas {
-  public:
-    RectangleCanvas(const int x, const int y, const uint32_t width, const uint32_t height);
-    virtual ~RectangleCanvas() {}
-
+  class UILeafElement : public UIElement {
   protected:
+    UILeafElement(const int x, const int y, const uint32_t width, const uint32_t height);
+    ~UILeafElement();
+
+    void add(UIObject& child) override {
+      throw upan::exception(XLOC, "Cannot child elements to leaf UI element");
+    }
     Layout& layout() override {
-      return _layout;
+      throw upan::exception(XLOC, "leaf UI element doesn't have a layout");
     }
 
-    bool intersect(int x, int y) const;
+    DrawBuffer& drawBuffer() override;
+    void draw() override;
+    void drawTopDown() override;
+    void drawToTop() override;
 
-  private:
-    RectangularLayout _layout;
+    virtual void doDraw() = 0;
   };
 }

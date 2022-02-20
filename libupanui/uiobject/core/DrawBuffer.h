@@ -33,6 +33,7 @@ namespace upanui {
 
     void clear();
     void initFrom(const DrawBuffer& parent, const int xOffset, const int yOffset);
+    void initFrom(uint32_t* buffer, const uint32_t width, const uint32_t height);
     void initLocal(const uint32_t width, const uint32_t height);
     void initLocal(const FrameBuffer& frameBuffer);
 
@@ -41,6 +42,8 @@ namespace upanui {
     bool isLocal() const { return _type == BufferType::Local || _type == BufferType::ForceLocal; }
     bool isNull() const { return _type == BufferType::Null; }
     uint32_t* buffer() const { return _buffer; }
+    uint32_t& at(int x, int y) const;
+    uint32_t& at(int offset)  const;
 
   private:
     enum BufferType { Null, Local, ForceLocal, Derived };

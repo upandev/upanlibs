@@ -79,7 +79,10 @@ namespace upanui {
     void onMouseFocus() override {}
     void onLoseMouseFocus() override {}
 
-    bool inside(const int x, const int y) const;
+    bool inside(int x, int y) const;
+    virtual bool intersect(int x, int y) const {
+      return true;
+    }
 
   private:
     int _x;

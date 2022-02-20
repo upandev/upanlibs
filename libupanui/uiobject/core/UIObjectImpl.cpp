@@ -136,9 +136,11 @@ namespace upanui {
           return o;
         }
       }
-      return upan::option<UIObject&>(this);
-    } else {
-      return upan::option<UIObject&>::empty();
+      if (intersect(x, y)) {
+        return upan::option<UIObject &>(this);
+      }
     }
+
+    return upan::option<UIObject&>::empty();
   }
 }

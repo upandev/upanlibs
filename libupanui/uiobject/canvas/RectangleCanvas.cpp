@@ -28,4 +28,24 @@ namespace upanui {
   RectangleCanvas::RectangleCanvas(const int x, const int y, const uint32_t width, const uint32_t height)
   : Canvas(x, y, width, height), _layout(*this) {
   }
+
+  bool RectangleCanvas::intersect(int x, int y) const {
+    const auto bgAlpha = backgroundColorAlpha();
+    const auto brThickness = borderThickness();
+
+    if (brThickness > 0) {
+      const auto brAplha = borderColorAlpha();
+
+      const int innerX = drawX() + brThickness;
+      const int innerWidth = width() - 2 * brThickness;
+
+      const int innerY = drawY() + brThickness;
+      const int innerHeight = height() - 2 * brThickness;
+
+      if (x < innerX || x > (innerX + innerWidth) || y < innerY || y > (innerY + innerHeight)) {
+        return brAplha != 0;
+      }
+    }
+    return bgAlpha != 0;
+  }
 }
