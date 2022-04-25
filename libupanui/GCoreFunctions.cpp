@@ -32,13 +32,7 @@ namespace upanui {
   }
 
   static uint32_t dround(double v) {
-    const uint32_t a = v * 100;
-    auto m = a % 100;
-    if (m < 50) {
-      return v;
-    } else {
-      return (uint32_t)v + 1;
-    }
+    return v < 0 ? uint32_t(v - 0.5) : uint32_t(v + 0.5);
   }
 
   void GCoreFunctions::setPixel(uint32_t& pixel, uint32_t color, bool isDirectSet) {

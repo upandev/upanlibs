@@ -36,105 +36,168 @@ namespace upanui {
       return;
     }
 
-    const auto bgColor = (backgroundColorForDraw() & ~GCoreFunctions::ALPHA_MASK) | (alpha << 24);
+    const auto rawColor = backgroundColorForDraw() & ~GCoreFunctions::ALPHA_MASK;
     const int thickness = borderThickness() > 1 ? borderThickness() : 1;
-    drawLine(_x1, _y1, _x2, _y2, thickness, bgColor, false);
+    drawLine(_x1, _y1, _x2, _y2, thickness, rawColor, backgroundColorAlpha(), false);
   }
 
-  void Line::drawLine(const int x1, const int y1, const int x2, const int y2, const uint32_t thickness, const uint32_t color, const bool fillLines) {
+  void Line::drawLine(const int x1, const int y1, const int x2, const int y2, const uint32_t thickness,
+                      const uint32_t rawColor, const uint32_t alpha, const bool fillLines) {
     const int dy = abs(y2 - y1);
     const int dx = abs(x2 - x1);
     if (dy < dx) {
       if (x1 > x2) {
-        drawLineWithLowSlope(x2, y2, x1, y1, thickness, color, fillLines);
+        drawLineWithLowSlope(x2, y2, x1, y1, thickness, rawColor, alpha, fillLines);
       } else {
-        drawLineWithLowSlope(x1, y1, x2, y2, thickness, color, fillLines);
+        drawLineWithLowSlope(x1, y1, x2, y2, thickness, rawColor, alpha, fillLines);
       }
     } else {
       if (y1 > y2) {
-        drawLineWithHighSlope(x2, y2, x1, y1, thickness, color, fillLines);
+        drawLineWithHighSlope(x2, y2, x1, y1, thickness, rawColor, alpha, fillLines);
       } else {
-        drawLineWithHighSlope(x1, y1, x2, y2, thickness, color, fillLines);
+        drawLineWithHighSlope(x1, y1, x2, y2, thickness, rawColor, alpha, fillLines);
       }
     }
   }
 
-  void Line::plot(const int x, const int y, const uint32_t color) {
+  void Line::plot(const int x, const int y, const uint32_t color, const uint32_t alpha) {
     auto& drawBuf = drawBuffer();
     if (x < 0 || y < 0 || x >= parent().width() || y >= parent().height()) {
       return;
     }
-    GCoreFunctions::setPixel(drawBuf.at(x, y), color, false);
+    GCoreFunctions::setPixel(drawBuf.at(x, y), color | (alpha << 24), false);
   }
 
-  void Line::drawLineWithLowSlope(const int sx, const int sy, const int ex, const int ey, const uint32_t thickness, const uint32_t color, const bool fillLines) {
+  void Line::drawLineWithLowSlope(const int sx, const int sy, const int ex, const int ey, const uint32_t thickness,
+                                  const uint32_t rawColor, const uint32_t alpha, const bool fillLines) {
     const int dx = ex - sx;
-    int dy = ey - sy;
-    int px, py;
-    calculatePxPy(px, py, dx, dy, sx, sy, thickness);
-
-    int yinc = 1;
-    if (dy < 0) {
-      yinc = -1;
-      dy = -dy;
+    const int dy = ey - sy;
+    if (dy == 0) {
+      drawHorizontalLine(sx, ex, sy, thickness, rawColor, alpha);
+      return;
     }
-    int d = 2 * dy - dx;
-    int y = sy;
+    const float m = float(dy) / float(dx);
 
-    bool yChanged = false;
-    for(int x = sx; x <= ex; ++x, ++px) {
-      if (thickness > 1) {
-        drawLine(x, y, px, py, 1, color, true);
-      } else {
-        plot(x, y, color);
-        if (yChanged && fillLines) {
-          yChanged = false;
-          plot(x, y - yinc, color);
+    int pex, pey;
+    calculatePxPy(pex, pey, dx, dy, sx, sy, thickness);
+    const int pdx = pex - sx;
+    const int pdy = pey - sy;
+    //inverse of slope to calculate actual X on perpendicular line
+    const float pm = float(pdx) / float(pdy);
+
+    const int width = ex - sx;
+
+    float apx = sx;
+
+    for(int py = sy; py <= pey; ++py) {
+      const int px1 = apx;
+      const int px2 = px1 + width;
+
+      const float pe = apx - px1;
+      const float pre = 1 - pe;
+      const uint32_t palpha1 = alpha * pre;
+      const uint32_t palpha2 = alpha * pe;
+
+      plot(px1, py, rawColor, palpha1);
+      plot(px1 + 1, py, rawColor, palpha2);
+
+      float ay = py;
+      for(int x = px1 + 1; x <= px2; ++x) {
+        ay += m;
+        int y = ay;
+        //border line
+        if (py == sy || py == pey) {
+          const float e = ay - y;
+          const float re = 1 - e;
+          const uint32_t alpha1 = alpha * re;
+          const uint32_t alpha2 = alpha * e;
+
+          plot(x, y, rawColor, py == sy ? alpha1 : alpha);
+          plot(x, y + 1, rawColor, py == pey ? alpha2 : alpha);
+        } else {
+          plot(x, y, rawColor, alpha);
+          plot(x, y + 1, rawColor, alpha);
         }
       }
-      if (d > 0) {
-        y += yinc;
-        py += yinc;
-        yChanged = true;
-        d += 2 * (dy - dx);
-      } else {
-        d += 2 * dy;
+
+      plot(px2 + 1, ay, rawColor, palpha2);
+
+      apx -= pm;
+    }
+  }
+
+  void Line::drawLineWithHighSlope(const int sx, const int sy, const int ex, const int ey, const uint32_t thickness,
+                                   const uint32_t rawColor, const uint32_t alpha, const bool fillLines) {
+    const int dx = ex - sx;
+    const int dy = ey - sy;
+    if (dx == 0) {
+      drawVerticalLine(sy, ey, sx, thickness, rawColor, alpha);
+      return;
+    }
+    //inverse of slope to calculate actual X
+    const float m = float(dx) / float(dy);
+
+    int pex, pey;
+    calculatePxPy(pex, pey, dx, dy, sx, sy, thickness);
+    const int pdx = pex - sx;
+    const int pdy = pey - sy;
+    const float pm = float(pdy) / float(pdx);
+
+    const int height = ey - sy;
+
+    float apy = sy;
+
+    for(int px = sx; px <= pex; ++px) {
+      const int py1 = apy;
+      const int py2 = py1 + height;
+
+      const float pe = apy - py1;
+      const float pre = 1 - pe;
+      const uint32_t palpha1 = alpha * pre;
+      const uint32_t palpha2 = alpha * pe;
+
+      plot(px, py1, rawColor, palpha1);
+      plot(px, py1 + 1, rawColor, palpha2);
+
+      float ax = px;
+      for(int y = py1 + 1; y <= py2; ++y) {
+        ax += m;
+        int x = ax;
+        //border line
+        if (px == sx || px == pex) {
+          const float e = ax - x;
+          const float re = 1 - e;
+          const uint32_t alpha1 = alpha * re;
+          const uint32_t alpha2 = alpha * e;
+
+          plot(x, y, rawColor, px == sx ? alpha1 : alpha);
+          plot(x + 1, y, rawColor, px == pex ? alpha2 : alpha);
+        } else {
+          plot(x, y, rawColor, alpha);
+          plot(x + 1, y, rawColor, alpha);
+        }
+      }
+
+      plot(ax, py2 + 1, rawColor, palpha2);
+
+      apy -= pm;
+    }
+  }
+
+  void Line::drawHorizontalLine(const int sx, const int ex, const int y, const uint32_t thickness,
+                                const uint32_t rawColor, const uint32_t alpha) {
+    for(auto py = y; py < (y + thickness); ++py) {
+      for (auto x = sx; x <= ex; ++x) {
+        plot(x, py, rawColor, alpha);
       }
     }
   }
 
-  void Line::drawLineWithHighSlope(const int sx, const int sy, const int ex, const int ey, const uint32_t thickness, const uint32_t color, const bool fillLines) {
-    int dx = ex - sx;
-    const int dy = ey - sy;
-    int px, py;
-    calculatePxPy(px, py, dx, dy, sx, sy, thickness);
-
-    int xinc = 1;
-    if (dx < 0) {
-      xinc = -1;
-      dx = -dx;
-    }
-    int d = 2 * dx - dy;
-    int x = sx;
-
-    bool xChanged = false;
-    for(int y = sy; y <= ey; ++y, ++py) {
-      if (thickness > 1) {
-        drawLine(x, y, px, py, 1, color, true);
-      } else {
-        plot(x, y, color);
-        if (xChanged && fillLines) {
-          xChanged = false;
-          plot(x - xinc, y, color);
-        }
-      }
-      if (d > 0) {
-        x += xinc;
-        px += xinc;
-        xChanged = true;
-        d += 2 * (dx - dy);
-      } else {
-        d += 2 * dx;
+  void Line::drawVerticalLine(const int sy, const int ey, const int x, const uint32_t thickness,
+                                const uint32_t rawColor, const uint32_t alpha) {
+    for(auto px = x; px < (x + thickness); ++px) {
+      for (auto y = sy; y <= ey; ++y) {
+        plot(px, y, rawColor, alpha);
       }
     }
   }
@@ -143,7 +206,7 @@ namespace upanui {
     px = sx;
     py = sy;
     if (thickness > 1) {
-      float m = -float(dx) / float(dy);
+      float m = float(dx) / float(dy);
       float r = sqrt(1 + m * m);
       px = float(sx) + thickness / r;
       py = float(sy) + thickness * m / r;

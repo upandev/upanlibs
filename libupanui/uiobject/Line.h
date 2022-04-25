@@ -33,10 +33,17 @@ namespace upanui {
     void doDraw() override;
 
   private:
-    void plot(int x, int y, uint32_t color);
-    void drawLine(int x1, int y1, int x2, int y2, uint32_t thickness, uint32_t color, bool fillLines);
-    void drawLineWithLowSlope(int sx, int sy, int ex, int ey, uint32_t thickness, uint32_t color, bool fillLines);
-    void drawLineWithHighSlope(int sx, int sy, int ex, int ey, uint32_t thickness, uint32_t color, bool fillLines);
+    void plot(int x, int y, const uint32_t color, const uint32_t alpha);
+    void drawLine(int x1, int y1, int x2, int y2, const uint32_t thickness,
+                  const uint32_t rawColor, const uint32_t alpha, bool fillLines);
+    void drawLineWithLowSlope(int sx, int sy, int ex, int ey, uint32_t thickness,
+                              const uint32_t rawColor, const uint32_t alpha, bool fillLines);
+    void drawLineWithHighSlope(int sx, int sy, int ex, int ey, uint32_t thickness,
+                               const uint32_t rawColor, const uint32_t alpha, bool fillLines);
+    void drawHorizontalLine(const int sx, const int ex, const int y, const uint32_t thickness,
+                            const uint32_t rawColor, const uint32_t alpha);
+    void drawVerticalLine(const int sy, const int ey, const int x, const uint32_t thickness,
+                            const uint32_t rawColor, const uint32_t alpha);
     void calculatePxPy(int& px, int& py, int dx, int dy, int sx, int sy, uint32_t thickness);
 
   private:
