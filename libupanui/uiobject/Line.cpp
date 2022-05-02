@@ -38,24 +38,24 @@ namespace upanui {
 
     const auto rawColor = backgroundColorForDraw() & ~GCoreFunctions::ALPHA_MASK;
     const int thickness = borderThickness() > 1 ? borderThickness() : 1;
-    drawLine(_x1, _y1, _x2, _y2, thickness, rawColor, backgroundColorAlpha(), false);
+    drawLine(_x1, _y1, _x2, _y2, thickness, rawColor, backgroundColorAlpha());
   }
 
   void Line::drawLine(const int x1, const int y1, const int x2, const int y2, const uint32_t thickness,
-                      const uint32_t rawColor, const uint32_t alpha, const bool fillLines) {
+                      const uint32_t rawColor, const uint32_t alpha) {
     const int dy = abs(y2 - y1);
     const int dx = abs(x2 - x1);
     if (dy < dx) {
       if (x1 > x2) {
-        drawLineWithLowSlope(x2, y2, x1, y1, thickness, rawColor, alpha, fillLines);
+        drawLineWithLowSlope(x2, y2, x1, y1, thickness, rawColor, alpha);
       } else {
-        drawLineWithLowSlope(x1, y1, x2, y2, thickness, rawColor, alpha, fillLines);
+        drawLineWithLowSlope(x1, y1, x2, y2, thickness, rawColor, alpha);
       }
     } else {
       if (y1 > y2) {
-        drawLineWithHighSlope(x2, y2, x1, y1, thickness, rawColor, alpha, fillLines);
+        drawLineWithHighSlope(x2, y2, x1, y1, thickness, rawColor, alpha);
       } else {
-        drawLineWithHighSlope(x1, y1, x2, y2, thickness, rawColor, alpha, fillLines);
+        drawLineWithHighSlope(x1, y1, x2, y2, thickness, rawColor, alpha);
       }
     }
   }
@@ -69,7 +69,7 @@ namespace upanui {
   }
 
   void Line::drawLineWithLowSlope(const int sx, const int sy, const int ex, const int ey, const uint32_t thickness,
-                                  const uint32_t rawColor, const uint32_t alpha, const bool fillLines) {
+                                  const uint32_t rawColor, const uint32_t alpha) {
     const int dx = ex - sx;
     const int dy = ey - sy;
     if (dy == 0) {
@@ -77,6 +77,7 @@ namespace upanui {
       return;
     }
     const float m = float(dy) / float(dx);
+    const bool positiveSlope = m > 0;
 
     int pex, pey;
     calculatePxPy(pex, pey, dx, dy, sx, sy, thickness);
@@ -88,9 +89,12 @@ namespace upanui {
     const int width = ex - sx;
 
     float apx = sx;
+    int px1 = sx;
+    int prev_px1;
 
     for(int py = sy; py <= pey; ++py) {
-      const int px1 = apx;
+      prev_px1 = px1;
+      px1 = apx;
       const int px2 = px1 + width;
 
       const float pe = apx - px1;
@@ -99,12 +103,14 @@ namespace upanui {
       const uint32_t palpha2 = alpha * pe;
 
       plot(px1, py, rawColor, palpha1);
-      plot(px1 + 1, py, rawColor, palpha2);
 
       float ay = py;
+      int prev_y;
+      int y = py;
       for(int x = px1 + 1; x <= px2; ++x) {
         ay += m;
-        int y = ay;
+        prev_y = y;
+        y = ay;
         //border line
         if (py == sy || py == pey) {
           const float e = ay - y;
@@ -113,21 +119,36 @@ namespace upanui {
           const uint32_t alpha2 = alpha * e;
 
           plot(x, y, rawColor, py == sy ? alpha1 : alpha);
-          plot(x, y + 1, rawColor, py == pey ? alpha2 : alpha);
+          if (py == pey) {
+            if (prev_y != y && prev_px1 != px1) {
+              if (positiveSlope) {
+                plot(x, prev_y, rawColor, py == sy ? alpha1 : alpha);
+              } else {
+                plot(x - 1, y, rawColor, py == sy ? alpha1 : alpha);
+              }
+            }
+            plot(x, y + 1, rawColor, alpha2);
+          }
         } else {
           plot(x, y, rawColor, alpha);
-          plot(x, y + 1, rawColor, alpha);
+          if (prev_y != y && prev_px1 != px1) {
+            if (positiveSlope) {
+              plot(x, prev_y, rawColor, alpha);
+            } else {
+              plot(x - 1, y, rawColor, alpha);
+            }
+          }
         }
       }
 
       plot(px2 + 1, ay, rawColor, palpha2);
 
-      apx -= pm;
+      apx += pm;
     }
   }
 
   void Line::drawLineWithHighSlope(const int sx, const int sy, const int ex, const int ey, const uint32_t thickness,
-                                   const uint32_t rawColor, const uint32_t alpha, const bool fillLines) {
+                                   const uint32_t rawColor, const uint32_t alpha) {
     const int dx = ex - sx;
     const int dy = ey - sy;
     if (dx == 0) {
@@ -136,6 +157,7 @@ namespace upanui {
     }
     //inverse of slope to calculate actual X
     const float m = float(dx) / float(dy);
+    const bool positiveSlope = m > 0;
 
     int pex, pey;
     calculatePxPy(pex, pey, dx, dy, sx, sy, thickness);
@@ -146,23 +168,29 @@ namespace upanui {
     const int height = ey - sy;
 
     float apy = sy;
+    int py1 = sy;
+    int prev_py1;
 
     for(int px = sx; px <= pex; ++px) {
-      const int py1 = apy;
+      prev_py1 = py1;
+      py1 = apy;
       const int py2 = py1 + height;
 
       const float pe = apy - py1;
-      const float pre = 1 - pe;
-      const uint32_t palpha1 = alpha * pre;
+      const float rpe = 1 - pe;
+      const uint32_t palpha1 = alpha * rpe;
       const uint32_t palpha2 = alpha * pe;
 
       plot(px, py1, rawColor, palpha1);
-      plot(px, py1 + 1, rawColor, palpha2);
 
       float ax = px;
+      int prev_x;
+      int x = px;
+
       for(int y = py1 + 1; y <= py2; ++y) {
         ax += m;
-        int x = ax;
+        prev_x = x;
+        x = ax;
         //border line
         if (px == sx || px == pex) {
           const float e = ax - x;
@@ -171,16 +199,31 @@ namespace upanui {
           const uint32_t alpha2 = alpha * e;
 
           plot(x, y, rawColor, px == sx ? alpha1 : alpha);
-          plot(x + 1, y, rawColor, px == pex ? alpha2 : alpha);
+          if (px == pex) {
+            if (prev_x != x && prev_py1 != py1) {
+              if (positiveSlope) {
+                plot(prev_x, y, rawColor, px == sx ? alpha1 : alpha);
+              } else {
+                plot(x, y - 1, rawColor, px == sx ? alpha1 : alpha);
+              }
+            }
+            plot(x + 1, y, rawColor, alpha2);
+          }
         } else {
           plot(x, y, rawColor, alpha);
-          plot(x + 1, y, rawColor, alpha);
+          if (prev_x != x && prev_py1 != py1) {
+            if (positiveSlope) {
+              plot(prev_x, y, rawColor, alpha);
+            } else {
+              plot(x, y - 1, rawColor, alpha);
+            }
+          }
         }
       }
 
       plot(ax, py2 + 1, rawColor, palpha2);
 
-      apy -= pm;
+      apy += pm;
     }
   }
 
@@ -206,10 +249,17 @@ namespace upanui {
     px = sx;
     py = sy;
     if (thickness > 1) {
-      float m = float(dx) / float(dy);
-      float r = sqrt(1 + m * m);
-      px = float(sx) + thickness / r;
-      py = float(sy) + thickness * m / r;
+      const float m_inv = float(dx) / float(dy);
+      const float r = sqrt(1 + m_inv * m_inv);
+      const int sign_inv = m_inv < 0.0 ? 1 : -1;
+      //low slope --> px can be either to the left of or right of sx but py is always larger than sy
+      if (dy < dx) {
+        px = float(sx) + sign_inv * float(thickness) / r;
+        py = float(sy) + float(thickness) * fabs(m_inv) / r;
+      } else {
+        px = float(sx) + float(thickness) / r;
+        py = float(sy) + sign_inv * float(thickness) * fabs(m_inv) / r;
+      }
     }
   }
 }
