@@ -28,34 +28,36 @@
 namespace upanui {
   UIObjectImpl::UIObjectImpl(const int x, const int y, const uint32_t width, const uint32_t height)
     : _x(x), _y(y), _width(width), _height(height),
-      _bgColor(0), _bgAlpha(100), _brColor(0xFFFFFF), _brAlpha(100), _borderThickness(0), _gc(GraphicsContext::Instance()) {
+      _bgColor(0), _bgAlpha(100), _brColor(0xFFFFFF),
+      _brAlpha(100), _borderThickness(0), _lockChangeNotification(false),
+      _gc(GraphicsContext::Instance()) {
   }
 
   void UIObjectImpl::x(const int x) {
     if (_x != x) {
       _x = x;
-      positionChanged();
+      notifyChange(ChangeNotificationType::Position);
     }
   }
 
   void UIObjectImpl::y(const int y) {
     if (_y != y) {
       _y = y;
-      positionChanged();
+      notifyChange(ChangeNotificationType::Position);
     }
   }
 
   void UIObjectImpl::width(const uint32_t width) {
     if (_width != width) {
       _width = width;
-      sizeChanged();
+      notifyChange(ChangeNotificationType::Size);
     }
   }
 
   void UIObjectImpl::height(const uint32_t height) {
     if (_height != height) {
       _height = height;
-      sizeChanged();
+      notifyChange(ChangeNotificationType::Size);
     }
   }
 
@@ -63,7 +65,7 @@ namespace upanui {
     if (_bgColor != color) {
       _bgColor = color;
       onBackgroundColorChange();
-      contentChanged();
+      notifyChange(ChangeNotificationType::Content);
     }
   }
 
@@ -74,14 +76,14 @@ namespace upanui {
       }
       _bgAlpha = alpha;
       onBackgroundColorChange();
-      contentChanged();
+      notifyChange(ChangeNotificationType::Content);
     }
   }
 
   void UIObjectImpl::borderColor(const uint32_t color) {
     if (_brColor != color) {
       _brColor = color;
-      contentChanged();
+      notifyChange(ChangeNotificationType::Content);
     }
   }
 
@@ -91,14 +93,14 @@ namespace upanui {
         throw upan::exception(XLOC, "alpha must be a value between 0 to 100");
       }
       _brAlpha = alpha;
-      contentChanged();
+      notifyChange(ChangeNotificationType::Content);
     }
   }
 
   void UIObjectImpl::borderThickness(const uint32_t thickness) {
     if (_borderThickness != thickness) {
       _borderThickness = thickness;
-      contentChanged();
+      notifyChange(ChangeNotificationType::Content);
     }
   }
 
@@ -142,5 +144,22 @@ namespace upanui {
     }
 
     return upan::option<UIObject&>::empty();
+  }
+
+  void UIObjectImpl::notifyChange(const ChangeNotificationType type) {
+    if (_lockChangeNotification) {
+      return;
+    }
+    switch(type) {
+      case Position:
+        positionChanged();
+        break;
+      case Size:
+        sizeChanged();
+        break;
+      case Content:
+        contentChanged();
+        break;
+    }
   }
 }

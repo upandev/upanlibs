@@ -25,9 +25,10 @@
 #include <math.h>
 
 namespace upanui {
-  Line::Line(const int x1, const int y1, const int x2, const int y2)
+  Line::Line(const int x1, const int y1, const int x2, const int y2, const uint32_t thickness)
       : UILeafElement(upan::min(x1, x2), upan::min(y1, y2), abs(x2 - x1), abs(y2 - y1)),
-        _x1(x1), _y1(y1), _x2(x2), _y2(y2) {
+        _x1(x1), _y1(y1), _x2(x2), _y2(y2), _thickness(thickness) {
+    updateLayoutArea();
   }
 
   void Line::doDraw() {
@@ -36,27 +37,26 @@ namespace upanui {
       return;
     }
 
+    if (_thickness == 0) {
+      return;
+    }
+
     const auto rawColor = backgroundColorForDraw() & ~GCoreFunctions::ALPHA_MASK;
-    const int thickness = borderThickness() > 1 ? borderThickness() : 1;
-    drawLine(_x1, _y1, _x2, _y2, thickness, rawColor, backgroundColorAlpha());
+    drawLine(rawColor, backgroundColorAlpha());
   }
 
-  void Line::drawLine(const int x1, const int y1, const int x2, const int y2, const uint32_t thickness,
-                      const uint32_t rawColor, const uint32_t alpha) {
-    const int dy = abs(y2 - y1);
-    const int dx = abs(x2 - x1);
+  void Line::drawLine(const uint32_t rawColor, const uint32_t alpha) {
+    const int dy = abs(_spec.ey() - _spec.sy());
+    const int dx = abs(_spec.ex() - _spec.sx());
+    if (dy == 0) {
+      drawHorizontalLine(rawColor, alpha);
+    } else if (dx == 0) {
+
+    }
     if (dy < dx) {
-      if (x1 > x2) {
-        drawLineWithLowSlope(x2, y2, x1, y1, thickness, rawColor, alpha);
-      } else {
-        drawLineWithLowSlope(x1, y1, x2, y2, thickness, rawColor, alpha);
-      }
+      drawLineWithLowSlope(rawColor, alpha);
     } else {
-      if (y1 > y2) {
-        drawLineWithHighSlope(x2, y2, x1, y1, thickness, rawColor, alpha);
-      } else {
-        drawLineWithHighSlope(x1, y1, x2, y2, thickness, rawColor, alpha);
-      }
+      drawLineWithHighSlope(rawColor, alpha);
     }
   }
 
@@ -68,31 +68,15 @@ namespace upanui {
     GCoreFunctions::setPixel(drawBuf.at(x, y), color | (alpha << 24), false);
   }
 
-  void Line::drawLineWithLowSlope(const int sx, const int sy, const int ex, const int ey, const uint32_t thickness,
-                                  const uint32_t rawColor, const uint32_t alpha) {
-    const int dx = ex - sx;
-    const int dy = ey - sy;
-    if (dy == 0) {
-      drawHorizontalLine(sx, ex, sy, thickness, rawColor, alpha);
-      return;
-    }
-    const float m = float(dy) / float(dx);
-    const bool positiveSlope = m > 0;
+  void Line::drawLineWithLowSlope(const uint32_t rawColor, const uint32_t alpha) {
+    const bool positiveSlope = _spec.m() > 0;
+    const int width = _spec.ex() - _spec.sx();
 
-    int pex, pey;
-    calculatePxPy(pex, pey, dx, dy, sx, sy, thickness);
-    const int pdx = pex - sx;
-    const int pdy = pey - sy;
-    //inverse of slope to calculate actual X on perpendicular line
-    const float pm = float(pdx) / float(pdy);
-
-    const int width = ex - sx;
-
-    float apx = sx;
-    int px1 = sx;
+    float apx = _spec.sx();
+    int px1 = _spec.sx();
     int prev_px1;
 
-    for(int py = sy; py <= pey; ++py) {
+    for(int py = _spec.sy(); py <= _spec.psy(); ++py) {
       prev_px1 = px1;
       px1 = apx;
       const int px2 = px1 + width;
@@ -108,23 +92,23 @@ namespace upanui {
       int prev_y;
       int y = py;
       for(int x = px1 + 1; x <= px2; ++x) {
-        ay += m;
+        ay += _spec.m();
         prev_y = y;
         y = ay;
         //border line
-        if (py == sy || py == pey) {
+        if (py == _spec.sy() || py == _spec.psy()) {
           const float e = ay - y;
           const float re = 1 - e;
           const uint32_t alpha1 = alpha * re;
           const uint32_t alpha2 = alpha * e;
 
-          plot(x, y, rawColor, py == sy ? alpha1 : alpha);
-          if (py == pey) {
+          plot(x, y, rawColor, py == _spec.sy() ? alpha1 : alpha);
+          if (py == _spec.psy()) {
             if (prev_y != y && prev_px1 != px1) {
               if (positiveSlope) {
-                plot(x, prev_y, rawColor, py == sy ? alpha1 : alpha);
+                plot(x, prev_y, rawColor, py == _spec.sy() ? alpha1 : alpha);
               } else {
-                plot(x - 1, y, rawColor, py == sy ? alpha1 : alpha);
+                plot(x - 1, y, rawColor, py == _spec.sy() ? alpha1 : alpha);
               }
             }
             plot(x, y + 1, rawColor, alpha2);
@@ -143,35 +127,19 @@ namespace upanui {
 
       plot(px2 + 1, ay, rawColor, palpha2);
 
-      apx += pm;
+      apx += _spec.pm();
     }
   }
 
-  void Line::drawLineWithHighSlope(const int sx, const int sy, const int ex, const int ey, const uint32_t thickness,
-                                   const uint32_t rawColor, const uint32_t alpha) {
-    const int dx = ex - sx;
-    const int dy = ey - sy;
-    if (dx == 0) {
-      drawVerticalLine(sy, ey, sx, thickness, rawColor, alpha);
-      return;
-    }
-    //inverse of slope to calculate actual X
-    const float m = float(dx) / float(dy);
-    const bool positiveSlope = m > 0;
+  void Line::drawLineWithHighSlope(const uint32_t rawColor, const uint32_t alpha) {
+    const bool positiveSlope = _spec.m() > 0;
+    const int height = _spec.ey() - _spec.sy();
 
-    int pex, pey;
-    calculatePxPy(pex, pey, dx, dy, sx, sy, thickness);
-    const int pdx = pex - sx;
-    const int pdy = pey - sy;
-    const float pm = float(pdy) / float(pdx);
-
-    const int height = ey - sy;
-
-    float apy = sy;
-    int py1 = sy;
+    float apy = _spec.sy();
+    int py1 = _spec.sy();
     int prev_py1;
 
-    for(int px = sx; px <= pex; ++px) {
+    for(int px = _spec.sx(); px <= _spec.psx(); ++px) {
       prev_py1 = py1;
       py1 = apy;
       const int py2 = py1 + height;
@@ -188,23 +156,23 @@ namespace upanui {
       int x = px;
 
       for(int y = py1 + 1; y <= py2; ++y) {
-        ax += m;
+        ax += _spec.m();
         prev_x = x;
         x = ax;
         //border line
-        if (px == sx || px == pex) {
+        if (px == _spec.sx() || px == _spec.psx()) {
           const float e = ax - x;
           const float re = 1 - e;
           const uint32_t alpha1 = alpha * re;
           const uint32_t alpha2 = alpha * e;
 
-          plot(x, y, rawColor, px == sx ? alpha1 : alpha);
-          if (px == pex) {
+          plot(x, y, rawColor, px == _spec.sx() ? alpha1 : alpha);
+          if (px == _spec.psx()) {
             if (prev_x != x && prev_py1 != py1) {
               if (positiveSlope) {
-                plot(prev_x, y, rawColor, px == sx ? alpha1 : alpha);
+                plot(prev_x, y, rawColor, px == _spec.sx() ? alpha1 : alpha);
               } else {
-                plot(x, y - 1, rawColor, px == sx ? alpha1 : alpha);
+                plot(x, y - 1, rawColor, px == _spec.sx() ? alpha1 : alpha);
               }
             }
             plot(x + 1, y, rawColor, alpha2);
@@ -223,43 +191,111 @@ namespace upanui {
 
       plot(ax, py2 + 1, rawColor, palpha2);
 
-      apy += pm;
+      apy += _spec.pm();
     }
   }
 
-  void Line::drawHorizontalLine(const int sx, const int ex, const int y, const uint32_t thickness,
-                                const uint32_t rawColor, const uint32_t alpha) {
-    for(auto py = y; py < (y + thickness); ++py) {
-      for (auto x = sx; x <= ex; ++x) {
+  void Line::drawHorizontalLine(const uint32_t rawColor, const uint32_t alpha) {
+    const auto endY = _spec.sy() + thickness();
+    for(auto py = _spec.sy(); py < endY; ++py) {
+      for (auto x = _spec.sx(); x <= _spec.ex(); ++x) {
         plot(x, py, rawColor, alpha);
       }
     }
   }
 
-  void Line::drawVerticalLine(const int sy, const int ey, const int x, const uint32_t thickness,
-                                const uint32_t rawColor, const uint32_t alpha) {
-    for(auto px = x; px < (x + thickness); ++px) {
-      for (auto y = sy; y <= ey; ++y) {
+  void Line::drawVerticalLine(const uint32_t rawColor, const uint32_t alpha) {
+    const auto endX = _spec.sx() + thickness();
+    for(auto px = _spec.sx(); px < endX; ++px) {
+      for (auto y = _spec.sy(); y <= _spec.ey(); ++y) {
         plot(px, y, rawColor, alpha);
       }
     }
   }
 
-  void Line::calculatePxPy(int& px, int& py, const int dx, const int dy, const int sx, const int sy, const uint32_t thickness) {
-    px = sx;
-    py = sy;
+  void Line::updateXY(const int x1, const int y1, const int x2, const int y2) {
+    _x1 = x1;
+    _y1 = y1;
+    _x2 = x2;
+    _y2 = y2;
+    updateLayoutArea();
+    contentChanged();
+  }
+
+  void Line::updateThickness(const uint32_t thickness) {
+    _thickness = thickness;
+    updateLayoutArea();
+    contentChanged();
+  }
+
+  void Line::updateLayoutArea() {
+    ChangeNotificationLock cLock(*this);
+    _spec.calculate(_x1, _y1, _x2, _y2, _thickness);
+
+    const int minX = upan::min(upan::min(_spec.sx(), _spec.ex()), upan::min(_spec.psx(), _spec.pex()));
+    const int maxX = upan::max(upan::max(_spec.sx(), _spec.ex()), upan::max(_spec.psx(), _spec.pex()));
+    const int minY = upan::min(upan::min(_spec.sy(), _spec.ey()), upan::min(_spec.psy(), _spec.pey()));
+    const int maxY = upan::max(upan::max(_spec.sy(), _spec.ey()), upan::max(_spec.psy(), _spec.pey()));
+
+    x(minX);
+    y(minY);
+    width(maxX - minX + 1);
+    height(maxY - minY + 1);
+    printf("\n%d,%d,%d,%d", x(), y(), width(), height());
+  }
+
+  void Line::Spec::calculate(const int x1, const int y1, const int x2, const int y2, const uint32_t thickness) {
+    const int ady = abs(y2 - y1);
+    const int adx = abs(x2 - x1);
+
+    const bool swapXY = (ady < adx) ? (x1 > x2) : (y1 > y2);
+    if (swapXY) {
+      _sx = x2; _sy = y2; _ex = x1; _ey = y1;
+    } else {
+      _sx = x1; _sy = y1; _ex = x2; _ey = y2;
+    }
+
+    const int dx = _ex - _sx;
+    const int dy = _ey - _sy;
+
+    _psx = _sx;
+    _psy = _sy;
     if (thickness > 1) {
-      const float m_inv = float(dx) / float(dy);
-      const float r = sqrt(1 + m_inv * m_inv);
-      const int sign_inv = m_inv < 0.0 ? 1 : -1;
-      //low slope --> px can be either to the left of or right of sx but py is always larger than sy
-      if (dy < dx) {
-        px = float(sx) + sign_inv * float(thickness) / r;
-        py = float(sy) + float(thickness) * fabs(m_inv) / r;
+      if (dy == 0) { // horizontal line
+        _psx = _sx;
+        _psy = _sy + thickness;
+      } else if (dx == 0) { // vertical line
+        _psx = _sx + thickness;
+        _psy = _sy;
       } else {
-        px = float(sx) + float(thickness) / r;
-        py = float(sy) + sign_inv * float(thickness) * fabs(m_inv) / r;
+        const float m_inv = float(dx) / float(dy);
+        const float r = sqrt(1 + m_inv * m_inv);
+        const int sign_inv = m_inv < 0.0 ? 1 : -1;
+        //low slope --> px can be either to the left of or right of sx but py is always larger than sy
+        if (dy < dx) { // line with low slope
+          _psx = float(_sx) + sign_inv * float(thickness) / r;
+          _psy = float(_sy) + float(thickness) * fabs(m_inv) / r;
+        } else { // line with high slope
+          _psx = float(_sx) + float(thickness) / r;
+          _psy = float(_sy) + sign_inv * float(thickness) * fabs(m_inv) / r;
+        }
       }
+    }
+
+    const int pdx = _psx - _sx;
+    const int pdy = _psy - _sy;
+    _pex = _ex + pdx;
+    _pey = _ey + pdy;
+
+    if (dy == 0 || dx == 0) {
+      _m = 0;
+      _pm = 0;
+    } else if (dy < dx) {
+      _m = float(dy) / float(dx);
+      _pm = float(pdx) / float(pdy);
+    } else if (dx < dy) {
+      _m = float(dx) / float(dy);
+      _pm = float(pdy) / float(pdx);
     }
   }
 }

@@ -28,29 +28,64 @@ namespace upanui {
   class Line : public UILeafElement {
   protected:
     virtual ~Line() {}
-    Line(const int x1, const int y1, const int x2, const int y2);
+    Line(const int x1, const int y1, const int x2, const int y2, const uint32_t thickness);
 
     void doDraw() override;
+    int x1() const { return _x1; }
+    int y1() const { return _y1; }
+    int x2() const { return _x2; }
+    int y2() const { return _y2; }
+    uint32_t thickness() const { return _thickness; }
+
+    void updateXY(const int x1, const int y1, const int x2, const int y2);
+    void updateThickness(const uint32_t thickness);
 
   private:
     void plot(int x, int y, const uint32_t color, const uint32_t alpha);
-    void drawLine(int x1, int y1, int x2, int y2, const uint32_t thickness,
-                  const uint32_t rawColor, const uint32_t alpha);
-    void drawLineWithLowSlope(int sx, int sy, int ex, int ey, uint32_t thickness,
-                              const uint32_t rawColor, const uint32_t alpha);
-    void drawLineWithHighSlope(int sx, int sy, int ex, int ey, uint32_t thickness,
-                               const uint32_t rawColor, const uint32_t alpha);
-    void drawHorizontalLine(const int sx, const int ex, const int y, const uint32_t thickness,
-                            const uint32_t rawColor, const uint32_t alpha);
-    void drawVerticalLine(const int sy, const int ey, const int x, const uint32_t thickness,
-                            const uint32_t rawColor, const uint32_t alpha);
-    void calculatePxPy(int& px, int& py, int dx, int dy, int sx, int sy, uint32_t thickness);
+    void drawLine(const uint32_t rawColor, const uint32_t alpha);
+    void drawLineWithLowSlope(const uint32_t rawColor, const uint32_t alpha);
+    void drawLineWithHighSlope(const uint32_t rawColor, const uint32_t alpha);
+    void drawHorizontalLine(const uint32_t rawColor, const uint32_t alpha);
+    void drawVerticalLine(const uint32_t rawColor, const uint32_t alpha);
+
+    void updateLayoutArea();
+
+    class Spec {
+    public:
+      void calculate(const int x1, const int y1, const int x2, const int y2, const uint32_t thickness);
+
+      int sx() const { return _sx; }
+      int sy() const { return _sy; }
+      int ex() const { return _ex; }
+      int ey() const { return _ey; }
+      int psx() const { return _psx; }
+      int psy() const { return _psy; }
+      int pex() const { return _pex; }
+      int pey() const { return _pey; }
+      float m() const { return _m; }
+      float pm() const { return _pm; }
+
+    private:
+      int _sx;
+      int _sy;
+      int _ex;
+      int _ey;
+      int _psx;
+      int _psy;
+      int _pex;
+      int _pey;
+      float _m;
+      float _pm;
+    };
 
   private:
-    const int _x1;
-    const int _y1;
-    const int _x2;
-    const int _y2;
+    int _x1;
+    int _y1;
+    int _x2;
+    int _y2;
+    uint32_t _thickness;
+    Spec _spec;
+
     friend class UIObjectFactory;
   };
 }

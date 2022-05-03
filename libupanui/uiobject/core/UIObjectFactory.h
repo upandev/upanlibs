@@ -35,6 +35,6 @@ namespace upanui {
     static Button& createButton(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height);
     static RectangleCanvas& createRectangleCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height);
     static RoundCanvas& createRoundCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height);
-    static Line& createLine(UIObject& parent, const int x1, const int y1, const int x2, const int y2);
+    static Line& createLine(UIObject& parent, const int x1, const int y1, const int x2, const int y2, const uint32_t thickness);
   };
 }

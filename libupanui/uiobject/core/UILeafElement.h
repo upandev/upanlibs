@@ -32,7 +32,7 @@ namespace upanui {
     ~UILeafElement();
 
     void add(UIObject& child) override {
-      throw upan::exception(XLOC, "Cannot child elements to leaf UI element");
+      throw upan::exception(XLOC, "Cannot add child elements to leaf UI element");
     }
     Layout& layout() override {
       throw upan::exception(XLOC, "leaf UI element doesn't have a layout");

@@ -44,8 +44,8 @@ namespace upanui {
     return canvas;
   }
 
-  Line& UIObjectFactory::createLine(UIObject& parent, const int x1, const int y1, const int x2, const int y2) {
-    auto& line = *new Line(x1, y1, x2, y2);
+  Line& UIObjectFactory::createLine(UIObject& parent, const int x1, const int y1, const int x2, const int y2, const uint32_t thickness) {
+    auto& line = *new Line(x1, y1, x2, y2, thickness);
     parent.add(line);
     return line;
   }

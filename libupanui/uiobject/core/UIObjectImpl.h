@@ -84,6 +84,21 @@ namespace upanui {
       return true;
     }
 
+    enum ChangeNotificationType { Position, Size, Content };
+    void notifyChange(ChangeNotificationType type);
+
+    class ChangeNotificationLock {
+    public:
+      ChangeNotificationLock(UIObjectImpl& object) : _object(object) {
+        _object._lockChangeNotification = true;
+      }
+      ~ChangeNotificationLock() {
+        _object._lockChangeNotification = false;
+      }
+    private:
+      UIObjectImpl& _object;
+    };
+
   private:
     int _x;
     int _y;
@@ -94,6 +109,8 @@ namespace upanui {
     uint32_t _brColor;
     uint8_t _brAlpha;
     uint32_t _borderThickness;
+    bool _lockChangeNotification;
+    friend class ChangeNotificatinLock;
 
     GraphicsContext& _gc;
   };
