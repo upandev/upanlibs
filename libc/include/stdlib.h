@@ -86,6 +86,7 @@ int atoi(const char *nptr) ;
 long atol(const char *nptr) ;
 long long atoll(const char *nptr) ;
 double atof(const char *nptr) ;
+int roundtoi(double v);
 long long strtoll(const char * __restrict str, char ** __restrict endptr, int base) ;
 double strtod(const char *__restrict str, char **__restrict endptr) ;
 long double strtold(const char *str, char **endptr) ;

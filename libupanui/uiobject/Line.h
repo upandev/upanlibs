@@ -26,11 +26,7 @@
 
 namespace upanui {
   class Line : public UILeafElement {
-  protected:
-    virtual ~Line() {}
-    Line(const int x1, const int y1, const int x2, const int y2, const uint32_t thickness);
-
-    void doDraw() override;
+  public:
     int x1() const { return _x1; }
     int y1() const { return _y1; }
     int x2() const { return _x2; }
@@ -39,6 +35,11 @@ namespace upanui {
 
     void updateXY(const int x1, const int y1, const int x2, const int y2);
     void updateThickness(const uint32_t thickness);
+
+  protected:
+    virtual ~Line() {}
+    Line(const int x1, const int y1, const int x2, const int y2, const uint32_t thickness);
+    void doDraw() override;
 
   private:
     void plot(int x, int y, const uint32_t color, const uint32_t alpha);

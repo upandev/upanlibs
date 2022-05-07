@@ -221,7 +221,7 @@ namespace upanui {
     _x2 = x2;
     _y2 = y2;
     updateLayoutArea();
-    contentChanged();
+    positionChanged();
   }
 
   void Line::updateThickness(const uint32_t thickness) {

@@ -69,9 +69,12 @@ extern unsigned long long _stdlib_strto_ll(register const char * __restrict str,
 				 char ** __restrict endptr, int base, int sflag);
 
 /**********************************************************************/
-double atof(const char *nptr)
-{
+double atof(const char *nptr) {
 	return strtod(nptr, (char **) NULL);
+}
+
+int roundtoi(double v) {
+  return v < 0 ? (int)(v - 0.5) : (int)(v + 0.5);
 }
 /**********************************************************************/
 #if INT_MAX < LONG_MAX

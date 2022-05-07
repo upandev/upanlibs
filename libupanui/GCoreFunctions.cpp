@@ -31,10 +31,6 @@ namespace upanui {
     return ai < bi ? -1 : ai > bi ? 1 : 0;
   }
 
-  static uint32_t dround(double v) {
-    return v < 0 ? uint32_t(v - 0.5) : uint32_t(v + 0.5);
-  }
-
   void GCoreFunctions::setPixel(uint32_t& pixel, uint32_t color, bool isDirectSet) {
     if (isDirectSet) {
       pixel = color;
@@ -127,7 +123,7 @@ namespace upanui {
             db += (srcRGB & 0xFF) * ipf;
           }
         }
-        destBuffer[x + y * destWidth] = dround(dr) << 16 | dround(dg) << 8 | dround(db) | dround(da) << 24; //0xFF000000;
+        destBuffer[x + y * destWidth] = roundtoi(dr) << 16 | roundtoi(dg) << 8 | roundtoi(db) | roundtoi(da) << 24; //0xFF000000;
       }
     }
     return destBufferU.release();
