@@ -38,5 +38,16 @@ namespace upanui {
     void positionChanged() override;
     void sizeChanged() override;
     void contentChanged() override;
+
+    void setupDrawBuffer();
+    DrawBuffer& drawBuffer() override {
+      return _drawBuffer;
+    }
+    virtual bool needLocalDrawBuffer() {
+      return false;
+    }
+
+  private:
+    DrawBuffer _drawBuffer;
   };
 }

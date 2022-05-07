@@ -31,19 +31,45 @@ namespace upanui {
   UILeafElement::~UILeafElement() noexcept {
   }
 
-  DrawBuffer& UILeafElement::drawBuffer() {
-    return parent().drawBuffer();
-  }
-
   void UILeafElement::draw() {
-    drawTopDown();
-  }
+    if (backgroundColorAlpha() != 100) {
+      parent().draw();
+    } else {
+      drawTopDown();
 
-  void UILeafElement::drawTopDown() {
-    doDraw();
+      if (!drawBuffer().isNull()) {
+        parent().drawToTop();
+      }
+    }
   }
 
   void UILeafElement::drawToTop() {
-    parent().drawToTop();
+    if (drawBuffer().isLocal()) {
+      parent().layout().draw(*this);
+    }
+
+    if (!drawBuffer().isNull()) {
+      parent().drawToTop();
+    }
+  }
+
+  void UILeafElement::drawTopDown() {
+    //1. do boundary check
+    //2. if child is outside then no need to draw
+    //3. if child is inside then child's buffer is same as parent's buffer
+    //4. if child id partially-inside then create your separate buffer
+    //5. Draw inside the buffer
+    //6. if using parent buffer then end the draw
+    //7. if using your own buffer then ask parent to copy the child buffer into it's buffer
+
+    setupDrawBuffer();
+
+    auto& drawBuf = drawBuffer();
+    if (!drawBuf.isNull()) {
+      doDraw();
+      if (drawBuf.isLocal()) {
+        parent().layout().draw(*this);
+      }
+    }
   }
 }

@@ -60,12 +60,14 @@ namespace upanui {
     }
   }
 
-  void Line::plot(const int x, const int y, const uint32_t color, const uint32_t alpha) {
+  void Line::plot(const int rx, const int ry, const uint32_t color, const uint32_t alpha) {
     auto& drawBuf = drawBuffer();
-    if (x < 0 || y < 0 || x >= parent().width() || y >= parent().height()) {
+    const auto ax = rx - x();
+    const auto ay = ry - y();
+    if (ax < 0 || ay < 0 || ax >= drawBuf.width() || ay >= drawBuf.height()) {
       return;
     }
-    GCoreFunctions::setPixel(drawBuf.at(x, y), color | (alpha << 24), false);
+    GCoreFunctions::setPixel(drawBuf.at(ax, ay), color | (alpha << 24), drawBuf.isLocal());
   }
 
   void Line::drawLineWithLowSlope(const uint32_t rawColor, const uint32_t alpha) {
@@ -241,7 +243,6 @@ namespace upanui {
     y(minY);
     width(maxX - minX + 1);
     height(maxY - minY + 1);
-    printf("\n%d,%d,%d,%d", x(), y(), width(), height());
   }
 
   void Line::Spec::calculate(const int x1, const int y1, const int x2, const int y2, const uint32_t thickness) {

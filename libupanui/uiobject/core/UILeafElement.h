@@ -38,7 +38,6 @@ namespace upanui {
       throw upan::exception(XLOC, "leaf UI element doesn't have a layout");
     }
 
-    DrawBuffer& drawBuffer() override;
     void draw() override;
     void drawTopDown() override;
     void drawToTop() override;

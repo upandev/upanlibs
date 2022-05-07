@@ -58,13 +58,14 @@ namespace upanui {
   }
 
   void DrawBuffer::initLocal(const uint32_t width, const uint32_t height) {
+    const auto bufSize = width * height;
     if (_type == BufferType::Local && _width == width && _height == height) {
+      memset(_buffer, 0, bufSize * sizeof(uint32_t));
       return;
     }
     clear();
     _width = width;
     _height = height;
-    const auto bufSize = width * height;
     _buffer = new uint32_t[bufSize];
     _type = BufferType::Local;
     memset(_buffer, 0, bufSize * sizeof(uint32_t));
