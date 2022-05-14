@@ -55,15 +55,23 @@ IT find_if(IT begin, IT end, MATCH match)
 }
 
 template <typename N>
-const N& max(const N& n1, const N& n2)
-{
-  return n1 > n2 ? n1 : n2;
+const N& max(const N& n) {
+  return n;
+}
+
+template <typename N, typename... Ns>
+const N& max(const N& n1, const N& n2, const Ns&... ns) {
+  return max(n1 > n2 ? n1 : n2, ns...);
 }
 
 template <typename N>
-const N& min(const N& n1, const N& n2)
-{
-  return n1 < n2 ? n1 : n2;
+const N& min(const N& n) {
+  return n;
+}
+
+template <typename N, typename... Ns>
+const N& min(const N& n1, const N& n2, const Ns&... ns) {
+  return min(n1 < n2 ? n1 : n2, ns...);
 }
 
 }

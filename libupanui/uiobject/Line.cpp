@@ -234,10 +234,10 @@ namespace upanui {
     ChangeNotificationLock cLock(*this);
     _spec.calculate(_x1, _y1, _x2, _y2, _thickness);
 
-    const int minX = upan::min(upan::min(_spec.sx(), _spec.ex()), upan::min(_spec.psx(), _spec.pex()));
-    const int maxX = upan::max(upan::max(_spec.sx(), _spec.ex()), upan::max(_spec.psx(), _spec.pex()));
-    const int minY = upan::min(upan::min(_spec.sy(), _spec.ey()), upan::min(_spec.psy(), _spec.pey()));
-    const int maxY = upan::max(upan::max(_spec.sy(), _spec.ey()), upan::max(_spec.psy(), _spec.pey()));
+    const int minX = upan::min(_spec.sx(), _spec.ex(), _spec.psx(), _spec.pex());
+    const int maxX = upan::max(_spec.sx(), _spec.ex(), _spec.psx(), _spec.pex());
+    const int minY = upan::min(_spec.sy(), _spec.ey(), _spec.psy(), _spec.pey());
+    const int maxY = upan::max(_spec.sy(), _spec.ey(), _spec.psy(), _spec.pey());
 
     x(minX);
     y(minY);
