@@ -56,8 +56,8 @@ namespace upanui {
     if (!childDrawBuffer.isLocal()) {
       return;
     }
-    const auto pwidth = parent().width() - 2 * parent().borderThickness();
-    const auto pheight = parent().height() - 2 * parent().borderThickness();
+    const auto pwidth = parent().width() - parent().borderThickness();
+    const auto pheight = parent().height() - parent().borderThickness();
 
     const int sx1 = child.x() >= 0 ? 0 : 0 - child.x();
     const int sy1 = child.y() >= 0 ? 0 : 0 - child.y();
