@@ -32,6 +32,7 @@ namespace upanui {
   class GraphicsContext;
   class KeyboardEvent;
   class MouseEvent;
+  class MouseEventHandler;
 
   class UIObjectImpl : public UIObject {
   protected:
@@ -70,12 +71,16 @@ namespace upanui {
       return _gc;
     }
 
+    void registerMouseEventHandler(MouseEventHandler& handler) override {
+      _mouseEventHandler = upan::option<MouseEventHandler&>(handler);
+    }
+
     upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) override;
 
   protected:
     virtual void onBackgroundColorChange() {}
     void onKeyboardEvent(const KeyboardEvent& event) override {}
-    void onMouseEvent(const MouseEvent& event) override {}
+    void onMouseEvent(const MouseEvent& event) override;
     void onMouseFocus() override {}
     void onLoseMouseFocus() override {}
 
@@ -110,6 +115,7 @@ namespace upanui {
     uint8_t _brAlpha;
     uint32_t _borderThickness;
     bool _lockChangeNotification;
+    upan::option<MouseEventHandler&> _mouseEventHandler;
     friend class ChangeNotificatinLock;
 
     GraphicsContext& _gc;

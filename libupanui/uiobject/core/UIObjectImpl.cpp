@@ -21,7 +21,6 @@
  */
 
 #include <UIObject.h>
-#include <KeyboardEventHandler.h>
 #include <MouseEventHandler.h>
 #include <GraphicsContext.h>
 
@@ -30,6 +29,7 @@ namespace upanui {
     : _x(x), _y(y), _width(width), _height(height),
       _bgColor(0), _bgAlpha(100), _brColor(0xFFFFFF),
       _brAlpha(100), _borderThickness(0), _lockChangeNotification(false),
+      _mouseEventHandler(upan::option<MouseEventHandler&>::empty()),
       _gc(GraphicsContext::Instance()) {
   }
 
@@ -161,5 +161,11 @@ namespace upanui {
         contentChanged();
         break;
     }
+  }
+
+  void UIObjectImpl::onMouseEvent(const MouseEvent &event) {
+    _mouseEventHandler.ifPresent([&](MouseEventHandler& handler) {
+      handler.onEvent(*this, event);
+    });
   }
 }

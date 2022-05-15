@@ -22,13 +22,11 @@
 
 #include <UIRoot.h>
 #include <GraphicsContext.h>
-#include <MouseEventHandler.h>
 #include <GCoreFunctions.h>
 
 namespace upanui {
   UIRoot::UIRoot(const int x, const int y, const uint32_t width, const uint32_t height)
   : UIObjectImpl(x, y, width, height),
-    _onDragHandler(upan::option<MouseEventHandler&>::empty()),
     _layout(*this) {
     gc().frame().updateViewport(x, y, width, height);
     _drawBuffer.initLocal(gc().frame().frameBuffer());
@@ -68,13 +66,5 @@ namespace upanui {
 
   void UIRoot::contentChanged() {
     redraw();
-  }
-
-  void UIRoot::onMouseEvent(const MouseEvent &event) {
-    if (event.getData().leftButtonState() == MouseData::HOLD) {
-      _onDragHandler.ifPresent([&](MouseEventHandler& handler) {
-        handler.onEvent(*this, event);
-      });
-    }
   }
 }

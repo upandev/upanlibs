@@ -33,6 +33,7 @@ namespace upanui {
   class MouseEvent;
   class DrawBuffer;
   class Layout;
+  class MouseEventHandler;
 
   class UIObject {
   protected:
@@ -84,6 +85,7 @@ namespace upanui {
     virtual Layout& layout() = 0;
     virtual DrawBuffer& drawBuffer() = 0;
 
+    virtual void registerMouseEventHandler(MouseEventHandler& handler) = 0;
   protected:
     virtual ~UIObject() {}
 

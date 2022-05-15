@@ -92,6 +92,10 @@ namespace upanui {
       throw upan::exception(XLOC, "unsupported drawBuffer for UIProxyParent");
     }
 
+    void registerMouseEventHandler(MouseEventHandler& handler) override {
+      throw upan::exception(XLOC, "unsupported event handlers for UIProxyParent");
+    }
+
   protected:
     void onKeyboardEvent(const KeyboardEvent& event) override {
       throw upan::exception(XLOC, "unsupported onKeyboardEvent for UIProxyParent");
