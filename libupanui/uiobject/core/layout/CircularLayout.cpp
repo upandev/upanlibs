@@ -107,7 +107,7 @@ namespace upanui {
         const auto antialiasPixelColor = (rawColor & 0xFFFFFF) | alpha_e << 24;
         //shift == 0 => outer/border circle => do direct-set => no alpha blending
         if (shift == 0) {
-          plotPixel(x, y + 1, r, shift, antialiasPixelColor, true);
+          plotPixel(x, y + 1, r, shift, antialiasPixelColor, parent().drawBuffer().isLocal());
         } else {
           const int sx1 = -x + r + shift;
           const int sy = r - y + shift;
