@@ -61,6 +61,9 @@ namespace upanui {
     void onKeyPress(KeyboardEventHandler& h);
 
   private:
+    Layout& layout() override {
+      throw upan::exception(XLOC, "layout not supported yet!");
+    }
     void onKeyboardEvent(const KeyboardEvent& event) override;
     void gotoCursor() override;
     void putChar(int iPos, byte ch, const upanui::CharStyle& attr) override;
