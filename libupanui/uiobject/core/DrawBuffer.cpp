@@ -22,6 +22,8 @@
 #include <DrawBuffer.h>
 #include <FrameBuffer.h>
 #include <string.h>
+#include <mosstd.h>
+#include "algorithm.h"
 
 namespace upanui {
   DrawBuffer::DrawBuffer() : _type(BufferType::Null), _buffer(nullptr), _width(0), _height(0) {
@@ -74,7 +76,7 @@ namespace upanui {
   void DrawBuffer::initLocal(const FrameBuffer& parent) {
     clear();
     _width = parent.width();
-    _height = parent.width();
+    _height = parent.height();
     _buffer = parent.buffer();
     _type = BufferType::ForceLocal;
   }
@@ -85,5 +87,20 @@ namespace upanui {
 
   uint32_t& DrawBuffer::at(const int offset) const {
     return _buffer[ offset ];
+  }
+
+  void DrawBuffer::copy(const void *src, int len) {
+    optimized_memcpy((uint32_t)buffer(), (uint32_t)src, len);
+  }
+
+  void DrawBuffer::fill(int sx, int sy, uint32_t width, uint32_t height, uint32_t color) {
+    const int ex = upan::min(_width, sx + width) - 1;
+    const int ey = upan::min(_height, sy + height) - 1;
+    for(auto y = sy; y <= ey; ++y) {
+      auto yOffset = y * _width;
+      for(auto x = sx; x <= ex; ++x) {
+        _buffer[x + yOffset] = color;
+      }
+    }
   }
 }

@@ -26,6 +26,8 @@
 #include <FrameBuffer.h>
 #include <BaseFrame.h>
 #include <GCoreFunctions.h>
+#include <UIObject.h>
+#include <DrawBuffer.h>
 
 namespace upanui {
   TextWriter::TextWriter() : _usfnContext(nullptr) {
@@ -33,10 +35,10 @@ namespace upanui {
     _yCharScale = 16;
   }
 
-  void TextWriter::drawChar(BaseFrame& frame, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg) {
+  void TextWriter::drawChar(upanui::UIObject& parent, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg) {
     if (_usfnContext) {
       try {
-        drawUSFNChar(frame, ch, x, y, fg, bg);
+        drawUSFNChar(parent, ch, x, y, fg, bg);
         return;
       } catch(upan::exception& e) {
         _usfnContext = nullptr;
@@ -45,39 +47,40 @@ namespace upanui {
     }
     x *= _xCharScale;
     y *= _yCharScale;
-    if((y + _yCharScale) >= frame.frameBuffer().height() || (x + _xCharScale) >= frame.frameBuffer().width())
+    auto& drawBuffer = parent.drawBuffer();
+    if((y + _yCharScale) >= drawBuffer.height() || (x + _xCharScale) >= drawBuffer.width())
       return;
     const byte* font_data = GraphicsFont::Get(ch);
     bool yr = false;
-    const auto pitch = frame.frameBuffer().pitch();
-    const auto bytesPerPixel = frame.frameBuffer().bytesPerPixel();
+    const auto pitch = drawBuffer.pitch();
+    const auto bytesPerPixel = drawBuffer.bytesPerPixel();
 
     for(unsigned f = 0; f < 8; ++y) {
-      unsigned lfbp = (uint32_t)frame.frameBuffer().buffer() + y * pitch + x * bytesPerPixel;
+      unsigned lfbp = (uint32_t)drawBuffer.buffer() + y * pitch + x * bytesPerPixel;
       for(unsigned i = 0x80; i != 0; i >>= 1, lfbp += bytesPerPixel)
         *(unsigned*)lfbp = font_data[f] & i ? fg : bg;
 
       if(yr) ++f;
       yr = !yr;
     }
-    frame.touch();
+    parent.draw();
   }
 
-  void TextWriter::drawUSFNChar(BaseFrame& frame, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg) {
+  void TextWriter::drawUSFNChar(upanui::UIObject& parent, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg) {
     //for SSFN, y is the baseline, the characters are drawn above y and hence add yScale to y --> this is only for Render() which is used for GUI
     //we don't have to do it for a standard text console display using RenderCharacter()
     //++y;
     x *= _xCharScale;
     y *= _yCharScale;
-
-    if(y >= frame.frameBuffer().height() || (x + _xCharScale) >= frame.frameBuffer().width())
+    auto& drawBuffer = parent.drawBuffer();
+    if(y >= drawBuffer.height() || (x + _xCharScale) >= drawBuffer.width())
       return;
 
     usfn::FrameBuffer buf = {                                  /* the destination pixel buffer */
-        .ptr = (uint8_t*)frame.frameBuffer().buffer(),               /* address of the buffer */
-        .w = (int16_t)frame.frameBuffer().width(),                        /* width */
-        .h = (int16_t)frame.frameBuffer().height(),                       /* height */
-        .p = (uint16_t)frame.frameBuffer().pitch(),    /* bytes per line */
+        .ptr = (uint8_t*)drawBuffer.buffer(),               /* address of the buffer */
+        .w = (int16_t)drawBuffer.width(),                        /* width */
+        .h = (int16_t)drawBuffer.height(),                       /* height */
+        .p = (uint16_t)drawBuffer.pitch(),    /* bytes per line */
         .x = (int16_t)x,                                       /* pen position */
         .y = (int16_t)y,
         .fg = fg | GCoreFunctions::ALPHA_MASK,
@@ -87,27 +90,27 @@ namespace upanui {
     //    const char s[2] = { (const char)ch, '\0' };
     //    _usfnContext->Render(buf, s, true);
     _usfnContext->RenderCharacter(buf, ch);
-    frame.touch();
+    parent.draw();
   }
 
   //TODO: this is assuming 4 bytes per pixel
   //TODO: initialize y and x scale as class members and base all calculations on y/x scale instead of assuming/hardcoding
-  void TextWriter::scrollDown(BaseFrame& frame) {
-    const uint32_t maxSize = frame.frameBuffer().width() * frame.frameBuffer().height();
+  void TextWriter::scrollDown(upanui::UIObject& parent) {
+    auto& drawBuffer = parent.drawBuffer();
+    const uint32_t maxSize = drawBuffer.width() * drawBuffer.height();
     //1 line = 16 rows as we are scaling y axis by 16
-    const uint32_t oneLine = frame.frameBuffer().width() * _yCharScale;
+    const uint32_t oneLine = drawBuffer.width() * _yCharScale;
 
-    frame.copy((void*)((uint32_t)frame.frameBuffer().buffer() + oneLine * frame.frameBuffer().bytesPerPixel()),
-               (maxSize - oneLine) * frame.frameBuffer().bytesPerPixel());
+    drawBuffer.copy((void*)((uint32_t)drawBuffer.buffer() + oneLine * drawBuffer.bytesPerPixel()), (maxSize - oneLine) * drawBuffer.bytesPerPixel());
 
-    frame.fillRect(0, frame.frameBuffer().height() - _yCharScale, frame.frameBuffer().width(), _yCharScale, GCoreFunctions::ALPHA_MASK);
-    frame.touch();
+    drawBuffer.fill(0, drawBuffer.height() - _yCharScale, drawBuffer.width(), _yCharScale, GCoreFunctions::ALPHA_MASK);
+    parent.draw();
   }
 
-  void TextWriter::drawCursor(BaseFrame& frame, uint32_t x, uint32_t y, uint32_t color) {
+  void TextWriter::drawCursor(upanui::UIObject& parent, uint32_t x, uint32_t y, uint32_t color) {
     x *= _xCharScale;
     y *= _yCharScale;
-    frame.fillRect(x + 1, y + _yCharScale - 1, _xCharScale - 1, 1, color | GCoreFunctions::ALPHA_MASK);
-    frame.touch();
+    parent.drawBuffer().fill(x + 1, y + _yCharScale - 1, _xCharScale - 1, 1, color | GCoreFunctions::ALPHA_MASK);
+    parent.draw();
   }
 }

@@ -39,11 +39,16 @@ namespace upanui {
 
     uint32_t width() const { return _width; }
     uint32_t height() const { return _height; }
+    uint32_t bytesPerPixel() const { return sizeof(uint32_t); }
+    uint32_t pitch() const { return width() * bytesPerPixel(); }
     bool isLocal() const { return _type == BufferType::Local || _type == BufferType::ForceLocal; }
     bool isNull() const { return _type == BufferType::Null; }
     uint32_t* buffer() const { return _buffer; }
     uint32_t& at(int x, int y) const;
     uint32_t& at(int offset)  const;
+
+    void copy(const void* src, int len);
+    void fill(int sx, int sy, uint32_t width, uint32_t height, uint32_t color);
 
   private:
     enum BufferType { Null, Local, ForceLocal, Derived };

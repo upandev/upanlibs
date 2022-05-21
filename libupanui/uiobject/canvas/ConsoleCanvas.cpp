@@ -36,6 +36,7 @@ namespace upanui {
       _usfnContext(nullptr),
       _keyboardHandler(upan::option<KeyboardEventHandler&>::empty()) {
     try {
+      UIElement::drawBuffer().initLocal(gc().frame().frameBuffer());
       _usfnContext.reset(new upanui::usfn::Context());
       _usfnContext->Load(upanui::usfn::Context::GetPreloadedFont(upanui::usfn::PreloadedFonts::VGA16));
       _usfnContext->Select(upanui::usfn::FAMILY_MONOSPACE, NULL, upanui::usfn::STYLE_REGULAR, 16);
@@ -116,13 +117,13 @@ namespace upanui {
     const unsigned x = (curPos % _consoleBuffer.maxColumns());
     const unsigned y = (curPos / _consoleBuffer.maxColumns());
 
-    _textWriter.drawChar(gc().frame(), ch, x, y,
+    _textWriter.drawChar(*this, ch, x, y,
                          ColorPalettes::CP16::Get(style.getFGColor()),
                          ColorPalettes::CP16::Get(style.getBGColor() >> 4));
   }
 
   void ConsoleCanvas::scrollDown() {
-    _textWriter.scrollDown(gc().frame());
+    _textWriter.scrollDown(*this);
   }
 
   void ConsoleCanvas::gotoCursor() {
@@ -147,7 +148,11 @@ namespace upanui {
     const auto x = (_cursorPos % _consoleBuffer.maxColumns());
     const auto y = (_cursorPos / _consoleBuffer.maxColumns());
 
-    _textWriter.drawCursor(gc().frame(), x, y, color);
+    _textWriter.drawCursor(*this, x, y, color);
+  }
+
+  void ConsoleCanvas::draw() {
+    gc().frame().touch();
   }
 
   void ConsoleCanvas::onKeyPress(KeyboardEventHandler& h) {

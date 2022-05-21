@@ -34,9 +34,6 @@ namespace upanui {
   class ConsoleCanvas : public UIElement, public IConsole {
   protected:
     ~ConsoleCanvas();
-    void draw() override {}
-    void drawTopDown() override {}
-    void drawToTop() override {}
 
   public:
     ConsoleCanvas(uint32_t maxRows, uint32_t maxColumns);
@@ -61,6 +58,9 @@ namespace upanui {
     void onKeyPress(KeyboardEventHandler& h);
 
   private:
+    void draw() override;
+    void drawTopDown() override {}
+    void drawToTop() override {}
     Layout& layout() override {
       throw upan::exception(XLOC, "layout not supported yet!");
     }

@@ -26,7 +26,7 @@
 #include <usfncontext.h>
 
 namespace upanui {
-  class BaseFrame;
+  class UIObject;
 
   class TextWriter {
   public:
@@ -34,12 +34,12 @@ namespace upanui {
     void setFontContext(usfn::Context* c) {
       _usfnContext = c;
     }
-    void drawChar(BaseFrame& frame, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg);
-    void scrollDown(BaseFrame& frame);
-    void drawCursor(BaseFrame& frame, uint32_t x, uint32_t y, uint32_t color);
+    void drawChar(upanui::UIObject& parent, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg);
+    void scrollDown(upanui::UIObject& parent);
+    void drawCursor(upanui::UIObject& parent, uint32_t x, uint32_t y, uint32_t color);
 
   private:
-    void drawUSFNChar(BaseFrame& frame, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg);
+    void drawUSFNChar(upanui::UIObject& parent, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg);
 
     usfn::Context* _usfnContext;
     uint32_t _xCharScale;

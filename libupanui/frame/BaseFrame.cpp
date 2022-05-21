@@ -29,10 +29,6 @@ namespace upanui {
   : _frameBuffer(frameBuffer), _viewport(viewport) {
   }
 
-  void BaseFrame::copy(const void *src, int len) {
-    optimized_memcpy((uint32_t)_frameBuffer.buffer(), (uint32_t)src, len);
-  }
-
   void BaseFrame::fillRect(int sx, int sy, uint32_t width, uint32_t height, uint32_t color) {
     const int ex = upan::min(_viewport.width(), sx + width) - 1;
     const int ey = upan::min(_viewport.height(), sy + height) - 1;

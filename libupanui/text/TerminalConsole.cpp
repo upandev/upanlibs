@@ -30,14 +30,16 @@
 namespace upanui {
   TerminalConsole* TerminalConsole::_instance = nullptr;
 
-  TerminalConsole::TerminalConsole(BaseFrame& frame, uint32_t maxRows, uint32_t maxColumns)
-    : _frame(frame), _cursorPos(0),
+  TerminalConsole::TerminalConsole(uint32_t maxRows, uint32_t maxColumns)
+    : UIElement(0, 0, GraphicsContext::Instance().frame().frameBuffer().width(), GraphicsContext::Instance().frame().frameBuffer().height()),
+      _cursorPos(0),
       _charStyle(CharStyle::WHITE_ON_BLACK()),
       _consoleBuffer(*this, maxRows, maxColumns),
       _cursorBlinkThread(*this),
       _readerThread(*this),
       _usfnContext(nullptr) {
     try {
+      UIElement::drawBuffer().initLocal(gc().frame().frameBuffer());
       init_term_console();
       _usfnContext.reset(new upanui::usfn::Context());
       _usfnContext->Load(upanui::usfn::Context::GetPreloadedFont(upanui::usfn::PreloadedFonts::VGA16));
@@ -55,7 +57,7 @@ namespace upanui {
       throw upan::exception(XLOC, "TerminalConsole is already created!");
     }
     //create on heap because you can't pass objects on stack as params to threads
-    _instance = new TerminalConsole(GraphicsContext::Instance().frame(), maxRows, maxColumns);
+    _instance = new TerminalConsole(maxRows, maxColumns);
     return *_instance;
   }
 
@@ -117,13 +119,13 @@ namespace upanui {
     const unsigned x = (curPos % _consoleBuffer.maxColumns());
     const unsigned y = (curPos / _consoleBuffer.maxColumns());
 
-    _textWriter.drawChar(_frame, ch, x, y,
+    _textWriter.drawChar(*this, ch, x, y,
                          ColorPalettes::CP16::Get(style.getFGColor()),
                          ColorPalettes::CP16::Get(style.getBGColor() >> 4));
   }
 
   void TerminalConsole::scrollDown() {
-    _textWriter.scrollDown(_frame);
+    _textWriter.scrollDown(*this);
   }
 
   void TerminalConsole::gotoCursor() {
@@ -148,7 +150,11 @@ namespace upanui {
     const auto x = (_cursorPos % _consoleBuffer.maxColumns());
     const auto y = (_cursorPos / _consoleBuffer.maxColumns());
 
-    _textWriter.drawCursor(_frame, x, y, color);
+    _textWriter.drawCursor(*this, x, y, color);
+  }
+
+  void TerminalConsole::draw() {
+    gc().frame().touch();
   }
 
   TerminalConsole::Reader::Reader(TerminalConsole &console) : _console(console) {

@@ -30,9 +30,9 @@
 #include <uniq_ptr.h>
 
 namespace upanui {
-  class TerminalConsole : public IConsole {
+  class TerminalConsole : public UIElement, public IConsole {
   private:
-    TerminalConsole(BaseFrame& frame, uint32_t maxRows, uint32_t maxColumns);
+    TerminalConsole(uint32_t maxRows, uint32_t maxColumns);
     static TerminalConsole* _instance;
 
   public:
@@ -54,6 +54,13 @@ namespace upanui {
     void setFontContext(upanui::usfn::Context* context);
 
   private:
+    void draw() override;
+    void drawTopDown() override {}
+    void drawToTop() override {}
+    Layout& layout() override {
+      throw upan::exception(XLOC, "layout not supported yet!");
+    }
+
     void gotoCursor() override;
     void putChar(int iPos, byte ch, const upanui::CharStyle& attr) override;
     void scrollDown() override;
@@ -75,7 +82,6 @@ namespace upanui {
     };
 
   private:
-    BaseFrame& _frame;
     int _cursorPos;
     TextWriter _textWriter;
     CharStyle _charStyle;
@@ -84,7 +90,5 @@ namespace upanui {
     CursorBlink _cursorBlinkThread;
     Reader _readerThread;
     upan::uniq_ptr<upanui::usfn::Context> _usfnContext;
-
-    friend class Reader;
   };
 }
