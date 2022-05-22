@@ -19,35 +19,36 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef _M_RESULT_H_
-#define _M_RESULT_H_
+#pragma once
 
 #include <exception.h>
 
 namespace upan {
 
-template <typename T>
-struct function_traits : function_traits<decltype(&T::operator())>
-{
-};
+  template <typename T>
+  struct function_traits : function_traits<decltype(&T::operator())>
+  {
+  };
 
-template <typename R, typename C, typename... A>
-struct function_traits<R(C::*)(A...) const>
-{
-  typedef R return_type;
-};
+  template <typename R, typename C, typename... A>
+  struct function_traits<R(C::*)(A...) const>
+  {
+    typedef R return_type;
+  };
 
-template <typename Good>
-class result
-{
+  template <typename Good>
+  class result
+  {
   protected:
-    bool _isBad;
     Good _value;
-    upan::error _error;
+    upan::error* _error;
 
   public:
-    result(const Good& value) : _isBad(false), _value(value) {}
-    result(const upan::error& error) : _isBad(true), _error(error) {}
+    result(const Good& value) : _value(value), _error(nullptr) {}
+    result(const upan::error& err) : _error(new upan::error(err)) {}
+    ~result() {
+      delete _error;
+    }
 
     static result<Good> bad(const char * __restrict fmsg, ...)
     {
@@ -57,27 +58,27 @@ class result
       va_end(arg);
       return r;
     }
-    
-    bool isBad() const { return _isBad; }
+
+    bool isBad() const { return _error != nullptr; }
     bool isGood() const { return !isBad(); }
 
     const Good& goodValue() const
     {
-      if(_isBad)
+      if(_error)
         throw exception(XLOC, "Result is bad - can't get Good value");
       return _value;
     }
 
-    const Good& goodValueOrThrow(const upan::string& fileName, unsigned lineNo) const
+    const Good& goodValueOrThrow(const char* fileName, unsigned lineNo) const
     {
-      if(_isBad)
-        throw exception(fileName, lineNo, _error);
+      if(_error)
+        throw exception(fileName, lineNo, *_error);
       return _value;
     }
 
     const Good& goodValueOrElse(const Good& defaultValue) const
     {
-      if(_isBad)
+      if(_error)
         return defaultValue;
       return _value;
     }
@@ -85,7 +86,7 @@ class result
     template <typename LAMBDA>
     bool onGood(const LAMBDA& lambdaf)
     {
-      if(isBad())
+      if(_error)
         return false;
       lambdaf(_value);
       return true;
@@ -93,9 +94,9 @@ class result
 
     const upan::error& badValue() const
     {
-      if(!_isBad)
+      if(!_error)
         throw exception(XLOC, "result is Good - can't get Error");
-      return _error;
+      return *_error;
     }
 
     template <typename LAMBDA>
@@ -103,14 +104,12 @@ class result
     {
       if(isGood())
         return false;
-      lambdaf(_error);
+      lambdaf(*_error);
       return true;
     }
-};
+  };
 
-template <typename Good>
-upan::result<Good> good(const Good& value) { return upan::result<Good>(value); }
+  template <typename Good>
+  upan::result<Good> good(const Good& value) { return upan::result<Good>(value); }
 
 }
-
-#endif
