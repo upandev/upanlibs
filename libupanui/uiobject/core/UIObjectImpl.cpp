@@ -47,6 +47,14 @@ namespace upanui {
     }
   }
 
+  void UIObjectImpl::xy(const int x, const int y) {
+    if (_y != y || _x != x) {
+      _x = x;
+      _y = y;
+      notifyChange(ChangeNotificationType::Position);
+    }
+  }
+
   void UIObjectImpl::width(const uint32_t width) {
     if (_width != width) {
       _width = width;
@@ -150,6 +158,7 @@ namespace upanui {
     if (_lockChangeNotification) {
       return;
     }
+
     switch(type) {
       case Position:
         positionChanged();

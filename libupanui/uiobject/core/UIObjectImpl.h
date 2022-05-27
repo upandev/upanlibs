@@ -52,6 +52,7 @@ namespace upanui {
 
     void x(const int) override;
     void y(const int) override;
+    void xy(const int x, const int y) override;
     void width(const uint32_t) override;
     void height(const uint32_t) override;
     void backgroundColor(const uint32_t color) override;

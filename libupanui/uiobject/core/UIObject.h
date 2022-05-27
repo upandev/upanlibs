@@ -55,6 +55,7 @@ namespace upanui {
 
     virtual void x(const int) = 0;
     virtual void y(const int) = 0;
+    virtual void xy(int, int) = 0;
     virtual void width(const uint32_t) = 0;
     virtual void height(const uint32_t) = 0;
     virtual void backgroundColor(const uint32_t color) = 0;
