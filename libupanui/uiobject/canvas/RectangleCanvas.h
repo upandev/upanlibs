@@ -34,6 +34,8 @@ namespace upanui {
     virtual ~RectangleCanvas() {}
 
   protected:
+    void doDraw() override;
+
     Layout& layout() override {
       return _layout;
     }

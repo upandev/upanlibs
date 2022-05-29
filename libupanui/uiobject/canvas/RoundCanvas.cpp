@@ -62,4 +62,8 @@ namespace upanui {
 
     return bgAlpha != 0;
   }
+
+  void RoundCanvas::doDraw() {
+    layout().fill();
+  }
 }

@@ -48,4 +48,8 @@ namespace upanui {
     }
     return bgAlpha != 0;
   }
+
+  void RectangleCanvas::doDraw() {
+    layout().fill();
+  }
 }

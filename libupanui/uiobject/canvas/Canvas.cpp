@@ -65,8 +65,7 @@ namespace upanui {
 
     auto& drawBuf = drawBuffer();
     if (!drawBuf.isNull()) {
-      layout().fill();
-      doDraw(drawBuf);
+      doDraw();
       for (auto child: children()) {
         child->drawTopDown();
       }

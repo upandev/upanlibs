@@ -34,8 +34,7 @@ namespace upanui {
     virtual ~Canvas() {}
 
   protected:
-    virtual void doDraw(const DrawBuffer& frameBuffer) {
-    }
+    virtual void doDraw() = 0;
 
   private:
     void draw() override;
