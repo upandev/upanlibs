@@ -26,12 +26,11 @@
 #include <GCoreFunctions.h>
 
 namespace upanui {
-  BmpImage::BmpImage(upan::uniq_ptr<uint32_t>&& imageBuffer, const Header& header, const InfoHeader& infoHeader, const int x, const int y)
-    : Image(x, y, infoHeader._width, infoHeader._height),
+  BmpImage::BmpImage(upan::uniq_ptr<uint32_t>&& imageBuffer, const Header& header, const InfoHeader& infoHeader)
+    : Image(infoHeader._width, infoHeader._height),
       _imageBuffer(upan::move(imageBuffer)),
       _header(header),
       _infoHeader(infoHeader) {
-    _drawBuffer.initFrom(_imageBuffer.get(), infoHeader._width, infoHeader._height);
   }
 
   BmpImage::~BmpImage() noexcept {
@@ -160,19 +159,10 @@ namespace upanui {
     return imageBuffer.release();
   }
 
-  BmpImage& BmpImage::create(const void* imageData, const int x, const int y, const uint32_t transparentColor) {
+  BmpImage& BmpImage::create(const void* imageData, const uint32_t transparentColor) {
     Header header;
     InfoHeader infoHeader;
     upan::uniq_ptr<uint32_t> imageBuffer(parse(imageData, header, infoHeader, transparentColor));
-    return *new BmpImage(upan::move(imageBuffer), header, infoHeader, x, y);
-  }
-
-  void BmpImage::draw() {
-  }
-
-  void BmpImage::drawTopDown() {
-  }
-
-  void BmpImage::drawToTop() {
+    return *new BmpImage(upan::move(imageBuffer), header, infoHeader);
   }
 }

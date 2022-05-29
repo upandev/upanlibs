@@ -24,19 +24,25 @@
 #include <UIElement.h>
 
 namespace upanui {
-  class Image : public UIElement {
+  class Image {
   protected:
     ~Image() {}
   public:
-    Image(const int x, const int y, const uint32_t width, const uint32_t height) : UIElement(x, y, width, height) {
-    }
-    Image(const Image& image) : UIElement(image.x(), image.y(), image.width(), image.height()) {
+    Image(const uint32_t width, const uint32_t height) : _width(width), _height(height) {
     }
 
-    Layout& layout() override {
-      throw upan::exception(XLOC, "unsupported layout for Image");
+    uint32_t width() const {
+      return _width;
+    }
+
+    uint32_t height() const {
+      return _height;
     }
 
     virtual const uint32_t* data() const = 0;
+
+  private:
+    uint32_t _width;
+    uint32_t _height;
   };
 }

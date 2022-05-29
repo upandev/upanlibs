@@ -31,19 +31,10 @@ namespace upanui {
   }
 
   RawImage::RawImage(const Image& image, uint32_t newWidth, uint32_t newHeight)
-    : Image(image.x(), image.y(), newWidth, newHeight), _imageBuffer(nullptr) {
+    : Image(newWidth, newHeight), _imageBuffer(nullptr) {
     _imageBuffer.reset(GCoreFunctions::resize(image.data(), image.width(), image.height(), newWidth, newHeight));
   }
 
   RawImage::~RawImage() noexcept {
-  }
-
-  void RawImage::draw() {
-  }
-
-  void RawImage::drawTopDown() {
-  }
-
-  void RawImage::drawToTop() {
   }
 }

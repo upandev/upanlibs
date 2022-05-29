@@ -26,15 +26,10 @@
 
 namespace upanui {
   class RawImage : public Image {
-  protected:
-    ~RawImage();
-    void draw() override;
-    void drawTopDown() override;
-    void drawToTop() override;
-
   public:
     RawImage(const Image& image);
     RawImage(const Image& image, uint32_t newWidth, uint32_t newHeight);
+    virtual ~RawImage();
 
     const uint32_t* data() const override {
       return const_cast<RawImage*>(this)->_imageBuffer.get();
