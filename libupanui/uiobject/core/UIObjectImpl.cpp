@@ -122,10 +122,12 @@ namespace upanui {
 
   void UIObjectImpl::add(UIObject& child) {
     _gc.uiObjectManager().add(*this, child);
+    redraw();
   }
 
   void UIObjectImpl::remove() {
     _gc.uiObjectManager().remove(*this);
+    redraw();
   }
 
   void UIObjectImpl::redraw() {
