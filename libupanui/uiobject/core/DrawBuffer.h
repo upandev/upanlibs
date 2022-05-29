@@ -48,6 +48,7 @@ namespace upanui {
     uint32_t& at(int offset)  const;
 
     void copy(const void* src, int len);
+    void copy(uint32_t* src, uint32_t width, uint32_t height);
     void fill(int sx, int sy, uint32_t width, uint32_t height, uint32_t color);
 
   private:

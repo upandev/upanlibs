@@ -19,25 +19,31 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-#pragma once
 
-#include <stdint.h>
+#include <ImageCanvas.h>
+#include <Image.h>
+#include <RawImage.h>
 
 namespace upanui {
-  class UIObject;
-  class Button;
-  class RectangleCanvas;
-  class RoundCanvas;
-  class ImageCanvas;
-  class Image;
-  class Line;
+  ImageCanvas::ImageCanvas(const Image& image, const int x, const int y, const uint32_t width, const uint32_t height)
+    : RectangleCanvas(x, y, width, height), _image(nullptr) {
+    _image.reset(new RawImage(image, width, height));
+  }
 
-  class UIObjectFactory {
-  public:
-    static Button& createButton(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height);
-    static RectangleCanvas& createRectangleCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height);
-    static RoundCanvas& createRoundCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height);
-    static ImageCanvas& createImageCanvas(UIObject& parent, const Image& image, const int x, const int y, const uint32_t width, const uint32_t height);
-    static Line& createLine(UIObject& parent, const int x1, const int y1, const int x2, const int y2, const uint32_t thickness);
-  };
+  void ImageCanvas::setImage(const Image& image) {
+    _image.reset(new RawImage(image, width(), height()));
+    contentChanged();
+  }
+
+  void ImageCanvas::doDraw() {
+    if (_image.toOption().isEmpty()) {
+      return;
+    }
+
+    if (width() != _image->width() || height() != _image->height()) {
+      return;
+    }
+
+    drawBuffer().copy(_image->data(), width(), height());
+  }
 }

@@ -93,6 +93,18 @@ namespace upanui {
     optimized_memcpy((uint32_t)buffer(), (uint32_t)src, len);
   }
 
+  void DrawBuffer::copy(uint32_t* src, uint32_t width, uint32_t height) {
+    const int ex = upan::min(_width, width) - 1;
+    const int ey = upan::min(_height, height) - 1;
+    for(auto y = 0; y <= ey; ++y) {
+      auto yDestOffset = y * _width;
+      auto ySrcOffset = y * width;
+      for(auto x = 0; x <= ex; ++x) {
+        _buffer[x + yDestOffset] = src[x + ySrcOffset];
+      }
+    }
+  }
+
   void DrawBuffer::fill(int sx, int sy, uint32_t width, uint32_t height, uint32_t color) {
     const int ex = upan::min(_width, sx + width) - 1;
     const int ey = upan::min(_height, sy + height) - 1;
