@@ -25,34 +25,39 @@
 #include "GCoreFunctions.h"
 
 namespace upanui {
-  Button::Button(const int x, const int y, const uint32_t width, const uint32_t height) : RectangleCanvas(x, y, width, height), _hover(false) {
-    Button::onBackgroundColorChange();
+  Button::Button(const int x, const int y, const uint32_t width, const uint32_t height)
+    : RectangleCanvas(x, y, width, height), _hover(false), _leftClickHold(false) {
+//    Button::onBackgroundColorChange();
   }
 
-  void Button::onBackgroundColorChange() {
-    const static auto lightness = 10u;
-    auto bgColor = backgroundColor();
-
-    auto b = bgColor & 0xFF;
-    b += upan::min(0xFF - b, lightness);
-
-    auto g = (bgColor & 0xFF00) >> 8;
-    g += upan::min(0xFF - g, lightness);
-
-    auto r = (bgColor & 0xFF0000) >> 16;
-    r += upan::min(0xFF - r, lightness);
-
-    _hoverColor = (bgColor & GCoreFunctions::ALPHA_MASK) | r << 16 | g << 8 | b;
-  }
+//  void Button::onBackgroundColorChange() {
+//    const static auto lightness = 10u;
+//    auto bgColor = backgroundColor();
+//
+//    auto b = bgColor & 0xFF;
+//    b += upan::min(0xFF - b, lightness);
+//
+//    auto g = (bgColor & 0xFF00) >> 8;
+//    g += upan::min(0xFF - g, lightness);
+//
+//    auto r = (bgColor & 0xFF0000) >> 16;
+//    r += upan::min(0xFF - r, lightness);
+//
+//    _hoverColor = (bgColor & GCoreFunctions::ALPHA_MASK) | r << 16 | g << 8 | b;
+//  }
 
   uint32_t Button::backgroundColorForDraw() const {
-    return _hover ? _hoverColor : backgroundColor();
+    return _hover ? (_leftClickHold ? _clickColor : _hoverColor) : backgroundColor();
   }
 
   void Button::onKeyboardEvent(const KeyboardEvent& event) {
   }
 
   void Button::onMouseEvent(const MouseEvent& event) {
+    auto x = event.getData().leftButtonState() == MouseData::State::HOLD;
+    if (x != _leftClickHold) {
+      contentChanged();
+    }
   }
 
   void Button::onMouseFocus() {

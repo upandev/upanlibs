@@ -73,6 +73,7 @@ include_directories(${PROJECT_SOURCE_DIR}/libustd/mthread)
 
 include_directories(${PROJECT_SOURCE_DIR}/libupanui)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/frame)
+include_directories(${PROJECT_SOURCE_DIR}/libupanui/uicomponent)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/uiobject)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/uiobject/draw)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/uiobject/core)

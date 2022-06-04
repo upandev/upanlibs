@@ -31,11 +31,22 @@ namespace upanui {
       return _hoverColor;
     }
 
+    void hoverColor(uint32_t color) {
+      _hoverColor = color;
+    }
+
+    uint32_t clickColor() const {
+      return _clickColor;
+    }
+
+    void clickColor(uint32_t color) {
+      _clickColor = color;
+    }
+
   protected:
     virtual ~Button() {}
     Button(const int x, const int y, const uint32_t width, const uint32_t height);
 
-    void onBackgroundColorChange() override;
     uint32_t backgroundColorForDraw() const override;
 
     void onKeyboardEvent(const KeyboardEvent& event) override;
@@ -45,7 +56,9 @@ namespace upanui {
 
   private:
     uint32_t _hoverColor;
+    uint32_t _clickColor;
     bool _hover;
+    bool _leftClickHold;
 
     friend class UIObjectFactory;
   };
