@@ -158,9 +158,9 @@ namespace upanui {
     upan::mutex_guard g(_uiObjectTreeMutex);
 
     const MouseData& data = event.getData();
-    upan::option<UIObject&> eventObject = _focusedUIObject;
     const int viewportX = data.x() - _rootCanvas.x();
     const int viewportY = data.y() - _rootCanvas.y();
+    upan::option<UIObject&> eventObject = upan::option<UIObject&>::empty();
 
     if (!data.anyButtonHeld()) {
       _rootCanvas.uiObjectUnderCursor(viewportX, viewportY).ifPresent([&](UIObject& o) {
@@ -169,19 +169,25 @@ namespace upanui {
         }
         eventObject = upan::option<UIObject&>(o);
       });
+    } else {
+      eventObject = _focusedUIObject;
     }
 
-    eventObject.ifPresent([&](UIObject& uiObject) {
+    if (eventObject.isEmpty()) {
+      if (!_mouseFocusedObject.isEmpty()) {
+        _mouseFocusedObject.value().onLoseMouseFocus();
+        _mouseFocusedObject = upan::option<UIObject&>::empty();
+      }
+    } else {
       if (_mouseFocusedObject.isEmpty()) {
         _mouseFocusedObject = eventObject;
         _mouseFocusedObject.value().onMouseFocus();
-      } else if (&_mouseFocusedObject.value() != &uiObject) {
+      } else if (&_mouseFocusedObject.value() != &eventObject.value()) {
         _mouseFocusedObject.value().onLoseMouseFocus();
         _mouseFocusedObject = eventObject;
         _mouseFocusedObject.value().onMouseFocus();
       }
-
-      uiObject.onMouseEvent(event);
-    });
+      eventObject.value().onMouseEvent(event);
+    }
   }
 }
