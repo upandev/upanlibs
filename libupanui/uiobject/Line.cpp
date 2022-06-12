@@ -51,9 +51,8 @@ namespace upanui {
     if (dy == 0) {
       drawHorizontalLine(rawColor, alpha);
     } else if (dx == 0) {
-
-    }
-    if (dy < dx) {
+      drawVerticalLine(rawColor, alpha);
+    } else if (dy < dx) {
       drawLineWithLowSlope(rawColor, alpha);
     } else {
       drawLineWithHighSlope(rawColor, alpha);
@@ -271,14 +270,15 @@ namespace upanui {
       } else {
         const float m_inv = float(dx) / float(dy);
         const float r = sqrt(1 + m_inv * m_inv);
+        // adjacent / hypotenuse = cos(theta) = 1 / sqrt(1 + tan^2(theta) = psx - sx / t = 1 / r = psx = sx + t / r
         const int sign_inv = m_inv < 0.0 ? 1 : -1;
         //low slope --> px can be either to the left of or right of sx but py is always larger than sy
         if (dy < dx) { // line with low slope
-          _psx = float(_sx) + sign_inv * float(thickness) / r;
-          _psy = float(_sy) + float(thickness) * fabs(m_inv) / r;
+          _psx = _sx + int(sign_inv * float(thickness) / r);
+          _psy = _sy + int(float(thickness) * fabs(m_inv) / r);
         } else { // line with high slope
-          _psx = float(_sx) + float(thickness) / r;
-          _psy = float(_sy) + sign_inv * float(thickness) * fabs(m_inv) / r;
+          _psx = _sx + int(float(thickness) / r);
+          _psy = _sy + int(sign_inv * float(thickness) * fabs(m_inv) / r);
         }
       }
     }
@@ -294,7 +294,7 @@ namespace upanui {
     } else if (dy < dx) {
       _m = float(dy) / float(dx);
       _pm = float(pdx) / float(pdy);
-    } else if (dx < dy) {
+    } else {
       _m = float(dx) / float(dy);
       _pm = float(pdy) / float(pdx);
     }
