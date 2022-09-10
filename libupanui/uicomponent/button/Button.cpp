@@ -22,7 +22,6 @@
 
 #include <Button.h>
 #include <MouseEventHandler.h>
-#include "GCoreFunctions.h"
 
 namespace upanui {
   Button::Button(const int x, const int y, const uint32_t width, const uint32_t height)
@@ -56,17 +55,18 @@ namespace upanui {
   void Button::onMouseEvent(const MouseEvent& event) {
     auto x = event.getData().leftButtonState() == MouseData::State::HOLD;
     if (x != _leftClickHold) {
-      contentChanged();
+      _leftClickHold = x;
+      notifyChange(ChangeNotificationType::Content);
     }
   }
 
   void Button::onMouseFocus() {
     _hover = true;
-    contentChanged();
+    notifyChange(ChangeNotificationType::Content);
   }
 
   void Button::onLoseMouseFocus() {
     _hover = false;
-    contentChanged();
+    notifyChange(ChangeNotificationType::Content);
   }
 }

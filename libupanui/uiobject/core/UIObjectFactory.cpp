@@ -25,14 +25,9 @@
 #include <RoundCanvas.h>
 #include <ImageCanvas.h>
 #include <Line.h>
+#include <CloseIconButton.h>
 
 namespace upanui {
-  Button& UIObjectFactory::createButton(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
-    auto& button = *new Button(x, y, width, height);
-    parent.add(button);
-    return button;
-  }
-
   RectangleCanvas& UIObjectFactory::createRectangleCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
     auto& canvas = *new RectangleCanvas(x, y, width, height);
     parent.add(canvas);
@@ -55,5 +50,18 @@ namespace upanui {
     auto& line = *new Line(x1, y1, x2, y2, thickness);
     parent.add(line);
     return line;
+  }
+
+  Button& UIObjectFactory::createButton(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
+    auto& button = *new Button(x, y, width, height);
+    parent.add(button);
+    return button;
+  }
+
+  CloseIconButton& UIObjectFactory::createCloseIconButton(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
+    auto& button = *new CloseIconButton(x, y, width, height);
+    parent.add(button);
+    button.init();
+    return button;
   }
 }
