@@ -26,4 +26,8 @@ namespace upan {
   template <typename T> T&& move(T& t) {
     return static_cast<T&&>(t);
   }
+
+  template <typename T> void swap(T& a, T& b) {
+    __asm__ __volatile__ ("xchgl %0, %1" : "=r" ( b ) : "m"( a ), "0" (b) : "memory" );
+  }
 }

@@ -23,6 +23,7 @@
 #include <Line.h>
 #include "GCoreFunctions.h"
 #include <math.h>
+#include <utility.h>
 
 namespace upanui {
   Line::Line(const int x1, const int y1, const int x2, const int y2, const uint32_t thickness)
@@ -197,8 +198,7 @@ namespace upanui {
   }
 
   void Line::drawHorizontalLine(const uint32_t rawColor, const uint32_t alpha) {
-    const auto endY = _spec.sy() + thickness();
-    for(auto py = _spec.sy(); py < endY; ++py) {
+    for(auto py = _spec.sy(); py < _spec.psy(); ++py) {
       for (auto x = _spec.sx(); x <= _spec.ex(); ++x) {
         plot(x, py, rawColor, alpha);
       }
@@ -206,8 +206,7 @@ namespace upanui {
   }
 
   void Line::drawVerticalLine(const uint32_t rawColor, const uint32_t alpha) {
-    const auto endX = _spec.sx() + thickness();
-    for(auto px = _spec.sx(); px < endX; ++px) {
+    for(auto px = _spec.sx(); px < _spec.psx(); ++px) {
       for (auto y = _spec.sy(); y <= _spec.ey(); ++y) {
         plot(px, y, rawColor, alpha);
       }
@@ -263,23 +262,23 @@ namespace upanui {
     if (thickness > 1) {
       if (dy == 0) { // horizontal line
         _psx = _sx;
-        _psy = _sy + thickness;
+        _psy = _sy + (x1 < x2 ? thickness : -thickness);
       } else if (dx == 0) { // vertical line
-        _psx = _sx + thickness;
+        _psx = _sx + (y1 > y2 ? thickness : -thickness);
         _psy = _sy;
       } else {
         const float m_inv = float(dx) / float(dy);
         const float r = sqrt(1 + m_inv * m_inv);
+
+        const int ssign = m_inv < 0.0 ? -1 : 1;
+        const int xsign = x1 < x2 ? -ssign : ssign;
+        const int ysign = x1 < x2 ? 1 : -1;
+        // Thickness is extended to the right of line from start-to-end as specified by original x & y
         // adjacent / hypotenuse = cos(theta) = 1 / sqrt(1 + tan^2(theta) = psx - sx / t = 1 / r = psx = sx + t / r
-        const int sign_inv = m_inv < 0.0 ? 1 : -1;
-        //low slope --> px can be either to the left of or right of sx but py is always larger than sy
-        if (dy < dx) { // line with low slope
-          _psx = _sx + int(sign_inv * float(thickness) / r);
-          _psy = _sy + int(float(thickness) * fabs(m_inv) / r);
-        } else { // line with high slope
-          _psx = _sx + int(float(thickness) / r);
-          _psy = _sy + int(sign_inv * float(thickness) * fabs(m_inv) / r);
-        }
+        // low slope --> px can be either to the left of or right of sx but py is always larger than sy
+        // ex: 10 - 2.6 and 10 + 2.6 --> 8 and 12 --> so truncate float before adding to 10
+        _psx = _sx + xsign * int(float(thickness) / r);
+        _psy = _sy + ysign * int(float(thickness) * fabs(m_inv) / r);
       }
     }
 
@@ -288,15 +287,26 @@ namespace upanui {
     _pex = _ex + pdx;
     _pey = _ey + pdy;
 
+    bool swapSP = false;
     if (dy == 0 || dx == 0) {
       _m = 0;
       _pm = 0;
+      swapSP = _sx > _psx || _sy > _psy;
     } else if (dy < dx) {
       _m = float(dy) / float(dx);
       _pm = float(pdx) / float(pdy);
+      swapSP = _sy > _psy;
     } else {
       _m = float(dx) / float(dy);
       _pm = float(pdy) / float(pdx);
+      swapSP = _sx > _psx;
+    }
+
+    if (swapSP) {
+      upan::swap(_sx, _psx);
+      upan::swap(_sy, _psy);
+      upan::swap(_ex, _pex);
+      upan::swap(_ey, _pey);
     }
   }
 }
