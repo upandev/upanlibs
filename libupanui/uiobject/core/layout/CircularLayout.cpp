@@ -6,10 +6,36 @@
 
 namespace upanui {
   Layout::BoundaryCheckResult CircularLayout::checkBoundary(UIObject &child) {
-    return Layout::Outside;
+    const auto cx1 = child.x();
+    const auto cy1 = child.y();
+    const auto cx2 = cx1 + child.width() - 1;
+    const auto cy2 = cy1 + child.height() - 1;
+
+    const auto outerRadius = (parent().width() / 2) - 1;
+    const auto innerRadius = outerRadius - parent().borderThickness();
+
+    const int cx = parent().width() / 2 - 1;
+    const int cy = cx;
+
+    const int dx1 = cx - cx1;
+    const int dy1 = cy - cy1;
+    const int d1 = sqrt(dx1 * dx1 + dy1 * dy1);
+
+    if (d1 <= innerRadius) {
+      const int dx2 = cx - cx2;
+      const int dy2 = cy - cy2;
+      const int d2 = sqrt(dx2 * dx2 + dy2 * dy2);
+      if (d2 <= innerRadius) {
+        return BoundaryCheckResult::Inside;
+      }
+    }
+
+    //TODO: support for PartiallyInside scenario
+    return BoundaryCheckResult::Outside;
   }
 
   void CircularLayout::draw(UIObject& child) {
+    // only support child objects that's Inside parent
   }
 
   void CircularLayout::plotLine(int x, int y, int r, int shift, uint32_t color) {

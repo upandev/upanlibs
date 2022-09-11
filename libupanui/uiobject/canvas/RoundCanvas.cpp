@@ -27,7 +27,7 @@
 
 namespace upanui {
   RoundCanvas::RoundCanvas(const int x, const int y, const uint32_t width, const uint32_t height)
-  : Canvas(x, y, (width & 1 ? width + 1 : width + 2), (height & 1 ? height + 1 : height + 2)), _layout(*this) {
+  : Canvas(x, y, (width & 1 ? width + 1 : width), (height & 1 ? height + 1 : height)), _layout(*this) {
   }
 
   bool RoundCanvas::needLocalDrawBuffer() {
