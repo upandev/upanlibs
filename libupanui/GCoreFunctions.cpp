@@ -36,7 +36,8 @@ namespace upanui {
       pixel = color;
     } else {
       const uint32_t ia = (color >> 24) & 0xFF;
-      if (ia == 100) {
+      const uint32_t oa = (pixel >> 24) & 0xFF;
+      if (ia == 100 || oa == 0) {
         pixel = color;
       } else if (ia > 0) {
         const uint32_t ir = (color >> 16) & 0xFF;
