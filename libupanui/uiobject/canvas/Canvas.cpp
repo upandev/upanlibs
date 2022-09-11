@@ -30,7 +30,7 @@ namespace upanui {
   }
 
   void Canvas::draw() {
-    if (backgroundColorAlpha() != 100) {
+    if (backgroundColorAlpha() != 100 || (borderThickness() > 0 && borderColorAlpha() != 100)) {
       parent().draw();
     } else {
       drawTopDown();
