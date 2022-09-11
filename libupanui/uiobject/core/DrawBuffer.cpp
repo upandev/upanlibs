@@ -115,4 +115,8 @@ namespace upanui {
       }
     }
   }
+
+  void DrawBuffer::fill(uint32_t color) {
+    fill(0, 0, _width, _height, color);
+  }
 }

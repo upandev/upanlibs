@@ -82,6 +82,9 @@ namespace upanui {
   void RectangularLayout::fill() {
     const auto alpha = parent().backgroundColorAlpha();
     if (alpha == 0 && parent().borderThickness() == 0) {
+      if (parent().drawBuffer().isLocal()) {
+        parent().drawBuffer().fill(0);
+      }
       return;
     }
 
