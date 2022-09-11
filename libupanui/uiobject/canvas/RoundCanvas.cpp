@@ -34,6 +34,12 @@ namespace upanui {
     return (backgroundColorAlpha() != 100 || (borderThickness() > 0 && borderColorAlpha() != 100));
   }
 
+  // because the circumference of the circle must alpha blend with parent layout/background always - we need to redraw the parent
+  // otherwise, there will be multiple re-application of alpha blending on every redraw of circle - leading to lose of smooth circumference
+  void RoundCanvas::draw() {
+    parent().draw();
+  }
+
   bool RoundCanvas::intersect(int x, int y) const {
     const auto bgAlpha = backgroundColorAlpha();
     const auto brAlpha = borderColorAlpha();

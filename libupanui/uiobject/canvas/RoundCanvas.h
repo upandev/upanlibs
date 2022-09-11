@@ -35,6 +35,7 @@ namespace upanui {
 
   protected:
     void doDraw() override;
+    void draw() override;
 
     Layout& layout() override {
       return _layout;
