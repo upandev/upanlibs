@@ -26,6 +26,7 @@
 #include <ImageCanvas.h>
 #include <Line.h>
 #include <CloseIconButton.h>
+#include <Label.h>
 
 namespace upanui {
   RectangleCanvas& UIObjectFactory::createRectangleCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
@@ -63,5 +64,15 @@ namespace upanui {
     parent.add(button);
     button.init();
     return button;
+  }
+
+  Label& UIObjectFactory::createLabel(UIObject& parent, const int x, const int y,
+                                      const uint32_t width, const uint32_t height,
+                                      const upan::string& str, uint32_t fgColor,
+                                      usfn::PreloadedFonts fontType,
+                                      int fontFamily, int fontStyle, int fontSize) {
+    auto& label = *new Label(x, y, width, height, str, fgColor, fontType, fontFamily, fontStyle, fontSize);
+    parent.add(label);
+    return label;
   }
 }

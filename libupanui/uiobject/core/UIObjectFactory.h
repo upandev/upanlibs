@@ -22,6 +22,8 @@
 #pragma once
 
 #include <stdint.h>
+#include <ustring.h>
+#include <usfntypes.h>
 
 namespace upanui {
   class UIObject;
@@ -30,6 +32,7 @@ namespace upanui {
   class ImageCanvas;
   class Image;
   class Line;
+  class Label;
 
   class Button;
   class CloseIconButton;
@@ -43,5 +46,11 @@ namespace upanui {
 
     static Button& createButton(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height);
     static CloseIconButton& createCloseIconButton(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height);
+
+    static Label& createLabel(UIObject& parent, const int x, const int y,
+                              const uint32_t width, const uint32_t height,
+                              const upan::string& str, uint32_t fgColor,
+                              usfn::PreloadedFonts fontType,
+                              int fontFamily, int fontStyle, int fontSize);
   };
 }
