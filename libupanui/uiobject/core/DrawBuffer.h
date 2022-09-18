@@ -32,7 +32,7 @@ namespace upanui {
     ~DrawBuffer();
 
     void clear();
-    void initFrom(const DrawBuffer& parent, const int xOffset, const int yOffset);
+    void initFrom(const DrawBuffer& parent, const int xOffset, const int yOffset, const uint32_t visualWidth, const uint32_t visualHeight);
     void initFrom(uint32_t* buffer, const uint32_t width, const uint32_t height);
     void initLocal(const uint32_t width, const uint32_t height);
     void initLocal(const FrameBuffer& frameBuffer);
@@ -48,7 +48,7 @@ namespace upanui {
     uint32_t& at(int offset)  const;
 
     void copy(const void* src, int len);
-    void copy(uint32_t* src, uint32_t width, uint32_t height);
+    void copy(uint32_t* src, uint32_t width, uint32_t height, bool directSet);
     void fill(int sx, int sy, uint32_t width, uint32_t height, uint32_t color);
     void fill(uint32_t color);
 
@@ -58,5 +58,7 @@ namespace upanui {
     uint32_t* _buffer;
     uint32_t _width;
     uint32_t _height;
+    uint32_t _vWidth;
+    uint32_t _vHeight;
   };
 }

@@ -23,10 +23,11 @@
 #include <FrameBuffer.h>
 #include <string.h>
 #include <mosstd.h>
+#include <GCoreFunctions.h>
 #include "algorithm.h"
 
 namespace upanui {
-  DrawBuffer::DrawBuffer() : _type(BufferType::Null), _buffer(nullptr), _width(0), _height(0) {
+  DrawBuffer::DrawBuffer() : _type(BufferType::Null), _buffer(nullptr), _width(0), _height(0), _vWidth(0), _vHeight(0) {
   }
 
   DrawBuffer::~DrawBuffer() {
@@ -38,24 +39,26 @@ namespace upanui {
       delete _buffer;
     }
     _buffer = nullptr;
-    _width = 0;
-    _height = 0;
+    _width = _vWidth = 0;
+    _height = _vHeight = 0;
     _type = BufferType::Null;
   }
 
-  void DrawBuffer::initFrom(const DrawBuffer& parent, const int xOffset, const int yOffset) {
+  void DrawBuffer::initFrom(const DrawBuffer& parent, const int xOffset, const int yOffset, const uint32_t visualWidth, const uint32_t visualHeight) {
     clear();
     _buffer = parent.buffer() + xOffset + yOffset * parent.width();
     _width = parent.width();
     _height = parent.height();
+    _vWidth = visualWidth;
+    _vHeight = visualHeight;
     _type = BufferType::Derived;
   }
 
   void DrawBuffer::initFrom(uint32_t* buffer, const uint32_t width, const uint32_t height) {
     clear();
     _buffer = buffer;
-    _width = width;
-    _height = height;
+    _width = _vWidth = width;
+    _height = _vHeight = height;
     _type = BufferType::Derived;
   }
 
@@ -66,8 +69,8 @@ namespace upanui {
       return;
     }
     clear();
-    _width = width;
-    _height = height;
+    _width = _vWidth = width;
+    _height = _vHeight = height;
     _buffer = new uint32_t[bufSize];
     _type = BufferType::Local;
     memset(_buffer, 0, bufSize * sizeof(uint32_t));
@@ -75,8 +78,8 @@ namespace upanui {
 
   void DrawBuffer::initLocal(const FrameBuffer& parent) {
     clear();
-    _width = parent.width();
-    _height = parent.height();
+    _width = _vWidth = parent.width();
+    _height = _vHeight = parent.height();
     _buffer = parent.buffer();
     _type = BufferType::ForceLocal;
   }
@@ -93,21 +96,21 @@ namespace upanui {
     optimized_memcpy((uint32_t)buffer(), (uint32_t)src, len);
   }
 
-  void DrawBuffer::copy(uint32_t* src, uint32_t width, uint32_t height) {
-    const int ex = upan::min(_width, width) - 1;
-    const int ey = upan::min(_height, height) - 1;
+  void DrawBuffer::copy(uint32_t* src, uint32_t width, uint32_t height, bool directSet) {
+    const int ex = upan::min(_vWidth, width) - 1;
+    const int ey = upan::min(_vHeight, height) - 1;
     for(auto y = 0; y <= ey; ++y) {
       auto yDestOffset = y * _width;
       auto ySrcOffset = y * width;
       for(auto x = 0; x <= ex; ++x) {
-        _buffer[x + yDestOffset] = src[x + ySrcOffset];
+        GCoreFunctions::setPixel(_buffer[x + yDestOffset], src[x + ySrcOffset], directSet);
       }
     }
   }
 
   void DrawBuffer::fill(int sx, int sy, uint32_t width, uint32_t height, uint32_t color) {
-    const int ex = upan::min(_width, sx + width) - 1;
-    const int ey = upan::min(_height, sy + height) - 1;
+    const int ex = upan::min(_vWidth, sx + width) - 1;
+    const int ey = upan::min(_vHeight, sy + height) - 1;
     for(auto y = sy; y <= ey; ++y) {
       auto yOffset = y * _width;
       for(auto x = sx; x <= ex; ++x) {
@@ -117,6 +120,6 @@ namespace upanui {
   }
 
   void DrawBuffer::fill(uint32_t color) {
-    fill(0, 0, _width, _height, color);
+    fill(0, 0, _vWidth, _vHeight, color);
   }
 }

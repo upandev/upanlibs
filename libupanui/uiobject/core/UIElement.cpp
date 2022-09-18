@@ -61,7 +61,7 @@ namespace upanui {
       } else if (boundaryCheckResult == Layout::Inside) {
         const auto cx = x() + parent().borderThickness();
         const auto cy = y() + parent().borderThickness();
-        _drawBuffer.initFrom(parent().drawBuffer(), cx, cy);
+        _drawBuffer.initFrom(parent().drawBuffer(), cx, cy, width(), height());
       } else if (boundaryCheckResult == Layout::PartiallyInside) {
         _drawBuffer.initLocal(width(), height());
       } else {
