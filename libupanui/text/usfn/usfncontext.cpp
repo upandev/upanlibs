@@ -231,7 +231,70 @@ namespace upanui {
       dst.x += chr[4]; dst.y += chr[5];
     }
 
-    int Context::Render(FrameBuffer& dst, const char *str, bool fillBG) {
+    void Context::DrawText(const char *str, FrameBuffer& buf) {
+      CalculateTextBufferSize(str, buf);
+      const int bufSize = buf.w * buf.h * sizeof(uint32_t);
+      if (!bufSize) {
+        return;
+      }
+      buf.p = buf.w * sizeof(uint32_t);
+      buf.ptr = (uint8_t*)malloc(bufSize);
+      memset(buf.ptr, 0, bufSize);
+      //printf("\n%d,%d,%d,%d", buf.w, buf.h, buf.x, buf.y);
+      buf.x = 0;
+      int ret;
+      while((ret = RenderText(buf, str, false)) > 0)
+        str += ret;
+    }
+
+    void Context::CalculateTextBufferSize(const char *str, FrameBuffer& buf) {
+      int ret, f = 1, s;
+
+      if(!str) {
+        throw upan::exception(XLOC, "string can't be null");
+      }
+      buf.w = buf.h = buf.x = buf.y = 0;
+      while((ret = RenderText(buf, str, false))) {
+        if(ret < 0 || !_g) {
+          return;
+        }
+        if(f) {
+          f = 0;
+          buf.w = buf.x = _style & STYLE_RTL ? _g->p : _g->o;
+        }
+        if(_g->x) {
+          if(_g->a > buf.y) buf.y = _g->a;
+          if(_g->h > buf.h) buf.h = _g->h;
+          buf.w += _g->x;
+        } else {
+          if(buf.w < _g->p) buf.w = _g->p;
+          buf.h += _g->y ? _g->y : _g->h;
+        }
+        str += ret;
+      }
+      if(_g->x) {
+        buf.w += _style & STYLE_RTL ? _g->o : _g->p;
+      } else {
+        buf.x = buf.w / 2;
+        buf.y = 0;
+      }
+      s = (_style & STYLE_ABS_SIZE) || TYPE_FAMILY(_f->type) == FAMILY_MONOSPACE || !_f->baseline ? _size : _size * _f->height / _f->baseline;
+      buf.w = buf.w * s / _f->height;
+      buf.h = buf.h * s / _f->height;
+      buf.x = _style & STYLE_RTL ? buf.w : (buf.x * s / _f->height);
+      //printf("\nbaseline: %d, s: %d, h: %d, size = %d, x = %d", _f->baseline, s, _f->height, _size, buf.x);
+      buf.y = buf.y * s / _f->height;
+    }
+
+    static int alphaTo100(int a) {
+      return (100 * a) / 0xFF;
+    }
+
+    static int alphaToFF(int a) {
+      return (0xFF * a) / 100;
+    }
+
+    int Context::RenderText(FrameBuffer& dst, const char *str, bool fillBG) {
       Font **fl;
       uint8_t *ptr = NULL, *frg, *end, *tmp, color, ci = 0, cb = 0, cs;
       uint16_t r[640];
@@ -570,8 +633,11 @@ namespace upanui {
         cb = (h + 64) >> 6; uix = w > s ? w : s; uax = 0;
         n = _f->underline * h / _f->height;
         fR = (dst.fg >> 16) & 0xFF; fG = (dst.fg >> 8) & 0xFF; fB = (dst.fg >> 0) & 0xFF; fA = (dst.fg >> 24) & 0xFF;
+        //upanix uses alpha as a percent from 0 to 100 - so convert alpha to 0 to 0xFF range
+        fA = alphaToFF(fA);
         bR = (dst.bg >> 16) & 0xFF; bG = (dst.bg >> 8) & 0xFF; bB = (dst.bg >> 0) & 0xFF;
         Op = (uint32_t*)(dst.ptr + dst.p * (dst.y - oy) + ((dst.x - ox) << 2));
+
         for (y = 0; y < h && dst.y + y - oy < dst.h; y++, Op += dst.p >> 2) {
           if(dst.y + y - oy < 0) continue;
           y0 = (y << 8) * _g->h / h; Y0 = y0 >> 8; y1 = ((y + 1) << 8) * _g->h / h; Y1 = y1 >> 8; Ol = Op;
@@ -596,8 +662,11 @@ namespace upanui {
                   k = 256 - (xs & 0xFF); xs &= ~0xFF; if(k > x1 - x0) k = x1 - x0;
                   pc = k == 256 ? yp : (k * yp) >> 8;
                 } else
-                  if (xs >> 8 == X1) { k = x1 & 0xFF; pc = k == 256 ? yp : (k * yp) >> 8; }
-                  else pc = yp;
+                  if (xs >> 8 == X1) {
+                    k = x1 & 0xFF; pc = k == 256 ? yp : (k * yp) >> 8;
+                  } else {
+                    pc = yp;
+                  }
                   m += pc;
                   k = _g->data[X2 + (xs >> 8)];
                   if(k == 0xFF) {
@@ -619,8 +688,12 @@ namespace upanui {
             if(m) { sR /= m; sG /= m; sB /= m; sA /= m; }
             else { sR >>= 8; sG >>= 8; sB >>= 8; sA >>= 8; }
             if(sA > 15 || fillBG) {
-              *Ol = ((sA > 255 ? 255 : sA) << 24) | ((sR > 255 ? 255 : sR) << (16 - cs)) |
-                  ((sG > 255 ? 255 : sG) << 8) | ((sB > 255 ? 255 : sB) << cs);
+              if (sA > 255) sA = 255;
+              //upanix uses alpha as a percent from 0 to 100 - so convert alpha to 0 to 0xFF range
+              *Ol = (alphaTo100(sA) << 24) |
+                  ((sR > 255 ? 255 : sR) << (16 - cs)) |
+                  ((sG > 255 ? 255 : sG) << 8) |
+                  ((sB > 255 ? 255 : sB) << cs);
               if(y == n) {
                 if(uix > x) uix = x;
                 if(uax < x) uax = x;
@@ -644,7 +717,7 @@ namespace upanui {
               bB += ((fB - bB) * fA) >> 8;
               bG += ((fG - bG) * fA) >> 8;
               bR += ((fR - bR) * fA) >> 8;
-              *Ol = (fA << 24) | (bR << (16 - cs)) | (bG << 8) | (bB << cs);
+              *Ol = (alphaTo100(fA) << 24) | (bR << (16 - cs)) | (bG << 8) | (bB << cs);
             }
           }
         }
@@ -662,7 +735,7 @@ namespace upanui {
               bB += ((fB - bB) * fA) >> 8;
               bG += ((fG - bG) * fA) >> 8;
               bR += ((fR - bR) * fA) >> 8;
-              *Ol = (fA << 24) | (bR << (16 - cs)) | (bG << 8) | (bB << cs);
+              *Ol = (alphaTo100(fA) << 24) | (bR << (16 - cs)) | (bG << 8) | (bB << cs);
             }
           }
         }

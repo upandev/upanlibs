@@ -33,9 +33,11 @@ namespace upanui {
       void Load(const uint8_t* fontData);
       void Select(int family, const char *name, int style, int size);
       void RenderCharacter(FrameBuffer& dst, uint32_t unicode);
-      int Render(FrameBuffer& dst, const char *str, bool fillBG);
+      void DrawText(const char *str, FrameBuffer& buf);
+      int RenderText(FrameBuffer& dst, const char *str, bool fillBG);
 
     private:
+      void CalculateTextBufferSize(const char *str, FrameBuffer& buf);
       void AddLineToContour(int p, int h, int x, int y);
       void AddBezierCurveToContour(int p, int h, int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3, int l);
       uint8_t* ParseChar(const Font *font, const char *str, int *len, uint32_t *unicode);
