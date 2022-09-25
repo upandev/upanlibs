@@ -24,6 +24,7 @@
 #include <string.h>
 #include <mosstd.h>
 #include <GCoreFunctions.h>
+#include <exception.h>
 #include "algorithm.h"
 
 namespace upanui {
@@ -46,6 +47,9 @@ namespace upanui {
 
   void DrawBuffer::initFrom(const DrawBuffer& parent, const int xOffset, const int yOffset, const uint32_t visualWidth, const uint32_t visualHeight) {
     clear();
+    if (parent.isNull()) {
+      return;
+    }
     _buffer = parent.buffer() + xOffset + yOffset * parent.width();
     _width = parent.width();
     _height = parent.height();

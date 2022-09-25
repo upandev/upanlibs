@@ -112,9 +112,9 @@ namespace upanui {
 
     if (_modifiedUIObjects.size() == MAX_OBJECTS_UPDATE_QUEUE) {
       _modifiedUIObjects.clear();
-      _modifiedUIObjects.insert(&_rootCanvas);
+      _modifiedUIObjects.push_back(&_rootCanvas);
     } else {
-      _modifiedUIObjects.insert(&uiObject);
+      _modifiedUIObjects.push_back(&uiObject);
     }
   }
 
@@ -144,7 +144,11 @@ namespace upanui {
   }
 
   void UIObjectManager::AutoRefreshHandler::on_timer_trigger() {
-    _uiObjectManager.draw();
+    try {
+      _uiObjectManager.draw();
+    } catch (upan::exception &e) {
+      printf("\n ui drawing failed: %s", e.ErrorMsg().c_str());
+    }
   }
 
   void UIObjectManager::dispatch(const KeyboardEvent& event) {
