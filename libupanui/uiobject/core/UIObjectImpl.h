@@ -62,7 +62,7 @@ namespace upanui {
     void borderThickness(const uint32_t) override;
 
     UIObject& parent() const override;
-    const upan::set<UIObject*>& children() override;
+    const upan::list<UIObject*>& children() override;
 
     void add(UIObject& child) override;
     void remove() override;

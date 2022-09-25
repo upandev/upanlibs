@@ -31,6 +31,7 @@
 #include <UIObject.h>
 #include <uniq_ptr.h>
 #include <UIProxyParent.h>
+#include <list.h>
 
 namespace upanui {
   class UIRoot;
@@ -45,7 +46,7 @@ namespace upanui {
     UIObjectManager(UIRoot& rootCanvas, const bool autoRefresh);
 
     UIObject& parent(const UIObject& child) const;
-    const upan::set<UIObject*>& children(UIObject& parent);
+    const upan::list<UIObject*>& children(UIObject& parent);
     void add(UIObject& parent, UIObject& child);
     void remove(UIObject& child);
     void destroy(UIObject& parent);
@@ -75,7 +76,7 @@ namespace upanui {
     void dispatch(const MouseEvent& event);
 
   private:
-    typedef upan::map<UIObject*, upan::set<UIObject*>> ParentChildMap;
+    typedef upan::map<UIObject*, upan::list<UIObject*>> ParentChildMap;
     typedef upan::map<const UIObject*, UIObject*> ChildParentMap;
     ParentChildMap _parentChildMap;
     ChildParentMap _childParentMap;

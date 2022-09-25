@@ -70,7 +70,7 @@ namespace upanui {
     UIObject& parent() const override {
       throw upan::exception(XLOC, "No parent for UIProxyParent");
     }
-    const upan::set<UIObject*>& children() override {
+    const upan::list<UIObject*>& children() override {
       throw upan::exception(XLOC, "No child relationship tracked for UIProxyParent");
     }
 

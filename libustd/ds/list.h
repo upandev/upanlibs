@@ -68,6 +68,12 @@ class list
     reverse_iterator sorted_reverse_insert_desc(const T& v);
     void clear();
     T& operator[](int index) const;
+    template <typename LAMBDA>
+    void foreach(const LAMBDA& lambda) const {
+      for(auto i = begin(); i != end(); ++i) {
+        lambda(*i);
+      }
+    }
 
   private:
     bool pop(bool front);

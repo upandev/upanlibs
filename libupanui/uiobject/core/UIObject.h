@@ -26,6 +26,7 @@
 #include <usfncontext.h>
 #include <option.h>
 #include <set.h>
+#include <list.h>
 
 namespace upanui {
   class GraphicsContext;
@@ -75,7 +76,7 @@ namespace upanui {
     virtual void contentChanged() = 0;
 
     virtual UIObject& parent() const = 0;
-    virtual const upan::set<UIObject*>& children() = 0;
+    virtual const upan::list<UIObject*>& children() = 0;
 
     virtual void add(UIObject& child) = 0;
     virtual void remove() = 0;

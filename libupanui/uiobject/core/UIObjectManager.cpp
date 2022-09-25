@@ -33,7 +33,7 @@ namespace upanui {
       _autoRefreshHandler(*this) {
     _proxyParent.reset(new UIProxyParent());
     add(*_proxyParent, rootCanvas);
-    _parentChildMap.insert(ParentChildMap::value_type(&_rootCanvas, upan::set<UIObject*>()));
+    _parentChildMap.insert(ParentChildMap::value_type(&_rootCanvas, upan::list<UIObject*>()));
     if (autoRefresh) {
       _autoRefreshHandler.start();
       queueForRedraw(_rootCanvas);
@@ -55,7 +55,7 @@ namespace upanui {
     return *i->second;
   }
 
-  const upan::set<UIObject*>& UIObjectManager::children(UIObject& parent) {
+  const upan::list<UIObject*>& UIObjectManager::children(UIObject& parent) {
     upan::mutex_guard g(_uiObjectTreeMutex);
     return _parentChildMap[&parent];
   }
@@ -71,7 +71,7 @@ namespace upanui {
     if (i != _childParentMap.end()) {
       throw upan::exception(XLOC, "UIObject is already a child of another UIObject");
     }
-    _parentChildMap[&parent].insert(&child);
+    _parentChildMap[&parent].push_back(&child);
     _childParentMap[&child] = &parent;
   }
 

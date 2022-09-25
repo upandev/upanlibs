@@ -116,7 +116,7 @@ namespace upanui {
     return _gc.uiObjectManager().parent(*this);
   }
 
-  const upan::set<UIObject*>& UIObjectImpl::children() {
+  const upan::list<UIObject*>& UIObjectImpl::children() {
     return _gc.uiObjectManager().children(*this);
   }
 
