@@ -59,8 +59,8 @@ namespace upanui {
   private:
     //assuming 4 bytes per pixel
     upan::uniq_ptr<const uint32_t> _imageBuffer;
-    int _x;
-    int _y;
+    __volatile__ int _x;
+    __volatile__ int _y;
     uint32_t _width;
     uint32_t _height;
   };
