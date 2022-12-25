@@ -48,7 +48,7 @@ namespace upanui {
     x *= _xCharScale;
     y *= _yCharScale;
     auto& drawBuffer = parent.drawBuffer();
-    if((y + _yCharScale) >= drawBuffer.height() || (x + _xCharScale) >= drawBuffer.width())
+    if(y >= drawBuffer.height() || (x + _xCharScale) >= drawBuffer.width())
       return;
     const byte* font_data = GraphicsFont::Get(ch);
     bool yr = false;
