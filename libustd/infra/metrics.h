@@ -5,56 +5,66 @@
  *  I am making my contributions/submissions to this project solely in
  *  my personal capacity and am not conveying any rights to any
  *  intellectual property of any third parties.
- *                                                                          
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *                                                                          
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *                                                                          
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-# include <dtime.h>
-# include <syscalldefs.h>
 
-time_t time(time_t * t)
-{
-	time_t result;
-	struct timeval tv;
+#pragma once
 
-	if (gettimeofday(&tv) ) //, (struct timezone *) NULL)) 
-	{
-		result = (time_t) - 1;
-	}
-   	else
-   	{
-		result = (time_t) tv.tSec;
-	}
+#include <map.h>
+#include <ustring.h>
+#include <atomicop.h>
+#include <mutex.h>
 
-	if (t != NULL) 
-	{
-		*t = result;
-	}
-	return result;
-}
+namespace upan {
+  class metrics {
+  private:
+    static metrics* _instance;
 
-clock_t clock()
-{
-	//stub
-	return 0 ;
-}
+  public:
+    class stats {
+    public:
+      stats();
 
-int gettimeofday(struct timeval* pTV)
-{
-  return SysUtil_GetTimeOfDay(pTV) ;
-}
+      void start();
+      void end();
 
-//in milliseconds
-uint32_t btime() {
-  return SysUtil_GetTimeSinceBoot();
+      uint32_t count();
+      uint32_t sum();
+      double avg();
+
+    private:
+      uint32_t _tick;
+      uint32_t _count;
+      uint32_t _sum;
+    };
+
+  public:
+    static void create();
+    static metrics& instance();
+
+    stats& get(const string& name);
+    void remove(const string& name);
+
+    uint32_t count(const string& name);
+    double avg(const string& name);
+
+  private:
+    typedef map<int, stats> STAT_MAP;
+    typedef map<string, STAT_MAP> STAT_PID_MAP;
+
+    STAT_PID_MAP _stats;
+    mutex _mutexStats;
+  };
 }
