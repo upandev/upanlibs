@@ -23,6 +23,7 @@
 
 #include <Layout.h>
 #include <stdlib.h>
+#include <GCoreFunctions.h>
 
 namespace upanui {
   class CircularLayout : public Layout {
@@ -31,9 +32,10 @@ namespace upanui {
     BoundaryCheckResult checkBoundary(UIObject& child) override;
     void draw(UIObject& child) override;
     void fill() override;
+
   private:
-    void plotLine(int x, int y, int r, int shift, uint32_t color);
-    void plotPixel(int x, int y, int r, int shift, uint32_t color, bool directSet);
+    void plotLine(int x, int y, int r, int shift, uint32_t color, GCoreFunctions::PixelCache& pixelCache);
+    void plotPixel(int x, int y, int r, int shift, uint32_t color, GCoreFunctions::PixelCache& pixelCache, bool directSet);
     void fill(uint32_t alpha, uint32_t color, int shift, int r);
   };
 }

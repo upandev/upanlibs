@@ -67,7 +67,7 @@ namespace upanui {
     if (ax < 0 || ay < 0 || ax >= drawBuf.width() || ay >= drawBuf.height()) {
       return;
     }
-    GCoreFunctions::setPixel(drawBuf.at(ax, ay), color | (alpha << 24), drawBuf.isLocal());
+    GCoreFunctions::setPixel(drawBuf.at(ax, ay), color | (alpha << 24), _pixelCache, drawBuf.isLocal());
   }
 
   void Line::drawLineWithLowSlope(const uint32_t rawColor, const uint32_t alpha) {

@@ -23,6 +23,7 @@
 #pragma once
 
 #include <UILeafElement.h>
+#include <GCoreFunctions.h>
 
 namespace upanui {
   class Line : public UILeafElement {
@@ -86,6 +87,7 @@ namespace upanui {
     int _y2;
     uint32_t _thickness;
     Spec _spec;
+    GCoreFunctions::PixelCache _pixelCache;
 
     friend class UIObjectFactory;
   };

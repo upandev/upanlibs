@@ -69,12 +69,12 @@ namespace upanui {
     const int h = (child.height() - sy1) <= (pheight - dy1) ? child.height() - sy1 : pheight - dy1;
 
     //printf("\n%d, %d, %d, %d, %d, %d, %d, %d, %d\n", srcX1, srcY1, destX1, destY1, w, h, srcXOffset, destXOffset, copyWidth);
-
+    GCoreFunctions::PixelCache pixelCache;
     for(int y = 0; y < h; ++y) {
       int srcOffet = sx1 + (sy1 + y) * childDrawBuffer.width();
       int destOffset = dx1 + (dy1 + y) * parentDrawBuffer.width();
       for(int x = 0; x < w; ++x) {
-        GCoreFunctions::setPixel(parentDrawBuffer.at(x + destOffset), childDrawBuffer.at(x + srcOffet), false);
+        GCoreFunctions::setPixel(parentDrawBuffer.at(x + destOffset), childDrawBuffer.at(x + srcOffet), pixelCache, false);
       }
     }
   }
@@ -91,22 +91,23 @@ namespace upanui {
     const auto& drawBuffer = parent().drawBuffer();
     const auto bgColor = (parent().backgroundColorForDraw() & ~GCoreFunctions::ALPHA_MASK) | (alpha << 24);
     const auto brColor = (parent().borderColor() & ~GCoreFunctions::ALPHA_MASK) | (parent().borderColorAlpha() << 24);
+    GCoreFunctions::PixelCache pixelCache;
 
     for(auto y = 0u; y < parent().height(); ++y) {
       auto yOffset = y * drawBuffer.width();
       if (y < parent().borderThickness() || (parent().height() - y) <= parent().borderThickness()) {
         for(auto x = 0u; x < parent().width(); ++x) {
-          GCoreFunctions::setPixel(drawBuffer.at(x + yOffset), brColor, drawBuffer.isLocal());
+          GCoreFunctions::setPixel(drawBuffer.at(x + yOffset), brColor, pixelCache, drawBuffer.isLocal());
         }
       } else {
         for(auto x = 0u; x < parent().borderThickness(); ++x) {
-          GCoreFunctions::setPixel(drawBuffer.at(x + yOffset), brColor, drawBuffer.isLocal());
+          GCoreFunctions::setPixel(drawBuffer.at(x + yOffset), brColor, pixelCache, drawBuffer.isLocal());
         }
         for(auto x = parent().borderThickness(); x < parent().width() - parent().borderThickness(); ++x) {
-          GCoreFunctions::setPixel(drawBuffer.at(x + yOffset), bgColor, drawBuffer.isLocal());
+          GCoreFunctions::setPixel(drawBuffer.at(x + yOffset), bgColor, pixelCache, drawBuffer.isLocal());
         }
         for(auto x = (parent().width() - parent().borderThickness()); x < parent().width(); ++x) {
-          GCoreFunctions::setPixel(drawBuffer.at(x + yOffset), brColor, drawBuffer.isLocal());
+          GCoreFunctions::setPixel(drawBuffer.at(x + yOffset), brColor, pixelCache, drawBuffer.isLocal());
         }
       }
     }

@@ -101,13 +101,14 @@ namespace upanui {
   }
 
   void DrawBuffer::copy(uint32_t* src, uint32_t width, uint32_t height, bool directSet) {
+    GCoreFunctions::PixelCache pixelCache;
     const int ex = upan::min(_vWidth, width) - 1;
     const int ey = upan::min(_vHeight, height) - 1;
     for(auto y = 0; y <= ey; ++y) {
       auto yDestOffset = y * _width;
       auto ySrcOffset = y * width;
       for(auto x = 0; x <= ex; ++x) {
-        GCoreFunctions::setPixel(_buffer[x + yDestOffset], src[x + ySrcOffset], directSet);
+        GCoreFunctions::setPixel(_buffer[x + yDestOffset], src[x + ySrcOffset], pixelCache, directSet);
       }
     }
   }

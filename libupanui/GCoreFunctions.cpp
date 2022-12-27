@@ -31,7 +31,7 @@ namespace upanui {
     return ai < bi ? -1 : ai > bi ? 1 : 0;
   }
 
-  void GCoreFunctions::setPixel(uint32_t& pixel, uint32_t color, bool isDirectSet) {
+  void GCoreFunctions::setPixel(uint32_t& pixel, uint32_t color, PixelCache& pixelCache, bool isDirectSet) {
     if (isDirectSet) {
       pixel = color;
     } else {
@@ -40,21 +40,28 @@ namespace upanui {
       if (ia == 100 || oa == 0) {
         pixel = color;
       } else if (ia > 0) {
-        const uint32_t ir = (color >> 16) & 0xFF;
-        const uint32_t ig = (color >> 8) & 0xFF;
-        const uint32_t ib = color & 0xFF;
+        if (pixelCache._cDest == pixel && pixelCache._cSrc == color) {
+          pixel = pixelCache._cRes;
+        } else {
+          pixelCache._cDest = pixel;
+          pixelCache._cSrc = color;
+          const uint32_t ir = (color >> 16) & 0xFF;
+          const uint32_t ig = (color >> 8) & 0xFF;
+          const uint32_t ib = color & 0xFF;
 
-        const uint32_t cb = pixel & 0xFF;
-        const uint32_t cg = (pixel >> 8) & 0xFF;
-        const uint32_t cr = (pixel >> 16) & 0xFF;
-        const uint32_t ca = (pixel >> 24) & 0xFF;
+          const uint32_t cb = pixel & 0xFF;
+          const uint32_t cg = (pixel >> 8) & 0xFF;
+          const uint32_t cr = (pixel >> 16) & 0xFF;
+          const uint32_t ca = (pixel >> 24) & 0xFF;
 
-        const uint32_t caf = (100 - ia);
+          const uint32_t caf = (100 - ia);
 
-        pixel = (uint8_t) upan::min((100 * ia + ca * caf) / 100, 100u) << 24
-                | (uint8_t) upan::min((ir * ia + cr * caf) / 100, 0xFFu) << 16
-                | (uint8_t) upan::min((ig * ia + cg * caf) / 100, 0xFFu) << 8
-                | (uint8_t) upan::min((ib * ia + cb * caf) / 100, 0xFFu);
+          pixel = (uint8_t) upan::min((100 * ia + ca * caf) / 100, 100u) << 24
+                  | (uint8_t) upan::min((ir * ia + cr * caf) / 100, 0xFFu) << 16
+                  | (uint8_t) upan::min((ig * ia + cg * caf) / 100, 0xFFu) << 8
+                  | (uint8_t) upan::min((ib * ia + cb * caf) / 100, 0xFFu);
+          pixelCache._cRes = pixel;
+        }
       }
     }
   }
