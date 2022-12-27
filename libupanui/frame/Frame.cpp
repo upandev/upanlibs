@@ -42,7 +42,6 @@ namespace upanui {
       viewportInfo._width = width;
       viewportInfo._height = height;
       set_viewport(&viewportInfo);
-      touch();
     }
   }
 }
