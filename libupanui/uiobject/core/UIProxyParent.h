@@ -81,6 +81,10 @@ namespace upanui {
     void remove() override {}
     void redraw() override {}
 
+    bool hasAlpha() override {
+      throw upan::exception(XLOC, "unsupported hasAlpha for UIProxyParent");
+    }
+
     upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) override {
       throw upan::exception(XLOC, "unsupported uiObjectUnderCursor for UIProxyParent");
     }

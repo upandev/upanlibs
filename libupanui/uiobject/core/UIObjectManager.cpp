@@ -30,7 +30,7 @@ namespace upanui {
     : _rootCanvas(rootCanvas),
       _focusedUIObject(rootCanvas),
       _mouseFocusedObject(upan::option<UIObject&>::empty()),
-      _autoRefreshHandler(*this) {
+      _autoRefreshHandler(*this), _hasAlpha(false), _recalcHasAlpha(true) {
     _proxyParent.reset(new UIProxyParent());
     add(*_proxyParent, rootCanvas);
     _parentChildMap.insert(ParentChildMap::value_type(&_rootCanvas, upan::list<UIObject*>()));
@@ -136,6 +136,10 @@ namespace upanui {
       modifiedUIObjects[i]->draw();
     }
     if (count > 0) {
+      if (_recalcHasAlpha) {
+        GraphicsContext::Instance().frame().hasAlpha(_rootCanvas.hasAlpha());
+        _recalcHasAlpha = false;
+      }
       GraphicsContext::Instance().frame().touch();
     }
   }

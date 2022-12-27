@@ -30,6 +30,10 @@ namespace upanui {
     gui_frame_touch();
   }
 
+  void Frame::hasAlpha(bool hasAlpha) {
+    gui_frame_has_alpha(hasAlpha);
+  }
+
   void Frame::updateViewport(int x, int y, uint32_t width, uint32_t height) {
     if (BaseFrame::_updateViewport(x, y, width, height)) {
       ViewportInfo viewportInfo;

@@ -32,7 +32,7 @@ namespace upanui {
   }
 
   void UILeafElement::draw() {
-    if (backgroundColorAlpha() != 100) {
+    if (backgroundColorAlpha() != GCoreFunctions::MAX_ALPHA) {
       parent().draw();
     } else {
       drawTopDown();

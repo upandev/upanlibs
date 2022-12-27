@@ -72,6 +72,10 @@ namespace upanui {
       return _focusedUIObject;
     }
 
+    void recalcHasAlpha() {
+      _recalcHasAlpha = true;
+    }
+
     void dispatch(const KeyboardEvent& event);
     void dispatch(const MouseEvent& event);
 
@@ -91,6 +95,9 @@ namespace upanui {
     upan::list<UIObject*> _modifiedUIObjects;
     AutoRefreshHandler _autoRefreshHandler;
     upan::uniq_ptr<UIProxyParent> _proxyParent;
+
+    bool _hasAlpha;
+    bool _recalcHasAlpha;
 
     friend class GraphicsContext;
     friend class UIObjectImpl;

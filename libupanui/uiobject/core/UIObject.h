@@ -82,6 +82,7 @@ namespace upanui {
     virtual void remove() = 0;
     virtual void redraw() = 0;
 
+    virtual bool hasAlpha() = 0;
     virtual upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) = 0;
 
     virtual Layout& layout() = 0;

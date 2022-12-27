@@ -31,7 +31,8 @@ namespace upanui {
   }
 
   bool RoundCanvas::needLocalDrawBuffer() {
-    return (backgroundColorAlpha() != 100 || (borderThickness() > 0 && borderColorAlpha() != 100));
+    return (backgroundColorAlpha() != GCoreFunctions::MAX_ALPHA
+    || (borderThickness() > 0 && borderColorAlpha() != GCoreFunctions::MAX_ALPHA));
   }
 
   // because the circumference of the circle must alpha blend with parent layout/background always - we need to redraw the parent

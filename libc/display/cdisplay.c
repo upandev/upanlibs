@@ -45,6 +45,10 @@ void gui_frame_touch() {
   SysDisplay_FrameTouch();
 }
 
+void gui_frame_has_alpha(bool hasAlpha) {
+  SysDisplay_FrameHasAlpha(hasAlpha);
+}
+
 void init_term_console() {
   SysDisplay_InitTermConsole();
 }

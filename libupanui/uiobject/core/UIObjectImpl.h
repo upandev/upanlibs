@@ -76,6 +76,7 @@ namespace upanui {
       _mouseEventHandler = upan::option<MouseEventHandler&>(handler);
     }
 
+    bool hasAlpha() override;
     upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) override;
 
   protected:

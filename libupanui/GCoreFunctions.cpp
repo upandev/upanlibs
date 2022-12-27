@@ -38,7 +38,7 @@ namespace upanui {
       const uint32_t ia = (color >> 24) & 0xFF;
       const uint32_t oa = (pixel >> 24) & 0xFF;
       if (ia > 0) {
-        if (ia == 100 || oa == 0) {
+        if (ia == MAX_ALPHA || oa == 0) {
           pixel = color;
         } else {
           if (pixelCache._cDest == pixel && pixelCache._cSrc == color) {
@@ -55,12 +55,12 @@ namespace upanui {
             const uint32_t cr = (pixel >> 16) & 0xFF;
             const uint32_t ca = (pixel >> 24) & 0xFF;
 
-            const uint32_t caf = (100 - ia);
+            const uint32_t caf = (MAX_ALPHA - ia);
 
-            pixel = (uint8_t) upan::min((100 * ia + ca * caf) / 100, 100u) << 24
-                    | (uint8_t) upan::min((ir * ia + cr * caf) / 100, 0xFFu) << 16
-                    | (uint8_t) upan::min((ig * ia + cg * caf) / 100, 0xFFu) << 8
-                    | (uint8_t) upan::min((ib * ia + cb * caf) / 100, 0xFFu);
+            pixel = (uint8_t) upan::min((MAX_ALPHA * ia + ca * caf) / MAX_ALPHA, 100u) << 24
+                    | (uint8_t) upan::min((ir * ia + cr * caf) / MAX_ALPHA, 0xFFu) << 16
+                    | (uint8_t) upan::min((ig * ia + cg * caf) / MAX_ALPHA, 0xFFu) << 8
+                    | (uint8_t) upan::min((ib * ia + cb * caf) / MAX_ALPHA, 0xFFu);
             pixelCache._cRes = pixel;
           }
         }

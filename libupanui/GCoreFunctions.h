@@ -26,7 +26,8 @@
 namespace upanui {
   class GCoreFunctions {
   public:
-    static constexpr uint32_t ALPHA_MASK = (100 << 24);
+    static constexpr uint32_t MAX_ALPHA = 100;
+    static constexpr uint32_t ALPHA_MASK = (MAX_ALPHA << 24);
 
     class PixelCache {
     public:

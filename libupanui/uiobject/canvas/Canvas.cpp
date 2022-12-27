@@ -23,6 +23,7 @@
 #include <Canvas.h>
 #include <GraphicsContext.h>
 #include <Layout.h>
+#include <GCoreFunctions.h>
 
 namespace upanui {
   Canvas::Canvas(const int x, const int y, const uint32_t width, const uint32_t height)
@@ -30,7 +31,8 @@ namespace upanui {
   }
 
   void Canvas::draw() {
-    if (backgroundColorAlpha() != 100 || (borderThickness() > 0 && borderColorAlpha() != 100)) {
+    if (backgroundColorAlpha() != GCoreFunctions::MAX_ALPHA
+    || (borderThickness() > 0 && borderColorAlpha() != GCoreFunctions::MAX_ALPHA)) {
       parent().draw();
     } else {
       drawTopDown();
