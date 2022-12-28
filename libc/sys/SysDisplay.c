@@ -248,6 +248,26 @@ void SysDisplay_FrameHasAlpha(bool hasAlpha) {
   __asm__ __volatile__("pop %eax") ;
 }
 
+void SysDisplay_SetGuiBase(bool isGuiBase) {
+  __volatile__ int iRetStatus ;
+
+  __asm__ __volatile__("push %eax") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("pushl $0x20") ;
+
+  __asm__ __volatile__("pushl %0" : : "rm"(isGuiBase)) ;
+  DO_SYS_CALL(SYS_CALL_DISPLAY_SET_GUI_BASE) ;
+
+  __asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
+  __asm__ __volatile__("pop %eax") ;
+}
+
 void SysDisplay_InitTermConsole() {
 	__volatile__ int iRetStatus ;
 

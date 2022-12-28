@@ -90,6 +90,10 @@ namespace upanui {
     return _uiObjectManager->setFocus(uiObject);
   }
 
+  void GraphicsContext::setGuiBase(bool isGuiBase) {
+    set_gui_base(isGuiBase);
+  }
+
   UIObjectManager& GraphicsContext::uiObjectManager() {
     if (_uiObjectManager.get() == nullptr) {
       throw upan::exception(XLOC, "UIObjectManager is not initialized!");

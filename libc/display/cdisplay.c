@@ -49,6 +49,10 @@ void gui_frame_has_alpha(bool hasAlpha) {
   SysDisplay_FrameHasAlpha(hasAlpha);
 }
 
+void set_gui_base(bool isGuiBase) {
+  SysDisplay_SetGuiBase(isGuiBase);
+}
+
 void init_term_console() {
   SysDisplay_InitTermConsole();
 }

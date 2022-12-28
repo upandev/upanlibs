@@ -53,6 +53,8 @@ namespace upanui {
     EventManager& eventManager();
 
     upan::option<UIObject&> setFocus(UIObject&);
+    void setGuiBase(bool isGuiBase);
+
     UIObjectManager& uiObjectManager();
 
   private:
