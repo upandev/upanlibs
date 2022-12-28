@@ -26,6 +26,7 @@
 #include <BaseFrame.h>
 #include <GraphicsContext.h>
 #include <fs.h>
+#include <GCoreFunctions.h>
 
 namespace upanui {
   TerminalConsole* TerminalConsole::_instance = nullptr;
@@ -39,6 +40,7 @@ namespace upanui {
       _readerThread(*this),
       _usfnContext(nullptr) {
     try {
+      gc().frame().fillRect(0, 0, width(), height(), GCoreFunctions::ALPHA_MASK);
       UIElement::drawBuffer().initLocal(gc().frame().frameBuffer());
       init_term_console();
       _usfnContext.reset(new upanui::usfn::Context());
