@@ -176,7 +176,7 @@ int SysProcess_SetEnv(const char* szVar, const char* szVal);
 int SysProcess_GetProcList(PS** pProcList, unsigned* uiListSize);
 void SysProcess_FreeProcListMem(PS* pProcList, unsigned uiListSize);
 
-void SysUtil_GetDateTime(RTCTime* pRTCTime);
+void SysUtil_GetDateTime(RTCDateTime* rtcDateTime);
 void SysUtil_Reboot();
 
 int SysUtil_GetTimeOfDay(struct timeval* pTV);

@@ -141,9 +141,9 @@ static void brain_damaged_fillrand(unsigned char *buf, unsigned int len)
 	int i, k;
 	uint32_t high, low, rh;
 	static uint64_t value;
-	RTCTime rtcTime ;
-	dtime(&rtcTime) ;
-	value += ((uint64_t) rtcTime.bSecond << 16) ^ rtcTime.bSecond ^ getpid();
+	RTCDateTime rtcDateTime;
+	dtime(&rtcDateTime) ;
+	value += ((uint64_t) rtcDateTime._second << 16) ^ rtcDateTime._second ^ getpid();
 	low = value & UINT32_MAX;
 	high = value >> 32;
 	for (i = 0; i < len; ++i) {

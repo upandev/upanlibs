@@ -22,7 +22,7 @@
 # include <syscalldefs.h>
 # include <dtime.h>
 
-void SysUtil_GetDateTime(RTCTime* pRTCTime)
+void SysUtil_GetDateTime(RTCDateTime* rtcDateTime)
 {
 	__asm__ __volatile__("push %eax") ;
 	__asm__ __volatile__("pushl $0x20") ;
@@ -34,7 +34,7 @@ void SysUtil_GetDateTime(RTCTime* pRTCTime)
 	__asm__ __volatile__("pushl $0x20") ;
 	__asm__ __volatile__("pushl $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(pRTCTime)) ;
+	__asm__ __volatile__("pushl %0" : : "rm"(rtcDateTime)) ;
 	DO_SYS_CALL(SYS_CALL_UTIL_DTIME) ;
 	__asm__ __volatile__("pop %eax") ;
 }

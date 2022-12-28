@@ -31,18 +31,17 @@ extern "C" {
 typedef unsigned time_t ;
 typedef int clock_t ;
 
-typedef struct
-{
-	byte bSecond ;
-	byte bMinute ;
-	byte bHour ;
+typedef struct {
+	uint8_t _second ;
+	uint8_t _minute ;
+	uint8_t _hour ;
 
-	byte bDayOfWeek ;
-	byte bDayOfMonth ;
-	byte bMonth ;
-	byte bCentury ;
-	byte bYear ;
-} RTCTime ;
+	uint8_t _dayOfWeek ;
+	uint8_t _dayOfMonth ;
+	uint8_t _month ;
+	uint8_t _century ;
+	uint8_t _year ;
+} RTCDateTime ;
 
 struct tm
 {
@@ -58,9 +57,6 @@ struct tm
 //	int tm_isdst;       /* daylight saving time */
 } ;
 
-extern void SysUtil_GetDateTime(RTCTime* pRTCTime) ;
-#define dtime(prtc) SysUtil_GetDateTime(prtc)
-
 time_t time(time_t * t) ;
 int localtime(struct tm* t, const time_t* time) ;
 
@@ -71,8 +67,7 @@ struct timeval
 } PACKED ;
 
 #define HRS_IN_DAY (86400)
-extern void SysUtil_GetDateTime(RTCTime* pRTCTime) ;
-
+extern void SysUtil_GetDateTime(RTCDateTime* rtcDateTime) ;
 #define dtime(prtc) SysUtil_GetDateTime(prtc)
 
 int gettimeofday(struct timeval*) ;
