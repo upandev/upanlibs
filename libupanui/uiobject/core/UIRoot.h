@@ -42,6 +42,10 @@ namespace upanui {
     void sizeChanged() override;
     void contentChanged() override;
 
+    bool captureMouseEvents() const override {
+      return true;
+    }
+
   private:
     Layout& layout() override {
       return _layout;

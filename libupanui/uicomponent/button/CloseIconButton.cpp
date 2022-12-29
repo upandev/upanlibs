@@ -35,14 +35,16 @@ namespace upanui {
       clickColor(0xC56043);
       backgroundColor(0x91908D);
 
-      const int dx = width() * 0.3;
-      const int dy = height() * 0.3;
+      const int x1 = width() * 0.3;
+      const int y1 = height() * 0.3;
+      const int x2 = width() - x1;
+      const int y2 = height() - y1;
 
-      auto &line1 = UIObjectFactory::createLine(*this, dx, dy, width() - dx + 2, height() - dy - 3, 2);
+      auto &line1 = UIObjectFactory::createLine(*this, x1, y1, x2, y2, 2);
       line1.backgroundColor(0xFFFFFF);
 
-      //auto &line2 = UIObjectFactory::createLine(*this, dx, height() - dy, width() - dx, dy, 2);
-      //line2.backgroundColor(0xFFFFFF);
+      auto &line2 = UIObjectFactory::createLine(*this, x1, y2, x2, y1, 2);
+      line2.backgroundColor(0xFFFFFF);
     }
     contentChanged();
   }

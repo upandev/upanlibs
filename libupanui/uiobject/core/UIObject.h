@@ -88,6 +88,9 @@ namespace upanui {
     virtual Layout& layout() = 0;
     virtual DrawBuffer& drawBuffer() = 0;
 
+    virtual bool captureMouseEvents() const = 0;
+    virtual void captureMouseEvents(bool) = 0;
+
     virtual void registerMouseEventHandler(MouseEventHandler& handler) = 0;
   protected:
     virtual ~UIObject() {}

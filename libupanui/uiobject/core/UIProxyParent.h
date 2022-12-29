@@ -85,6 +85,14 @@ namespace upanui {
       throw upan::exception(XLOC, "unsupported hasAlpha for UIProxyParent");
     }
 
+    bool captureMouseEvents() const override {
+      throw upan::exception(XLOC, "unsupported (get)captureMouseEvents for UIProxyParent");
+    }
+
+    void captureMouseEvents(bool) override {
+      throw upan::exception(XLOC, "unsupported (set)captureMouseEvents for UIProxyParent");
+    }
+
     upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) override {
       throw upan::exception(XLOC, "unsupported uiObjectUnderCursor for UIProxyParent");
     }

@@ -74,10 +74,19 @@ namespace upanui {
 
     void registerMouseEventHandler(MouseEventHandler& handler) override {
       _mouseEventHandler = upan::option<MouseEventHandler&>(handler);
+      captureMouseEvents(true);
     }
 
     bool hasAlpha() override;
     upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) override;
+
+    bool captureMouseEvents() const override {
+      return _captureMouseEvents;
+    }
+
+    void captureMouseEvents(bool val) override {
+      _captureMouseEvents = val;
+    }
 
   protected:
     virtual void onBackgroundColorChange() {}
@@ -118,6 +127,8 @@ namespace upanui {
     uint32_t _borderThickness;
     bool _lockChangeNotification;
     upan::option<MouseEventHandler&> _mouseEventHandler;
+    bool _captureMouseEvents;
+
     friend class ChangeNotificatinLock;
 
     GraphicsContext& _gc;

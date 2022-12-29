@@ -30,7 +30,7 @@ namespace upanui {
     : _x(x), _y(y), _width(width), _height(height),
       _bgColor(0), _bgAlpha(GCoreFunctions::MAX_ALPHA), _brColor(0xFFFFFF),
       _brAlpha(GCoreFunctions::MAX_ALPHA), _borderThickness(0), _lockChangeNotification(false),
-      _mouseEventHandler(upan::option<MouseEventHandler&>::empty()),
+      _mouseEventHandler(upan::option<MouseEventHandler&>::empty()), _captureMouseEvents(false),
       _gc(GraphicsContext::Instance()) {
   }
 
@@ -160,7 +160,7 @@ namespace upanui {
   }
 
   upan::option<UIObject&> UIObjectImpl::uiObjectUnderCursor(const int x, const int y) {
-    if (inside(x, y)) {
+    if (captureMouseEvents() && inside(x, y)) {
       for(auto& child : children()) {
         const upan::option<UIObject&> o = child->uiObjectUnderCursor(x, y);
         if (!o.isEmpty()) {
