@@ -32,8 +32,8 @@ namespace upanui {
     const auto cx2 = cx1 + child.width() - 1;
     const auto cy2 = cy1 + child.height() - 1;
 
-    const auto pwidth = parent().width() - 2 * parent().borderThickness();
-    const auto pheight = parent().height() - 2 * parent().borderThickness();
+    const int pwidth = parent().width() - 2 * parent().borderThickness();
+    const int pheight = parent().height() - 2 * parent().borderThickness();
 
     if (cx1 >= 0 && cx2 < pwidth && cy1 >= 0 && cy2 < pheight) {
       return BoundaryCheckResult::Inside;
@@ -56,6 +56,7 @@ namespace upanui {
     if (!childDrawBuffer.isLocal()) {
       return;
     }
+
     const auto pwidth = parent().width() - parent().borderThickness();
     const auto pheight = parent().height() - parent().borderThickness();
 
