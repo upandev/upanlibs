@@ -113,7 +113,7 @@ namespace upanui {
     if (_modifiedUIObjects.size() == MAX_OBJECTS_UPDATE_QUEUE) {
       _modifiedUIObjects.clear();
       _modifiedUIObjects.push_back(&_rootCanvas);
-    } else {
+    } else if (_modifiedUIObjects.empty() || _modifiedUIObjects.back() != &uiObject) {
       _modifiedUIObjects.push_back(&uiObject);
     }
   }
