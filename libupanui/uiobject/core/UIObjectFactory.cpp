@@ -27,6 +27,7 @@
 #include <Line.h>
 #include <CloseIconButton.h>
 #include <Label.h>
+#include <VerticalScroller.h>
 
 namespace upanui {
   RectangleCanvas& UIObjectFactory::createRectangleCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
@@ -74,5 +75,14 @@ namespace upanui {
     auto& label = *new Label(x, y, width, height, str, fgColor, fontType, fontFamily, fontStyle, fontSize);
     parent.add(label);
     return label;
+  }
+
+  VerticalScroller& UIObjectFactory::createVerticalScroller(UIObject& parent, const int x, const int y,
+                                                            const uint32_t width, const uint32_t height,
+                                                            const uint32_t scrollBarWidth, const uint32_t scrollBarHeight) {
+    auto& scroller = *new VerticalScroller(x, y, width, height, scrollBarWidth, scrollBarHeight);
+    parent.add(scroller);
+    scroller.init();
+    return scroller;
   }
 }

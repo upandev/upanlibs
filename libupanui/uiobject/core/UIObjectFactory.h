@@ -37,6 +37,8 @@ namespace upanui {
   class Button;
   class CloseIconButton;
 
+  class VerticalScroller;
+
   class UIObjectFactory {
   public:
     static RectangleCanvas& createRectangleCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height);
@@ -52,5 +54,9 @@ namespace upanui {
                               const upan::string& str, uint32_t fgColor,
                               usfn::PreloadedFonts fontType,
                               int fontFamily, int fontStyle, int fontSize);
+
+    static VerticalScroller& createVerticalScroller(UIObject& parent, const int x, const int y,
+                                                    const uint32_t width, const uint32_t height,
+                                                    const uint32_t scrollBarWidth, const uint32_t scrollBarHeight);
   };
 }
