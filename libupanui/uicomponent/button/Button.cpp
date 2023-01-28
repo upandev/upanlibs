@@ -26,7 +26,7 @@
 namespace upanui {
   Button::Button(const int x, const int y, const uint32_t width, const uint32_t height)
     : RectangleCanvas(x, y, width, height), _hover(false), _leftClickHold(false) {
-    captureMouseEvents(true);
+    UIObjectImpl::captureMouseEvents(true);
   }
 
   uint32_t Button::backgroundColorForDraw() const {
@@ -42,6 +42,7 @@ namespace upanui {
       _leftClickHold = x;
       notifyChange(ChangeNotificationType::Content);
     }
+    RectangleCanvas::onMouseEvent(event);
   }
 
   void Button::onMouseFocus() {
