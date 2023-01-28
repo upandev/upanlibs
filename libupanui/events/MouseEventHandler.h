@@ -28,6 +28,7 @@
 namespace upanui {
 class MouseEventHandler {
 public:
+  virtual ~MouseEventHandler() { }
   virtual void onEvent(UIObject& uiObject, const MouseEvent& event) = 0;
 };
 }

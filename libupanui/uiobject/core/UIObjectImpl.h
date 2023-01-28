@@ -88,6 +88,9 @@ namespace upanui {
       _captureMouseEvents = val;
     }
 
+    void vscroll(int rows) override {}
+    void hscroll(int columns) override {}
+
   protected:
     virtual void onBackgroundColorChange() {}
     void onKeyboardEvent(const KeyboardEvent& event) override {}

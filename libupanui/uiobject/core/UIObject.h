@@ -92,6 +92,10 @@ namespace upanui {
     virtual void captureMouseEvents(bool) = 0;
 
     virtual void registerMouseEventHandler(MouseEventHandler& handler) = 0;
+
+    virtual void vscroll(int rows) = 0;
+    virtual void hscroll(int columns) = 0;
+
   protected:
     virtual ~UIObject() {}
 

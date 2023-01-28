@@ -109,6 +109,9 @@ namespace upanui {
       throw upan::exception(XLOC, "unsupported event handlers for UIProxyParent");
     }
 
+    void vscroll(int rows) override {}
+    void hscroll(int columns) override {}
+    
   protected:
     void onKeyboardEvent(const KeyboardEvent& event) override {
       throw upan::exception(XLOC, "unsupported onKeyboardEvent for UIProxyParent");
