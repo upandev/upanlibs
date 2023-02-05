@@ -23,6 +23,7 @@
 #include <VerticalScroller.h>
 #include <UIObjectFactory.h>
 #include <Button.h>
+#include <dtime.h>
 
 namespace upanui {
   VerticalScroller::VerticalScroller(const int x, const int y,
@@ -30,7 +31,7 @@ namespace upanui {
                                      const uint32_t scrollBarWidth, const uint32_t scrollBarHeight)
     : RectangleCanvas(x, y, width, height),
       _scrollBarWidth(scrollBarWidth), _scrollBarHeight(scrollBarHeight),
-      _mouseHandler(nullptr),
+      _mouseHandler(nullptr), _scrollUpBt(nullptr), _scrollDownBt(nullptr), _scrollBar(nullptr),
       _childCheck(false), _scrollableChild(upan::option<UIObject&>::empty()) {
   }
 
@@ -49,16 +50,18 @@ namespace upanui {
       auto& scrollerCanvas = UIObjectFactory::createRectangleCanvas(*this, scrollBarX, scrollerY, _scrollBarWidth, scrollerHeight);
       scrollerCanvas.backgroundColor(0xFFFFFF);
     }
-    auto &btScrollUp = UIObjectFactory::createButton(*this, scrollBarX, scrollBarTopBtY, _scrollBarWidth, _scrollBarWidth);
-    btScrollUp.backgroundColor(0xFFFAABB);
 
-    auto &btScrollDown = UIObjectFactory::createButton(*this, scrollBarX, scrollBarBottomBtY, _scrollBarWidth, _scrollBarWidth);
-    btScrollDown.backgroundColor(0xFFFAABB);
+    _scrollUpBt = &UIObjectFactory::createButton(*this, scrollBarX, scrollBarTopBtY, _scrollBarWidth, _scrollBarWidth);
+    _scrollUpBt->backgroundColor(0xFFFAABB);
+
+    _scrollDownBt = &UIObjectFactory::createButton(*this, scrollBarX, scrollBarBottomBtY, _scrollBarWidth, _scrollBarWidth);
+    _scrollDownBt->backgroundColor(0xFFFAABB);
 
     captureMouseEvents(true);
 
     _mouseHandler = new ScrollerMouseHandler(*this);
-    btScrollUp.registerMouseEventHandler(*_mouseHandler);
+    _scrollUpBt->registerMouseEventHandler(*_mouseHandler);
+    _scrollDownBt->registerMouseEventHandler(*_mouseHandler);
 
     _childCheck = true;
   }
@@ -73,11 +76,15 @@ namespace upanui {
     RectangleCanvas::add(child);
   }
 
-  void VerticalScroller::handleMouseEvent(upanui::UIObject &uiObject, const upanui::MouseEvent &event) {
+  void VerticalScroller::handleMouseEvent(upanui::UIObject& sender, const upanui::MouseEvent& event) {
     const auto& e = event.getData();
     if (e.leftButtonState() == MouseData::State::PRESSED || e.leftButtonState() == MouseData::State::HOLD) {
-      _scrollableChild.ifPresent([](UIObject& child) {
-        child.y(child.y() - 1);
+      _scrollableChild.ifPresent([&](UIObject& child) {
+        if (&sender == _scrollUpBt) {
+          child.vscroll(-1, height());
+        } else if (&sender == _scrollDownBt) {
+          child.vscroll(1, height());
+        }
       });
     }
   }

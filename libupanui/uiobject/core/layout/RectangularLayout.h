@@ -22,13 +22,18 @@
 #pragma once
 
 #include <Layout.h>
+#include <DrawBuffer.h>
 
 namespace upanui {
   class RectangularLayout : public Layout {
   public:
-    RectangularLayout(UIObject& parent) : Layout(parent) {}
+    RectangularLayout(UIObject& parent) : Layout(parent), _cacheKey(0) {}
     BoundaryCheckResult checkBoundary(UIObject& child) override;
     void draw(UIObject& child) override;
     void fill() override;
+
+  private:
+    DrawBuffer _cache;
+    uint32_t _cacheKey;
   };
 }

@@ -24,6 +24,7 @@
 #include <UIObject.h>
 #include <DrawBuffer.h>
 #include <GCoreFunctions.h>
+#include <mosstd.h>
 
 namespace upanui {
   Layout::BoundaryCheckResult RectangularLayout::checkBoundary(UIObject &child) {
@@ -70,12 +71,18 @@ namespace upanui {
     const int h = (child.height() - sy1) <= (pheight - dy1) ? child.height() - sy1 : pheight - dy1;
 
     //printf("\n%d, %d, %d, %d, %d, %d, %d, %d, %d\n", srcX1, srcY1, destX1, destY1, w, h, srcXOffset, destXOffset, copyWidth);
+    //TODO: will this check impact circles without alpha but which are partially inside the parent ?
+    const bool hasAlpha = child.hasAlphaLocal();
     GCoreFunctions::PixelCache pixelCache;
     for(int y = 0; y < h; ++y) {
       int srcOffet = sx1 + (sy1 + y) * childDrawBuffer.width();
       int destOffset = dx1 + (dy1 + y) * parentDrawBuffer.width();
-      for(int x = 0; x < w; ++x) {
-        GCoreFunctions::setPixel(parentDrawBuffer.at(x + destOffset), childDrawBuffer.at(x + srcOffet), pixelCache, false);
+      if (hasAlpha) {
+        for (int x = 0; x < w; ++x) {
+          GCoreFunctions::setPixel(parentDrawBuffer.at(x + destOffset), childDrawBuffer.at(x + srcOffet), pixelCache, false);
+        }
+      } else {
+        memcpy(&parentDrawBuffer.at(destOffset), &childDrawBuffer.at(srcOffet), w * childDrawBuffer.bytesPerPixel());
       }
     }
   }
@@ -92,8 +99,15 @@ namespace upanui {
     const auto& drawBuffer = parent().drawBuffer();
     const auto bgColor = (parent().backgroundColorForDraw() & ~GCoreFunctions::ALPHA_MASK) | (alpha << 24);
     const auto brColor = (parent().borderColor() & ~GCoreFunctions::ALPHA_MASK) | (parent().borderColorAlpha() << 24);
-    GCoreFunctions::PixelCache pixelCache;
 
+    const bool useCache = parent().drawBuffer().isLocal() || !parent().hasAlphaLocal();
+    const auto cacheKey = upan::hash32(bgColor, brColor, parent().height(), parent().width(), parent().borderThickness());
+    if (_cacheKey == cacheKey && !_cache.isNull() && useCache) {
+      parent().drawBuffer().copy(_cache);
+      return;
+    }
+
+    GCoreFunctions::PixelCache pixelCache;
     for(auto y = 0u; y < parent().height(); ++y) {
       auto yOffset = y * drawBuffer.width();
       if (y < parent().borderThickness() || (parent().height() - y) <= parent().borderThickness()) {
@@ -111,6 +125,12 @@ namespace upanui {
           GCoreFunctions::setPixel(drawBuffer.at(x + yOffset), brColor, pixelCache, drawBuffer.isLocal());
         }
       }
+    }
+
+    if (useCache) {
+      _cacheKey = cacheKey;
+      _cache.initLocal(parent().width(), parent().height());
+      _cache.copy(parent().drawBuffer());
     }
   }
 }

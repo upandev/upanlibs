@@ -81,6 +81,10 @@ namespace upanui {
     void remove() override {}
     void redraw() override {}
 
+    bool hasAlphaLocal() override {
+      throw upan::exception(XLOC, "unsupported hasAlphaLocal for UIProxyParent");
+    }
+
     bool hasAlpha() override {
       throw upan::exception(XLOC, "unsupported hasAlpha for UIProxyParent");
     }
@@ -109,7 +113,7 @@ namespace upanui {
       throw upan::exception(XLOC, "unsupported event handlers for UIProxyParent");
     }
 
-    void vscroll(int rows) override {}
+    void vscroll(int rows, int scrollableHeight) override {}
     void hscroll(int columns) override {}
     
   protected:

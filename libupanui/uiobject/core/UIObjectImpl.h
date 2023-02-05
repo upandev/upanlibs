@@ -77,6 +77,7 @@ namespace upanui {
       captureMouseEvents(true);
     }
 
+    bool hasAlphaLocal() override;
     bool hasAlpha() override;
     upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) override;
 
@@ -88,8 +89,8 @@ namespace upanui {
       _captureMouseEvents = val;
     }
 
-    void vscroll(int rows) override {}
-    void hscroll(int columns) override {}
+    void vscroll(int rows, int scrollableHeight) override;
+    void hscroll(int columns) override;
 
   protected:
     virtual void onBackgroundColorChange() {}

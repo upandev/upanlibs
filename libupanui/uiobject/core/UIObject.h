@@ -82,6 +82,7 @@ namespace upanui {
     virtual void remove() = 0;
     virtual void redraw() = 0;
 
+    virtual bool hasAlphaLocal() = 0;
     virtual bool hasAlpha() = 0;
     virtual upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) = 0;
 
@@ -93,7 +94,7 @@ namespace upanui {
 
     virtual void registerMouseEventHandler(MouseEventHandler& handler) = 0;
 
-    virtual void vscroll(int rows) = 0;
+    virtual void vscroll(int rows, int scrollableHeight) = 0;
     virtual void hscroll(int columns) = 0;
 
   protected:

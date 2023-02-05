@@ -36,7 +36,7 @@ namespace upanui {
   }
 
   // because the circumference of the circle must alpha blend with parent layout/background always - we need to redraw the parent
-  // otherwise, there will be multiple re-application of alpha blending on every redraw of circle - leading to lose of smooth circumference
+  // otherwise, there will be multiple re-application of alpha blending on every redraw of circle - leading to loss of smooth circumference
   void RoundCanvas::draw() {
     parent().draw();
   }

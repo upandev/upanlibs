@@ -35,7 +35,7 @@ namespace upanui {
 
     void init();
     void add(UIObject& child) override;
-    void handleMouseEvent(upanui::UIObject &uiObject, const upanui::MouseEvent &event);
+    void handleMouseEvent(upanui::UIObject& sender, const upanui::MouseEvent& event);
 
     class ScrollerMouseHandler : public MouseEventHandler {
     public:
@@ -54,6 +54,10 @@ namespace upanui {
     uint32_t _scrollBarHeight;
 
     ScrollerMouseHandler* _mouseHandler;
+    UIObject* _scrollUpBt;
+    UIObject* _scrollDownBt;
+    UIObject* _scrollBar;
+
     //one child enforcer
     bool _childCheck;
     upan::option<UIObject&> _scrollableChild;

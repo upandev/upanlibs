@@ -97,19 +97,33 @@ namespace upanui {
   }
 
   void DrawBuffer::copy(const void *src, int len) {
-    optimized_memcpy((uint32_t)buffer(), (uint32_t)src, len);
+    memcpy(buffer(), src, len);
   }
 
   void DrawBuffer::copy(uint32_t* src, uint32_t width, uint32_t height, bool directSet) {
     GCoreFunctions::PixelCache pixelCache;
-    const int ex = upan::min(_vWidth, width) - 1;
-    const int ey = upan::min(_vHeight, height) - 1;
-    for(auto y = 0; y <= ey; ++y) {
+    const int ex = upan::min(_vWidth, width);
+    const int ey = upan::min(_vHeight, height);
+    for(auto y = 0; y < ey; ++y) {
       auto yDestOffset = y * _width;
       auto ySrcOffset = y * width;
-      for(auto x = 0; x <= ex; ++x) {
-        GCoreFunctions::setPixel(_buffer[x + yDestOffset], src[x + ySrcOffset], pixelCache, directSet);
+      if (directSet) {
+        memcpy(&_buffer[yDestOffset], &src[ySrcOffset], ex * bytesPerPixel());
+      } else {
+        for (auto x = 0; x < ex; ++x) {
+          GCoreFunctions::setPixel(_buffer[x + yDestOffset], src[x + ySrcOffset], pixelCache, directSet);
+        }
       }
+    }
+  }
+
+  void DrawBuffer::copy(DrawBuffer& src) {
+    const int ex = upan::min(_vWidth, src.width());
+    const int ey = upan::min(_vHeight, src.height());
+    for(auto y = 0; y < ey; ++y) {
+      auto yDestOffset = y * _width;
+      auto ySrcOffset = y * src.width();
+      memcpy(&_buffer[yDestOffset], &src.at(ySrcOffset), ex * bytesPerPixel());
     }
   }
 

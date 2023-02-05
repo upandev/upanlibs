@@ -138,18 +138,27 @@ namespace upanui {
     _gc.uiObjectManager().queueForRedraw(*this);
   }
 
-  bool UIObjectImpl::hasAlpha() {
+  bool UIObjectImpl::hasAlphaLocal() {
     if (backgroundColorAlpha() != GCoreFunctions::MAX_ALPHA)
       return true;
 
     if (borderThickness() > 0 && borderColorAlpha() != GCoreFunctions::MAX_ALPHA)
       return true;
 
+    return false;
+  }
+
+  bool UIObjectImpl::hasAlpha() {
+    if (hasAlphaLocal()) {
+      return true;
+    }
+
     for(auto& child : children()) {
       if (child->hasAlpha()) {
         return true;
       }
     }
+
     return false;
   }
 
@@ -198,4 +207,22 @@ namespace upanui {
       handler.onEvent(*this, event);
     });
   }
+
+  void UIObjectImpl::vscroll(int rows, int scrollableHeight) {
+    int newY = y() + rows;
+    if (newY > 0) {
+      newY = 0;
+    } else {
+      int h = (int)height() + newY;
+      if (h < scrollableHeight) {
+        newY = scrollableHeight - (int)height();
+      }
+    }
+    y(newY);
+  }
+
+  void UIObjectImpl::hscroll(int columns) {
+   x(x() + columns);
+  }
+
 }

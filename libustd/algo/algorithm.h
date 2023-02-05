@@ -74,6 +74,16 @@ const N& min(const N& n1, const N& n2, const Ns&... ns) {
   return min(n1 < n2 ? n1 : n2, ns...);
 }
 
+template <typename N>
+uint32_t hash32(const N& n) {
+  return n;
+}
+
+template <typename N1, typename N2, typename... Ns>
+uint32_t hash32(const N1& n1, const N2& n2, const Ns&... ns) {
+  return hash32(((n1 << 1) | (n1 >> 31)) ^ n2, ns...);
+}
+
 }
 
 #endif
