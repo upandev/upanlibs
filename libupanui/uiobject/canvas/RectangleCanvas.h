@@ -33,6 +33,8 @@ namespace upanui {
     RectangleCanvas(const int x, const int y, const uint32_t width, const uint32_t height);
     virtual ~RectangleCanvas() {}
 
+    bool isRectangularShape() override { return true; }
+
   protected:
     void doDraw() override;
 

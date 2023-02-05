@@ -81,6 +81,10 @@ namespace upanui {
     void remove() override {}
     void redraw() override {}
 
+    bool isRectangularShape() override {
+      throw upan::exception(XLOC, "unsupported isRectangularShape for UIProxyParent");
+    }
+
     bool hasAlphaLocal() override {
       throw upan::exception(XLOC, "unsupported hasAlphaLocal for UIProxyParent");
     }

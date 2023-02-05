@@ -57,6 +57,8 @@ namespace upanui {
     void setFontContext(upanui::usfn::Context* context);
     void onKeyPress(KeyboardEventHandler& h);
 
+    bool isRectangularShape() override { return true; }
+
   private:
     void draw() override;
     void drawTopDown() override {}

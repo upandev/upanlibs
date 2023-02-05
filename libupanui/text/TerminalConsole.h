@@ -52,6 +52,7 @@ namespace upanui {
     void clearScreen();
 
     void setFontContext(upanui::usfn::Context* context);
+    bool isRectangularShape() override { return true; }
 
   private:
     void draw() override;

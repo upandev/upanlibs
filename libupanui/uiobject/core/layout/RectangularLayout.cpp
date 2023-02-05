@@ -71,18 +71,17 @@ namespace upanui {
     const int h = (child.height() - sy1) <= (pheight - dy1) ? child.height() - sy1 : pheight - dy1;
 
     //printf("\n%d, %d, %d, %d, %d, %d, %d, %d, %d\n", srcX1, srcY1, destX1, destY1, w, h, srcXOffset, destXOffset, copyWidth);
-    //TODO: will this check impact circles without alpha but which are partially inside the parent ?
-    const bool hasAlpha = child.hasAlphaLocal();
+    const bool directCopy = child.isRectangularShape() && !child.hasAlphaLocal();
     GCoreFunctions::PixelCache pixelCache;
     for(int y = 0; y < h; ++y) {
       int srcOffet = sx1 + (sy1 + y) * childDrawBuffer.width();
       int destOffset = dx1 + (dy1 + y) * parentDrawBuffer.width();
-      if (hasAlpha) {
+      if (directCopy) {
+        memcpy(&parentDrawBuffer.at(destOffset), &childDrawBuffer.at(srcOffet), w * childDrawBuffer.bytesPerPixel());
+      } else {
         for (int x = 0; x < w; ++x) {
           GCoreFunctions::setPixel(parentDrawBuffer.at(x + destOffset), childDrawBuffer.at(x + srcOffet), pixelCache, false);
         }
-      } else {
-        memcpy(&parentDrawBuffer.at(destOffset), &childDrawBuffer.at(srcOffet), w * childDrawBuffer.bytesPerPixel());
       }
     }
   }

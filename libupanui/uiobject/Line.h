@@ -37,6 +37,8 @@ namespace upanui {
     void updateXY(const int x1, const int y1, const int x2, const int y2);
     void updateThickness(const uint32_t thickness);
 
+    bool isRectangularShape() override { return false; }
+
   protected:
     virtual ~Line() {}
     Line(const int x1, const int y1, const int x2, const int y2, const uint32_t thickness);

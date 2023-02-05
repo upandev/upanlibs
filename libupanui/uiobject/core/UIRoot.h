@@ -46,6 +46,8 @@ namespace upanui {
       return true;
     }
 
+    bool isRectangularShape() override { return true; }
+
   private:
     Layout& layout() override {
       return _layout;
