@@ -48,7 +48,7 @@ namespace upanui {
     uint32_t& at(int offset)  const;
 
     void copy(const void* src, int len);
-    void copy(uint32_t* src, uint32_t width, uint32_t height, bool directSet);
+    void copy(const uint32_t* src, uint32_t width, uint32_t height, bool directSet);
     void copy(DrawBuffer& src);
     void fill(int sx, int sy, uint32_t width, uint32_t height, uint32_t color);
     void fill(uint32_t color);

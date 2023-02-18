@@ -25,7 +25,7 @@
 #include "algorithm.h"
 
 namespace upanui {
-  static int dcompare(double a, double b) {
+  int GCoreFunctions::dcompare(double a, double b) {
     const int32_t ai = a * 100;
     const int32_t  bi = b * 100;
     return ai < bi ? -1 : ai > bi ? 1 : 0;
@@ -66,76 +66,5 @@ namespace upanui {
         }
       }
     }
-  }
-
-  uint32_t* GCoreFunctions::resize(const uint32_t* srcBuffer, const uint32_t srcWidth, const uint32_t srcHeight, const uint32_t destWidth, const uint32_t destHeight) {
-    auto destSize = destWidth * destHeight;
-    upan::uniq_ptr<uint32_t> destBufferU(new uint32_t[destSize]);
-    auto destBuffer = destBufferU.get();
-
-    const double fx = srcWidth * 1.0 / destWidth;
-    const double fy = srcHeight * 1.0 / destHeight;
-
-    const double fa = 1.0 / (fx * fy);
-
-    for(uint32_t y = 0; y < destHeight; ++y) {
-      for(uint32_t x = 0; x < destWidth; ++x) {
-        double dr = 0;
-        double dg = 0;
-        double db = 0;
-        double da = 0;
-
-        uint32_t sy = y * fy;
-        double scy = y * fy;
-
-        for(double sfy = fy; dcompare(sfy, 0.0) != 0 && sy < srcHeight;) {
-          auto dy = sy + 1 - scy;
-          const auto pycmp = dcompare(dy, sfy);
-          if (pycmp < 0) {
-            ++sy;
-            scy = sy;
-            sfy -= dy;
-          } else if(pycmp == 0) {
-            ++sy;
-            scy = sy;
-            sfy = 0;
-          } else {
-            dy = sfy;
-            scy += dy;
-            sfy = 0;
-          }
-
-          uint32_t sx = x * fx;
-          double scx = x * fx;
-          for (double sfx = fx; dcompare(sfx, 0.0) != 0 && sx < srcWidth;) {
-            auto dx = sx + 1 - scx;
-            const auto pxcmp = dcompare(dx, sfx);
-            if (pxcmp < 0) {
-              ++sx;
-              scx = sx;
-              sfx -= dx;
-            } else if(pxcmp == 0) {
-              ++sx;
-              scx = sx;
-              sfx = 0;
-            } else {
-              dx = sfx;
-              scx += dx;
-              sfx = 0;
-            }
-
-            double ipf = dx * dy * fa;
-            uint32_t srcRGB = srcBuffer[sx + sy * srcWidth];
-
-            da += ((srcRGB >> 24) & 0xFF) * ipf;
-            dr += ((srcRGB >> 16) & 0xFF) * ipf;
-            dg += ((srcRGB >> 8) & 0xFF) * ipf;
-            db += (srcRGB & 0xFF) * ipf;
-          }
-        }
-        destBuffer[x + y * destWidth] = roundtoi(dr) << 16 | roundtoi(dg) << 8 | roundtoi(db) | roundtoi(da) << 24; //0xFF000000;
-      }
-    }
-    return destBufferU.release();
   }
 }

@@ -42,7 +42,7 @@ namespace upanui {
       return;
     }
 
-    const auto rawColor = backgroundColorForDraw() & ~GCoreFunctions::ALPHA_MASK;
+    const auto rawColor = backgroundColorForDraw() & GCoreFunctions::NO_ALPHA_MASK;
     drawLine(rawColor, backgroundColorAlpha());
   }
 

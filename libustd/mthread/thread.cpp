@@ -106,6 +106,6 @@ namespace upan {
 
   void thread::set_error(const upan::error& e) {
     mutex_guard g(_t_mutex);
-    _error = e;
+    _error = upan::option<upan::error>(e);
   }
 }

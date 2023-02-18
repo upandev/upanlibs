@@ -25,11 +25,10 @@
 #include <uniq_ptr.h>
 
 namespace upanui {
-    class BmpImage : public Image {
-    protected:
-      ~BmpImage();
-
+    class BmpDecoder {
     public:
+      BmpDecoder() {}
+
       typedef struct {
         uint8_t _signature[2];
         uint32_t _fileSize;
@@ -64,25 +63,11 @@ namespace upanui {
         }
       } PACKED InfoHeader;
 
-      BmpImage(upan::uniq_ptr<uint32_t>&& imageBuffer, const Header& header, const InfoHeader& infoHeader);
-
-      static uint32_t* parse(const void* imageData, Header& header, InfoHeader& infoHeader, const uint32_t transparentColor);
-      static BmpImage& create(const void* imageData, const uint32_t transparentColor);
-      static BmpImage& create(const void* imageData) {
-        return create(imageData, 0);
-      }
-
-    public:
-      const uint32_t* data() const override {
-        return const_cast<BmpImage*>(this)->_imageBuffer.get();
-      }
-
+      Image& parse(const void* imageData, upan::option<uint32_t> transparentColor);
       void DebugPrint() const;
 
     private:
-      //assuming 4 bytes per pixel
-      upan::uniq_ptr<uint32_t> _imageBuffer;
-      const Header _header;
-      const InfoHeader _infoHeader;
+      Header _header;
+      InfoHeader _infoHeader;
     };
 }

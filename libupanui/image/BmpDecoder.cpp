@@ -20,79 +20,69 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include <BmpImage.h>
+#include <BmpDecoder.h>
 #include <exception.h>
 #include <ColorPalettes.h>
 #include <GCoreFunctions.h>
 
 namespace upanui {
-  BmpImage::BmpImage(upan::uniq_ptr<uint32_t>&& imageBuffer, const Header& header, const InfoHeader& infoHeader)
-    : Image(infoHeader._width, infoHeader._height),
-      _imageBuffer(upan::move(imageBuffer)),
-      _header(header),
-      _infoHeader(infoHeader) {
-  }
-
-  BmpImage::~BmpImage() noexcept {
-  }
-
-  void BmpImage::DebugPrint() const {
+  void BmpDecoder::DebugPrint() const {
     _header.DebugPrint();
     _infoHeader.DebugPrint();
   }
 
-  uint32_t* BmpImage::parse(const void* imageData, Header& header, InfoHeader& infoHeader, const uint32_t transparentColor) {
+  Image& BmpDecoder::parse(const void* imageData, upan::option<uint32_t> transparentColor) {
     if (imageData == nullptr) {
       throw upan::exception(XLOC, "imageData can't be null");
     }
 
-    memcpy(&header, imageData, sizeof(Header));
-    if (header._signature[0] != 'B' || header._signature[1] != 'M') {
-      throw upan::exception(XLOC, "invalid BMP image data. Signature = %c%c", header._signature[0], header._signature[1]);
+    memcpy((void*)&_header, imageData, sizeof(Header));
+    if (_header._signature[0] != 'B' || _header._signature[1] != 'M') {
+      throw upan::exception(XLOC, "invalid BMP image data. Signature = %c%c", _header._signature[0], _header._signature[1]);
     }
 
-    memcpy(&infoHeader, (void*)((uint32_t)imageData + sizeof(Header)), sizeof(InfoHeader));
-    if (infoHeader._infoHeadersize != 40) {
+    memcpy((void*)&_infoHeader, (void*)((uint32_t)imageData + sizeof(Header)), sizeof(InfoHeader));
+    if (_infoHeader._infoHeadersize != 40) {
       throw upan::exception(XLOC, "can't support BMP InfoHeader size != 40");
     }
 
-    if (infoHeader._compression != 0) {
-      throw upan::exception(XLOC, "compressed BMP is not supported yet (%d)", infoHeader._compression);
+    if (_infoHeader._compression != 0) {
+      throw upan::exception(XLOC, "compressed BMP is not supported yet (%d)", _infoHeader._compression);
     }
 
-    if (infoHeader._width < 1 || infoHeader._width > 3000) {
-      throw upan::exception(XLOC, "unsupported width %d", infoHeader._width);
+    if (_infoHeader._width < 1 || _infoHeader._width > 3000) {
+      throw upan::exception(XLOC, "unsupported width %d", _infoHeader._width);
     }
 
-    if (infoHeader._height < 1 || infoHeader._height > 3000) {
-      throw upan::exception(XLOC, "unsupported height %d", infoHeader._height);
+    if (_infoHeader._height < 1 || _infoHeader._height > 3000) {
+      throw upan::exception(XLOC, "unsupported height %d", _infoHeader._height);
     }
 
-    if (infoHeader._bitsPerPixel != 4 && infoHeader._bitsPerPixel != 8 && infoHeader._bitsPerPixel != 24) {
-      throw upan::exception(XLOC, "unsupported BMP resolution: %d", infoHeader._bitsPerPixel);
+    if (_infoHeader._bitsPerPixel != 4 && _infoHeader._bitsPerPixel != 8 && _infoHeader._bitsPerPixel != 24) {
+      throw upan::exception(XLOC, "unsupported BMP resolution: %d", _infoHeader._bitsPerPixel);
     }
 
     const auto headerSize = sizeof(Header) + sizeof(InfoHeader);
-    const auto colorTableSize = header._dataOffset - headerSize;
+    const auto colorTableSize = _header._dataOffset - headerSize;
     //4 bytes per pixel * no. of bits per pixel
-    const auto colorTableExists = (infoHeader._bitsPerPixel == 4 && colorTableSize == 16 * 4)
-        || (infoHeader._bitsPerPixel == 8 && colorTableSize == 256 * 4);
+    const auto colorTableExists = (_infoHeader._bitsPerPixel == 4 && colorTableSize == 16 * 4)
+        || (_infoHeader._bitsPerPixel == 8 && colorTableSize == 256 * 4);
 
     //TODO: sort colorTable by _importantColors.
     const uint32_t* colorTable = colorTableExists ? static_cast<const uint32_t*>((void*)((uint32_t)imageData + headerSize))
-        : infoHeader._bitsPerPixel == 4 ? ColorPalettes::CP16::GetColorTable()
-        : infoHeader._bitsPerPixel == 8 ? ColorPalettes::CP256::GetColorTable()
+        : _infoHeader._bitsPerPixel == 4 ? ColorPalettes::CP16::GetColorTable()
+        : _infoHeader._bitsPerPixel == 8 ? ColorPalettes::CP256::GetColorTable()
         : nullptr;
 
-    const auto pixelData = static_cast<const uint8_t*>((void*)((uint32_t)imageData + header._dataOffset));
-    const uint32_t imageBufferSize = infoHeader._width * infoHeader._height;
+    const auto pixelData = static_cast<const uint8_t*>((void*)((uint32_t)imageData + _header._dataOffset));
+    const uint32_t imageBufferSize = _infoHeader._width * _infoHeader._height;
     upan::uniq_ptr<uint32_t> imageBuffer = new uint32_t[imageBufferSize];
 
     int scanLinePadding = 0;
-    switch(infoHeader._bitsPerPixel) {
+    switch(_infoHeader._bitsPerPixel) {
       case 4: {
         //2 pixels in 1 byte
-        int delta = (infoHeader._width / 2) % 4;
+        int delta = (_infoHeader._width / 2) % 4;
         if (delta) {
           scanLinePadding = (4 - delta) * 2;
         }
@@ -100,7 +90,7 @@ namespace upanui {
       break;
       case 8: {
         //1 pixel per byte
-        int delta = infoHeader._width % 4;
+        int delta = _infoHeader._width % 4;
         if (delta) {
           scanLinePadding = 4 - delta;
         }
@@ -108,7 +98,7 @@ namespace upanui {
       break;
       case 24: {
         //1 pixel = 3 bytes
-        int delta = (3 * infoHeader._width) % 4;
+        int delta = (3 * _infoHeader._width) % 4;
         if (delta) {
           scanLinePadding = 4 - delta;
         }
@@ -117,15 +107,19 @@ namespace upanui {
     }
 
     auto applyTransparencyFilter = [transparentColor](const uint32_t color) -> uint32_t  {
-      return color == transparentColor ? color & ~GCoreFunctions::ALPHA_MASK : color | GCoreFunctions::ALPHA_MASK;
+      if (!transparentColor.isEmpty() && transparentColor.value() == color) {
+        return color & GCoreFunctions::NO_ALPHA_MASK;
+      } else {
+        return color | GCoreFunctions::ALPHA_MASK;
+      }
     };
 
     int dataIndex = 0;
-    for(int y = infoHeader._height - 1; y >= 0; --y) {
-      const auto y_offset = y * infoHeader._width;
-      for(uint32_t x = 0; x < infoHeader._width; ++x) {
+    for(int y = _infoHeader._height - 1; y >= 0; --y) {
+      const auto y_offset = y * _infoHeader._width;
+      for(uint32_t x = 0; x < _infoHeader._width; ++x) {
         auto p = (uint32_t*)(imageBuffer.get() + y_offset + x);
-        switch(infoHeader._bitsPerPixel) {
+        switch(_infoHeader._bitsPerPixel) {
           case 4: {
             const uint8_t code = pixelData[dataIndex / 2];
             const uint32_t colorCode = dataIndex & 0x1 ? code & 0xF : (code >> 4) & 0xF;
@@ -151,18 +145,11 @@ namespace upanui {
           break;
 
           default:
-            throw upan::exception(XLOC, "unsupported BMP resolution: %d", infoHeader._bitsPerPixel);
+            throw upan::exception(XLOC, "unsupported BMP resolution: %d", _infoHeader._bitsPerPixel);
         }
       }
       dataIndex += scanLinePadding;
     }
-    return imageBuffer.release();
-  }
-
-  BmpImage& BmpImage::create(const void* imageData, const uint32_t transparentColor) {
-    Header header;
-    InfoHeader infoHeader;
-    upan::uniq_ptr<uint32_t> imageBuffer(parse(imageData, header, infoHeader, transparentColor));
-    return *new BmpImage(upan::move(imageBuffer), header, infoHeader);
+    return *new Image(_infoHeader._width, _infoHeader._height, imageBuffer.release());
   }
 }

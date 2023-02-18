@@ -28,6 +28,7 @@ namespace upanui {
   public:
     static constexpr uint32_t MAX_ALPHA = 100;
     static constexpr uint32_t ALPHA_MASK = (MAX_ALPHA << 24);
+    static constexpr uint32_t NO_ALPHA_MASK = 0x00FFFFFF;
 
     class PixelCache {
     public:
@@ -37,7 +38,7 @@ namespace upanui {
       uint32_t _cRes;
     };
 
+    static int dcompare(double a, double b);
     static void setPixel(uint32_t& pixel, uint32_t color, PixelCache& pixelCache, bool isDirectSet);
-    static uint32_t* resize(const uint32_t* srcBuffer, const uint32_t srcWidth, const uint32_t srcHeight, const uint32_t destWidth, const uint32_t destHeight);
   };
 }

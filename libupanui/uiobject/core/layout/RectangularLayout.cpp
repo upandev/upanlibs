@@ -96,8 +96,8 @@ namespace upanui {
     }
 
     const auto& drawBuffer = parent().drawBuffer();
-    const auto bgColor = (parent().backgroundColorForDraw() & ~GCoreFunctions::ALPHA_MASK) | (alpha << 24);
-    const auto brColor = (parent().borderColor() & ~GCoreFunctions::ALPHA_MASK) | (parent().borderColorAlpha() << 24);
+    const auto bgColor = (parent().backgroundColorForDraw() & GCoreFunctions::NO_ALPHA_MASK) | (alpha << 24);
+    const auto brColor = (parent().borderColor() & GCoreFunctions::NO_ALPHA_MASK) | (parent().borderColorAlpha() << 24);
 
     const bool useCache = parent().drawBuffer().isLocal() || !parent().hasAlphaLocal();
     const auto cacheKey = upan::hash32(bgColor, brColor, parent().height(), parent().width(), parent().borderThickness());

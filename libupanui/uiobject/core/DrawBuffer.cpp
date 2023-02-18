@@ -100,7 +100,7 @@ namespace upanui {
     memcpy(buffer(), src, len);
   }
 
-  void DrawBuffer::copy(uint32_t* src, uint32_t width, uint32_t height, bool directSet) {
+  void DrawBuffer::copy(const uint32_t* src, uint32_t width, uint32_t height, bool directSet) {
     GCoreFunctions::PixelCache pixelCache;
     const int ex = upan::min(_vWidth, width);
     const int ey = upan::min(_vHeight, height);

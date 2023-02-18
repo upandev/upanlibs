@@ -21,22 +21,35 @@
  */
 #pragma once
 
-#include <Image.h>
+#include <UIElement.h>
 #include <uniq_ptr.h>
 
 namespace upanui {
-  class RawImage : public Image {
+  class Image {
   public:
-    RawImage(const Image& image);
-    RawImage(const Image& image, uint32_t newWidth, uint32_t newHeight);
-    virtual ~RawImage();
+    Image(const uint32_t width, const uint32_t height, uint32_t* imageData);
+    Image(const Image&);
+    Image(const Image& image, const uint32_t width, const uint32_t height);
+    ~Image() {}
 
-    const uint32_t* data() const override {
-      return const_cast<RawImage*>(this)->_imageBuffer.get();
+    uint32_t width() const {
+      return _width;
     }
 
+    uint32_t height() const {
+      return _height;
+    }
+
+    const uint32_t* data() const {
+      return const_cast<Image*>(this)->_imageData.get();
+    }
+
+    void resize(const uint32_t width, const uint32_t height);
+
   private:
+    uint32_t _width;
+    uint32_t _height;
     //assuming 4 bytes per pixel
-    upan::uniq_ptr<uint32_t> _imageBuffer;
+    upan::uniq_ptr<uint32_t> _imageData;
   };
 }

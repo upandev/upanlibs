@@ -71,6 +71,9 @@ include_directories(${PROJECT_SOURCE_DIR}/libustd/mthread)
 #add_compile_definitions(FT_CONFIG_MODULES_H="<ftmodule.h>")
 #add_compile_definitions(FT2_BUILD_LIBRARY)
 
+include_directories(${PROJECT_SOURCE_DIR}/libgccucore/i386)
+include_directories(${PROJECT_SOURCE_DIR}/libgccucore/zlib)
+
 include_directories(${PROJECT_SOURCE_DIR}/libupanui)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/frame)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/uicomponent)
@@ -85,8 +88,10 @@ include_directories(${PROJECT_SOURCE_DIR}/libupanui/uiobject/canvas)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/events)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/text)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/text/usfn)
-include_directories(${PROJECT_SOURCE_DIR}/libupanui/text/usfn/zlib)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/text/default)
+include_directories(${PROJECT_SOURCE_DIR}/libupanui/image)
+include_directories(${PROJECT_SOURCE_DIR}/libupanui/image/png)
+include_directories(${PROJECT_SOURCE_DIR}/libupanui/image/png/i386)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/interop/includes)
 
 add_custom_target(fonts COMMAND make WORKING_DIRECTORY libupanui/text/usfn/fonts)
@@ -130,6 +135,11 @@ add_library(cxxrt STATIC ${CXXRT_SRC1} ${CXXRT_SRC2})
 execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libustd -name '*.cpp' | grep -v CMakeFile" OUTPUT_VARIABLE LIB_USTD_SRC)
 string(REPLACE "\n" ";" LIB_USTD_SRC ${LIB_USTD_SRC})
 add_library(ustd STATIC ${LIB_USTD_SRC})
+
+#LIBGCCUCORE
+execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libgccucore -name '*.cpp' | grep -v CMakeFile" OUTPUT_VARIABLE LIB_GCCUCORE_SRC)
+string(REPLACE "\n" ";" LIB_GCCUCORE_SRC ${LIB_GCCUCORE_SRC})
+add_library(gccucore STATIC ${LIB_GCCUCORE_SRC})
 
 #LIBSFN
 #execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libsfn -name '*.c' | grep -v CMakeFile | grep -v builds" OUTPUT_VARIABLE LIB_SFN_SRC)

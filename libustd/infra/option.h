@@ -34,7 +34,7 @@ class option
     option() : _isEmpty(true) {}
 
   public:
-    option(const T& value) : _isEmpty(false), _value(value) {}
+    explicit option(const T& value) : _isEmpty(false), _value(value) {}
     
     static option<T> empty() {
       return option<T>();

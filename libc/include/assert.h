@@ -42,6 +42,12 @@ extern void __assert __P((const char *, const char *, int, const char *));
 	  /* __assert (__STRING(expr),__FILE__, __LINE__, __ASSERT_FUNCTION) ;*/ \
 	}
 
+#define	assert_f(expr, func)	\
+	if((expr) != false)	\
+	{\
+	  /* __assert (__STRING(expr),__FILE__, __LINE__, func) ;*/ \
+	}
+
 /*((void) ((expr) ||							      \
 	   (__assert (__STRING(expr),				      \
 			   __FILE__, __LINE__, __ASSERT_FUNCTION), 0)))

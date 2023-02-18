@@ -27,7 +27,6 @@
 
 namespace upanui {
   class Image;
-  class RawImage;
 
   class ImageCanvas : public RectangleCanvas {
   public:
@@ -39,6 +38,6 @@ namespace upanui {
   protected:
     void doDraw() override;
 
-    upan::uniq_ptr<RawImage> _image;
+    upan::uniq_ptr<Image> _image;
   };
 }

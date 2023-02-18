@@ -22,16 +22,15 @@
 
 #include <ImageCanvas.h>
 #include <Image.h>
-#include <RawImage.h>
 
 namespace upanui {
   ImageCanvas::ImageCanvas(const Image& image, const int x, const int y, const uint32_t width, const uint32_t height)
     : RectangleCanvas(x, y, width, height), _image(nullptr) {
-    _image.reset(new RawImage(image, width, height));
+    _image.reset(new Image(image, width, height));
   }
 
   void ImageCanvas::setImage(const Image& image) {
-    _image.reset(new RawImage(image, width(), height()));
+    _image.reset(new Image(image, width(), height()));
     contentChanged();
   }
 

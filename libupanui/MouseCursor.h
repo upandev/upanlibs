@@ -22,12 +22,13 @@
 #pragma once
 
 #include <stdlib.h>
+#include <Image.h>
 
 namespace upanui {
   class MouseCursor {
   public:
-    MouseCursor(const uint32_t* imageBuffer, const int x, const int y, const uint32_t width, const uint32_t height)
-    : _imageBuffer(imageBuffer), _x(x), _y(y), _width(width), _height(height) {
+    MouseCursor(const Image& image, const int x, const int y)
+    : _image(image), _x(x), _y(y) {
     }
 
     int x() const {
@@ -45,23 +46,20 @@ namespace upanui {
     }
 
     uint32_t width() const {
-      return _width;
+      return _image.width();
     }
 
     uint32_t height() const {
-      return _height;
+      return _image.height();
     }
 
     const uint32_t* data() const {
-      return const_cast<MouseCursor*>(this)->_imageBuffer.get();
+      return const_cast<MouseCursor*>(this)->_image.data();
     }
 
   private:
-    //assuming 4 bytes per pixel
-    upan::uniq_ptr<const uint32_t> _imageBuffer;
+    Image _image;
     __volatile__ int _x;
     __volatile__ int _y;
-    uint32_t _width;
-    uint32_t _height;
   };
 }

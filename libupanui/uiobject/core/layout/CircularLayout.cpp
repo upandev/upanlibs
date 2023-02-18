@@ -102,7 +102,7 @@ namespace upanui {
     if (alpha == 0 && parent().borderThickness() == 0) {
       return;
     }
-    rawColor &= ~GCoreFunctions::ALPHA_MASK;
+    rawColor &= GCoreFunctions::NO_ALPHA_MASK;
     const auto color = rawColor | (alpha << 24);
 
     int x = 0;
@@ -151,6 +151,8 @@ namespace upanui {
   }
 
   void CircularLayout::fill() {
+    //TODO: optimize by caching drawbuffer
+    printf("\n drawing circle");
     const auto outerCircleRadius = (parent().width() / 2) - 1;
     const auto innerCircleRadius = outerCircleRadius - parent().borderThickness();
     if (outerCircleRadius > innerCircleRadius) {
