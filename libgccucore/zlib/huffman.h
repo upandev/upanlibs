@@ -24,42 +24,40 @@
 
 #include <stdlib.h>
 
-namespace upanui {
-  namespace usfn {
-    class huffman {
-    public:
-      static constexpr int ZFAST_BITS = 9;
-      static constexpr int ZFAST_MASK = ((1 << ZFAST_BITS) - 1);
+namespace gccucore {
+  class huffman {
+  public:
+    static constexpr int ZFAST_BITS = 9;
+    static constexpr int ZFAST_MASK = ((1 << ZFAST_BITS) - 1);
 
-      void build(unsigned char *sizelist, int num);
+    void build(unsigned char *sizelist, int num);
 
-      uint16_t getFastAt(int i) {
-        return fast[i];
-      }
+    uint16_t getFastAt(int i) {
+      return fast[i];
+    }
 
-      int getMaxCodeAt(int i) {
-        return maxcode[i];
-      }
+    int getMaxCodeAt(int i) {
+      return maxcode[i];
+    }
 
-      uint16_t getFirstCodeAt(int i) {
-        return firstcode[i];
-      }
+    uint16_t getFirstCodeAt(int i) {
+      return firstcode[i];
+    }
 
-      uint16_t getFirstSymbolAt(int i) {
-        return firstsymbol[i];
-      }
+    uint16_t getFirstSymbolAt(int i) {
+      return firstsymbol[i];
+    }
 
-      uint16_t getValueAt(int i) {
-        return value[i];
-      }
+    uint16_t getValueAt(int i) {
+      return value[i];
+    }
 
-    private:
-      uint16_t fast[1 << ZFAST_BITS];
-      uint16_t firstcode[16];
-      int maxcode[17];
-      uint16_t firstsymbol[16];
-      unsigned char size[288];
-      uint16_t value[288];
-    };
-  }
+  private:
+    uint16_t fast[1 << ZFAST_BITS];
+    uint16_t firstcode[16];
+    int maxcode[17];
+    uint16_t firstsymbol[16];
+    unsigned char size[288];
+    uint16_t value[288];
+  };
 }

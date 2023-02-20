@@ -19,26 +19,10 @@
  *  You should have received a copy of the GNU General Public License
    *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
+#include <zlib.h>
 
-#include <uzlib.h>
-
-namespace upanui {
-  namespace usfn {
-    int zlib::bitreverse16(int n) {
-      n = ((n & 0xAAAA) >>  1) | ((n & 0x5555) << 1);
-      n = ((n & 0xCCCC) >>  2) | ((n & 0x3333) << 2);
-      n = ((n & 0xF0F0) >>  4) | ((n & 0x0F0F) << 4);
-      n = ((n & 0xFF00) >>  8) | ((n & 0x00FF) << 8);
-      return n;
-    }
-
-    int zlib::bit_reverse(int v, int bits) {
-      return bitreverse16(v) >> (16-bits);
-    }
-
-    char* zlib::decode(const char *buffer) {
-      zbuffer zbuf((unsigned char *) buffer);
-      return zbuf.parse();
-    }
+namespace gccucore {
+  namespace zlib {
+void inflate_fast(z_stream* strm, uint32_t start);
   }
 }
