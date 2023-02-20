@@ -25,9 +25,9 @@
 #include <uniq_ptr.h>
 
 namespace upanui {
-    class BmpDecoder {
+    class BmpEncoder {
     public:
-      BmpDecoder() {}
+      BmpEncoder() {}
 
       typedef struct {
         uint8_t _signature[2];
@@ -63,7 +63,7 @@ namespace upanui {
         }
       } PACKED InfoHeader;
 
-      Image& parse(const void* imageData, upan::option<uint32_t> transparentColor);
+      Image& decode(const void* imageData, upan::option<uint32_t> transparentColor);
       void DebugPrint() const;
 
     private:

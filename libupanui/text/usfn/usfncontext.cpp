@@ -22,7 +22,7 @@
 
 #include <usfncontext.h>
 #include <exception.h>
-#include <uzlib.h>
+#include <zlib.h>
 #include <vector.h>
 
 extern uint32_t _binary_fonts_FreeSans_sfn_start;
@@ -87,7 +87,7 @@ namespace upanui {
         if(code & 16) {
           while(*fontData++ != 0);
         }
-        font = (Font*)zlib::decode((const char*)fontData);
+        font = (Font*)gccucore::zlib::decode((const char*)fontData);
         _bufs = (char**)realloc(_bufs, (_numbuf + 1) * sizeof(char*));
         if (!_bufs) {
           _numbuf = 0;

@@ -20,18 +20,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include <BmpDecoder.h>
+#include <BmpEncoder.h>
 #include <exception.h>
 #include <ColorPalettes.h>
 #include <GCoreFunctions.h>
 
 namespace upanui {
-  void BmpDecoder::DebugPrint() const {
+  void BmpEncoder::DebugPrint() const {
     _header.DebugPrint();
     _infoHeader.DebugPrint();
   }
 
-  Image& BmpDecoder::parse(const void* imageData, upan::option<uint32_t> transparentColor) {
+  Image& BmpEncoder::decode(const void* imageData, upan::option<uint32_t> transparentColor) {
     if (imageData == nullptr) {
       throw upan::exception(XLOC, "imageData can't be null");
     }

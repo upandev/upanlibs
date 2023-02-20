@@ -43,6 +43,6 @@ namespace upanui {
       return;
     }
 
-    drawBuffer().copy(_image->data(), width(), height(), true);
+    drawBuffer().copy(_image->data(), width(), height(), false);
   }
 }
