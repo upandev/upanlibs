@@ -26,9 +26,9 @@
 namespace upanui {
   class GCoreFunctions {
   public:
-    static constexpr uint32_t MAX_ALPHA = 100;
+    static constexpr uint32_t MAX_ALPHA = 0xFF;
     static constexpr uint32_t ALPHA_MASK = (MAX_ALPHA << 24);
-    static constexpr uint32_t NO_ALPHA_MASK = 0x00FFFFFF;
+    static constexpr uint32_t NO_ALPHA_MASK = ~ALPHA_MASK;
 
     class PixelCache {
     public:
@@ -39,6 +39,7 @@ namespace upanui {
     };
 
     static int dcompare(double a, double b);
+    static uint32_t percentToAlpha(uint32_t percent);
     static void setPixel(uint32_t& pixel, uint32_t color, PixelCache& pixelCache, bool isDirectSet);
   };
 }

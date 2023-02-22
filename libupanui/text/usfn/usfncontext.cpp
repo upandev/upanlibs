@@ -286,14 +286,6 @@ namespace upanui {
       buf.y = buf.y * s / _f->height;
     }
 
-    static int alphaTo100(int a) {
-      return (100 * a) / 0xFF;
-    }
-
-    static int alphaToFF(int a) {
-      return (0xFF * a) / 100;
-    }
-
     int Context::RenderText(FrameBuffer& dst, const char *str, bool fillBG) {
       Font **fl;
       uint8_t *ptr = NULL, *frg, *end, *tmp, color, ci = 0, cb = 0, cs;
@@ -633,8 +625,6 @@ namespace upanui {
         cb = (h + 64) >> 6; uix = w > s ? w : s; uax = 0;
         n = _f->underline * h / _f->height;
         fR = (dst.fg >> 16) & 0xFF; fG = (dst.fg >> 8) & 0xFF; fB = (dst.fg >> 0) & 0xFF; fA = (dst.fg >> 24) & 0xFF;
-        //upanix uses alpha as a percent from 0 to 100 - so convert alpha to 0 to 0xFF range
-        fA = alphaToFF(fA);
         bR = (dst.bg >> 16) & 0xFF; bG = (dst.bg >> 8) & 0xFF; bB = (dst.bg >> 0) & 0xFF;
         Op = (uint32_t*)(dst.ptr + dst.p * (dst.y - oy) + ((dst.x - ox) << 2));
 
@@ -690,7 +680,7 @@ namespace upanui {
             if(sA > 15 || fillBG) {
               if (sA > 255) sA = 255;
               //upanix uses alpha as a percent from 0 to 100 - so convert alpha to 0 to 0xFF range
-              *Ol = (alphaTo100(sA) << 24) |
+              *Ol = (sA << 24) |
                   ((sR > 255 ? 255 : sR) << (16 - cs)) |
                   ((sG > 255 ? 255 : sG) << 8) |
                   ((sB > 255 ? 255 : sB) << cs);
@@ -717,7 +707,7 @@ namespace upanui {
               bB += ((fB - bB) * fA) >> 8;
               bG += ((fG - bG) * fA) >> 8;
               bR += ((fR - bR) * fA) >> 8;
-              *Ol = (alphaTo100(fA) << 24) | (bR << (16 - cs)) | (bG << 8) | (bB << cs);
+              *Ol = (fA << 24) | (bR << (16 - cs)) | (bG << 8) | (bB << cs);
             }
           }
         }
@@ -735,7 +725,7 @@ namespace upanui {
               bB += ((fB - bB) * fA) >> 8;
               bG += ((fG - bG) * fA) >> 8;
               bR += ((fR - bR) * fA) >> 8;
-              *Ol = (alphaTo100(fA) << 24) | (bR << (16 - cs)) | (bG << 8) | (bB << cs);
+              *Ol = (fA << 24) | (bR << (16 - cs)) | (bG << 8) | (bB << cs);
             }
           }
         }

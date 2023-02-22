@@ -31,6 +31,10 @@ namespace upanui {
     return ai < bi ? -1 : ai > bi ? 1 : 0;
   }
 
+  uint32_t GCoreFunctions::percentToAlpha(uint32_t percent) {
+    return MAX_ALPHA * upan::min(percent, 100u) / 100;
+  }
+
   void GCoreFunctions::setPixel(uint32_t& pixel, uint32_t color, PixelCache& pixelCache, bool isDirectSet) {
     if (isDirectSet) {
       pixel = color;
@@ -57,7 +61,7 @@ namespace upanui {
 
             const uint32_t caf = (MAX_ALPHA - ia);
 
-            pixel = (uint8_t) upan::min((MAX_ALPHA * ia + ca * caf) / MAX_ALPHA, 100u) << 24
+            pixel = (uint8_t) upan::min((MAX_ALPHA * ia + ca * caf) / MAX_ALPHA, 0xFFu) << 24
                     | (uint8_t) upan::min((ir * ia + cr * caf) / MAX_ALPHA, 0xFFu) << 16
                     | (uint8_t) upan::min((ig * ia + cg * caf) / MAX_ALPHA, 0xFFu) << 8
                     | (uint8_t) upan::min((ib * ia + cb * caf) / MAX_ALPHA, 0xFFu);
