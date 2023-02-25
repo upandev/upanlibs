@@ -65,8 +65,8 @@ namespace upanui {
         double db = 0;
         double da = 0;
 
-        uint32_t sy = y * fy;
         double scy = y * fy;
+        auto sy = (uint32_t)scy;
 
         for(double sfy = fy; GCoreFunctions::dcompare(sfy, 0.0) != 0 && sy < srcHeight;) {
           auto dy = sy + 1 - scy;
@@ -85,8 +85,12 @@ namespace upanui {
             sfy = 0;
           }
 
-          uint32_t sx = x * fx;
+          if (sy >= srcHeight) {
+            break;
+          }
+
           double scx = x * fx;
+          auto sx = (uint32_t)scx;
           for (double sfx = fx; GCoreFunctions::dcompare(sfx, 0.0) != 0 && sx < srcWidth;) {
             auto dx = sx + 1 - scx;
             const auto pxcmp = GCoreFunctions::dcompare(dx, sfx);
@@ -102,6 +106,10 @@ namespace upanui {
               dx = sfx;
               scx += dx;
               sfx = 0;
+            }
+
+            if (sx >= srcWidth) {
+              break;
             }
 
             double ipf = dx * dy * fa;
