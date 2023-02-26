@@ -21,29 +21,25 @@
  */
 #pragma once
 
-#include <PngEncoder.h>
-#include <PngParser.h>
+#include <stddef.h>
 
 namespace upanui {
-  Image& PngEncoder::decode(const ImageResource& imageResource) {
-    return decode(imageResource.data(), imageResource.size());
-  }
+  class ImageResource {
+  private:
+    ImageResource() = delete;
+    ImageResource(const void* data, size_t size) : _data(data), _size(size) {}
 
-  Image& PngEncoder::decode(const void *imageData, size_t len) {
-    upan::uniq_ptr<PngParser> parser(new PngParser(imageData, len));
+  public:
+    const void* data() const { return _data; }
+    size_t size() const { return _size; }
 
-    size_t out_size;
-    parser->decoded_image_size(PngParser::PNG_FMT_RGBA8, out_size);
-    byte* out = new byte[out_size];
+    static const ImageResource TEST_PNG;
+    static const ImageResource MOUSE_CURSOR_PNG;
 
-    parser->decode_image(out, out_size, PngParser::PNG_FMT_RGBA8, 0);
+    static const ImageResource MOUSE_CURSOR_BMP;
 
-    for(int i = 0; i < out_size; i += 4) {
-      byte x = out[i + 2];
-      out[i + 2] = out[i];
-      out[i] = x;
-    }
-
-    return *new Image(parser->image_width(), parser->image_height(), (uint32_t*)out);
-  }
+  private:
+    const void* _data;
+    const size_t _size;
+  };
 }

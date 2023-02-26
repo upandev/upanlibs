@@ -88,7 +88,7 @@ include_directories(${PROJECT_SOURCE_DIR}/libupanui/image/bmp)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/image/png)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/interop/includes)
 
-add_custom_target(fonts COMMAND make WORKING_DIRECTORY libupanui/text/usfn/fonts)
+add_custom_target(resources COMMAND make WORKING_DIRECTORY libupanui/resources/)
 
 #LIBC
 execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.c' | grep -v CMakeFile | grep -v './libc/sys/'" OUTPUT_VARIABLE LIBC_SRC)
@@ -136,18 +136,18 @@ string(REPLACE "\n" ";" LIB_GCCUCORE_SRC ${LIB_GCCUCORE_SRC})
 add_library(gccucore STATIC ${LIB_GCCUCORE_SRC})
 
 #LIBUPANUI
-execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ${PROJECT_SOURCE_DIR}/libupanui/text/usfn/fonts/obj -name '*.o';" OUTPUT_VARIABLE FONT_OBJS)
-message(${FONT_OBJS})
-string(REPLACE "\n" ";" FONT_OBJS ${FONT_OBJS})
+execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ${PROJECT_SOURCE_DIR}/libupanui/resources/obj -name '*.o';" OUTPUT_VARIABLE RESOURCE_OBJS)
+message(${RESOURCE_OBJS})
+string(REPLACE "\n" ";" RESOURCE_OBJS ${RESOURCE_OBJS})
 
 execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libupanui -name '*.cpp' | grep -v CMakeFile | grep -v './libupanui/interop/src/'" OUTPUT_VARIABLE LIB_UPANUI_CPP_SRC)
 execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libupanui -name '*.cpp' | grep -v CMakeFile | grep './libupanui/interop/src/'" OUTPUT_VARIABLE LIB_UPANUI_INTEROP_CPP_SRC)
 string(REPLACE "\n" ";" LIB_UPANUI_CPP_SRC ${LIB_UPANUI_CPP_SRC})
 string(REPLACE "\n" ";" LIB_UPANUI_INTEROP_CPP_SRC ${LIB_UPANUI_INTEROP_CPP_SRC})
-add_library(upanui STATIC ${FONT_OBJS} ${LIB_UPANUI_CPP_SRC} ${LIB_UPANUI_INTEROP_CPP_SRC})
-add_library(upanui_interop STATIC ${FONT_OBJS} ${LIB_UPANUI_CPP_SRC})
+add_library(upanui STATIC ${RESOURCE_OBJS} ${LIB_UPANUI_CPP_SRC} ${LIB_UPANUI_INTEROP_CPP_SRC})
+add_library(upanui_interop STATIC ${RESOURCE_OBJS} ${LIB_UPANUI_CPP_SRC})
 
-add_dependencies(upanui fonts)
-add_dependencies(upanui_interop fonts)
+add_dependencies(upanui resources)
+add_dependencies(upanui_interop resources)
 
 link_directories(${OUTPUT_DIR})

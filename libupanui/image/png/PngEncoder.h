@@ -22,10 +22,12 @@
 #pragma once
 
 #include <Image.h>
+#include <ImageResource.h>
 
 namespace upanui {
   class PngEncoder {
   public:
+    Image &decode(const ImageResource& imageResource);
     Image &decode(const void *imageData, size_t len);
   };
 }

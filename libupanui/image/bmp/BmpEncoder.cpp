@@ -31,6 +31,10 @@ namespace upanui {
     _infoHeader.DebugPrint();
   }
 
+  Image& BmpEncoder::decode(const ImageResource& imageResource, upan::option<uint32_t> transparentColor) {
+    return decode(imageResource.data(), transparentColor);
+  }
+
   Image& BmpEncoder::decode(const void* imageData, upan::option<uint32_t> transparentColor) {
     if (imageData == nullptr) {
       throw upan::exception(XLOC, "imageData can't be null");

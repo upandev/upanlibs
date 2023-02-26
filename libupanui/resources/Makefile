@@ -19,21 +19,33 @@
 #	 along with this program.  If not, see <http://www.gnu.org/licenses/
 LD = ${HOME}/opt/cross/i686-elf/bin/ld
 
-# List all the font files
-FONT_FILES := $(shell find . -name '*.sfn')
+# List all the resource files
+PNG_FILES := $(shell find icons/png -name '*.png')
+BMP_FILES := $(shell find icons/bmp -name '*.bmp')
+FONT_FILES := $(shell find fonts/sfn -name '*.sfn')
 
 # Generate the list of all the output .o files
-OBJ_FILES := $(patsubst %.sfn,obj/%.o,$(FONT_FILES))
+PNG_OBJ_FILES := $(patsubst %.png,obj/%.o,$(PNG_FILES))
+BMP_OBJ_FILES := $(patsubst %.bmp,obj/%.o,$(BMP_FILES))
+FONT_OBJ_FILES := $(patsubst %.sfn,obj/%.o,$(FONT_FILES))
 
 # Default target to build all the .o files
-all: $(OBJ_FILES)
+all: $(PNG_OBJ_FILES) $(BMP_OBJ_FILES) $(FONT_OBJ_FILES)
+
+# Rule to build a .o file from a .png file
+obj/%.o: %.png
+	mkdir -p $(@D)
+	${LD} -r -b binary -o $@ $<
+
+# Rule to build a .o file from a .bmp file
+obj/%.o: %.bmp
+	mkdir -p $(@D)
+	${LD} -r -b binary -o $@ $<
 
 # Rule to build a .o file from a .sfn file
 obj/%.o: %.sfn
 	mkdir -p $(@D)
 	${LD} -r -b binary -o $@ $<
-
-#readelf -s ${FONT_FREE_SANS_OBJ}
 
 clean:
 	rm -rf obj/

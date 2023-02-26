@@ -23,6 +23,7 @@
 
 #include <Image.h>
 #include <uniq_ptr.h>
+#include <ImageResource.h>
 
 namespace upanui {
     class BmpEncoder {
@@ -63,6 +64,7 @@ namespace upanui {
         }
       } PACKED InfoHeader;
 
+      Image& decode(const ImageResource& imageResource, upan::option<uint32_t> transparentColor);
       Image& decode(const void* imageData, upan::option<uint32_t> transparentColor);
       void DebugPrint() const;
 

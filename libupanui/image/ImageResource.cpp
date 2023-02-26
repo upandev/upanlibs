@@ -19,31 +19,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-#pragma once
+#include <ImageResource.h>
 
-#include <PngEncoder.h>
-#include <PngParser.h>
+#define DECLARE_IMAGE(name, type) \
+extern unsigned _binary_icons_##type##_##name##_##type##_start; \
+extern unsigned _binary_icons_##type##_##name##_##type##_size;
+
+#define IMAGE_PARAMS(name, type) \
+&_binary_icons_##type##_##name##_##type##_start, (size_t)&_binary_icons_##type##_##name##_##type##_size
+
+DECLARE_IMAGE(test, png)
+DECLARE_IMAGE(mouse_cursor, png)
+
+DECLARE_IMAGE(mouse_cursor, bmp)
 
 namespace upanui {
-  Image& PngEncoder::decode(const ImageResource& imageResource) {
-    return decode(imageResource.data(), imageResource.size());
-  }
+  const ImageResource ImageResource::TEST_PNG(IMAGE_PARAMS(test, png));
+  const ImageResource ImageResource::MOUSE_CURSOR_PNG(IMAGE_PARAMS(mouse_cursor, png));
 
-  Image& PngEncoder::decode(const void *imageData, size_t len) {
-    upan::uniq_ptr<PngParser> parser(new PngParser(imageData, len));
-
-    size_t out_size;
-    parser->decoded_image_size(PngParser::PNG_FMT_RGBA8, out_size);
-    byte* out = new byte[out_size];
-
-    parser->decode_image(out, out_size, PngParser::PNG_FMT_RGBA8, 0);
-
-    for(int i = 0; i < out_size; i += 4) {
-      byte x = out[i + 2];
-      out[i + 2] = out[i];
-      out[i] = x;
-    }
-
-    return *new Image(parser->image_width(), parser->image_height(), (uint32_t*)out);
-  }
+  const ImageResource ImageResource::MOUSE_CURSOR_BMP(IMAGE_PARAMS(mouse_cursor,bmp));
 }

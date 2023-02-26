@@ -25,9 +25,9 @@
 #include <zlib.h>
 #include <vector.h>
 
-extern uint32_t _binary_fonts_FreeSans_sfn_start;
-extern uint32_t _binary_unifont_sfn_start;
-extern uint32_t _binary_u_vga16_sfn_start;
+extern uint32_t _binary_fonts_sfn_freesans_sfn_start;
+extern uint32_t _binary_fonts_sfn_unifont_sfn_start;
+extern uint32_t _binary_fonts_sfn_vga16_sfn_start;
 
 namespace upanui {
   namespace usfn {
@@ -56,11 +56,11 @@ namespace upanui {
     const uint8_t* Context::GetPreloadedFont(PreloadedFonts type) {
       switch(type) {
         case FreeSans:
-          return (uint8_t*)&_binary_fonts_FreeSans_sfn_start;
+          return (uint8_t*)&_binary_fonts_sfn_freesans_sfn_start;
         case VGA16:
-          return (uint8_t*)&_binary_u_vga16_sfn_start;
+          return (uint8_t*)&_binary_fonts_sfn_vga16_sfn_start;
         case Unifont:
-          return (uint8_t*)&_binary_unifont_sfn_start;
+          return (uint8_t*)&_binary_fonts_sfn_unifont_sfn_start;
       }
       throw upan::exception(XLOC, "unsupported preloaded font: %d", type);
     }
