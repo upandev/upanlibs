@@ -22,24 +22,53 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdint.h>
+#include <option.h>
 
 namespace upanui {
-  class ImageResource {
-  private:
-    ImageResource() = delete;
-    ImageResource(const void* data, size_t size) : _data(data), _size(size) {}
+  enum ImageComposeType {
+    FIT_IN,
+    STRETCH
+  };
 
+  class Image;
+
+  class ImageResource {
   public:
     const void* data() const { return _data; }
     size_t size() const { return _size; }
+    virtual Image& create() const = 0;
 
-    static const ImageResource TEST_PNG;
-    static const ImageResource MOUSE_CURSOR_PNG;
-
-    static const ImageResource MOUSE_CURSOR_BMP;
+  protected:
+    ~ImageResource() {}
+    ImageResource(const void* data, size_t size) : _data(data), _size(size) {}
 
   private:
     const void* _data;
     const size_t _size;
+  };
+
+  class PngImageResource : public ImageResource {
+  public:
+    PngImageResource(const void* data, size_t size) : ImageResource(data, size) {}
+    Image& create() const override;
+
+    static const PngImageResource TEST;
+    static const PngImageResource MOUSE_CURSOR;
+    static const PngImageResource CLOSE;
+    static const PngImageResource UP;
+    static const PngImageResource DOWN;
+  };
+
+  class BmpImageResource : public ImageResource {
+  public:
+    BmpImageResource(const void* data, size_t size, upan::option<uint32_t> transparentColor) : ImageResource(data, size), _transparentColor(transparentColor) {}
+    BmpImageResource(const void* data, size_t size) : BmpImageResource(data, size, upan::option<uint32_t>::empty()) {}
+
+    Image& create() const override;
+
+    static const BmpImageResource MOUSE_CURSOR;
+  private:
+    upan::option<uint32_t> _transparentColor;
   };
 }

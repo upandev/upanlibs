@@ -22,7 +22,7 @@
 
 #include <VerticalScroller.h>
 #include <UIObjectFactory.h>
-#include <Button.h>
+#include <IconButton.h>
 #include <dtime.h>
 
 namespace upanui {
@@ -51,10 +51,10 @@ namespace upanui {
       scrollerCanvas.backgroundColor(0xFFFFFF);
     }
 
-    _scrollUpBt = &UIObjectFactory::createButton(*this, scrollBarX, scrollBarTopBtY, _scrollBarWidth, _scrollBarWidth);
+    _scrollUpBt = &UIObjectFactory::createIconButton(*this, PngImageResource::UP, scrollBarX, scrollBarTopBtY, _scrollBarWidth, _scrollBarWidth);
     _scrollUpBt->backgroundColor(0xFFFAABB);
 
-    _scrollDownBt = &UIObjectFactory::createButton(*this, scrollBarX, scrollBarBottomBtY, _scrollBarWidth, _scrollBarWidth);
+    _scrollDownBt = &UIObjectFactory::createIconButton(*this, PngImageResource::DOWN, scrollBarX, scrollBarBottomBtY, _scrollBarWidth, _scrollBarWidth);
     _scrollDownBt->backgroundColor(0xFFFAABB);
 
     captureMouseEvents(true);

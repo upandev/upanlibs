@@ -20,6 +20,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 #include <ImageResource.h>
+#include <PngEncoder.h>
+#include <BmpEncoder.h>
 
 #define DECLARE_IMAGE(name, type) \
 extern unsigned _binary_icons_##type##_##name##_##type##_start; \
@@ -30,12 +32,28 @@ extern unsigned _binary_icons_##type##_##name##_##type##_size;
 
 DECLARE_IMAGE(test, png)
 DECLARE_IMAGE(mouse_cursor, png)
+DECLARE_IMAGE(close, png)
+DECLARE_IMAGE(up, png)
+DECLARE_IMAGE(down, png)
 
 DECLARE_IMAGE(mouse_cursor, bmp)
 
 namespace upanui {
-  const ImageResource ImageResource::TEST_PNG(IMAGE_PARAMS(test, png));
-  const ImageResource ImageResource::MOUSE_CURSOR_PNG(IMAGE_PARAMS(mouse_cursor, png));
+  const PngImageResource PngImageResource::TEST(IMAGE_PARAMS(test, png));
+  const PngImageResource PngImageResource::MOUSE_CURSOR(IMAGE_PARAMS(mouse_cursor, png));
+  const PngImageResource PngImageResource::CLOSE(IMAGE_PARAMS(close, png));
+  const PngImageResource PngImageResource::UP(IMAGE_PARAMS(up, png));
+  const PngImageResource PngImageResource::DOWN(IMAGE_PARAMS(down, png));
 
-  const ImageResource ImageResource::MOUSE_CURSOR_BMP(IMAGE_PARAMS(mouse_cursor,bmp));
+  const BmpImageResource BmpImageResource::MOUSE_CURSOR(IMAGE_PARAMS(mouse_cursor,bmp));
+
+  Image& PngImageResource::create() const {
+    PngEncoder encoder;
+    return encoder.decode(*this);
+  }
+
+  Image& BmpImageResource::create() const {
+    BmpEncoder encoder;
+    return encoder.decode(*this, _transparentColor);
+  }
 }

@@ -23,19 +23,19 @@
 #pragma once
 
 #include <Button.h>
-#include <Line.h>
-#include <uniq_ptr.h>
+#include <ImageResource.h>
 
 namespace upanui {
-  class CloseIconButton : public Button {
-  public:
-    CloseIconButton();
-
+  class IconButton : public Button {
   protected:
-    virtual ~CloseIconButton() {}
-    CloseIconButton (const int x, const int y, const uint32_t width, const uint32_t height);
+    virtual ~IconButton() {}
+    IconButton(const ImageResource& imageResource, const ImageComposeType composeType,
+               const int x, const int y, const uint32_t width, const uint32_t height);
     void init();
 
+  private:
+    const ImageResource& _imageResource;
+    const ImageComposeType _composeType;
     friend class UIObjectFactory;
   };
 }

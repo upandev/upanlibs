@@ -25,9 +25,10 @@
 #include <RoundCanvas.h>
 #include <ImageCanvas.h>
 #include <Line.h>
-#include <CloseIconButton.h>
+#include <IconButton.h>
 #include <Label.h>
 #include <VerticalScroller.h>
+#include <Image.h>
 
 namespace upanui {
   RectangleCanvas& UIObjectFactory::createRectangleCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
@@ -42,8 +43,36 @@ namespace upanui {
     return canvas;
   }
 
+  ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const Image& image, ImageComposeType composeType,
+                                                  const int x, const int y, const uint32_t width, const uint32_t height) {
+    auto& canvas = *new ImageCanvas(image, composeType, x, y, width, height);
+    parent.add(canvas);
+    return canvas;
+  }
+
   ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const Image& image, const int x, const int y, const uint32_t width, const uint32_t height) {
-    auto& canvas = *new ImageCanvas(image, x, y, width, height);
+    return createImageCanvas(parent, image, ImageComposeType::FIT_IN, x, y, width, height);
+  }
+
+  ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const Image& image, const int x, const int y) {
+    return createImageCanvas(parent, image, ImageComposeType::FIT_IN, x, y, image.width(), image.height());
+  }
+
+  ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const ImageResource& imageResource, ImageComposeType composeType,
+                                                  const int x, const int y, const uint32_t width, const uint32_t height) {
+    auto& canvas = *new ImageCanvas(&imageResource.create(), composeType, x, y, width, height);
+    parent.add(canvas);
+    return canvas;
+  }
+
+  ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const ImageResource& imageResource,
+                                                  const int x, const int y, const uint32_t width, const uint32_t height) {
+    return createImageCanvas(parent, imageResource, ImageComposeType::FIT_IN, x, y, width, height);
+  }
+
+  ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const ImageResource& imageResource, const int x, const int y) {
+    Image& image = imageResource.create();
+    auto& canvas = *new ImageCanvas(&image, ImageComposeType::FIT_IN, x, y, image.width(), image.height());
     parent.add(canvas);
     return canvas;
   }
@@ -60,11 +89,17 @@ namespace upanui {
     return button;
   }
 
-  CloseIconButton& UIObjectFactory::createCloseIconButton(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
-    auto& button = *new CloseIconButton(x, y, width, height);
+  IconButton& UIObjectFactory::createIconButton(UIObject& parent, const ImageResource& imageResource, ImageComposeType composeType,
+                                                const int x, const int y, const uint32_t width, const uint32_t height) {
+    auto& button = *new IconButton(imageResource, composeType, x, y, width, height);
     parent.add(button);
     button.init();
     return button;
+  }
+
+  IconButton& UIObjectFactory::createIconButton(UIObject& parent, const ImageResource& imageResource,
+                                                const int x, const int y, const uint32_t width, const uint32_t height) {
+    return createIconButton(parent, imageResource, ImageComposeType::FIT_IN, x, y, width, height);
   }
 
   Label& UIObjectFactory::createLabel(UIObject& parent, const int x, const int y,

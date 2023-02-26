@@ -24,13 +24,18 @@
 
 #include <RectangleCanvas.h>
 #include <uniq_ptr.h>
+#include <ImageResource.h>
 
 namespace upanui {
   class Image;
 
   class ImageCanvas : public RectangleCanvas {
   public:
-    ImageCanvas(const Image& image, const int x, const int y, const uint32_t width, const uint32_t height);
+    ImageCanvas(const Image& image, ImageComposeType composeType,
+                const int x, const int y, const uint32_t width, const uint32_t height);
+    ImageCanvas(Image* inImage, ImageComposeType composeType,
+                const int x, const int y, const uint32_t width, const uint32_t height);
+
     void setImage(const Image& image);
 
     bool hasAlphaLocal() override;
@@ -39,5 +44,6 @@ namespace upanui {
     void doDraw() override;
 
     upan::uniq_ptr<Image> _image;
+    ImageComposeType _composeType;
   };
 }

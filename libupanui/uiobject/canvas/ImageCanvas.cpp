@@ -24,9 +24,14 @@
 #include <Image.h>
 
 namespace upanui {
-  ImageCanvas::ImageCanvas(const Image& image, const int x, const int y, const uint32_t width, const uint32_t height)
-    : RectangleCanvas(x, y, width, height), _image(nullptr) {
-    _image.reset(new Image(image, width, height));
+  ImageCanvas::ImageCanvas(const Image& image, ImageComposeType composeType,
+                           const int x, const int y, const uint32_t width, const uint32_t height)
+    : RectangleCanvas(x, y, width, height), _image(new Image(image)), _composeType(composeType) {
+  }
+
+  ImageCanvas::ImageCanvas(Image* inImage, ImageComposeType composeType,
+                           const int x, const int y, const uint32_t width, const uint32_t height)
+      : RectangleCanvas(x, y, width, height), _image(inImage), _composeType(composeType) {
   }
 
   void ImageCanvas::setImage(const Image& image) {
@@ -43,10 +48,24 @@ namespace upanui {
       return;
     }
 
-    if (width() != _image->width() || height() != _image->height()) {
-      return;
+    uint32_t nw, nh;
+    switch(_composeType) {
+      case STRETCH:
+        nw = upan::max(width(), _image->width());
+        nh = upan::max(height(), _image->height());
+        break;
+
+      case FIT_IN:
+      default:
+        nw = upan::min(width(), _image->width());
+        nh = upan::min(height(), _image->height());
+        break;
     }
 
-    drawBuffer().copy(_image->data(), width(), height(), !hasAlphaLocal());
+    if (nw != _image->width() || nh != _image->height()) {
+      _image->resize(nw, nh);
+    }
+
+    drawBuffer().copy(_image->data(), _image->width(), _image->height(), !hasAlphaLocal());
   }
 }
