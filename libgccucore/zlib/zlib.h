@@ -53,10 +53,11 @@
 // * are errors, positive values are used for special but normal events.
 // */
 //
-//#define Z_NO_COMPRESSION         0
-//#define Z_BEST_SPEED             1
-//#define Z_BEST_COMPRESSION       9
-#define Z_DEFAULT_COMPRESSION  (-1)
+#define Z_NO_COMPRESSION         0
+#define Z_BEST_SPEED             1
+#define Z_DEFAULT_COMPRESSION    6
+#define Z_BEST_COMPRESSION       9
+
 ///* compression levels */
 //
 #define Z_FILTERED            1
