@@ -19,30 +19,24 @@
 #	 along with this program.  If not, see <http://www.gnu.org/licenses/
 LD = ${HOME}/opt/cross/i686-elf/bin/ld
 
-#fonts_FreeSans.sfn  u_vga16.o  u_vga16.sfn  unifont.o  unifont.sfn
-FONT_FREE_SANS = fonts_FreeSans.sfn
-FONT_U_VGA16 = u_vga16.sfn
-FONT_UNIFONT = unifont.sfn
+# List all the font files
+FONT_FILES := $(shell find . -name '*.sfn')
 
-FONT_FREE_SANS_OBJ = fonts_FreeSans.o 
-FONT_U_VGA16_OBJ = u_vga16.o
-FONT_UNIFONT_OBJ = unifont.o
+# Generate the list of all the output .o files
+OBJ_FILES := $(patsubst %.sfn,obj/%.o,$(FONT_FILES))
 
-build: ${FONT_FREE_SANS_OBJ} ${FONT_U_VGA16_OBJ} ${FONT_UNIFONT_OBJ}
+# Default target to build all the .o files
+all: $(OBJ_FILES)
 
-${FONT_FREE_SANS_OBJ}: ${FONT_FREE_SANS}
-	${LD} -r -b binary -o ${FONT_FREE_SANS_OBJ} ${FONT_FREE_SANS}
-
-${FONT_U_VGA16_OBJ}: ${FONT_U_VGA16}
-	${LD} -r -b binary -o ${FONT_U_VGA16_OBJ} ${FONT_U_VGA16}
-
-${FONT_UNIFONT_OBJ}: ${FONT_UNIFONT}
-	${LD} -r -b binary -o ${FONT_UNIFONT_OBJ} ${FONT_UNIFONT}
+# Rule to build a .o file from a .sfn file
+obj/%.o: %.sfn
+	mkdir -p $(@D)
+	${LD} -r -b binary -o $@ $<
 
 #readelf -s ${FONT_FREE_SANS_OBJ}
 
 clean:
-	rm -f *.o
+	rm -rf obj/
 
 distclean:
-	rm -f *.o
+	rm -rf obj/

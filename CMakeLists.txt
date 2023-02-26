@@ -65,12 +65,6 @@ include_directories(${PROJECT_SOURCE_DIR}/libustd/infra)
 include_directories(${PROJECT_SOURCE_DIR}/libustd/mem)
 include_directories(${PROJECT_SOURCE_DIR}/libustd/mthread)
 
-#include_directories(${PROJECT_SOURCE_DIR}/libsfn)
-#include_directories(${PROJECT_SOURCE_DIR}/libsfn/freetype2/devel)
-#include_directories(${PROJECT_SOURCE_DIR}/libsfn/freetype2/include)
-#add_compile_definitions(FT_CONFIG_MODULES_H="<ftmodule.h>")
-#add_compile_definitions(FT2_BUILD_LIBRARY)
-
 include_directories(${PROJECT_SOURCE_DIR}/libgccucore/i386)
 include_directories(${PROJECT_SOURCE_DIR}/libgccucore/zlib)
 
@@ -141,13 +135,8 @@ execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libgccucore -n
 string(REPLACE "\n" ";" LIB_GCCUCORE_SRC ${LIB_GCCUCORE_SRC})
 add_library(gccucore STATIC ${LIB_GCCUCORE_SRC})
 
-#LIBSFN
-#execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libsfn -name '*.c' | grep -v CMakeFile | grep -v builds" OUTPUT_VARIABLE LIB_SFN_SRC)
-#string(REPLACE "\n" ";" LIB_SFN_SRC ${LIB_SFN_SRC})
-#add_library(sfn STATIC ${LIB_SFN_SRC})
-
 #LIBUPANUI
-execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ${PROJECT_SOURCE_DIR}/libupanui/text/usfn/fonts/ -name '*.sfn' -exec sh -c 'echo \${1%.sfn}.o' _ {} \;" OUTPUT_VARIABLE FONT_OBJS)
+execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ${PROJECT_SOURCE_DIR}/libupanui/text/usfn/fonts/obj -name '*.o';" OUTPUT_VARIABLE FONT_OBJS)
 message(${FONT_OBJS})
 string(REPLACE "\n" ";" FONT_OBJS ${FONT_OBJS})
 
