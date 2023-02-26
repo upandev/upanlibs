@@ -34,6 +34,10 @@ namespace upanui {
     contentChanged();
   }
 
+  bool ImageCanvas::hasAlphaLocal() {
+    return _image->hasAlpha();
+  }
+
   void ImageCanvas::doDraw() {
     if (_image.toOption().isEmpty()) {
       return;
@@ -43,6 +47,6 @@ namespace upanui {
       return;
     }
 
-    drawBuffer().copy(_image->data(), width(), height(), false);
+    drawBuffer().copy(_image->data(), width(), height(), !hasAlphaLocal());
   }
 }

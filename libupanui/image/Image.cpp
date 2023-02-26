@@ -25,18 +25,21 @@
 
 namespace upanui {
   Image::Image(const uint32_t width, const uint32_t height, uint32_t* imageData) : _width(width), _height(height), _imageData(imageData) {
+    calculateHasAlpha();
   }
 
   Image::Image(const Image& image) : _width(image.width()), _height(image.height()), _imageData(nullptr) {
     auto size = _width * _height;
     _imageData.reset(new uint32_t[size]);
     memcpy(_imageData.get(), image.data(), size * sizeof(uint32_t));
+    calculateHasAlpha();
   }
 
   Image::Image(const Image& image, const uint32_t width, const uint32_t height) : _width(image.width()), _height(image.height()), _imageData(nullptr) {
     auto size = _width * _height;
     _imageData.reset(new uint32_t[size]);
     memcpy(_imageData.get(), image.data(), size * sizeof(uint32_t));
+    calculateHasAlpha();
     resize(width, height);
   }
 
@@ -121,11 +124,28 @@ namespace upanui {
             db += (srcRGB & 0xFF) * ipf;
           }
         }
+        if (!_hasAlpha) {
+          da = GCoreFunctions::MAX_ALPHA;
+        }
         destBuffer[x + y * destWidth] = roundtoi(dr) << 16 | roundtoi(dg) << 8 | roundtoi(db) | roundtoi(da) << 24; //0xFF000000;
       }
     }
     _width = destWidth;
     _height = destHeight;
     _imageData.reset(destBufferU.release());
+    calculateHasAlpha();
+  }
+
+  void Image::calculateHasAlpha() {
+    const auto size = _width * _height;
+    auto data = _imageData.get();
+    uint32_t i;
+    for(i = 0; i < size; ++i) {
+      const uint32_t p = data[i];
+      if ((p & GCoreFunctions::ALPHA_MASK) != GCoreFunctions::ALPHA_MASK) {
+        break;
+      }
+    }
+    _hasAlpha = i < size;
   }
 }

@@ -33,7 +33,7 @@ namespace upanui {
     ImageCanvas(const Image& image, const int x, const int y, const uint32_t width, const uint32_t height);
     void setImage(const Image& image);
 
-    bool hasAlphaLocal() override { return true; }
+    bool hasAlphaLocal() override;
 
   protected:
     void doDraw() override;

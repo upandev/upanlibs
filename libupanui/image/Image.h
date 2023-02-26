@@ -32,6 +32,10 @@ namespace upanui {
     Image(const Image& image, const uint32_t width, const uint32_t height);
     ~Image() {}
 
+    bool hasAlpha() const {
+      return _hasAlpha;
+    }
+
     uint32_t width() const {
       return _width;
     }
@@ -47,6 +51,9 @@ namespace upanui {
     void resize(const uint32_t width, const uint32_t height);
 
   private:
+    void calculateHasAlpha();
+
+    bool _hasAlpha;
     uint32_t _width;
     uint32_t _height;
     //assuming 4 bytes per pixel
