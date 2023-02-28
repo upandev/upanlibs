@@ -20,31 +20,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include <CloseIconButton.h>
+#include <IconButton.h>
 #include <UIObjectFactory.h>
+#include <Line.h>+
 
 namespace upanui {
-  CloseIconButton::CloseIconButton(const int x, const int y, const uint32_t width, const uint32_t height)
-    : Button(x, y, width, height) {
+  IconButton::IconButton(const ImageResource& imageResource, const ImageComposeType composeType,
+                         const int x, const int y,
+                         const uint32_t width, const uint32_t height)
+    : Button(x, y, width, height), _imageResource(imageResource), _composeType(composeType) {
   }
 
-  void CloseIconButton::init() {
+  void IconButton::init() {
     {
       ChangeNotificationLock g(*this);
       hoverColor(0xD53C1C);
       clickColor(0xC56043);
       backgroundColor(0x91908D);
 
-      const int x1 = width() * 0.3;
-      const int y1 = height() * 0.3;
-      const int x2 = width() - x1;
-      const int y2 = height() - y1;
-
-      auto &line1 = UIObjectFactory::createLine(*this, x1, y1, x2, y2, 2);
-      line1.backgroundColor(0xFFFFFF);
-
-      auto &line2 = UIObjectFactory::createLine(*this, x1, y2, x2, y1, 2);
-      line2.backgroundColor(0xFFFFFF);
+      auto& imageCanvas = UIObjectFactory::createImageCanvas(*this, _imageResource, _composeType, 0, 0, width(), height());
     }
     contentChanged();
   }
