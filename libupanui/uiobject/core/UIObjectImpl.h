@@ -33,6 +33,7 @@ namespace upanui {
   class KeyboardEvent;
   class MouseEvent;
   class MouseEventHandler;
+  class VerticalScroller;
 
   class UIObjectImpl : public UIObject {
   protected:
@@ -91,6 +92,8 @@ namespace upanui {
 
     void vscroll(int rows, int scrollableHeight) override;
     void hscroll(int columns) override;
+    void registerVerticalScroller(VerticalScroller& verticalScroller) override;
+    void removeVerticalScroller() override;
 
   protected:
     virtual void onBackgroundColorChange() {}
@@ -132,6 +135,7 @@ namespace upanui {
     bool _lockChangeNotification;
     upan::option<MouseEventHandler&> _mouseEventHandler;
     bool _captureMouseEvents;
+    upan::option<VerticalScroller&> _verticalScroller;
 
     friend class ChangeNotificatinLock;
 

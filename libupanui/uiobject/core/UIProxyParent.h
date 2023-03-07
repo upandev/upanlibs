@@ -119,7 +119,9 @@ namespace upanui {
 
     void vscroll(int rows, int scrollableHeight) override {}
     void hscroll(int columns) override {}
-    
+    void registerVerticalScroller(VerticalScroller&) override {}
+    void removeVerticalScroller() override {}
+
   protected:
     void onKeyboardEvent(const KeyboardEvent& event) override {
       throw upan::exception(XLOC, "unsupported onKeyboardEvent for UIProxyParent");

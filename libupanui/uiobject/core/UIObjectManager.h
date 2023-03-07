@@ -77,7 +77,9 @@ namespace upanui {
     }
 
     void dispatch(const KeyboardEvent& event);
-    void dispatch(const MouseEvent& event);
+    void dispatch(const MouseData& data);
+
+    upan::mutex& drawLock() { return _uiObjectTreeMutex; }
 
   private:
     typedef upan::map<UIObject*, upan::list<UIObject*>> ParentChildMap;

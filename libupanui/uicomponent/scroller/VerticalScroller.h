@@ -27,10 +27,10 @@
 
 namespace upanui {
   class VerticalScroller : public RectangleCanvas {
+  public:
+    void caliberateScrollbar();
   private:
-    VerticalScroller(const int x, const int y,
-                     const uint32_t width, const uint32_t height,
-                     const uint32_t scrollBarWidth, const uint32_t scrollBarHeight);
+    VerticalScroller(const int x, const int y, const uint32_t width, const uint32_t height, const uint32_t scrollBarWidth);
     virtual ~VerticalScroller();
 
     void init();
@@ -51,9 +51,13 @@ namespace upanui {
 
   private:
     uint32_t _scrollBarWidth;
-    uint32_t _scrollBarHeight;
+    int _scrollBarMinY;
+    int _scrollBarMaxY;
+    uint32_t _scrollBarMaxHeight;
+    int _scrollMultiplier;
 
     ScrollerMouseHandler* _mouseHandler;
+    UIObject* _scrollerCanvas;
     UIObject* _scrollUpBt;
     UIObject* _scrollDownBt;
     UIObject* _scrollBar;

@@ -28,14 +28,19 @@
 namespace upanui {
 class MouseEvent : public Event {
 public:
-  MouseEvent(const MouseData& data) : _data(data) {
+  MouseEvent(const MouseData& data, const int viewX, const int viewY) : _data(data), _viewX(viewX), _viewY(viewY) {
   }
 
   MouseData getData() const {
     return _data;
   }
 
+  int viewX() const { return _viewX; }
+  int viewY() const { return _viewY; }
+
 private:
   const MouseData _data;
+  const int _viewX;
+  const int _viewY;
 };
 }

@@ -72,6 +72,6 @@ namespace upanui {
 
     static VerticalScroller& createVerticalScroller(UIObject& parent, const int x, const int y,
                                                     const uint32_t width, const uint32_t height,
-                                                    const uint32_t scrollBarWidth, const uint32_t scrollBarHeight);
+                                                    const uint32_t scrollBarWidth);
   };
 }

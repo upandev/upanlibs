@@ -62,9 +62,7 @@ namespace upanui {
         break;
     }
 
-    if (nw != _image->width() || nh != _image->height()) {
-      _image->resize(nw, nh);
-    }
+    _image->resize(nw, nh);
 
     drawBuffer().copy(_image->data(), _image->width(), _image->height(), !hasAlphaLocal());
   }

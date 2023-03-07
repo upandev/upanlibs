@@ -47,7 +47,7 @@
 #include <mosstd.h>
 
 namespace upan {
-  mutex::mutex() : _lock(0), _processID(FREE_MUTEX) {
+  mutex::mutex() : _lock(0), _processID(FREE_MUTEX), _lockCount(0) {
   }
 
   mutex::~mutex() {
@@ -92,8 +92,12 @@ namespace upan {
         }
       }
 
-      if (_processID == FREE_MUTEX)
+      if (_processID == FREE_MUTEX) {
         _processID = val;
+        _lockCount = 1;
+      } else {
+        ++_lockCount;
+      }
 
       release();
       break;
@@ -116,7 +120,12 @@ namespace upan {
       return false;
     }
 
-    _processID = FREE_MUTEX;
+    if (_lockCount > 0) {
+      --_lockCount;
+      if (!_lockCount) {
+        _processID = FREE_MUTEX;
+      }
+    }
 
     release();
 

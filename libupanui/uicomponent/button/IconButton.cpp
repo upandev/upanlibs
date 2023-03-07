@@ -38,7 +38,14 @@ namespace upanui {
       clickColor(0xC56043);
       backgroundColor(0x91908D);
 
-      auto& imageCanvas = UIObjectFactory::createImageCanvas(*this, _imageResource, _composeType, 0, 0, width(), height());
+      //reduce image size by 40% - this should be parameterized
+      const auto iw = width() * 0.6;
+      const auto ih = height() * 0.6;
+      // center the image
+      const int ix = (width() - iw) / 2;
+      const int iy = (height() - ih) / 2;
+
+      auto& imageCanvas = UIObjectFactory::createImageCanvas(*this, _imageResource, _composeType, ix, iy, iw, ih);
     }
     contentChanged();
   }

@@ -30,6 +30,7 @@ namespace upan{
       private:
       atomic::integral<uint32_t> _lock;
       __volatile__ int _processID;
+      __volatile__ int _lockCount;
 
       static const int FREE_MUTEX = -999;
     public:

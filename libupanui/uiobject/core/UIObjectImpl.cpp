@@ -24,6 +24,7 @@
 #include <MouseEventHandler.h>
 #include <GraphicsContext.h>
 #include <GCoreFunctions.h>
+#include <VerticalScroller.h>
 
 namespace upanui {
   UIObjectImpl::UIObjectImpl(const int x, const int y, const uint32_t width, const uint32_t height)
@@ -31,11 +32,13 @@ namespace upanui {
       _bgColor(0), _bgAlpha(GCoreFunctions::MAX_ALPHA), _brColor(0xFFFFFF),
       _brAlpha(GCoreFunctions::MAX_ALPHA), _borderThickness(0), _lockChangeNotification(false),
       _mouseEventHandler(upan::option<MouseEventHandler&>::empty()), _captureMouseEvents(false),
+      _verticalScroller(upan::option<VerticalScroller&>::empty()),
       _gc(GraphicsContext::Instance()) {
   }
 
   void UIObjectImpl::x(const int x) {
     if (_x != x) {
+      upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _x = x;
       notifyChange(ChangeNotificationType::Position);
     }
@@ -43,6 +46,7 @@ namespace upanui {
 
   void UIObjectImpl::y(const int y) {
     if (_y != y) {
+      upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _y = y;
       notifyChange(ChangeNotificationType::Position);
     }
@@ -50,6 +54,7 @@ namespace upanui {
 
   void UIObjectImpl::xy(const int x, const int y) {
     if (_y != y || _x != x) {
+      upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _x = x;
       _y = y;
       notifyChange(ChangeNotificationType::Position);
@@ -58,6 +63,7 @@ namespace upanui {
 
   void UIObjectImpl::width(const uint32_t width) {
     if (_width != width) {
+      upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _width = width;
       notifyChange(ChangeNotificationType::Size);
     }
@@ -65,13 +71,18 @@ namespace upanui {
 
   void UIObjectImpl::height(const uint32_t height) {
     if (_height != height) {
+      upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _height = height;
       notifyChange(ChangeNotificationType::Size);
+      _verticalScroller.ifPresent([](VerticalScroller& verticalScroller) {
+        verticalScroller.caliberateScrollbar();
+      });
     }
   }
 
   void UIObjectImpl::backgroundColor(const uint32_t color) {
     if (_bgColor != color) {
+      upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _bgColor = color;
       onBackgroundColorChange();
       notifyChange(ChangeNotificationType::Content);
@@ -80,6 +91,7 @@ namespace upanui {
 
   void UIObjectImpl::backgroundColorAlpha(const uint8_t alpha) {
     if (_bgAlpha != alpha) {
+      upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       if (alpha > GCoreFunctions::MAX_ALPHA) {
         throw upan::exception(XLOC, "alpha must be a value between 0 to %u", GCoreFunctions::MAX_ALPHA);
       }
@@ -92,6 +104,7 @@ namespace upanui {
 
   void UIObjectImpl::borderColor(const uint32_t color) {
     if (_brColor != color) {
+      upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _brColor = color;
       notifyChange(ChangeNotificationType::Content);
     }
@@ -99,6 +112,7 @@ namespace upanui {
 
   void UIObjectImpl::borderColorAlpha(const uint8_t alpha) {
     if (_brAlpha != alpha) {
+      upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       if (alpha > GCoreFunctions::MAX_ALPHA) {
         throw upan::exception(XLOC, "alpha must be a value between 0 to %u", GCoreFunctions::MAX_ALPHA);
       }
@@ -110,6 +124,7 @@ namespace upanui {
 
   void UIObjectImpl::borderThickness(const uint32_t thickness) {
     if (_borderThickness != thickness) {
+      upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _borderThickness = thickness;
       notifyChange(ChangeNotificationType::Content);
       _gc.uiObjectManager().recalcHasAlpha();
@@ -225,4 +240,11 @@ namespace upanui {
    x(x() + columns);
   }
 
+  void UIObjectImpl::registerVerticalScroller(VerticalScroller& verticalScroller) {
+    _verticalScroller = upan::option<VerticalScroller&>(verticalScroller);
+  }
+
+  void UIObjectImpl::removeVerticalScroller() {
+    _verticalScroller = upan::option<VerticalScroller&>::empty();
+  }
 }

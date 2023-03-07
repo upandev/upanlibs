@@ -423,7 +423,6 @@ namespace upanui {
     if (ret) return ret;
 
     if (res > SIZE_MAX / height) return PNG_EOVERFLOW;
-    printf("\nW:%u, H:%u", res, height);
     res = res * height;
 
     len = res;

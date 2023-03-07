@@ -114,8 +114,8 @@ namespace upanui {
 
   VerticalScroller& UIObjectFactory::createVerticalScroller(UIObject& parent, const int x, const int y,
                                                             const uint32_t width, const uint32_t height,
-                                                            const uint32_t scrollBarWidth, const uint32_t scrollBarHeight) {
-    auto& scroller = *new VerticalScroller(x, y, width, height, scrollBarWidth, scrollBarHeight);
+                                                            const uint32_t scrollBarWidth) {
+    auto& scroller = *new VerticalScroller(x, y, width, height, scrollBarWidth);
     parent.add(scroller);
     scroller.init();
     return scroller;

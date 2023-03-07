@@ -112,8 +112,7 @@ namespace upanui {
         throw upan::exception(XLOC, "read event data size (%d) < MouseData size (%d)", n, sizeof(MouseData));
       }
 
-      MouseEvent mouseEvent(data);
-      GraphicsContext::Instance().uiObjectManager().dispatch(mouseEvent);
+      GraphicsContext::Instance().uiObjectManager().dispatch(data);
     }
   }
 }

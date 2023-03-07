@@ -35,6 +35,7 @@ namespace upanui {
   class DrawBuffer;
   class Layout;
   class MouseEventHandler;
+  class VerticalScroller;
 
   class UIObject {
   protected:
@@ -97,6 +98,8 @@ namespace upanui {
 
     virtual void vscroll(int rows, int scrollableHeight) = 0;
     virtual void hscroll(int columns) = 0;
+    virtual void registerVerticalScroller(VerticalScroller& verticalScroller) = 0;
+    virtual void removeVerticalScroller() = 0;
 
   protected:
     virtual ~UIObject() {}

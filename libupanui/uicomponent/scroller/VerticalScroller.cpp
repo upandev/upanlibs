@@ -28,11 +28,15 @@
 namespace upanui {
   VerticalScroller::VerticalScroller(const int x, const int y,
                                      const uint32_t width, const uint32_t height,
-                                     const uint32_t scrollBarWidth, const uint32_t scrollBarHeight)
-    : RectangleCanvas(x, y, width, height),
-      _scrollBarWidth(scrollBarWidth), _scrollBarHeight(scrollBarHeight),
-      _mouseHandler(nullptr), _scrollUpBt(nullptr), _scrollDownBt(nullptr), _scrollBar(nullptr),
-      _childCheck(false), _scrollableChild(upan::option<UIObject&>::empty()) {
+                                     const uint32_t scrollBarWidth)
+      : RectangleCanvas(x, y, width, height),
+        _scrollBarWidth(scrollBarWidth),
+        _scrollBarMinY(scrollBarWidth),
+        _scrollBarMaxY(height - scrollBarWidth),
+        _scrollBarMaxHeight(height - scrollBarWidth * 2),
+        _scrollMultiplier(8),
+        _mouseHandler(nullptr), _scrollUpBt(nullptr), _scrollDownBt(nullptr), _scrollBar(nullptr),
+        _childCheck(false), _scrollableChild(upan::option<UIObject &>::empty()) {
   }
 
   VerticalScroller::~VerticalScroller() {
@@ -40,50 +44,89 @@ namespace upanui {
   }
 
   void VerticalScroller::init() {
-    const int scrollerHeight = height() - _scrollBarWidth * 2;
-    const int scrollBarX = width() - _scrollBarWidth;
-    const int scrollBarTopBtY = 0;
-    const int scrollerY = _scrollBarWidth;
-    const int scrollBarBottomBtY = scrollerY + scrollerHeight;
-
-    if (scrollerHeight > 0) {
-      auto& scrollerCanvas = UIObjectFactory::createRectangleCanvas(*this, scrollBarX, scrollerY, _scrollBarWidth, scrollerHeight);
-      scrollerCanvas.backgroundColor(0xFFFFFF);
+    if (height() <= 0 || width() <= _scrollBarWidth || _scrollBarWidth == 0) {
+      throw upan::exception(XLOC, "Invalid vertical scroll bar dimensions");
     }
 
-    _scrollUpBt = &UIObjectFactory::createIconButton(*this, PngImageResource::UP, scrollBarX, scrollBarTopBtY, _scrollBarWidth, _scrollBarWidth);
+    _scrollerCanvas = &UIObjectFactory::createRectangleCanvas(*this, width() - _scrollBarWidth, 0, _scrollBarWidth, height());
+    _scrollerCanvas->backgroundColor(0xFFFFFF);
+
+    _scrollUpBt = &UIObjectFactory::createIconButton(*_scrollerCanvas, PngImageResource::UP, 0, 0, _scrollBarWidth, _scrollBarWidth);
     _scrollUpBt->backgroundColor(0xFFFAABB);
 
-    _scrollDownBt = &UIObjectFactory::createIconButton(*this, PngImageResource::DOWN, scrollBarX, scrollBarBottomBtY, _scrollBarWidth, _scrollBarWidth);
+    _scrollDownBt = &UIObjectFactory::createIconButton(*_scrollerCanvas, PngImageResource::DOWN, 0, _scrollBarMaxY, _scrollBarWidth, _scrollBarWidth);
     _scrollDownBt->backgroundColor(0xFFFAABB);
 
+    _scrollBar = &UIObjectFactory::createRectangleCanvas(*_scrollerCanvas, 0, _scrollBarMinY, _scrollBarWidth, _scrollBarWidth);
+    _scrollBar->borderThickness(1);
+    _scrollBar->borderColor(0x000000);
+    _scrollBar->backgroundColor(0xFAD7A0);
+
     captureMouseEvents(true);
+    _scrollerCanvas->captureMouseEvents(true);
 
     _mouseHandler = new ScrollerMouseHandler(*this);
     _scrollUpBt->registerMouseEventHandler(*_mouseHandler);
     _scrollDownBt->registerMouseEventHandler(*_mouseHandler);
+    _scrollBar->registerMouseEventHandler(*_mouseHandler);
+    _scrollerCanvas->registerMouseEventHandler(*_mouseHandler);
 
     _childCheck = true;
   }
 
-  void VerticalScroller::add(UIObject& child) {
+  void VerticalScroller::caliberateScrollbar() {
+    const int minScrollBarHeight = _scrollBarWidth / 2;
+    const int scrollBarMaxRunway = _scrollBarMaxHeight - minScrollBarHeight;
+    const int scrollContentHeight = _scrollableChild.value().height() - height();
+    _scrollMultiplier = 8;
+    int scrollBarRequiredRunway = scrollContentHeight / _scrollMultiplier;
+    while(scrollBarRequiredRunway > scrollBarMaxRunway) {
+      _scrollMultiplier <<= 1;
+      scrollBarRequiredRunway = scrollContentHeight / _scrollMultiplier;
+    }
+    const int scrollBarHeight = _scrollBarMaxHeight - scrollBarRequiredRunway;
+    _scrollBar->height(scrollBarHeight);
+    _scrollBar->y((-_scrollableChild.value().y() / _scrollMultiplier) + _scrollBarMinY);
+  }
+
+  void VerticalScroller::add(UIObject &child) {
     if (_childCheck) {
       if (!_scrollableChild.isEmpty()) {
         throw upan::exception(XLOC, "Scroller can have only scrollable child");
       }
-      _scrollableChild = upan::option<UIObject&>(child);
+      _scrollableChild = upan::option<UIObject &>(child);
+      child.registerVerticalScroller(*this);
+      caliberateScrollbar();
     }
     RectangleCanvas::add(child);
   }
 
-  void VerticalScroller::handleMouseEvent(upanui::UIObject& sender, const upanui::MouseEvent& event) {
-    const auto& e = event.getData();
+  void VerticalScroller::handleMouseEvent(upanui::UIObject &sender, const upanui::MouseEvent &event) {
+    const auto &e = event.getData();
     if (e.leftButtonState() == MouseData::State::PRESSED || e.leftButtonState() == MouseData::State::HOLD) {
-      _scrollableChild.ifPresent([&](UIObject& child) {
+      _scrollableChild.ifPresent([&](UIObject &child) {
+        int newY = _scrollBar->y();
         if (&sender == _scrollUpBt) {
-          child.vscroll(-1, height());
+          newY -= 1;
         } else if (&sender == _scrollDownBt) {
-          child.vscroll(1, height());
+          newY += 1;
+        } else if (&sender == _scrollBar) {
+          const int mouseViewY = event.viewY();
+          if (mouseViewY >= int(_scrollUpBt->drawY() + _scrollBarWidth) && mouseViewY < _scrollDownBt->drawY()) {
+            newY = _scrollBar->y() - event.getData().deltaY();
+          }
+        } else if (&sender == _scrollerCanvas && e.leftButtonState() == MouseData::State::PRESSED) {
+          newY = event.viewY() - parent().drawY();
+        }
+        if (newY != _scrollBar->y()) {
+          if (newY < _scrollBarMinY) {
+            newY = _scrollBarMinY;
+          } else if (int(newY + _scrollBar->height()) >= _scrollBarMaxY) {
+            newY = _scrollBarMaxY - (int)_scrollBar->height();
+          }
+          const int delta = _scrollBar->y() - newY;
+          _scrollBar->y(newY);
+          child.vscroll(delta * _scrollMultiplier, height());
         }
       });
     }
