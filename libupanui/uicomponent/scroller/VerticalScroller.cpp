@@ -116,7 +116,11 @@ namespace upanui {
             newY = _scrollBar->y() - event.getData().deltaY();
           }
         } else if (&sender == _scrollerCanvas && e.leftButtonState() == MouseData::State::PRESSED) {
-          newY = event.viewY() - parent().drawY();
+          newY = event.viewY() - _scrollerCanvas->drawY();
+          const int bottomY = _scrollBar->y() + _scrollBar->height();
+          if (newY > bottomY) {
+            newY = _scrollBar->y() + (newY - bottomY);
+          }
         }
         if (newY != _scrollBar->y()) {
           if (newY < _scrollBarMinY) {
