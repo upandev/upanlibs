@@ -63,10 +63,6 @@ namespace upanui {
       throw upan::exception(XLOC, "drawToTop is not applicable for UIProxyParent");
     }
 
-    void positionChanged() override {}
-    void sizeChanged() override {}
-    void contentChanged() override {}
-
     UIObject& parent() const override {
       throw upan::exception(XLOC, "No parent for UIProxyParent");
     }
@@ -113,6 +109,10 @@ namespace upanui {
       throw upan::exception(XLOC, "unsupported drawBuffer for UIProxyParent");
     }
 
+    const DrawBuffer& drawBuffer() const override {
+      throw upan::exception(XLOC, "unsupported drawBuffer for UIProxyParent");
+    }
+
     void registerMouseEventHandler(MouseEventHandler& handler) override {
       throw upan::exception(XLOC, "unsupported event handlers for UIProxyParent");
     }
@@ -121,6 +121,10 @@ namespace upanui {
     void hscroll(int columns) override {}
     void registerVerticalScroller(VerticalScroller&) override {}
     void removeVerticalScroller() override {}
+
+    void notifyChange(const ChangeState changeState) override {}
+    void setChangeState(const ChangeState) override {}
+    bool isChangeState(const ChangeState, const bool only) const override { return false; }
 
   protected:
     void onKeyboardEvent(const KeyboardEvent& event) override {

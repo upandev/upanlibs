@@ -39,31 +39,46 @@ namespace upanui {
     return parent().drawY() + y();
   }
 
-  void UIElement::positionChanged() {
-    parent().redraw();
+
+  void UIElement::notifyChange(const ChangeState changeState) {
+    if (isChangeNotificationLocked()) {
+      return;
+    }
+
+    setChangeState(changeState);
+    switch(changeState) {
+      case Position:
+        parent().setChangeState(ChangeState::Content);
+        parent().redraw();
+        break;
+      case Size:
+        parent().setChangeState(ChangeState::Content);
+        parent().redraw();
+        break;
+      case Content:
+        redraw();
+        break;
+    }
   }
 
-  void UIElement::sizeChanged() {
-    parent().redraw();
-  }
-
-  void UIElement::contentChanged() {
-    redraw();
+  bool UIElement::skipRedraw() const {
+    return drawBuffer().isLocal() && (isChangeState(ChangeState::Clean, true) || isChangeState(ChangeState::Position, true));
   }
 
   void UIElement::setupDrawBuffer() {
+    DrawBuffer& drawBuf = drawBuffer();
     if (needLocalDrawBuffer()) {
-      _drawBuffer.initLocal(width(), height());
+      drawBuf.initLocal(width(), height());
     } else {
       const auto boundaryCheckResult = parent().layout().checkBoundary(*this);
       if (boundaryCheckResult == Layout::Outside) {
-        _drawBuffer.clear();
+        drawBuf.clear();
       } else if (boundaryCheckResult == Layout::Inside) {
         const auto cx = x() + parent().borderThickness();
         const auto cy = y() + parent().borderThickness();
-        _drawBuffer.initFrom(parent().drawBuffer(), cx, cy, width(), height());
+        drawBuf.initFrom(parent().drawBuffer(), cx, cy, width(), height());
       } else if (boundaryCheckResult == Layout::PartiallyInside) {
-        _drawBuffer.initLocal(width(), height());
+        drawBuf.initLocal(width(), height());
       } else {
         throw upan::exception(XLOC, "Unsupported BoundaryCheckResult: %d", boundaryCheckResult);
       }

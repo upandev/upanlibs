@@ -27,6 +27,7 @@
 #include <option.h>
 #include <set.h>
 #include <UIObject.h>
+#include <DrawBuffer.h>
 
 namespace upanui {
   class GraphicsContext;
@@ -95,6 +96,10 @@ namespace upanui {
     void registerVerticalScroller(VerticalScroller& verticalScroller) override;
     void removeVerticalScroller() override;
 
+
+    void setChangeState(const ChangeState) override;
+    bool isChangeState(const ChangeState, const bool only) const override;
+
   protected:
     virtual void onBackgroundColorChange() {}
     void onKeyboardEvent(const KeyboardEvent& event) override {}
@@ -107,9 +112,6 @@ namespace upanui {
       return true;
     }
 
-    enum ChangeNotificationType { Position, Size, Content };
-    void notifyChange(ChangeNotificationType type);
-
     class ChangeNotificationLock {
     public:
       ChangeNotificationLock(UIObjectImpl& object) : _object(object) {
@@ -121,6 +123,15 @@ namespace upanui {
     private:
       UIObjectImpl& _object;
     };
+
+    bool isChangeNotificationLocked() { return _lockChangeNotification; }
+
+    DrawBuffer& drawBuffer() override {
+      return _drawBuffer;
+    }
+    const DrawBuffer& drawBuffer() const override {
+      return _drawBuffer;
+    }
 
   private:
     int _x;
@@ -136,8 +147,8 @@ namespace upanui {
     upan::option<MouseEventHandler&> _mouseEventHandler;
     bool _captureMouseEvents;
     upan::option<VerticalScroller&> _verticalScroller;
-
-    friend class ChangeNotificatinLock;
+    uint32_t _changeState;
+    DrawBuffer _drawBuffer;
 
     GraphicsContext& _gc;
   };

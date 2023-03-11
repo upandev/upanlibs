@@ -24,7 +24,6 @@
 #include <stdlib.h>
 #include <UIObjectImpl.h>
 #include <RectangularLayout.h>
-#include <DrawBuffer.h>
 
 namespace upanui {
   class UIRoot : public UIObjectImpl {
@@ -38,26 +37,20 @@ namespace upanui {
     void drawTopDown() override;
     void drawToTop() override;
 
-    void positionChanged() override;
-    void sizeChanged() override;
-    void contentChanged() override;
-
     bool captureMouseEvents() const override {
       return true;
     }
 
     bool isRectangularShape() override { return true; }
 
+    void notifyChange(const ChangeState changeState) override;
+
   private:
     Layout& layout() override {
       return _layout;
     }
-    DrawBuffer& drawBuffer() override {
-      return _drawBuffer;
-    }
 
   private:
-    DrawBuffer _drawBuffer;
     RectangularLayout _layout;
 
     friend class GraphicsContext;

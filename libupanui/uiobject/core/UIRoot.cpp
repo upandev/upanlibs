@@ -29,7 +29,7 @@ namespace upanui {
   : UIObjectImpl(x, y, width, height),
     _layout(*this) {
     gc().frame().updateViewport(x, y, width, height);
-    _drawBuffer.initLocal(gc().frame().frameBuffer());
+    UIObjectImpl::drawBuffer().initLocal(gc().frame().frameBuffer());
   }
 
   void UIRoot::draw() {
@@ -55,16 +55,24 @@ namespace upanui {
     return 0;
   }
 
-  void UIRoot::positionChanged() {
-    gc().frame().updateViewport(x(), y(), width(), height());
-  }
 
-  void UIRoot::sizeChanged() {
-    gc().frame().updateViewport(x(), y(), width(), height());
-    redraw();
-  }
+  void UIRoot::notifyChange(const ChangeState changeState) {
+    if (isChangeNotificationLocked()) {
+      return;
+    }
 
-  void UIRoot::contentChanged() {
-    redraw();
+    setChangeState(changeState);
+    switch(changeState) {
+      case Position:
+        gc().frame().updateViewport(x(), y(), width(), height());
+        break;
+      case Size:
+        gc().frame().updateViewport(x(), y(), width(), height());
+        redraw();
+        break;
+      case Content:
+        redraw();
+        break;
+    }
   }
 }

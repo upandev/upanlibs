@@ -44,6 +44,13 @@ namespace upanui {
     UIObject& operator=(const UIObject&) = delete;
 
   public:
+    enum ChangeState {
+      Clean = 0,
+      Position = 1,
+      Size = 2,
+      Content = 4
+    };
+
     virtual int x() const = 0;
     virtual int y() const = 0;
     virtual uint32_t width() const = 0;
@@ -72,10 +79,6 @@ namespace upanui {
     virtual void drawTopDown() = 0;
     virtual void drawToTop() = 0;
 
-    virtual void positionChanged() = 0;
-    virtual void sizeChanged() = 0;
-    virtual void contentChanged() = 0;
-
     virtual UIObject& parent() const = 0;
     virtual const upan::list<UIObject*>& children() = 0;
 
@@ -90,6 +93,7 @@ namespace upanui {
 
     virtual Layout& layout() = 0;
     virtual DrawBuffer& drawBuffer() = 0;
+    virtual const DrawBuffer& drawBuffer() const = 0;
 
     virtual bool captureMouseEvents() const = 0;
     virtual void captureMouseEvents(bool) = 0;
@@ -100,6 +104,10 @@ namespace upanui {
     virtual void hscroll(int columns) = 0;
     virtual void registerVerticalScroller(VerticalScroller& verticalScroller) = 0;
     virtual void removeVerticalScroller() = 0;
+
+    virtual void notifyChange(const ChangeState changeState) = 0;
+    virtual void setChangeState(const ChangeState changeState) = 0;
+    virtual bool isChangeState(const ChangeState changeState, const bool only) const = 0;
 
   protected:
     virtual ~UIObject() {}

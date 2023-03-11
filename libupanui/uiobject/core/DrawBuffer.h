@@ -46,6 +46,7 @@ namespace upanui {
     uint32_t* buffer() const { return _buffer; }
     uint32_t& at(int x, int y) const;
     uint32_t& at(int offset)  const;
+    void cleanBuffer();
 
     void copy(const void* src, int len);
     void copy(const uint32_t* src, uint32_t width, uint32_t height, bool directSet);

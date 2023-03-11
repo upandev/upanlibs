@@ -32,7 +32,7 @@ namespace upanui {
       _bgColor(0), _bgAlpha(GCoreFunctions::MAX_ALPHA), _brColor(0xFFFFFF),
       _brAlpha(GCoreFunctions::MAX_ALPHA), _borderThickness(0), _lockChangeNotification(false),
       _mouseEventHandler(upan::option<MouseEventHandler&>::empty()), _captureMouseEvents(false),
-      _verticalScroller(upan::option<VerticalScroller&>::empty()),
+      _verticalScroller(upan::option<VerticalScroller&>::empty()), _changeState(UIObject::ChangeState::Content),
       _gc(GraphicsContext::Instance()) {
   }
 
@@ -40,7 +40,7 @@ namespace upanui {
     if (_x != x) {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _x = x;
-      notifyChange(ChangeNotificationType::Position);
+      notifyChange(ChangeState::Position);
     }
   }
 
@@ -48,7 +48,7 @@ namespace upanui {
     if (_y != y) {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _y = y;
-      notifyChange(ChangeNotificationType::Position);
+      notifyChange(ChangeState::Position);
     }
   }
 
@@ -57,7 +57,7 @@ namespace upanui {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _x = x;
       _y = y;
-      notifyChange(ChangeNotificationType::Position);
+      notifyChange(ChangeState::Position);
     }
   }
 
@@ -65,7 +65,7 @@ namespace upanui {
     if (_width != width) {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _width = width;
-      notifyChange(ChangeNotificationType::Size);
+      notifyChange(ChangeState::Size);
     }
   }
 
@@ -73,7 +73,7 @@ namespace upanui {
     if (_height != height) {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _height = height;
-      notifyChange(ChangeNotificationType::Size);
+      notifyChange(ChangeState::Size);
       _verticalScroller.ifPresent([](VerticalScroller& verticalScroller) {
         verticalScroller.caliberateScrollbar();
       });
@@ -85,7 +85,7 @@ namespace upanui {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _bgColor = color;
       onBackgroundColorChange();
-      notifyChange(ChangeNotificationType::Content);
+      notifyChange(ChangeState::Content);
     }
   }
 
@@ -97,7 +97,7 @@ namespace upanui {
       }
       _bgAlpha = alpha;
       onBackgroundColorChange();
-      notifyChange(ChangeNotificationType::Content);
+      notifyChange(ChangeState::Content);
       _gc.uiObjectManager().recalcHasAlpha();
     }
   }
@@ -106,7 +106,7 @@ namespace upanui {
     if (_brColor != color) {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _brColor = color;
-      notifyChange(ChangeNotificationType::Content);
+      notifyChange(ChangeState::Content);
     }
   }
 
@@ -117,7 +117,7 @@ namespace upanui {
         throw upan::exception(XLOC, "alpha must be a value between 0 to %u", GCoreFunctions::MAX_ALPHA);
       }
       _brAlpha = alpha;
-      notifyChange(ChangeNotificationType::Content);
+      notifyChange(ChangeState::Content);
       _gc.uiObjectManager().recalcHasAlpha();
     }
   }
@@ -126,7 +126,7 @@ namespace upanui {
     if (_borderThickness != thickness) {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _borderThickness = thickness;
-      notifyChange(ChangeNotificationType::Content);
+      notifyChange(ChangeState::Content);
       _gc.uiObjectManager().recalcHasAlpha();
     }
   }
@@ -140,12 +140,17 @@ namespace upanui {
   }
 
   void UIObjectImpl::add(UIObject& child) {
+    upan::mutex_guard g(_gc.uiObjectManager().drawLock());
     _gc.uiObjectManager().add(*this, child);
+    setChangeState(ChangeState::Content);
+    child.setChangeState(ChangeState::Content);
     redraw();
   }
 
   void UIObjectImpl::remove() {
+    upan::mutex_guard g(_gc.uiObjectManager().drawLock());
     _gc.uiObjectManager().remove(*this);
+    setChangeState(ChangeState::Content);
     redraw();
   }
 
@@ -199,24 +204,6 @@ namespace upanui {
     return upan::option<UIObject&>::empty();
   }
 
-  void UIObjectImpl::notifyChange(const ChangeNotificationType type) {
-    if (_lockChangeNotification) {
-      return;
-    }
-
-    switch(type) {
-      case Position:
-        positionChanged();
-        break;
-      case Size:
-        sizeChanged();
-        break;
-      case Content:
-        contentChanged();
-        break;
-    }
-  }
-
   void UIObjectImpl::onMouseEvent(const MouseEvent &event) {
     _mouseEventHandler.ifPresent([&](MouseEventHandler& handler) {
       handler.onEvent(*this, event);
@@ -246,5 +233,17 @@ namespace upanui {
 
   void UIObjectImpl::removeVerticalScroller() {
     _verticalScroller = upan::option<VerticalScroller&>::empty();
+  }
+
+  void UIObjectImpl::setChangeState(const UIObject::ChangeState changeState) {
+    if (changeState == UIObject::ChangeState::Clean) {
+      _changeState = changeState;
+    } else {
+      _changeState |= changeState;
+    }
+  }
+
+  bool UIObjectImpl::isChangeState(UIObject::ChangeState changeState, bool only) const {
+    return (only || changeState == UIObject::ChangeState::Clean) ? _changeState == changeState : _changeState & changeState;
   }
 }

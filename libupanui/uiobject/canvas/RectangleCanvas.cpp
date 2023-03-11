@@ -50,6 +50,7 @@ namespace upanui {
   }
 
   void RectangleCanvas::doDraw() {
+    drawBuffer().cleanBuffer();
     layout().fill();
   }
 }

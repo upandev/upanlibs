@@ -33,6 +33,7 @@ namespace upanui {
   }
 
   void Line::doDraw() {
+    drawBuffer().cleanBuffer();
     const auto alpha = backgroundColorAlpha();
     if (alpha == 0) {
       return;
@@ -219,13 +220,13 @@ namespace upanui {
     _x2 = x2;
     _y2 = y2;
     updateLayoutArea();
-    positionChanged();
+    notifyChange(ChangeState::Size);
   }
 
   void Line::updateThickness(const uint32_t thickness) {
     _thickness = thickness;
     updateLayoutArea();
-    contentChanged();
+    notifyChange(ChangeState::Content);
   }
 
   void Line::updateLayoutArea() {

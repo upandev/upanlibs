@@ -71,6 +71,7 @@ namespace upanui {
   }
 
   void RoundCanvas::doDraw() {
+    drawBuffer().cleanBuffer();
     layout().fill();
   }
 }

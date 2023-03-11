@@ -47,6 +47,6 @@ namespace upanui {
 
       auto& imageCanvas = UIObjectFactory::createImageCanvas(*this, _imageResource, _composeType, ix, iy, iw, ih);
     }
-    contentChanged();
+    notifyChange(ChangeState::Content);
   }
 }

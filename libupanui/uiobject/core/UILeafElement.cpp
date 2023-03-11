@@ -66,7 +66,9 @@ namespace upanui {
 
     auto& drawBuf = drawBuffer();
     if (!drawBuf.isNull()) {
-      doDraw();
+      if (!skipRedraw()) {
+        doDraw();
+      }
       if (drawBuf.isLocal()) {
         parent().layout().draw(*this);
       }

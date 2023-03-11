@@ -23,7 +23,6 @@
 
 #include <stdlib.h>
 #include <UIObjectImpl.h>
-#include <DrawBuffer.h>
 #include <Layout.h>
 
 namespace upanui {
@@ -35,19 +34,13 @@ namespace upanui {
     int drawX() const override;
     int drawY() const override;
 
-    void positionChanged() override;
-    void sizeChanged() override;
-    void contentChanged() override;
-
     void setupDrawBuffer();
-    DrawBuffer& drawBuffer() override {
-      return _drawBuffer;
-    }
+
     virtual bool needLocalDrawBuffer() {
       return false;
     }
 
-  private:
-    DrawBuffer _drawBuffer;
+    void notifyChange(const ChangeState changeState) override;
+    bool skipRedraw() const;
   };
 }

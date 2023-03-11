@@ -36,7 +36,7 @@ namespace upanui {
 
   void ImageCanvas::setImage(const Image& image) {
     _image.reset(new Image(image, width(), height()));
-    contentChanged();
+    notifyChange(ChangeState::Content);
   }
 
   bool ImageCanvas::hasAlphaLocal() {
@@ -44,6 +44,8 @@ namespace upanui {
   }
 
   void ImageCanvas::doDraw() {
+    drawBuffer().cleanBuffer();
+
     if (_image.toOption().isEmpty()) {
       return;
     }

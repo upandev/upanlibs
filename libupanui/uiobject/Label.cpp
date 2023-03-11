@@ -87,7 +87,7 @@ namespace upanui {
 
   void Label::markForUpdateText() {
     _updateText.set(true);
-    notifyChange(ChangeNotificationType::Content);
+    notifyChange(ChangeState::Content);
   }
 
   void Label::updateText() {

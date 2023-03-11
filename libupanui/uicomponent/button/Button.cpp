@@ -40,18 +40,18 @@ namespace upanui {
     auto x = event.getData().leftButtonState() == MouseData::State::HOLD;
     if (x != _leftClickHold) {
       _leftClickHold = x;
-      notifyChange(ChangeNotificationType::Content);
+      notifyChange(ChangeState::Content);
     }
     RectangleCanvas::onMouseEvent(event);
   }
 
   void Button::onMouseFocus() {
     _hover = true;
-    notifyChange(ChangeNotificationType::Content);
+    notifyChange(ChangeState::Content);
   }
 
   void Button::onLoseMouseFocus() {
     _hover = false;
-    notifyChange(ChangeNotificationType::Content);
+    notifyChange(ChangeState::Content);
   }
 }

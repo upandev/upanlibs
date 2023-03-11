@@ -67,14 +67,17 @@ namespace upanui {
 
     auto& drawBuf = drawBuffer();
     if (!drawBuf.isNull()) {
-      doDraw();
-      for (auto child: children()) {
-        child->drawTopDown();
+      if (!skipRedraw()) {
+        doDraw();
+        for (auto child: children()) {
+          child->drawTopDown();
+        }
       }
 
       if (drawBuf.isLocal()) {
         parent().layout().draw(*this);
       }
+      setChangeState(ChangeState::Clean);
     }
   }
 }
