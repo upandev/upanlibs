@@ -44,7 +44,8 @@ namespace upanui {
       uint32_t DecodeUTF8(char **s);
       void CleanUp();
 
-      const Font **_fnt[5];         /* dynamic font registry */
+      static const int MAX_LOADED_FONT_FAMILIES = 5;
+      const Font **_fnt[MAX_LOADED_FONT_FAMILIES];         /* dynamic font registry */
       const Font *_s;               /* explicitly selected font */
       const Font *_f;               /* font selected by best match */
       Glyph _ga;                    /* glyph sketch area */

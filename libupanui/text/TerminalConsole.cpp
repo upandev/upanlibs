@@ -44,8 +44,8 @@ namespace upanui {
       UIElement::drawBuffer().initLocal(gc().frame().frameBuffer());
       init_term_console();
       _usfnContext.reset(new upanui::usfn::Context());
-      _usfnContext->Load(upanui::usfn::Context::GetPreloadedFont(upanui::usfn::PreloadedFonts::VGA16));
-      _usfnContext->Select(upanui::usfn::FAMILY_MONOSPACE, nullptr, upanui::usfn::STYLE_REGULAR, 16);
+      _usfnContext->Load(usfn::Context::GetPreloadedFont(usfn::PreloadedFonts::VGA16));
+      _usfnContext->Select(usfn::FAMILY_ANY, nullptr, usfn::STYLE_REGULAR, 16);
       _textWriter.setFontContext(_usfnContext.get());
     } catch(upan::exception& e) {
       printf("\n Failed to load USFN font: %s", e.ErrorMsg().c_str());

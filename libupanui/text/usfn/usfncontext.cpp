@@ -166,6 +166,17 @@ namespace upanui {
         if(family != FAMILY_ANY && (family > FAMILY_HAND || !_len[family])) {
           throw upan::exception(XLOC, "usfn: font family not found: %d", family);
         }
+        if (family == FAMILY_ANY) {
+          for(int i = 0; i < MAX_LOADED_FONT_FAMILIES; ++i) {
+            if (_fnt[i] != nullptr) {
+              family = i;
+              break;
+            }
+          }
+          if (family == MAX_LOADED_FONT_FAMILIES) {
+            throw upan::exception(XLOC, "usfn: no font is loaded");
+          }
+        }
         _s = _fnt[family][0];
       }
 
