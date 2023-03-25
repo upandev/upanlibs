@@ -34,7 +34,7 @@ namespace upanui {
     int drawX() const override;
     int drawY() const override;
 
-    void setupDrawBuffer();
+    bool setupDrawBuffer();
 
     virtual bool needLocalDrawBuffer() {
       return false;

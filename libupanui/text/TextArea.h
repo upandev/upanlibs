@@ -25,11 +25,18 @@
 #include <RectangleCanvas.h>
 #include <map.h>
 #include <vector.h>
+#include <mutex.h>
+#include <timer_thread.h>
 
 namespace upanui {
 
   class TextArea : public RectangleCanvas {
   public:
+    void enter();
+    void moveup();
+    void movedown();
+    void moveleft();
+    void moveright();
     void insert(uint16_t ch);
 
     uint8_t getCurrentFontSize() const {
@@ -40,11 +47,11 @@ namespace upanui {
       _currentFontSize = currentFontSize;
     }
 
-    uint8_t getCurrentFontType() const {
-      return _currentFontType;
+    usfn::PreloadedFonts getCurrentFontType() const {
+      return (usfn::PreloadedFonts) _currentFontType;
     }
 
-    void setCurrentFontType(uint8_t currentFontType) {
+    void setCurrentFontType(usfn::PreloadedFonts currentFontType) {
       _currentFontType = currentFontType;
     }
 
@@ -75,6 +82,10 @@ namespace upanui {
   private:
     TextArea(int x, int y, uint32_t width, uint32_t height);
     ~TextArea();
+    void doDraw() override;
+    void onKeyboardEvent(const KeyboardEvent& event) override;
+
+    void clearArea(int x, int  y, uint32_t width, uint32_t height);
 
   private:
     class Character {
@@ -163,37 +174,49 @@ namespace upanui {
         _maxHeight = maxHeight;
       }
       uint32_t size() const { return _characters.size(); }
+      const upan::vector<Character*>& characters() const { return _characters; }
     private:
       upan::vector<Character*> _characters;
       uint32_t _width;
       uint8_t _maxHeight;
     };
 
-    class CharacterPos {
+    class Position {
     public:
-      CharacterPos() : _row(0), _column(0) {}
+      Position() : _x(0), _y(0) {}
 
-      uint32_t getRow() const {
-        return _row;
+      int x() const {
+        return _x;
       }
 
-      uint32_t getColumn() const {
-        return _column;
+      int y() const {
+        return _y;
       }
 
-      void set(uint32_t row, uint32_t column) {
-        _row = row;
-        _column = column;
+      void set(int x, int y) {
+        _x = x;
+        _y = y;
       }
 
     private:
-      uint32_t _row;
-      uint32_t _column;
+      int _x;
+      int _y;
+    };
+
+    class CursorBlink : public upan::timer_thread {
+    public:
+      explicit CursorBlink(TextArea& textArea);
+      void on_timer_trigger() override;
+      TextArea& _textArea;
+      bool _showCursorToggle;
     };
 
     usfn::Context& getUSFNContext(usfn::PreloadedFonts fontType);
     void validateCursorPos() const;
-    void scrollOnEnter();
+    void scroll();
+    void updateCursor(int x, int y);
+    void updateCursor(bool showCursor);
+    void RenderLine(const Line& line, int charX, int baseDrawY);
 
   private:
     static const uint8_t MAX_FONT_SIZE = 128;
@@ -208,9 +231,11 @@ namespace upanui {
     uint16_t _currentStyle;
     uint32_t _currentFGColor;
     uint32_t _currentBGColor;
-    CharacterPos _characterPos;
-    uint32_t _cursorPos;
+    Position _characterPos;
+    Position _cursorPos;
     DrawBuffer _textBuffer;
+    upan::mutex _drawMutex;
+    CursorBlink _cursorBlinkThread;
 
     friend class UIObjectFactory;
   };

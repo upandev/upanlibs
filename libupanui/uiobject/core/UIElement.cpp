@@ -65,20 +65,22 @@ namespace upanui {
     return drawBuffer().isLocal() && (isChangeState(ChangeState::Clean, true) || isChangeState(ChangeState::Position, true));
   }
 
-  void UIElement::setupDrawBuffer() {
+  bool UIElement::setupDrawBuffer() {
     DrawBuffer& drawBuf = drawBuffer();
     if (needLocalDrawBuffer()) {
-      drawBuf.initLocal(width(), height());
+      return drawBuf.initLocal(width(), height());
     } else {
       const auto boundaryCheckResult = parent().layout().checkBoundary(*this);
       if (boundaryCheckResult == Layout::Outside) {
         drawBuf.clear();
+        return true;
       } else if (boundaryCheckResult == Layout::Inside) {
         const auto cx = x() + parent().borderThickness();
         const auto cy = y() + parent().borderThickness();
         drawBuf.initFrom(parent().drawBuffer(), cx, cy, width(), height());
+        return true;
       } else if (boundaryCheckResult == Layout::PartiallyInside) {
-        drawBuf.initLocal(width(), height());
+        return drawBuf.initLocal(width(), height());
       } else {
         throw upan::exception(XLOC, "Unsupported BoundaryCheckResult: %d", boundaryCheckResult);
       }

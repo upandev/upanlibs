@@ -190,7 +190,7 @@ namespace upanui {
 
   upan::option<UIObject&> UIObjectImpl::uiObjectUnderCursor(const int x, const int y) {
     if (captureMouseEvents() && inside(x, y)) {
-      for(auto& child : children()) {
+      for(auto child = children().rbegin(); child != children().rend(); ++child) {
         const upan::option<UIObject&> o = child->uiObjectUnderCursor(x, y);
         if (!o.isEmpty()) {
           return o;

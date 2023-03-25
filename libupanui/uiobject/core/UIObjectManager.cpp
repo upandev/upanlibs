@@ -24,6 +24,7 @@
 #include <UIObject.h>
 #include <UIRoot.h>
 #include <GraphicsContext.h>
+#include <typeinfo.h>
 
 namespace upanui {
   UIObjectManager::UIObjectManager(UIRoot& rootCanvas, const bool autoRefresh)

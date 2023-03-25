@@ -73,10 +73,10 @@ namespace upanui {
     }
   }
 
-  void DrawBuffer::initLocal(const uint32_t width, const uint32_t height) {
+  bool DrawBuffer::initLocal(const uint32_t width, const uint32_t height) {
     const auto bufSize = width * height;
     if (_type == BufferType::Local && _width == width && _height == height) {
-      return;
+      return false;
     }
     clear();
     _width = _vWidth = width;
@@ -84,6 +84,7 @@ namespace upanui {
     _buffer = new uint32_t[bufSize];
     _type = BufferType::Local;
     cleanBuffer();
+    return true;
   }
 
   void DrawBuffer::initLocal(const FrameBuffer& parent) {
@@ -106,21 +107,25 @@ namespace upanui {
     memcpy(buffer(), src, len);
   }
 
-  void DrawBuffer::copy(const uint32_t* src, uint32_t width, uint32_t height, bool directSet) {
+  void DrawBuffer::copy(int sx, int sy, const uint32_t* src, uint32_t srcWidth, uint32_t copyWidth, uint32_t copyHeight, bool directSet) {
     GCoreFunctions::PixelCache pixelCache;
-    const int ex = upan::min(_vWidth, width);
-    const int ey = upan::min(_vHeight, height);
-    for(auto y = 0; y < ey; ++y) {
+    const int ex = upan::min(_vWidth, sx + copyWidth);
+    const int ey = upan::min(_vHeight, sy + copyHeight);
+    for(auto y = sy; y < ey; ++y) {
       auto yDestOffset = y * _width;
-      auto ySrcOffset = y * width;
+      auto ySrcOffset = y * srcWidth;
       if (directSet) {
-        memcpy(&_buffer[yDestOffset], &src[ySrcOffset], ex * bytesPerPixel());
+        memcpy(&_buffer[sx + yDestOffset], &src[ySrcOffset], copyWidth * bytesPerPixel());
       } else {
-        for (auto x = 0; x < ex; ++x) {
-          GCoreFunctions::setPixel(_buffer[x + yDestOffset], src[x + ySrcOffset], pixelCache, directSet);
+        for (auto x = sx; x < ex; ++x) {
+          GCoreFunctions::setPixel(_buffer[x + yDestOffset], src[(sx - x) + ySrcOffset], pixelCache, directSet);
         }
       }
     }
+  }
+
+  void DrawBuffer::copy(const uint32_t* src, uint32_t width, uint32_t height, bool directSet) {
+    copy(0, 0, src, width, width, height, directSet);
   }
 
   void DrawBuffer::copy(DrawBuffer& src) {

@@ -28,6 +28,7 @@
 #include <set.h>
 #include <UIObject.h>
 #include <DrawBuffer.h>
+#include <GCoreFunctions.h>
 
 namespace upanui {
   class GraphicsContext;
@@ -101,6 +102,9 @@ namespace upanui {
     bool isChangeState(const ChangeState, const bool only) const override;
 
   protected:
+    uint32_t backgroundColorWithAlpha() const {
+      return (_bgColor & GCoreFunctions::NO_ALPHA_MASK) | (_bgAlpha << 24);
+    }
     virtual void onBackgroundColorChange() {}
     void onKeyboardEvent(const KeyboardEvent& event) override {}
     void onMouseEvent(const MouseEvent& event) override;

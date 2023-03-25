@@ -63,11 +63,11 @@ namespace upanui {
     //7. if using parent buffer then end the draw
     //8. if using your own buffer then ask parent to copy the child buffer into it's buffer
 
-    setupDrawBuffer();
+    const bool drawBufReset = setupDrawBuffer();
 
     auto& drawBuf = drawBuffer();
     if (!drawBuf.isNull()) {
-      if (!skipRedraw()) {
+      if (drawBufReset || !skipRedraw()) {
         doDraw();
         for (auto child: children()) {
           child->drawTopDown();

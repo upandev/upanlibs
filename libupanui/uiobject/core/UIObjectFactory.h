@@ -39,6 +39,7 @@ namespace upanui {
   class IconButton;
 
   class VerticalScroller;
+  class TextArea;
 
   class UIObjectFactory {
   public:
@@ -73,5 +74,7 @@ namespace upanui {
     static VerticalScroller& createVerticalScroller(UIObject& parent, const int x, const int y,
                                                     const uint32_t width, const uint32_t height,
                                                     const uint32_t scrollBarWidth);
+    static TextArea& createTextArea(UIObject& parent, const int x, const int y,
+                                    const uint32_t width, const uint32_t height);
   };
 }
