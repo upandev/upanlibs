@@ -138,9 +138,9 @@ namespace upanui {
     }
   }
 
-  void DrawBuffer::fill(int sx, int sy, uint32_t width, uint32_t height, uint32_t color) {
-    const int ex = upan::min(_vWidth, sx + width) - 1;
-    const int ey = upan::min(_vHeight, sy + height) - 1;
+  void DrawBuffer::fill(int sx, int sy, uint32_t fillWidth, uint32_t fillHeight, uint32_t color) {
+    const int ex = upan::min(_vWidth, sx + fillWidth) - 1;
+    const int ey = upan::min(_vHeight, sy + fillHeight) - 1;
     for(auto y = sy; y <= ey; ++y) {
       auto yOffset = y * _width;
       for(auto x = sx; x <= ex; ++x) {

@@ -38,6 +38,8 @@ namespace upanui {
     void moveleft();
     void moveright();
     void insert(uint16_t ch);
+    void removech();
+    void backspace();
 
     uint8_t getCurrentFontSize() const {
       return _currentFontSize;
@@ -166,8 +168,10 @@ namespace upanui {
 
     class Line {
     public:
-      Line() : _width(0), _maxHeight(0) {}
+      Line(uint8_t defaultHeight) : _width(0), _maxHeight(defaultHeight) {}
       void insert(int pos, Character& ch);
+      void remove(int from, int last);
+
       uint32_t width() const { return _width; }
       uint8_t maxHeight() const { return _maxHeight; }
       void setMaxHeight(uint8_t maxHeight) {
@@ -213,7 +217,6 @@ namespace upanui {
 
     usfn::Context& getUSFNContext(usfn::PreloadedFonts fontType);
     void validateCursorPos() const;
-    void scroll();
     void updateCursor(int x, int y);
     void updateCursor(bool showCursor);
     void RenderLine(const Line& line, int charX, int baseDrawY);

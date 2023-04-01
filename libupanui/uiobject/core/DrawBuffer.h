@@ -52,7 +52,7 @@ namespace upanui {
     void copy(int sx, int sy, const uint32_t* src, uint32_t srcWidth, uint32_t copyWidth, uint32_t copyHeight, bool directSet);
     void copy(const uint32_t* src, uint32_t width, uint32_t height, bool directSet);
     void copy(DrawBuffer& src);
-    void fill(int sx, int sy, uint32_t width, uint32_t height, uint32_t color);
+    void fill(int sx, int sy, uint32_t fillWidth, uint32_t fillHeight, uint32_t color);
     void fill(uint32_t color);
 
   private:
