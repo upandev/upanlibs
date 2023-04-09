@@ -166,23 +166,32 @@ namespace upanui {
       uint32_t _bgColor;
     } PACKED;
 
+    typedef upan::vector<Character*> Characters;
+
     class Line {
     public:
-      Line(uint8_t defaultHeight) : _width(0), _maxHeight(defaultHeight) {}
+      Line(uint8_t defaultHeight) : _width(MIN_CURSOR_WIDTH_BUFFER), _maxHeight(defaultHeight), _wrapped(false) {}
       void insert(int pos, Character& ch);
       void remove(int from, int last);
 
       uint32_t width() const { return _width; }
       uint8_t maxHeight() const { return _maxHeight; }
-      void setMaxHeight(uint8_t maxHeight) {
+      void maxHeight(uint8_t maxHeight) {
         _maxHeight = maxHeight;
+      }
+      bool wrapped() const { return _wrapped; }
+      void wrapped(bool wrapped) {
+        _wrapped = wrapped;
       }
       uint32_t size() const { return _characters.size(); }
       const upan::vector<Character*>& characters() const { return _characters; }
+      Character* characters(int i) const { return _characters[i]; }
     private:
-      upan::vector<Character*> _characters;
+      const int MIN_CURSOR_WIDTH_BUFFER = 8;
+      Characters _characters;
       uint32_t _width;
       uint8_t _maxHeight;
+      bool _wrapped;
     };
 
     class Position {
@@ -219,6 +228,8 @@ namespace upanui {
     void validateCursorPos() const;
     void updateCursor(int x, int y);
     void updateCursor(bool showCursor);
+    void insert(int lineX, int lineY, Character& newCh);
+    void insert(TextArea::Line& line, int lineX, int lineY, const TextArea::Characters& characters);
     void RenderLine(const Line& line, int charX, int baseDrawY);
 
   private:

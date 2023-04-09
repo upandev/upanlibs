@@ -75,6 +75,8 @@ namespace upanui {
   }
 
   void TextArea::enter() {
+    updateCursor(false);
+
     Line& curLine = *_lines[_characterPos.y()];
     Line& newLine = *new Line(_currentFontSize);
     _lines.insert(_characterPos.y() + 1, &newLine);
@@ -86,50 +88,108 @@ namespace upanui {
     curLine.remove(_characterPos.x(), curLine.characters().size());
     RenderLine(curLine, _characterPos.x(), _cursorPos.y());
 
-    _characterPos.set(0, _characterPos.y() + 1);
-
-    updateCursor(false);
-
-    auto cursorY = _cursorPos.y() + _currentFontSize;
-    if (cursorY < height()) {
+    auto newCursorY = _cursorPos.y() + newLine.maxHeight();
+    if (newCursorY < height()) {
       auto srcY = MAX_FONT_SIZE + _cursorPos.y() + 1;
-      auto destY = MAX_FONT_SIZE + cursorY + 1;
-      memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + srcY * width(), (height() - cursorY - 1) * width() * _textBuffer.bytesPerPixel());
+      auto destY = MAX_FONT_SIZE + newCursorY + 1;
+      memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + srcY * width(), (height() - newCursorY - 1) * width() * _textBuffer.bytesPerPixel());
+      RenderLine(newLine, 0, newCursorY);
     } else {
-      auto moveY = cursorY - (height() - 1);
+      auto moveY = newCursorY - (height() - 1);
       auto srcY = MAX_FONT_SIZE + moveY;
       auto destY = MAX_FONT_SIZE;
-      memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + srcY * width(), (_cursorPos.y() - moveY) * width() * _textBuffer.bytesPerPixel());
-      cursorY = height() - 1;
+      memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + srcY * width(),
+              (_cursorPos.y() - moveY) * width() * _textBuffer.bytesPerPixel());
+      newCursorY = height() - 1;
+      RenderLine(newLine, 0, newCursorY);
     }
 
-    RenderLine(newLine, 0, cursorY);
-
-    _cursorPos.set(0, cursorY);
+    _characterPos.set(0, _characterPos.y() + 1);
+    _cursorPos.set(0, newCursorY);
     updateCursor(true);
-    notifyChange(ChangeState::Content);
-
   }
 
   void TextArea::insert(uint16_t ch) {
-    if (is_command_key(ch)) {
-      return;
+    if (!is_command_key(ch)) {
+      insert(_characterPos.x(), _characterPos.y(),
+             *new Character(ch, _currentFontSize, _currentFontType, _currentStyle, _currentFGColor, _currentBGColor));
+    }
+  }
+
+  void TextArea::insert(TextArea::Line& line, int lineX, int lineY, const TextArea::Characters& characters) {
+    for(int i = 0; i < characters.size(); ++i) {
+      line.insert(lineX + i, *characters[i]);
     }
 
-    auto line = _lines[_characterPos.y()];
-    if ((line->width() + _currentFontSize / 2) >= width()) {
-      //TODO: wrap the line
-      return;
+    Characters wrapCharacters;
+    while (line.width() > width()) {
+      auto ch = line.characters(line.size() - 1);
+      line.remove(line.size() - 1, line.size());
+      wrapCharacters.push_back(ch);
     }
 
-    if (line->maxHeight() < _currentFontSize) {
-      updateCursor(_cursorPos.x(), _cursorPos.y() + _currentFontSize - line->maxHeight());
+    if (!wrapCharacters.empty()) {
+      lineY += 1;
+      if (line.wrapped()) {
+        auto nextLine = _lines[lineY];
+        insert(*nextLine, 0, lineY, wrapCharacters);
+      } else {
+        line.wrapped(true);
+        auto newLine = new Line(_currentFontSize);
+        _lines.insert(lineY, newLine);
+        insert(*newLine, 0, lineY, wrapCharacters);
+      }
     }
-    auto character = new Character(ch, _currentFontSize, _currentFontType, _currentStyle, _currentFGColor, _currentBGColor);
-    line->insert(_characterPos.x(), *character);
-    RenderLine(*line, _characterPos.x(), _cursorPos.y());
-    _characterPos.set(_characterPos.x() + 1, _characterPos.y());
-    updateCursor(_cursorPos.x() + character->getChWidth(), _cursorPos.y());
+  }
+
+  void TextArea::insert(int lineX, int lineY, Character& newCh) {
+    auto line = _lines[lineY];
+    auto origLineCount = _lines.size();
+
+    Characters characters;
+    characters.push_back(&newCh);
+    insert(*line, lineX, lineY, characters);
+
+    auto hasNewLine = _lines.size() != origLineCount;
+
+    if (hasNewLine) {
+      auto srcCursorY = _cursorPos.y();
+      auto destCursorY = _cursorPos.y();
+      for (int i = lineY + 1; i < _lines.size(); ++i) {
+        auto l = _lines[i];
+        if (l->wrapped()) {
+          srcCursorY += l->maxHeight();
+        } else {
+          destCursorY = srcCursorY + l->maxHeight();
+          break;
+        }
+      }
+
+      if (destCursorY < height()) {
+        auto srcY = MAX_FONT_SIZE + srcCursorY + 1;
+        auto destY = MAX_FONT_SIZE + destCursorY + 1;
+        memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + srcY * width(),
+                (height() - destCursorY - 1) * width() * _textBuffer.bytesPerPixel());
+      }
+    }
+
+    auto cursorY = _cursorPos.y();
+    for(int i = lineY; i < _lines.size(); ++i) {
+      RenderLine(*_lines[i], 0, cursorY);
+      if (!_lines[i]->wrapped()) { break; }
+      if (cursorY >= height()) { break; }
+      cursorY += _lines[i]->maxHeight();
+    }
+
+    if (line->size() == lineX) {
+      //This means the new character inserted has moved to the next line
+      _characterPos.set(1, lineY);
+      updateCursor(newCh.getChWidth(), _cursorPos.y());
+      movedown();
+    } else {
+      _characterPos.set(_characterPos.x() + 1, _characterPos.y());
+      updateCursor(_cursorPos.x() + newCh.getChWidth(), _cursorPos.y());
+    }
   }
 
   void TextArea::removech() {
@@ -139,7 +199,6 @@ namespace upanui {
     }
     line->remove(_characterPos.x(), _characterPos.x() + 1);
     RenderLine(*line, _characterPos.x(), _cursorPos.y());
-    notifyChange(ChangeState::Content);
   }
 
   void TextArea::backspace() {
@@ -148,31 +207,6 @@ namespace upanui {
     }
     moveleft();
     removech();
-  }
-
-  void TextArea::RenderLine(const Line& line, int charX, int baseDrawY) {
-    auto drawX = 0;
-    auto& characters = line.characters();
-    for(int i = 0; i < charX; ++i) {
-      drawX += characters[i]->getChWidth();
-    }
-    clearArea(drawX, baseDrawY - line.maxHeight(), width() - drawX, line.maxHeight() + 1);
-
-    for(int i = charX; i < characters.size(); ++i) {
-      auto ch = characters[i];
-      usfn::FrameBuffer buf = {
-          .ptr = (uint8_t*)_textBuffer.buffer(),
-          .w = (int16_t)_textBuffer.width(),
-          .h = (int16_t)_textBuffer.height(),
-          .p = (uint16_t)_textBuffer.pitch(),
-          .x = (int16_t)drawX,
-          .y = (int16_t)(baseDrawY + MAX_FONT_SIZE - ch->getChHeight()),
-          .fg = _currentFGColor | GCoreFunctions::ALPHA_MASK,
-          .bg = _currentBGColor | GCoreFunctions::ALPHA_MASK
-      };
-      getUSFNContext(getCurrentFontType()).RenderCharacter(buf, ch->getCh());
-      drawX += characters[charX]->getChWidth();
-    }
   }
 
   void TextArea::moveup() {
@@ -208,7 +242,6 @@ namespace upanui {
 
       _cursorPos.set(cursorX, prevLine->maxHeight());
       updateCursor(true);
-      notifyChange(ChangeState::Content);
     }
   }
 
@@ -241,7 +274,6 @@ namespace upanui {
 
       _cursorPos.set(cursorX, height() - 1);
       updateCursor(true);
-      notifyChange(ChangeState::Content);
     }
   }
 
@@ -305,6 +337,7 @@ namespace upanui {
         insert(ch);
         break;
     }
+    notifyChange(ChangeState::Content);
   }
 
   void TextArea::doDraw() {
@@ -312,12 +345,40 @@ namespace upanui {
     drawBuffer().copy(_textBuffer.buffer() + MAX_FONT_SIZE * _textBuffer.width(), width(), height(), true);
   }
 
+  void TextArea::RenderLine(const Line& line, int charX, int baseDrawY) {
+    auto topY = baseDrawY - line.maxHeight();
+    if (topY > height()) {
+      return;
+    }
+    auto drawX = 0;
+    auto& characters = line.characters();
+    for(int i = 0; i < charX; ++i) {
+      drawX += characters[i]->getChWidth();
+    }
+    clearArea(drawX, topY, width() - drawX, line.maxHeight() + 1);
+
+    for(int i = charX; i < characters.size(); ++i) {
+      auto ch = characters[i];
+      usfn::FrameBuffer buf = {
+          .ptr = (uint8_t*)_textBuffer.buffer(),
+          .w = (int16_t)_textBuffer.width(),
+          .h = (int16_t)_textBuffer.height(),
+          .p = (uint16_t)_textBuffer.pitch(),
+          .x = (int16_t)drawX,
+          .y = (int16_t)(baseDrawY + MAX_FONT_SIZE - ch->getChHeight()),
+          .fg = _currentFGColor | GCoreFunctions::ALPHA_MASK,
+          .bg = _currentBGColor | GCoreFunctions::ALPHA_MASK
+      };
+      getUSFNContext(getCurrentFontType()).RenderCharacter(buf, ch->getCh());
+      drawX += characters[charX]->getChWidth();
+    }
+  }
+
   void TextArea::updateCursor(int x, int y) {
     upan::mutex_guard g(_drawMutex);
     updateCursor(false);
     _cursorPos.set(x, y);
     updateCursor(true);
-    notifyChange(ChangeState::Content);
   }
 
   void TextArea::updateCursor(bool showCursor) {
@@ -341,7 +402,7 @@ namespace upanui {
       return;
     }
     _characters.erase(from, last);
-    _width = 0;
+    _width = MIN_CURSOR_WIDTH_BUFFER;
     // if the line is empty then leave the maxHeight to whatever it was before
     // if the line is not empty then recalculate the maxHeight based on remaining characters
     if (!_characters.empty()) {
