@@ -228,7 +228,6 @@ namespace upanui {
     void validateCursorPos() const;
     void updateCursor(int x, int y);
     void updateCursor(bool showCursor);
-    void insert(int lineX, int lineY, Character& newCh);
     void insert(TextArea::Line& line, int lineX, int lineY, const TextArea::Characters& characters);
     void RenderLine(const Line& line, int charX, int baseDrawY);
 

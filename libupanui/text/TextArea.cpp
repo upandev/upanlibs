@@ -86,6 +86,7 @@ namespace upanui {
     }
 
     curLine.remove(_characterPos.x(), curLine.characters().size());
+    curLine.wrapped(false);
     RenderLine(curLine, _characterPos.x(), _cursorPos.y());
 
     auto newCursorY = _cursorPos.y() + newLine.maxHeight();
@@ -110,9 +111,58 @@ namespace upanui {
   }
 
   void TextArea::insert(uint16_t ch) {
-    if (!is_command_key(ch)) {
-      insert(_characterPos.x(), _characterPos.y(),
-             *new Character(ch, _currentFontSize, _currentFontType, _currentStyle, _currentFGColor, _currentBGColor));
+    if (is_command_key(ch)) {
+      return;
+    }
+
+    auto newCh = new Character(ch, _currentFontSize, _currentFontType, _currentStyle, _currentFGColor, _currentBGColor);
+
+    auto line = _lines[_characterPos.y()];
+    auto origLineCount = _lines.size();
+
+    Characters characters;
+    characters.push_back(newCh);
+    insert(*line, _characterPos.x(), _characterPos.y(), characters);
+
+    auto hasNewLine = _lines.size() != origLineCount;
+
+    if (hasNewLine) {
+      auto srcCursorY = _cursorPos.y();
+      auto destCursorY = _cursorPos.y();
+      for (int i = _characterPos.y() + 1; i < _lines.size(); ++i) {
+        auto l = _lines[i];
+        if (l->wrapped()) {
+          srcCursorY += l->maxHeight();
+        } else {
+          destCursorY = srcCursorY + l->maxHeight();
+          break;
+        }
+      }
+
+      if (destCursorY < height()) {
+        auto srcY = MAX_FONT_SIZE + srcCursorY + 1;
+        auto destY = MAX_FONT_SIZE + destCursorY + 1;
+        memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + srcY * width(),
+                (height() - destCursorY - 1) * width() * _textBuffer.bytesPerPixel());
+      }
+    }
+
+    auto cursorY = _cursorPos.y();
+    for(int i = _characterPos.y(); i < _lines.size(); ++i) {
+      RenderLine(*_lines[i], 0, cursorY);
+      if (!_lines[i]->wrapped()) { break; }
+      if (cursorY >= height()) { break; }
+      cursorY += _lines[i]->maxHeight();
+    }
+
+    if (line->size() == _characterPos.x()) {
+      //This means the new character inserted has moved to the next line
+      _characterPos.set(1, _characterPos.y());
+      updateCursor(newCh->getChWidth(), _cursorPos.y());
+      movedown();
+    } else {
+      _characterPos.set(_characterPos.x() + 1, _characterPos.y());
+      updateCursor(_cursorPos.x() + newCh->getChWidth(), _cursorPos.y());
     }
   }
 
@@ -142,63 +192,56 @@ namespace upanui {
     }
   }
 
-  void TextArea::insert(int lineX, int lineY, Character& newCh) {
-    auto line = _lines[lineY];
-    auto origLineCount = _lines.size();
-
-    Characters characters;
-    characters.push_back(&newCh);
-    insert(*line, lineX, lineY, characters);
-
-    auto hasNewLine = _lines.size() != origLineCount;
-
-    if (hasNewLine) {
-      auto srcCursorY = _cursorPos.y();
-      auto destCursorY = _cursorPos.y();
-      for (int i = lineY + 1; i < _lines.size(); ++i) {
-        auto l = _lines[i];
-        if (l->wrapped()) {
-          srcCursorY += l->maxHeight();
-        } else {
-          destCursorY = srcCursorY + l->maxHeight();
-          break;
-        }
-      }
-
-      if (destCursorY < height()) {
-        auto srcY = MAX_FONT_SIZE + srcCursorY + 1;
-        auto destY = MAX_FONT_SIZE + destCursorY + 1;
-        memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + srcY * width(),
-                (height() - destCursorY - 1) * width() * _textBuffer.bytesPerPixel());
-      }
-    }
-
-    auto cursorY = _cursorPos.y();
-    for(int i = lineY; i < _lines.size(); ++i) {
-      RenderLine(*_lines[i], 0, cursorY);
-      if (!_lines[i]->wrapped()) { break; }
-      if (cursorY >= height()) { break; }
-      cursorY += _lines[i]->maxHeight();
-    }
-
-    if (line->size() == lineX) {
-      //This means the new character inserted has moved to the next line
-      _characterPos.set(1, lineY);
-      updateCursor(newCh.getChWidth(), _cursorPos.y());
-      movedown();
-    } else {
-      _characterPos.set(_characterPos.x() + 1, _characterPos.y());
-      updateCursor(_cursorPos.x() + newCh.getChWidth(), _cursorPos.y());
-    }
-  }
-
   void TextArea::removech() {
     auto line = _lines[_characterPos.y()];
-    if (_characterPos.x() == line->characters().size()) {
-      return;
+    if (line->wrapped()) {
+
+    } else {
+      if (_characterPos.x() == line->characters().size()) {
+        if (_characterPos.x() == 0) {
+          if (_characterPos.y() < (_lines.size() - 1)) {
+            int copyHeight = 0;
+            int lastLineIndex = -1;
+            auto lastLineBaseCursorY = _cursorPos.y();
+
+            for (int i = _characterPos.y() + 1; i < _lines.size(); ++i) {
+              lastLineBaseCursorY += _lines[i]->maxHeight();
+              if (lastLineBaseCursorY >= height()) {
+                lastLineIndex = i;
+                break;
+              }
+              copyHeight += _lines[i]->maxHeight();
+            }
+
+            const auto destY = MAX_FONT_SIZE + _cursorPos.y() - line->maxHeight() + 1;
+            const auto srcY = MAX_FONT_SIZE + _cursorPos.y();
+
+            memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + (srcY + 1) * width(), copyHeight * width() * _textBuffer.bytesPerPixel());
+
+            const auto destYOnCanvas = destY + copyHeight - MAX_FONT_SIZE;
+            if (copyHeight > 0) {
+              clearArea(0, destYOnCanvas, width(), height() - destYOnCanvas);
+            }
+
+            for (int y = destYOnCanvas; y < height() && lastLineIndex != -1 && lastLineIndex < _lines.size();) {
+              auto lastLine = _lines[lastLineIndex];
+              RenderLine(*lastLine, 0, y + lastLine->maxHeight());
+              y += lastLine->maxHeight();
+              ++lastLineIndex;
+            }
+
+            if (copyHeight > 0) {
+              _lines.erase(_characterPos.y(), _characterPos.y() + 1);
+            }
+          }
+        } else {
+          //line->wrapped(true);
+        }
+      } else {
+        line->remove(_characterPos.x(), _characterPos.x() + 1);
+        RenderLine(*line, _characterPos.x(), _cursorPos.y());
+      }
     }
-    line->remove(_characterPos.x(), _characterPos.x() + 1);
-    RenderLine(*line, _characterPos.x(), _cursorPos.y());
   }
 
   void TextArea::backspace() {
