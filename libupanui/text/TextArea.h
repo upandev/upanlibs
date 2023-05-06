@@ -229,6 +229,8 @@ namespace upanui {
     void updateCursor(int x, int y);
     void updateCursor(bool showCursor);
     void insert(TextArea::Line& line, int lineX, int lineY, const TextArea::Characters& characters);
+    void wrapremovech(int x, int y, int& deletedLine);
+    void lineremovech(int y, int baseY);
     void RenderLine(const Line& line, int charX, int baseDrawY);
 
   private:

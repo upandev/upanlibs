@@ -192,50 +192,118 @@ namespace upanui {
     }
   }
 
+  void TextArea::wrapremovech(int x, int y, int& deletedLine) {
+    auto line = _lines[y];
+    line->remove(x, x + 1);
+
+    if (!line->wrapped()) {
+      return;
+    }
+
+    auto ny = y + 1;
+    if (ny < _lines.size()) {
+      auto nextLine = _lines[ny];
+      int availWidth = (int)width() - line->width();
+      bool deletedFromNextLine = false;
+      while (nextLine->size() > 0) {
+        auto ch = nextLine->characters(0);
+        if (ch->getChWidth() < availWidth) {
+          line->insert(line->size(), *ch);
+          availWidth -= ch->getChWidth();
+          wrapremovech(0, ny, deletedLine);
+          deletedFromNextLine = true;
+        } else {
+          break;
+        }
+      }
+      //deleting when cursor is at the end of current line which is full - then we need to remove the first char from next line
+      if (!deletedFromNextLine && nextLine->size() > 0 && x == line->size()) {
+        wrapremovech(0, ny, deletedLine);
+      }
+      if (nextLine->size() == 0) {
+        line->wrapped(false);
+        deletedLine = ny;
+      }
+    }
+  }
+
+  void TextArea::lineremovech(const int y, const int baseY) {
+    auto line = _lines[y];
+    auto visibleBaseY = baseY - line->maxHeight();
+    auto insideCanvas = visibleBaseY < height();
+
+    if (y < (_lines.size() - 1) && insideCanvas) {
+      int copyHeight = 0;
+      int lastLineIndex = -1;
+      auto lastLineBaseCursorY = baseY;
+
+      for (int i = y + 1; i < _lines.size(); ++i) {
+        lastLineBaseCursorY += _lines[i]->maxHeight();
+        if (lastLineBaseCursorY >= height()) {
+          lastLineIndex = i;
+          break;
+        }
+        copyHeight += _lines[i]->maxHeight();
+      }
+
+      const auto destY = MAX_FONT_SIZE + visibleBaseY + 1;
+      const auto srcY = MAX_FONT_SIZE + baseY;
+
+      memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + (srcY + 1) * width(), copyHeight * width() * _textBuffer.bytesPerPixel());
+
+      const int destYOnCanvas = destY + copyHeight - MAX_FONT_SIZE;
+      if (copyHeight > 0) {
+        clearArea(0, destYOnCanvas, width(), height() - destYOnCanvas);
+      }
+
+      for (int lastLineBaseY = destYOnCanvas; lastLineBaseY < height() && lastLineIndex != -1 && lastLineIndex < _lines.size();) {
+        auto lastLine = _lines[lastLineIndex];
+        RenderLine(*lastLine, 0, lastLineBaseY + lastLine->maxHeight());
+        lastLineBaseY += lastLine->maxHeight();
+        ++lastLineIndex;
+      }
+
+      _lines.erase(y, y + 1);
+    } else if (_characterPos.y() < y) { //its a no-op if deleting the line where character cursor is
+      if (insideCanvas) {
+        clearArea(0, visibleBaseY + 1, width(), line->maxHeight());
+      }
+      _lines.erase(y, y + 1);
+    }
+  }
+
   void TextArea::removech() {
     auto line = _lines[_characterPos.y()];
+    if (!line->wrapped() && _characterPos.x() == line->characters().size() && _characterPos.x() > 0) {
+      line->wrapped(true);
+    }
     if (line->wrapped()) {
+      int deletedLine = -1;
+      wrapremovech(_characterPos.x(), _characterPos.y(), deletedLine);
+      int baseY = _cursorPos.y() - line->maxHeight();
+      for (int i = _characterPos.y(); i < _lines.size(); ++i) {
+        auto l = _lines[i];
+        if (baseY > height()) {
+          break;
+        }
+        baseY += l->maxHeight();
+        RenderLine(*l, 0, baseY);
+        if (!l->wrapped()) {
+          break;
+        }
+      }
 
+      if (deletedLine > 0) {
+        int baseY = _cursorPos.y() - line->maxHeight();
+        for (int i = _characterPos.y(); i <= deletedLine; ++i) {
+          baseY += _lines[i]->maxHeight();
+        }
+        lineremovech(deletedLine, baseY);
+      }
     } else {
       if (_characterPos.x() == line->characters().size()) {
         if (_characterPos.x() == 0) {
-          if (_characterPos.y() < (_lines.size() - 1)) {
-            int copyHeight = 0;
-            int lastLineIndex = -1;
-            auto lastLineBaseCursorY = _cursorPos.y();
-
-            for (int i = _characterPos.y() + 1; i < _lines.size(); ++i) {
-              lastLineBaseCursorY += _lines[i]->maxHeight();
-              if (lastLineBaseCursorY >= height()) {
-                lastLineIndex = i;
-                break;
-              }
-              copyHeight += _lines[i]->maxHeight();
-            }
-
-            const auto destY = MAX_FONT_SIZE + _cursorPos.y() - line->maxHeight() + 1;
-            const auto srcY = MAX_FONT_SIZE + _cursorPos.y();
-
-            memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + (srcY + 1) * width(), copyHeight * width() * _textBuffer.bytesPerPixel());
-
-            const auto destYOnCanvas = destY + copyHeight - MAX_FONT_SIZE;
-            if (copyHeight > 0) {
-              clearArea(0, destYOnCanvas, width(), height() - destYOnCanvas);
-            }
-
-            for (int y = destYOnCanvas; y < height() && lastLineIndex != -1 && lastLineIndex < _lines.size();) {
-              auto lastLine = _lines[lastLineIndex];
-              RenderLine(*lastLine, 0, y + lastLine->maxHeight());
-              y += lastLine->maxHeight();
-              ++lastLineIndex;
-            }
-
-            if (copyHeight > 0) {
-              _lines.erase(_characterPos.y(), _characterPos.y() + 1);
-            }
-          }
-        } else {
-          //line->wrapped(true);
+          lineremovech(_characterPos.y(), _cursorPos.y());
         }
       } else {
         line->remove(_characterPos.x(), _characterPos.x() + 1);
