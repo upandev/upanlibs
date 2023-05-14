@@ -118,7 +118,7 @@ namespace upanui {
         memcpy(&_buffer[sx + yDestOffset], &src[ySrcOffset], copyWidth * bytesPerPixel());
       } else {
         for (auto x = sx; x < ex; ++x) {
-          GCoreFunctions::setPixel(_buffer[x + yDestOffset], src[(sx - x) + ySrcOffset], pixelCache, directSet);
+          GCoreFunctions::setPixel(_buffer[x + yDestOffset], src[(x - sx) + ySrcOffset], pixelCache, directSet);
         }
       }
     }
