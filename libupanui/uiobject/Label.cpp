@@ -33,6 +33,7 @@ namespace upanui {
                usfn::PreloadedFonts fontType,
                int fontFamily, int fontStyle, int fontSize)
     : RectangleCanvas(x, y, width, height), _c(nullptr), _str(str),
+      _fontType(-1), _fontFamily(-1),
       _fontStyle(fontStyle), _fontSize(fontSize), _updateText(false) {
     _textBuffer.ptr = nullptr;
     _textBuffer.fg = fgColor | GCoreFunctions::ALPHA_MASK;

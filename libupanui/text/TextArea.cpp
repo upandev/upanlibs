@@ -30,7 +30,10 @@ namespace upanui {
   TextArea::TextArea(int x, int y, uint32_t width, uint32_t height) : RectangleCanvas(x, y, width, height),
     _currentFontSize(16), _currentFontType(usfn::PreloadedFonts::VGA16), _currentStyle(usfn::STYLE_REGULAR),
     _currentFGColor(0x000000 | GCoreFunctions::ALPHA_MASK), _currentBGColor(0xFFFFFF | GCoreFunctions::ALPHA_MASK),
-    _cursorBlinkThread(*this) {
+    _maxLineCharWidth(width - 8), _cursorBlinkThread(*this) {
+    if (width <= 8) {
+      throw upan::exception(XLOC, "TextArea should have a min width > 8");
+    }
     _lines.push_back(new Line(_currentFontSize));
     backgroundColor(_currentBGColor);
     _textBuffer.initLocal(width, MAX_FONT_SIZE * 2 + height);
@@ -172,7 +175,7 @@ namespace upanui {
     }
 
     Characters wrapCharacters;
-    while (line.width() > width()) {
+    while (line.width() > _maxLineCharWidth) {
       auto ch = line.characters(line.size() - 1);
       line.remove(line.size() - 1, line.size());
       wrapCharacters.push_back(ch);
@@ -203,7 +206,7 @@ namespace upanui {
     auto ny = y + 1;
     if (ny < _lines.size()) {
       auto nextLine = _lines[ny];
-      int availWidth = (int)width() - line->width();
+      int availWidth = (int)_maxLineCharWidth - line->width();
       bool deletedFromNextLine = false;
       while (nextLine->size() > 0) {
         auto ch = nextLine->characters(0);
@@ -314,7 +317,9 @@ namespace upanui {
 
   void TextArea::backspace() {
     if (_characterPos.x() == 0) {
-      return;
+      if (_characterPos.y() == 0) {
+        return;
+      }
     }
     moveleft();
     removech();
@@ -406,6 +411,15 @@ namespace upanui {
     updateCursor(_cursorPos.x() + curLine->characters()[_characterPos.x() - 1]->getChWidth(), _cursorPos.y());
   }
 
+  void TextArea::movehome() {
+    if (_characterPos.x() == 0) {
+      return;
+    }
+  }
+
+  void TextArea::moveend() {
+  }
+
   void TextArea::clearArea(int x, int  y, uint32_t width, uint32_t height) {
     _textBuffer.fill(x, y + MAX_FONT_SIZE, width, height, backgroundColorWithAlpha());
   }
@@ -476,11 +490,13 @@ namespace upanui {
           .h = (int16_t)_textBuffer.height(),
           .p = (uint16_t)_textBuffer.pitch(),
           .x = (int16_t)drawX,
-          .y = (int16_t)(baseDrawY + MAX_FONT_SIZE - ch->getChHeight()),
+          .y = (int16_t)(baseDrawY + MAX_FONT_SIZE - 1 - ch->getChHeight()),
           .fg = _currentFGColor | GCoreFunctions::ALPHA_MASK,
           .bg = _currentBGColor | GCoreFunctions::ALPHA_MASK
       };
-      getUSFNContext(getCurrentFontType()).RenderCharacter(buf, ch->getCh());
+      //getUSFNContext(getCurrentFontType()).RenderCharacter(buf, ch->getCh());
+      char str[2] = { ch->getCh(), '\0'};
+      getUSFNContext(getCurrentFontType()).RenderText(buf, str, true, false);
       drawX += characters[charX]->getChWidth();
     }
   }

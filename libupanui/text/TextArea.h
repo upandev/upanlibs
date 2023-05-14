@@ -37,6 +37,8 @@ namespace upanui {
     void movedown();
     void moveleft();
     void moveright();
+    void movehome();
+    void moveend();
     void insert(uint16_t ch);
     void removech();
     void backspace();
@@ -85,6 +87,7 @@ namespace upanui {
     TextArea(int x, int y, uint32_t width, uint32_t height);
     ~TextArea();
     void doDraw() override;
+    void vscroll(int rows, int scrollableHeight) override {}
     void onKeyboardEvent(const KeyboardEvent& event) override;
 
     void clearArea(int x, int  y, uint32_t width, uint32_t height);
@@ -246,6 +249,7 @@ namespace upanui {
     uint16_t _currentStyle;
     uint32_t _currentFGColor;
     uint32_t _currentBGColor;
+    uint32_t _maxLineCharWidth;
     Position _characterPos;
     Position _cursorPos;
     DrawBuffer _textBuffer;

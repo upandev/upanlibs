@@ -254,7 +254,7 @@ namespace upanui {
       //printf("\n%d,%d,%d,%d", buf.w, buf.h, buf.x, buf.y);
       buf.x = 0;
       int ret;
-      while((ret = RenderText(buf, str, false)) > 0)
+      while((ret = RenderText(buf, str, false, false)) > 0)
         str += ret;
     }
 
@@ -265,7 +265,7 @@ namespace upanui {
         throw upan::exception(XLOC, "string can't be null");
       }
       buf.w = buf.h = buf.x = buf.y = 0;
-      while((ret = RenderText(buf, str, false))) {
+      while((ret = RenderText(buf, str, false, false))) {
         if(ret < 0 || !_g) {
           return;
         }
@@ -297,7 +297,7 @@ namespace upanui {
       buf.y = buf.y * s / _f->height;
     }
 
-    int Context::RenderText(FrameBuffer& dst, const char *str, bool fillBG) {
+    int Context::RenderText(FrameBuffer& dst, const char *str, bool fixedUpperBaseLine, bool fillBG) {
       Font **fl;
       uint8_t *ptr = NULL, *frg, *end, *tmp, color, ci = 0, cb = 0, cs;
       uint16_t r[640];
@@ -629,7 +629,7 @@ namespace upanui {
       if(dst.ptr) {
         if(_g->x) {
           ox = (_g->o * h / _f->height) + (_style & STYLE_RTL ? w : 0);
-          oy = _g->a * h / _f->height;
+          oy = fixedUpperBaseLine ? 0 : _g->a * h / _f->height;
         } else { ox = w / 2; oy = 0; }
         j = dst.w < 0 ? -dst.w : dst.w;
         cs = dst.w < 0 ? 16 : 0;

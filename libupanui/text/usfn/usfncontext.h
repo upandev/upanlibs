@@ -34,7 +34,7 @@ namespace upanui {
       void Select(int family, const char *name, int style, int size);
       void RenderCharacter(FrameBuffer& dst, uint32_t unicode);
       void DrawText(const char *str, FrameBuffer& buf);
-      int RenderText(FrameBuffer& dst, const char *str, bool fillBG);
+      int RenderText(FrameBuffer& dst, const char *str, bool fixedUpperBaseLine, bool fillBG);
 
     private:
       void CalculateTextBufferSize(const char *str, FrameBuffer& buf);
