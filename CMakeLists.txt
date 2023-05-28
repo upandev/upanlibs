@@ -88,7 +88,7 @@ include_directories(${PROJECT_SOURCE_DIR}/libupanui/image/bmp)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/image/png)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/interop/includes)
 
-add_custom_target(resources COMMAND make WORKING_DIRECTORY libupanui/resources/)
+add_custom_target(resources COMMAND make WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/libupanui/resources/)
 
 #LIBC
 execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.c' | grep -v CMakeFile | grep -v './libc/sys/'" OUTPUT_VARIABLE LIBC_SRC)
