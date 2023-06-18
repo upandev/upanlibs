@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <thread.h>
+#include <ithread.h>
 
 namespace upan {
     class timer_thread : public thread {

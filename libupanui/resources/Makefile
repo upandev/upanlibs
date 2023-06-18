@@ -17,7 +17,7 @@
 #																			 
 #	 You should have received a copy of the GNU General Public License
 #	 along with this program.  If not, see <http://www.gnu.org/licenses/
-LD = ${HOME}/opt/cross/i686-elf/bin/ld
+LD = ${HOME}/opt/cross/bin/i686-elf-ld
 
 # List all the resource files
 PNG_FILES := $(shell find icons/png -name '*.png')
