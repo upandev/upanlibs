@@ -36,8 +36,8 @@ extern "C" {
 #define NO_OF_SYSCALL_PARAMS 10
 
 #define DO_SYS_CALL(SYS_CALL_ID) \
-__asm__ __volatile__("pushl %0" : : "i"(SYS_CALL_ID)) ; \
-__asm__ __volatile__("lcall $0x78, $0x00") ; 
+__asm__ __volatile__("pushq %0" : : "i"(SYS_CALL_ID)) ; \
+;//__asm__ __volatile__("lcall $0x78, $0x00") ;
 
 /*********************************** SYS CALL NUMBERS *******************************/
 
@@ -166,7 +166,7 @@ int SysMemory_Alloc(void** addr, unsigned uiSizeInBytes);
 int SysMemory_Free(void* uiAddress);
 int SysMemory_GetAllocSize(void* uiAddress, int* size);
 int SysProcess_Exec(const char* szFileName, int iNoOfArgs, const char *const szArgList[]);
-int SysProcess_ThreadExec(uint32_t threadCaller, uint32_t entryAddress, void* arg);
+int SysProcess_ThreadExec(uintptr_t threadCaller, uintptr_t entryAddress, void* arg);
 void SysProcess_WaitPID(int iProcessID);
 void SysProcess_Exit(int iExitStatus);
 void SysProcess_Yield();

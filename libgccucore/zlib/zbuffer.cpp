@@ -120,11 +120,11 @@ namespace gccucore {
     for (s = huffman::ZFAST_BITS + 1; ; ++s)
       if (k < z.getMaxCodeAt(s))
         break;
-      if (s == 16) return -1;
-      int b = (k >> (16-s)) - z.getFirstCodeAt(s) + z.getFirstSymbolAt(s);
-      code_buffer >>= s;
-      num_bits -= s;
-      return z.getValueAt(b);
+    if (s == 16) return -1;
+    int b = (k >> (16-s)) - z.getFirstCodeAt(s) + z.getFirstSymbolAt(s);
+    code_buffer >>= s;
+    num_bits -= s;
+    return z.getValueAt(b);
   }
 
   int zbuffer::huffman_decode(huffman& z) {

@@ -82,16 +82,25 @@ long strtol(const char * __restrict str, char ** __restrict endptr, int base) ;
 #if defined (__cplusplus)
 }
 #endif
+
+#if defined(ULLONG_MAX) && (ULLONG_MAX == ULONG_MAX)
+long atoll(const char *nptr);
+long strtoll(const char * __restrict str, char ** __restrict endptr, int base) ;
+unsigned long strtoull(const char * __restrict str, char ** __restrict endptr, int base) ;
+#else
+long long atoll(const char *nptr);
+long long strtoll(const char * __restrict str, char ** __restrict endptr, int base) ;
+unsigned long long strtoull(const char * __restrict str, char ** __restrict endptr, int base) ;
+#endif
+
+long atol(const char *nptr);
 int atoi(const char *nptr) ;
-long atol(const char *nptr) ;
-long long atoll(const char *nptr) ;
 double atof(const char *nptr) ;
 int roundtoi(double v);
-long long strtoll(const char * __restrict str, char ** __restrict endptr, int base) ;
+
 double strtod(const char *__restrict str, char **__restrict endptr) ;
 long double strtold(const char *str, char **endptr) ;
 float strtof(const char *str, char **endptr) ;
-unsigned long long strtoull(const char * __restrict str, char ** __restrict endptr, int base) ;
 
 /******************/
 extern void SysUtil_Reboot() ;

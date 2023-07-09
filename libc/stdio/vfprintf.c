@@ -344,7 +344,7 @@ enum {
 #define __va_arg_ptr(ap,type)		(((type *)(ap += sizeof(type))) - 1)
 #endif
 
-#if 1
+#if 0
 #ifdef __GNUC__
 /* TODO -- need other than for 386 as well! */
 

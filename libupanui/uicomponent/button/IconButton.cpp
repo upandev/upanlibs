@@ -22,7 +22,7 @@
 
 #include <IconButton.h>
 #include <UIObjectFactory.h>
-#include <Line.h>+
+#include <Line.h>
 
 namespace upanui {
   IconButton::IconButton(const ImageResource& imageResource, const ImageComposeType composeType,
@@ -45,7 +45,7 @@ namespace upanui {
       const int ix = (width() - iw) / 2;
       const int iy = (height() - ih) / 2;
 
-      auto& imageCanvas = UIObjectFactory::createImageCanvas(*this, _imageResource, _composeType, ix, iy, iw, ih);
+      UIObjectFactory::createImageCanvas(*this, _imageResource, _composeType, ix, iy, iw, ih);
     }
     notifyChange(ChangeState::Content);
   }

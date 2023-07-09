@@ -24,57 +24,57 @@
 
 void SysUtil_GetDateTime(RTCDateTime* rtcDateTime)
 {
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(rtcDateTime)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(rtcDateTime)) ;
 	DO_SYS_CALL(SYS_CALL_UTIL_DTIME) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("pop %rax") ;
 }
 
 void SysUtil_Reboot()
 {
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
 	DO_SYS_CALL(SYS_CALL_UTIL_REBOOT) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("pop %rax") ;
 }
 
 int SysUtil_GetTimeOfDay(struct timeval* pTV)
 {
 	__volatile__ int iRet ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(pTV)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(pTV)) ;
 	DO_SYS_CALL(SYS_CALL_UTIL_TOD) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRet) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRet) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 
 	return iRet ;
 }
@@ -83,21 +83,21 @@ uint32_t SysUtil_GetTimeSinceBoot()
 {
   __volatile__ int iRet ;
 
-  __asm__ __volatile__("push %eax") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("push %rax") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
 
   DO_SYS_CALL(SYS_CALL_UTIL_BTIME) ;
 
-  __asm__ __volatile__("movl %%eax, %0" : "=m"(iRet) : ) ;
-  __asm__ __volatile__("pop %eax") ;
+  __asm__ __volatile__("mov %%rax, %0" : "=m"(iRet) : ) ;
+  __asm__ __volatile__("pop %rax") ;
 
   return iRet ;
 }

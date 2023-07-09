@@ -56,9 +56,9 @@ namespace upanui {
     const auto bytesPerPixel = drawBuffer.bytesPerPixel();
 
     for(unsigned f = 0; f < 8; ++y) {
-      unsigned lfbp = (uint32_t)drawBuffer.buffer() + y * pitch + x * bytesPerPixel;
+      uintptr_t lfbp = (uintptr_t)drawBuffer.buffer() + y * pitch + x * bytesPerPixel;
       for(unsigned i = 0x80; i != 0; i >>= 1, lfbp += bytesPerPixel)
-        *(unsigned*)lfbp = font_data[f] & i ? fg : bg;
+        *(uintptr_t*)lfbp = font_data[f] & i ? fg : bg;
 
       if(yr) ++f;
       yr = !yr;
@@ -101,7 +101,7 @@ namespace upanui {
     //1 line = 16 rows as we are scaling y axis by 16
     const uint32_t oneLine = drawBuffer.width() * _yCharScale;
 
-    drawBuffer.copy((void*)((uint32_t)drawBuffer.buffer() + oneLine * drawBuffer.bytesPerPixel()), (maxSize - oneLine) * drawBuffer.bytesPerPixel());
+    drawBuffer.copy((void*)((uintptr_t)drawBuffer.buffer() + oneLine * drawBuffer.bytesPerPixel()), (maxSize - oneLine) * drawBuffer.bytesPerPixel());
 
     drawBuffer.fill(0, drawBuffer.height() - _yCharScale, drawBuffer.width(), _yCharScale, GCoreFunctions::ALPHA_MASK);
     parent.draw();

@@ -26,21 +26,21 @@ int SysDrive_ChangeDrive(const char* szDriveName)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(szDriveName)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(szDriveName)) ;
 	DO_SYS_CALL(SYS_CALL_CHANGE_DRIVE) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -48,21 +48,21 @@ int SysDrive_ShowDrives(DriveStat** pDriveList, int* iListSize)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(iListSize)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(pDriveList)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(iListSize)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(pDriveList)) ;
 	DO_SYS_CALL(SYS_CALL_SHOW_DRIVES) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -70,21 +70,21 @@ int SysDrive_Mount(const char* szDriveName)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(szDriveName)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(szDriveName)) ;
 	DO_SYS_CALL(SYS_CALL_MOUNT_DRIVE) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -92,21 +92,21 @@ int SysDrive_UnMount(const char* szDriveName)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(szDriveName)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(szDriveName)) ;
 	DO_SYS_CALL(SYS_CALL_UNMOUNT_DRIVE) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -114,21 +114,21 @@ int SysDrive_Format(const char* szDriveName)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(szDriveName)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(szDriveName)) ;
 	DO_SYS_CALL(SYS_CALL_FORMAT_DRIVE) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -136,20 +136,20 @@ int SysDrive_GetCurrentDriveStat(DriveStat* pDriveStat)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(pDriveStat)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(pDriveStat)) ;
 	DO_SYS_CALL(SYS_CALL_CURRENT_DRIVE_STAT) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }

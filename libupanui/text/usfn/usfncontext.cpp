@@ -660,30 +660,38 @@ namespace upanui {
               X2 = (ys >> 8) * _g->p;
               for(xs = x0; xs < x1; xs += 256) {
                 if (xs >> 8 == X0) {
-                  k = 256 - (xs & 0xFF); xs &= ~0xFF; if(k > x1 - x0) k = x1 - x0;
+                  k = 256 - (xs & 0xFF);
+                  xs &= ~0xFF;
+                  if (k > x1 - x0) k = x1 - x0;
                   pc = k == 256 ? yp : (k * yp) >> 8;
-                } else
+                } else {
                   if (xs >> 8 == X1) {
-                    k = x1 & 0xFF; pc = k == 256 ? yp : (k * yp) >> 8;
+                    k = x1 & 0xFF;
+                    pc = k == 256 ? yp : (k * yp) >> 8;
                   } else {
                     pc = yp;
                   }
-                  m += pc;
-                  k = _g->data[X2 + (xs >> 8)];
-                  if(k == 0xFF) {
-                    sB += bB * pc; sG += bG * pc; sR += bR * pc;
-                  } else
-                    if(k == 0xFE || !_f->cmap_offs) {
-                      af = (256 - fA) * pc;
-                      sB += fB * af; sG += fG * af; sR += fR * af; sA += fA * pc;
-                    } else {
-                      P = *((uint32_t*)((uint8_t*)_f + _f->cmap_offs + (k << 2)));
-                      af = (256 - (P >> 24)) * pc;
-                      sR += (((P >> 16) & 0xFF) * af);
-                      sG += (((P >> 8) & 0xFF) * af);
-                      sB += (((P >> 0) & 0xFF) * af);
-                      sA += (((P >> 24) & 0xFF) * pc);
-                    }
+                }
+                m += pc;
+                k = _g->data[X2 + (xs >> 8)];
+                if (k == 0xFF) {
+                  sB += bB * pc;
+                  sG += bG * pc;
+                  sR += bR * pc;
+                } else if (k == 0xFE || !_f->cmap_offs) {
+                  af = (256 - fA) * pc;
+                  sB += fB * af;
+                  sG += fG * af;
+                  sR += fR * af;
+                  sA += fA * pc;
+                } else {
+                  P = *((uint32_t *) ((uint8_t *) _f + _f->cmap_offs + (k << 2)));
+                  af = (256 - (P >> 24)) * pc;
+                  sR += (((P >> 16) & 0xFF) * af);
+                  sG += (((P >> 8) & 0xFF) * af);
+                  sB += (((P >> 0) & 0xFF) * af);
+                  sA += (((P >> 24) & 0xFF) * pc);
+                }
               }
             }
             if(m) { sR /= m; sG /= m; sB /= m; sA /= m; }

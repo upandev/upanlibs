@@ -26,10 +26,10 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 
-set(CMAKE_CXX_COMPILER ${CROSS_TOOL_PATH}/bin/i686-elf-g++)
-set(CMAKE_C_COMPILER ${CROSS_TOOL_PATH}/bin/i686-elf-gcc)
-set(CMAKE_LINKER ${CROSS_TOOL_PATH}/bin/i686-elf-ld)
-set(CMAKE_AR ${CROSS_TOOL_PATH}/bin/i686-elf-ar)
+set(CMAKE_CXX_COMPILER ${CROSS_TOOL_PATH}/bin/x86_64-elf-g++)
+set(CMAKE_C_COMPILER ${CROSS_TOOL_PATH}/bin/x86_64-elf-gcc)
+set(CMAKE_LINKER ${CROSS_TOOL_PATH}/bin/x86_64-elf-ld)
+set(CMAKE_AR ${CROSS_TOOL_PATH}/bin/x86_64-elf-ar)
 
 message("Assembler used by CMake: ${CMAKE_ASM_COMPILER}")
 
@@ -53,6 +53,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(${PROJECT_SOURCE_DIR}/libc/include)
 include_directories(${PROJECT_SOURCE_DIR}/libc/stdio)
+include_directories(${PROJECT_SOURCE_DIR}/libc/sysdeps)
 include_directories(${PROJECT_SOURCE_DIR}/libc/sysdeps/mos/common)
 include_directories(${PROJECT_SOURCE_DIR}/libc/sysdeps/mos/common/bits)
 
@@ -93,15 +94,18 @@ include_directories(${PROJECT_SOURCE_DIR}/libupanui/interop/includes)
 add_custom_target(resources COMMAND make WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/libupanui/resources/)
 
 #LIBC
-execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.c' | grep -v CMakeFile | grep -v './libc/sys/'" OUTPUT_VARIABLE LIBC_SRC)
+execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.S' | grep -v CMakeFile | grep -v './libc/sys/'" OUTPUT_VARIABLE LIBC_ASM_SRC)
+execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.[cS]' | grep -v CMakeFile | grep -v './libc/sys/'" OUTPUT_VARIABLE LIBC_SRC)
 execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.c' | grep -v CMakeFile | grep './libc/sys/'" OUTPUT_VARIABLE LIBC_SYS_SRC)
 string(REPLACE "\n" ";" LIBC_SRC ${LIBC_SRC})
+string(REPLACE "\n" ";" LIBC_ASM_SRC ${LIBC_ASM_SRC})
 string(REPLACE "\n" ";" LIBC_SYS_SRC ${LIBC_SYS_SRC})
-add_library(c SHARED ${LIBC_SRC} ${LIBC_SYS_SRC})
+set_source_files_properties(${LIBC_ASM_SRC} PROPERTIES LANGUAGE C)
+add_library(c SHARED ${LIBC_SRC} ${LIBC_ASM_SRC} ${LIBC_SYS_SRC})
 target_compile_options(c PRIVATE -O0 ${SO_COMPILE_FLAGS})
 
 #LIBC static for kernel - so don't include sys-call code
-add_library(upanc STATIC ${LIBC_SRC})
+add_library(upanc STATIC ${LIBC_SRC} ${LIBC_ASM_SRC})
 set_target_properties(upanc PROPERTIES OUTPUT_NAME c)
 
 #LIBM

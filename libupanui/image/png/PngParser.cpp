@@ -1038,7 +1038,7 @@ namespace upanui {
     return c;
   }
 
-  PNG_TARGET_CLONES("default,avx2")
+  //PNG_TARGET_CLONES("default,avx2")
 
   static void defilter_up(size_t bytes, unsigned char *row, const unsigned char *prev) {
     size_t i;

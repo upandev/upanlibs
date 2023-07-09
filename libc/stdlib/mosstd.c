@@ -30,7 +30,7 @@ static void thread_entry_caller(thread_entry_func_p tmain, void* arg) {
 }
 
 int exect(thread_entry_func_p entryPoint, void* arg) {
-  return SysProcess_ThreadExec((uint32_t)thread_entry_caller, (uint32_t)entryPoint, arg);
+  return SysProcess_ThreadExec((uintptr_t)thread_entry_caller, (uintptr_t)entryPoint, arg);
 }
 
 int childalive(int pid) {
