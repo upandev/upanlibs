@@ -65,7 +65,7 @@ int SysMemory_Free(void* uiAddress)
 	return iRetStatus ;
 }
 
-int SysMemory_GetAllocSize(void* uiAddress, int* size)
+int SysMemory_GetAllocSize(void* address, size_t* size)
 {
 	__volatile__ int iRetStatus ;
 
@@ -79,7 +79,7 @@ int SysMemory_GetAllocSize(void* uiAddress, int* size)
 	__asm__ __volatile__("pushq $0x20") ;
 
 	__asm__ __volatile__("pushq %0" : : "rm"((uintptr_t)size)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"((uintptr_t)uiAddress)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"((uintptr_t)address)) ;
 	DO_SYS_CALL(SYS_CALL_GET_ALLOC_SIZE) ;
 
 	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;

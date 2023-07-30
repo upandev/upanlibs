@@ -28,11 +28,11 @@
 extern "C" {
 #endif
 
-void* malloc(unsigned uiSizeInBytes) ;
+void* malloc(size_t sizeInBytes) ;
 void* calloc(size_t n, size_t s) ;
-void* realloc(void* ptr, int s) ;
-void free(void* uiAddress) ;
-int get_alloc_size(void* uiAddress, int* size) ;
+void* realloc(void* ptr, size_t s) ;
+void free(void* address) ;
+int get_alloc_size(void* address, size_t* size) ;
 
 #if defined __cplusplus
 }

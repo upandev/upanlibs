@@ -48,7 +48,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 #ifdef inhibit_libc
 
 #ifndef malloc
-extern void *malloc (size_t);
+extern void *malloc (size_t sizeInBytes);
 #endif
 
 #ifndef free

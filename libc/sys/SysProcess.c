@@ -202,7 +202,7 @@ int SysProcess_GetPID()
 	return iProcessID ;
 }
 
-const char* SysProcess_GetEnv(const char* szVar)
+int SysProcess_GetEnv(const char* szVar, char* retVal)
 {
 	__volatile__ uintptr_t iRetStatus ;
 
@@ -214,13 +214,13 @@ const char* SysProcess_GetEnv(const char* szVar)
 	__asm__ __volatile__("pushq $0x20") ;
 	__asm__ __volatile__("pushq $0x20") ;
 	__asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq %0" : : "rm"(retVal)) ;
 	__asm__ __volatile__("pushq %0" : : "rm"(szVar)) ;
 	DO_SYS_CALL(SYS_CALL_PROCESS_GET_ENV) ;
 
 	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
 	__asm__ __volatile__("pop %rax") ;
-	return (const char*)iRetStatus ;
+	return iRetStatus ;
 }
 
 int SysProcess_SetEnv(const char* szVar, const char* szVal)

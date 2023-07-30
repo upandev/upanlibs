@@ -164,7 +164,7 @@ int SysFS_FileStatFD(int iFD, struct stat* pFileStat);
 
 int SysMemory_Alloc(void** addr, unsigned uiSizeInBytes);
 int SysMemory_Free(void* uiAddress);
-int SysMemory_GetAllocSize(void* uiAddress, int* size);
+int SysMemory_GetAllocSize(void* address, size_t* size);
 int SysProcess_Exec(const char* szFileName, int iNoOfArgs, const char *const szArgList[]);
 int SysProcess_ThreadExec(uintptr_t threadCaller, uintptr_t entryAddress, void* arg);
 void SysProcess_WaitPID(int iProcessID);
@@ -172,7 +172,7 @@ void SysProcess_Exit(int iExitStatus);
 void SysProcess_Yield();
 void SysProcess_Sleep(unsigned milisec);
 int SysProcess_GetPID();
-const char* SysProcess_GetEnv(const char* szVar);
+int SysProcess_GetEnv(const char* szVar, char* retVal);
 int SysProcess_SetEnv(const char* szVar, const char* szVal);
 int SysProcess_GetProcList(PS** pProcList, unsigned* uiListSize);
 void SysProcess_FreeProcListMem(PS* pProcList, unsigned uiListSize);
