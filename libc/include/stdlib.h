@@ -145,6 +145,7 @@ void *bsearch(const void *key, const void *base, size_t /* nmemb */ high,
 #define MAX_ENV_KEYS 1024
 #define LD_LIBRARY_PATH_ENV "LD_LIBRARY_PATH"
 #define PATH_ENV			"PATH"
+#define I_DIVIDE_AND_CEIL(N, D) ((N) / (D) + (((N) % (D)) ? 1 : 0))
 
 int getenv(const char* var, char* retVal) ;
 int setenv(const char* var, const char* val) ;
