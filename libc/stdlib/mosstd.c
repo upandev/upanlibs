@@ -61,7 +61,7 @@ void yield() {
   SysProcess_Yield();
 }
 
-void optimized_memcpy(uint32_t dest, uint32_t src, int len) {
+void optimized_memcpy(uint64_t dest, uint64_t src, int len) {
   const int inc = 16 * 8; // number of bytes copied per iteration = 16 bytes per xmm register * 8 xmm registers
   for(int i = 0; i < len; i += inc) {
     __asm__ __volatile__ (

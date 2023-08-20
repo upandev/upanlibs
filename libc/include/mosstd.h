@@ -78,7 +78,7 @@ int isprocessalive(int pid);
 int iskernel();
 int getpid();
 void yield();
-void optimized_memcpy(uint32_t dest, uint32_t src, int len);
+void optimized_memcpy(uint64_t dest, uint64_t src, int len);
 
 extern void SysProcess_WaitPID(int iProcessID) ;
 extern void SysProcess_Exit(int iExitStatus) ;
