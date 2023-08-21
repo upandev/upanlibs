@@ -30,7 +30,7 @@ static void thread_entry_caller(thread_entry_func_p tmain, void* arg) {
 }
 
 int exect(thread_entry_func_p entryPoint, void* arg) {
-  return SysProcess_ThreadExec((uint32_t)thread_entry_caller, (uint32_t)entryPoint, arg);
+  return SysProcess_ThreadExec((uintptr_t)thread_entry_caller, (uintptr_t)entryPoint, arg);
 }
 
 int childalive(int pid) {
@@ -61,7 +61,7 @@ void yield() {
   SysProcess_Yield();
 }
 
-void optimized_memcpy(uint32_t dest, uint32_t src, int len) {
+void optimized_memcpy(uint64_t dest, uint64_t src, int len) {
   const int inc = 16 * 8; // number of bytes copied per iteration = 16 bytes per xmm register * 8 xmm registers
   for(int i = 0; i < len; i += inc) {
     __asm__ __volatile__ (

@@ -29,81 +29,81 @@ int SysProcess_Exec(const char* szFileName, int iNoOfArgs, const char *const szA
 {
 	__volatile__ int iProcessID ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(szArgList)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(iNoOfArgs)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(szFileName)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(szArgList)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(iNoOfArgs)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(szFileName)) ;
 	DO_SYS_CALL(SYS_CALL_PROCESS_EXEC) ;
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iProcessID) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iProcessID) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 
 	return iProcessID ;
 }
 
-int SysProcess_ThreadExec(uint32_t threadCaller, uint32_t entryAddress, void* arg)
+int SysProcess_ThreadExec(uintptr_t threadCaller, uintptr_t entryAddress, void* arg)
 {
   __volatile__ int threadID;
 
-  __asm__ __volatile__("push %eax") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("push %rax") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
 
-  __asm__ __volatile__("pushl %0" : : "rm"(arg)) ;
-  __asm__ __volatile__("pushl %0" : : "rm"(entryAddress)) ;
-  __asm__ __volatile__("pushl %0" : : "rm"(threadCaller)) ;
+  __asm__ __volatile__("pushq %0" : : "rm"(arg)) ;
+  __asm__ __volatile__("pushq %0" : : "rm"(entryAddress)) ;
+  __asm__ __volatile__("pushq %0" : : "rm"(threadCaller)) ;
   DO_SYS_CALL(SYS_CALL_THREAD_EXEC) ;
-  __asm__ __volatile__("movl %%eax, %0" : "=m"(threadID) : ) ;
-  __asm__ __volatile__("pop %eax") ;
+  __asm__ __volatile__("mov %%rax, %0" : "=m"(threadID) : ) ;
+  __asm__ __volatile__("pop %rax") ;
 
   return threadID;
 }
 
 void SysProcess_WaitPID(int iProcessID)
 {
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(iProcessID)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(iProcessID)) ;
 	DO_SYS_CALL(SYS_CALL_PROCESS_WAIT_PID) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("pop %rax") ;
 }
 
 int SysProcess_IsChildAlive(int iProcessID)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(iProcessID)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(iProcessID)) ;
 	DO_SYS_CALL(SYS_CALL_PROCESS_CHILD_ALIVE) ;
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 
 	return iRetStatus ;
 }
@@ -111,137 +111,137 @@ int SysProcess_IsChildAlive(int iProcessID)
 int SysProcess_IsProcessAlive(int iProcessID) {
   __volatile__ int iRetStatus ;
 
-  __asm__ __volatile__("push %eax") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("push %rax") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
 
-  __asm__ __volatile__("pushl %0" : : "rm"(iProcessID)) ;
+  __asm__ __volatile__("pushq %0" : : "rm"(iProcessID)) ;
   DO_SYS_CALL(SYS_CALL_PROCESS_ALIVE) ;
-  __asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-  __asm__ __volatile__("pop %eax") ;
+  __asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+  __asm__ __volatile__("pop %rax") ;
 
   return iRetStatus ;
 }
 
 void SysProcess_Exit(int iExitStatus)
 {
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(iExitStatus)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(iExitStatus)) ;
 	DO_SYS_CALL(SYS_CALL_PROCESS_EXIT) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("pop %rax") ;
 }
 
 void SysProcess_Yield()
 {
-  __asm__ __volatile__("push %eax") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
+  __asm__ __volatile__("push %rax") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq $0x20") ;
 
   DO_SYS_CALL(SYS_CALL_PROCESS_YIELD) ;
-  __asm__ __volatile__("pop %eax") ;
+  __asm__ __volatile__("pop %rax") ;
 }
 
 void SysProcess_Sleep(unsigned milisec)
 {
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(milisec)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(milisec)) ;
 	DO_SYS_CALL(SYS_CALL_PROCESS_SLEEP) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("pop %rax") ;
 }
 
 int SysProcess_GetPID()
 {
 	__volatile__ int iProcessID ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
 	DO_SYS_CALL(SYS_CALL_PROCESS_PID) ;
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iProcessID) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iProcessID) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 
 	return iProcessID ;
 }
 
-const char* SysProcess_GetEnv(const char* szVar)
+int SysProcess_GetEnv(const char* szVar, char* retVal)
 {
-	__volatile__ int iRetStatus ;
+	__volatile__ uintptr_t iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-  __asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl %0" : : "rm"(szVar)) ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+  __asm__ __volatile__("pushq %0" : : "rm"(retVal)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(szVar)) ;
 	DO_SYS_CALL(SYS_CALL_PROCESS_GET_ENV) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
-	return (const char*)iRetStatus ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
+	return iRetStatus ;
 }
 
 int SysProcess_SetEnv(const char* szVar, const char* szVal)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(szVal)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(szVar)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(szVal)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(szVar)) ;
 	DO_SYS_CALL(SYS_CALL_PROCESS_SET_ENV) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -249,39 +249,39 @@ int SysProcess_GetProcList(PS** pProcList, unsigned* uiListSize)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(uiListSize)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(pProcList)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(uiListSize)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(pProcList)) ;
 	DO_SYS_CALL(SYS_CALL_PROCESS_GET_PS_LIST) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
 void SysProcess_FreeProcListMem(PS* pProcList, unsigned uiListSize)
 {
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(uiListSize)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(pProcList)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(uiListSize)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(pProcList)) ;
 	DO_SYS_CALL(SYS_CALL_PROCESS_FREE_PS_LIST) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("pop %rax") ;
 }
 
 int exec(const char* szFileName, ...)
@@ -291,7 +291,7 @@ int exec(const char* szFileName, ...)
 	char** argv = NULL ;
 
 	__volatile__ int i ;
-	__volatile__ int* ref = (int*)&szFileName + 1 ;
+	__volatile__ uintptr_t* ref = (uintptr_t*)&szFileName + 1 ;
 	for(argc = 0; *(ref + argc); argc++) ;
 
 	if(argc)

@@ -26,60 +26,60 @@ int SysFS_ChangeDirectory(const char* szDirPath)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(szDirPath)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(szDirPath)) ;
 	DO_SYS_CALL(SYS_CALL_CHANGE_DIR) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
 void SysFS_PWD(char** uiReturnDirPathAddress)
 {
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(uiReturnDirPathAddress)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(uiReturnDirPathAddress)) ;
 	DO_SYS_CALL(SYS_CALL_PWD) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("pop %rax") ;
 }
 
 int SysFS_CWD(char* uiReturnDirPathAddress, int len)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"((unsigned)len)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(uiReturnDirPathAddress)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"((uintptr_t)len)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(uiReturnDirPathAddress)) ;
 	DO_SYS_CALL(SYS_CALL_CWD) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -87,21 +87,21 @@ int SysFS_CreateDirectory(const char* szDirPath, unsigned short usAttribute)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"((unsigned)usAttribute)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(szDirPath)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"((uintptr_t)usAttribute)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(szDirPath)) ;
 	DO_SYS_CALL(SYS_CALL_MKDIR) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -109,21 +109,21 @@ int SysFS_DeleteDirectory(const char* szDirPath)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(szDirPath)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(szDirPath)) ;
 	DO_SYS_CALL(SYS_CALL_RMDIR) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -131,21 +131,21 @@ int SysFS_GetDirContent(const char* szDirPath, FS_Node** pDirList, int* iListSiz
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(iListSize)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(pDirList)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(szDirPath)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(iListSize)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(pDirList)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(szDirPath)) ;
 	DO_SYS_CALL(SYS_CALL_GET_DIR_LIST) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -153,21 +153,21 @@ int SysFS_CreateFile(const char* szDirPath, unsigned short usAttribute)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"((unsigned)usAttribute)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(szDirPath)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"((uintptr_t)usAttribute)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(szDirPath)) ;
 	DO_SYS_CALL(SYS_CALL_FILE_CREATE) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -175,21 +175,21 @@ int SysFS_FileOpen(const char* szFileName, byte bMode)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"((unsigned)bMode)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(szFileName)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"((uintptr_t)bMode)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(szFileName)) ;
 	DO_SYS_CALL(SYS_CALL_FILE_OPEN) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -197,21 +197,21 @@ int SysFS_FileClose(int fd)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(fd)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(fd)) ;
 	DO_SYS_CALL(SYS_CALL_FILE_CLOSE) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -219,21 +219,21 @@ int SysFS_FileRead(int fd, void* buf, int len)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(len)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(buf)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(fd)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(len)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(buf)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(fd)) ;
 	DO_SYS_CALL(SYS_CALL_FILE_READ) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -241,63 +241,63 @@ int SysFS_FileWrite(int fd, const void* buf, int len)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(len)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(buf)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(fd)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(len)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(buf)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(fd)) ;
 	DO_SYS_CALL(SYS_CALL_FILE_WRITE) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
 void SysFS_FileSelect(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors) {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(readyIODescriptors)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(waitIODescriptors)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(readyIODescriptors)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(waitIODescriptors)) ;
 	DO_SYS_CALL(SYS_CALL_FILE_SELECT) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 }
 
 int SysFS_FileSeek(int fd, int offSet, int seekType)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(seekType)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(offSet)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(fd)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(seekType)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(offSet)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(fd)) ;
 	DO_SYS_CALL(SYS_CALL_FILE_SEEK) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -305,21 +305,21 @@ int SysFS_FileTell(int fd)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(fd)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(fd)) ;
 	DO_SYS_CALL(SYS_CALL_FILE_TELL) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -327,21 +327,21 @@ int SysFS_FileOpenMode(int fd)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(fd)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(fd)) ;
 	DO_SYS_CALL(SYS_CALL_FILE_MODE) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -349,21 +349,21 @@ int SysFS_FileStat(const char* szFileName, struct stat* pFileStat)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(pFileStat)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(szFileName)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(pFileStat)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(szFileName)) ;
 	DO_SYS_CALL(SYS_CALL_FILE_STAT) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -371,21 +371,21 @@ int SysFS_FileStatFD(int iFD, struct stat* pFileStat)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(pFileStat)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(iFD)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(pFileStat)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(iFD)) ;
 	DO_SYS_CALL(SYS_CALL_FILE_STAT_FD) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -393,21 +393,21 @@ int SysFS_FileAccess(const char* szFileName, int mode)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(mode)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(szFileName)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(mode)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(szFileName)) ;
 	DO_SYS_CALL(SYS_CALL_FILE_ACCESS) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 
@@ -415,21 +415,21 @@ int SysFS_Dup2(int oldFD, int newFD)
 {
 	__volatile__ int iRetStatus ;
 
-	__asm__ __volatile__("push %eax") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
-	__asm__ __volatile__("pushl $0x20") ;
+	__asm__ __volatile__("push %rax") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
+	__asm__ __volatile__("pushq $0x20") ;
 
-	__asm__ __volatile__("pushl %0" : : "rm"(newFD)) ;
-	__asm__ __volatile__("pushl %0" : : "rm"(oldFD)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(newFD)) ;
+	__asm__ __volatile__("pushq %0" : : "rm"(oldFD)) ;
 	DO_SYS_CALL(SYS_CALL_FILE_DUP2) ;
 
-	__asm__ __volatile__("movl %%eax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %eax") ;
+	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
+	__asm__ __volatile__("pop %rax") ;
 	return iRetStatus ;
 }
 

@@ -783,9 +783,9 @@ void exit(int rv)
 	_exit(rv);
 }
 
-const char* getenv(const char* var)
+int getenv(const char* var, char* retVal)
 {
-  return SysProcess_GetEnv(var);
+  return SysProcess_GetEnv(var, retVal);
 }
 
 int setenv(const char* var, const char* val)

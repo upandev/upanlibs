@@ -96,6 +96,7 @@ typedef void cecho_func(char ch, void*) ;
 
 #define IS_STD_STREAM(S) (S->__filedes == 0 || S->__filedes == 1 || S->__filedes == 2)
 
+int printf_debug(const char * __restrict format, unsigned param);
 int printf(const char * __restrict format, ...) ;
 int snprintf(char *__restrict buf, size_t size, const char * __restrict format, ...) ;
 int asprintf(char **__restrict buf, const char * __restrict format, ...);

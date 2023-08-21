@@ -25,7 +25,7 @@
 
 extern int SysMemory_Alloc(void** addr, unsigned uiSizeInBytes) ;
 extern int SysMemory_Free(void* uiAddress) ;
-extern int SysMemory_GetAllocSize(void* uiAddress, int* size) ;
+extern int SysMemory_GetAllocSize(void* address, size_t* size) ;
 
 void* calloc(size_t n, size_t s)
 {
@@ -34,26 +34,26 @@ void* calloc(size_t n, size_t s)
 	return a ;
 }
 
-void* malloc(unsigned uiSizeInBytes)
+void* malloc(size_t sizeInBytes)
 {
   void* addr;
-	if(SysMemory_Alloc(&addr, uiSizeInBytes) < 0)
+	if(SysMemory_Alloc(&addr, sizeInBytes) < 0)
     return NULL;
   return addr;
 }
 
-void free(void* uiAddress)
+void free(void* address)
 {
 	/* If Free fails!!! It should stop / crash the process */
-	SysMemory_Free(uiAddress) ;
+	SysMemory_Free(address) ;
 }
 
-int get_alloc_size(void* uiAddress, int* size)
+int get_alloc_size(void* address, size_t* size)
 {
-	return SysMemory_GetAllocSize(uiAddress, size) ;
+	return SysMemory_GetAllocSize(address, size) ;
 }
 
-void* realloc(void* ptr, int s)
+void* realloc(void* ptr, size_t s)
 {
 	void* new_ptr = NULL ;
 
@@ -62,7 +62,7 @@ void* realloc(void* ptr, int s)
 
 	if(ptr)
 	{
-		int old_size ;
+		size_t old_size ;
 
 		if(get_alloc_size(ptr, &old_size) < 0)
 			return (void*)NULL ;

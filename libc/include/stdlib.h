@@ -82,16 +82,25 @@ long strtol(const char * __restrict str, char ** __restrict endptr, int base) ;
 #if defined (__cplusplus)
 }
 #endif
+
+#if defined(ULLONG_MAX) && (ULLONG_MAX == ULONG_MAX)
+long atoll(const char *nptr);
+long strtoll(const char * __restrict str, char ** __restrict endptr, int base) ;
+unsigned long strtoull(const char * __restrict str, char ** __restrict endptr, int base) ;
+#else
+long long atoll(const char *nptr);
+long long strtoll(const char * __restrict str, char ** __restrict endptr, int base) ;
+unsigned long long strtoull(const char * __restrict str, char ** __restrict endptr, int base) ;
+#endif
+
+long atol(const char *nptr);
 int atoi(const char *nptr) ;
-long atol(const char *nptr) ;
-long long atoll(const char *nptr) ;
 double atof(const char *nptr) ;
 int roundtoi(double v);
-long long strtoll(const char * __restrict str, char ** __restrict endptr, int base) ;
+
 double strtod(const char *__restrict str, char **__restrict endptr) ;
 long double strtold(const char *str, char **endptr) ;
 float strtof(const char *str, char **endptr) ;
-unsigned long long strtoull(const char * __restrict str, char ** __restrict endptr, int base) ;
 
 /******************/
 extern void SysUtil_Reboot() ;
@@ -131,7 +140,14 @@ void *bsearch(const void *key, const void *base, size_t /* nmemb */ high,
 			  size_t size, int (*compar)(const void *, const void *)) ;
 /* Algos End */
 
-const char* getenv(const char* var) ;
+#define MAX_ENV_KEY_LEN 64
+#define MAX_ENV_VAL_LEN 2048
+#define MAX_ENV_KEYS 1024
+#define LD_LIBRARY_PATH_ENV "LD_LIBRARY_PATH"
+#define PATH_ENV			"PATH"
+#define I_DIVIDE_AND_CEIL(N, D) ((N) / (D) + (((N) % (D)) ? 1 : 0))
+
+int getenv(const char* var, char* retVal) ;
 int setenv(const char* var, const char* val) ;
 int putenv(char* env) ;
 

@@ -19,3 +19,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
+
+#pragma once
+
+#ifdef __LP64__
+#define __WORDSIZE 64
+#else
+#define __WORDSIZE 32
+#endif

@@ -45,7 +45,7 @@ namespace upanui {
       throw upan::exception(XLOC, "invalid BMP image data. Signature = %c%c", _header._signature[0], _header._signature[1]);
     }
 
-    memcpy((void*)&_infoHeader, (void*)((uint32_t)imageData + sizeof(Header)), sizeof(InfoHeader));
+    memcpy((void*)&_infoHeader, (void*)((uintptr_t)imageData + sizeof(Header)), sizeof(InfoHeader));
     if (_infoHeader._infoHeadersize != 40) {
       throw upan::exception(XLOC, "can't support BMP InfoHeader size != 40");
     }
@@ -73,12 +73,12 @@ namespace upanui {
         || (_infoHeader._bitsPerPixel == 8 && colorTableSize == 256 * 4);
 
     //TODO: sort colorTable by _importantColors.
-    const uint32_t* colorTable = colorTableExists ? static_cast<const uint32_t*>((void*)((uint32_t)imageData + headerSize))
+    const uint32_t* colorTable = colorTableExists ? static_cast<const uint32_t*>((void*)((uintptr_t)imageData + headerSize))
         : _infoHeader._bitsPerPixel == 4 ? ColorPalettes::CP16::GetColorTable()
         : _infoHeader._bitsPerPixel == 8 ? ColorPalettes::CP256::GetColorTable()
         : nullptr;
 
-    const auto pixelData = static_cast<const uint8_t*>((void*)((uint32_t)imageData + _header._dataOffset));
+    const auto pixelData = static_cast<const uint8_t*>((void*)((uintptr_t)imageData + _header._dataOffset));
     const uint32_t imageBufferSize = _infoHeader._width * _infoHeader._height;
     upan::uniq_ptr<uint32_t> imageBuffer = new uint32_t[imageBufferSize];
 

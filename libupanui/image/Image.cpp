@@ -28,7 +28,7 @@ namespace upanui {
     calculateHasAlpha();
   }
 
-  Image::Image(const Image& image) : _width(image.width()), _height(image.height()), _hasAlpha(image.hasAlpha()), _imageData(nullptr) {
+  Image::Image(const Image& image) : _hasAlpha(image.hasAlpha()), _width(image.width()), _height(image.height()), _imageData(nullptr) {
     auto size = _width * _height;
     _imageData.reset(new uint32_t[size]);
     memcpy(_imageData.get(), image.data(), size * sizeof(uint32_t));

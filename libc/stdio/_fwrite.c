@@ -18,7 +18,7 @@ size_t __stdio_fwrite(const unsigned char * __restrict buffer, size_t bytes, reg
 
 	__STDIO_STREAM_VALIDATE(stream);
 	assert(__STDIO_STREAM_IS_WRITING(stream));
-	assert((int)buffer);
+	assert((uintptr_t)buffer);
 	assert(bytes);
 
 	bool commit = false ;
