@@ -166,7 +166,7 @@ private:
   int   _capacity;
 
 public:
-  static upan::string to_string(uint32_t uiNumber) {
+  static upan::string to_string(uint64_t uiNumber) {
     char strNumber[128];
     unsigned i = 0;
 
