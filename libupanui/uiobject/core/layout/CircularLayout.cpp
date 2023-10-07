@@ -152,7 +152,6 @@ namespace upanui {
 
   void CircularLayout::fill() {
     //TODO: optimize by caching drawbuffer
-    printf("\n drawing circle");
     const auto outerCircleRadius = (parent().width() / 2) - 1;
     const auto innerCircleRadius = outerCircleRadius - parent().borderThickness();
     if (outerCircleRadius > innerCircleRadius) {
