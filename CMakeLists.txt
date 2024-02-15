@@ -124,6 +124,7 @@ string(REPLACE "\n" ";" CXXRT_SRC1 ${CXXRT_SRC1})
 execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libcxxrt -name '*.cc' | grep -v CMakeFile" OUTPUT_VARIABLE CXXRT_SRC2)
 string(REPLACE "\n" ";" CXXRT_SRC2 ${CXXRT_SRC2})
 add_library(cxxrt STATIC ${CXXRT_SRC1} ${CXXRT_SRC2})
+target_compile_options(cxxrt PRIVATE -fPIC)
 
 #LIBUSTD
 execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libustd -name '*.cpp' | grep -v CMakeFile" OUTPUT_VARIABLE LIB_USTD_SRC)
