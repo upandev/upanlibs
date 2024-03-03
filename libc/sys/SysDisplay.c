@@ -23,327 +23,70 @@
 # include <ctype.h>
 #include <cdisplay.h>
 
-void SysDisplay_Message(const char* szMessage, unsigned uiAttr)
-{
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(uiAttr)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(szMessage)) ;
-	DO_SYS_CALL(SYS_CALL_DISPLAY_MESSAGE) ;
-	__asm__ __volatile__("pop %rax") ;
+void SysDisplay_Message(const char* szMessage, unsigned uiAttr) {
+  _upanix_syscall(SYS_CALL_DISPLAY_MESSAGE, (uint64_t)szMessage, (uint64_t)uiAttr, 3, 4, 5);
 }
 
-void SysDisplay_ClearScreen()
-{
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	DO_SYS_CALL(SYS_CALL_DISPLAY_CLR_SCR) ;
-	__asm__ __volatile__("pop %rax") ;
+void SysDisplay_ClearScreen() {
+  _upanix_syscall(SYS_CALL_DISPLAY_CLR_SCR, 1, 2, 3, 4, 5);
 }
 
-void SysDisplay_MoveCursor(int n)
-{
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(n)) ;
-	DO_SYS_CALL(SYS_CALL_DISPLAY_MOV_CURSOR) ;
-	__asm__ __volatile__("pop %rax") ;
+void SysDisplay_MoveCursor(int n) {
+  _upanix_syscall(SYS_CALL_DISPLAY_MOV_CURSOR, (uint64_t)n, 2, 3, 4, 5);
 }
 
-void SysDisplay_ClearLine(int pos)
-{
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(pos)) ;
-	DO_SYS_CALL(SYS_CALL_DISPLAY_CLR_LINE) ;
-	__asm__ __volatile__("pop %rax") ;
+void SysDisplay_ClearLine(int pos) {
+  _upanix_syscall(SYS_CALL_DISPLAY_CLR_LINE, (uint64_t)pos, 2, 3, 4, 5);
 }
 
-void SysDisplay_SetCursor(__volatile__ int iCurPos, __volatile__ bool bUpdateCursorOnScreen)
-{
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "m"(bUpdateCursorOnScreen)) ;
-	__asm__ __volatile__("pushq %0" : : "m"(iCurPos)) ;
-	DO_SYS_CALL(SYS_CALL_DISPLAY_SET_CURSOR) ;
-	__asm__ __volatile__("pop %rax") ;
+void SysDisplay_SetCursor(int iCurPos, bool bUpdateCursorOnScreen) {
+  _upanix_syscall(SYS_CALL_DISPLAY_SET_CURSOR, (uint64_t)iCurPos, (uint64_t)bUpdateCursorOnScreen, 3, 4, 5);
 }
 
-int SysDisplay_GetCursor()
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	DO_SYS_CALL(SYS_CALL_DISPLAY_GET_CURSOR) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysDisplay_GetCursor() {
+  return _upanix_syscall(SYS_CALL_DISPLAY_GET_CURSOR, 1, 2, 3, 4, 5);
 }
 
-void SysDisplay_RawCharacter(__volatile__ const char ch, __volatile__ unsigned uiAttr, __volatile__ bool bUpdateCursorOnScreen)
-{
-	__volatile__ unsigned v = ch ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"((uintptr_t)bUpdateCursorOnScreen)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"((uintptr_t)uiAttr)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"((uintptr_t)v)) ;
-
-	DO_SYS_CALL(SYS_CALL_DISPLAY_RAW_CHAR) ;
-	__asm__ __volatile__("pop %rax") ;
+void SysDisplay_RawCharacter(const char ch, unsigned uiAttr, bool bUpdateCursorOnScreen) {
+  _upanix_syscall(SYS_CALL_DISPLAY_RAW_CHAR, (uint64_t)ch, (uint64_t)uiAttr, (uint64_t)bUpdateCursorOnScreen, 4, 5);
 }
 
 void SysDisplay_RawCharacterArea(const MChar* src, uint32_t rows, uint32_t cols, int curPos) {
-  __asm__ __volatile__("push %rax") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-
-  __asm__ __volatile__("pushq %0" : : "rm"(curPos)) ;
-  __asm__ __volatile__("pushq %0" : : "rm"(cols)) ;
-  __asm__ __volatile__("pushq %0" : : "rm"(rows)) ;
-  __asm__ __volatile__("pushq %0" : : "rm"(src)) ;
-
-  DO_SYS_CALL(SYS_CALL_DISPLAY_RAW_CHAR_AREA) ;
-  __asm__ __volatile__("pop %rax") ;
+  _upanix_syscall(SYS_CALL_DISPLAY_RAW_CHAR_AREA, (uint64_t)src, (uint64_t)rows, (uint64_t)cols, (uint64_t)curPos, 5);
 }
 
-void SysDisplay_GetConsoleSize(unsigned* retMaxRows, unsigned* retMaxCols)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(retMaxCols)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(retMaxRows)) ;
-	DO_SYS_CALL(SYS_CALL_DISPLAY_CONSOLE_SIZE) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
+void SysDisplay_GetConsoleSize(unsigned* retMaxRows, unsigned* retMaxCols) {
+  _upanix_syscall(SYS_CALL_DISPLAY_CONSOLE_SIZE, (uint64_t)retMaxRows, (uint64_t)retMaxCols, 3, 4, 5);
 }
 
 void SysDisplay_InitGuiFrame(FrameBufferInfo* frameBufferInfo) {
-  __volatile__ int iRetStatus ;
-
-  __asm__ __volatile__("push %rax") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-
-  __asm__ __volatile__("pushq %0" : : "rm"(frameBufferInfo)) ;
-  DO_SYS_CALL(SYS_CALL_DISPLAY_INIT_GUI_FRAME) ;
-
-  __asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-  __asm__ __volatile__("pop %rax") ;
+  _upanix_syscall(SYS_CALL_DISPLAY_INIT_GUI_FRAME, (uint64_t)frameBufferInfo, 2, 3, 4, 5);
 }
 
 void SysDisplay_FrameTouch() {
-  __volatile__ int iRetStatus ;
-
-  __asm__ __volatile__("push %rax") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-
-  DO_SYS_CALL(SYS_CALL_DISPLAY_GUI_FRAME_TOUCH) ;
-
-  __asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-  __asm__ __volatile__("pop %rax") ;
+  _upanix_syscall(SYS_CALL_DISPLAY_GUI_FRAME_TOUCH, 1, 2, 3, 4, 5);
 }
 
 void SysDisplay_FrameHasAlpha(bool hasAlpha) {
-  __volatile__ int iRetStatus ;
-
-  __asm__ __volatile__("push %rax") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-
-  __asm__ __volatile__("pushq %0" : : "rm"(hasAlpha)) ;
-  DO_SYS_CALL(SYS_CALL_DISPLAY_GUI_FRAME_HAS_ALPHA) ;
-
-  __asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-  __asm__ __volatile__("pop %rax") ;
+  _upanix_syscall(SYS_CALL_DISPLAY_GUI_FRAME_HAS_ALPHA, (uint64_t)hasAlpha, 2, 3, 4, 5);
 }
 
 void SysDisplay_SetGuiBase(bool isGuiBase) {
-  __volatile__ int iRetStatus ;
-
-  __asm__ __volatile__("push %rax") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-
-  __asm__ __volatile__("pushq %0" : : "rm"(isGuiBase)) ;
-  DO_SYS_CALL(SYS_CALL_DISPLAY_SET_GUI_BASE) ;
-
-  __asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-  __asm__ __volatile__("pop %rax") ;
+  _upanix_syscall(SYS_CALL_DISPLAY_SET_GUI_BASE, (uint64_t)isGuiBase, 2, 3, 4, 5);
 }
 
 void SysDisplay_InitTermConsole() {
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	DO_SYS_CALL(SYS_CALL_DISPLAY_INIT_TERM_CONSOLE) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
+  _upanix_syscall(SYS_CALL_DISPLAY_INIT_TERM_CONSOLE, 1, 2, 3, 4, 5);
 }
 
 void SysDisplay_InitGuiEventStream(int fdList[]) {
-  __volatile__ int iRetStatus ;
-
-  __asm__ __volatile__("push %rax") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-
-  __asm__ __volatile__("pushq %0" : : "rm"(fdList)) ;
-  DO_SYS_CALL(SYS_CALL_DISPLAY_INIT_GUI_EVENT_STREAM) ;
-
-  __asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-  __asm__ __volatile__("pop %rax") ;
+  _upanix_syscall(SYS_CALL_DISPLAY_INIT_GUI_EVENT_STREAM, (uint64_t)fdList, 2, 3, 4, 5);
 }
 
 void SysDisplay_SetViewport(const ViewportInfo* viewportInfo) {
-  __volatile__ int iRetStatus ;
-
-  __asm__ __volatile__("push %rax") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-
-  __asm__ __volatile__("pushq %0" : : "rm"(viewportInfo)) ;
-  DO_SYS_CALL(SYS_CALL_DISPLAY_SET_VIEWPORT) ;
-
-  __asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-  __asm__ __volatile__("pop %rax") ;
+  _upanix_syscall(SYS_CALL_DISPLAY_SET_VIEWPORT, (uint64_t)viewportInfo, 2, 3, 4, 5);
 }
 
 void SysDisplay_GetViewport(ViewportInfo* viewportInfo) {
-  __volatile__ int iRetStatus ;
-
-  __asm__ __volatile__("push %rax") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-
-  __asm__ __volatile__("pushq %0" : : "rm"(viewportInfo)) ;
-  DO_SYS_CALL(SYS_CALL_DISPLAY_GET_VIEWPORT) ;
-
-  __asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-  __asm__ __volatile__("pop %rax") ;
+  _upanix_syscall(SYS_CALL_DISPLAY_GET_VIEWPORT, (uint64_t)viewportInfo, 2, 3, 4, 5);
 }

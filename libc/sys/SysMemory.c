@@ -21,68 +21,14 @@
  */
 # include <syscalldefs.h>
 
-int SysMemory_Alloc(void** addr, unsigned uiSizeInBytes)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(uiSizeInBytes)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(addr)) ;
-	DO_SYS_CALL(SYS_CALL_ALLOC) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus;
+int SysMemory_Alloc(void** addr, unsigned uiSizeInBytes) {
+  return _upanix_syscall(SYS_CALL_ALLOC, (uint64_t)addr, (uint64_t)uiSizeInBytes, 3, 4, 5);
 }
 
-int SysMemory_Free(void* uiAddress)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"((uintptr_t)uiAddress)) ;
-	DO_SYS_CALL(SYS_CALL_FREE) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysMemory_Free(void* uiAddress) {
+  return _upanix_syscall(SYS_CALL_FREE, (uint64_t)uiAddress, 2, 3, 4, 5);
 }
 
-int SysMemory_GetAllocSize(void* address, size_t* size)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"((uintptr_t)size)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"((uintptr_t)address)) ;
-	DO_SYS_CALL(SYS_CALL_GET_ALLOC_SIZE) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysMemory_GetAllocSize(void* address, size_t* size) {
+  return _upanix_syscall(SYS_CALL_GET_ALLOC_SIZE, (uint64_t)address, (uint64_t)size, 3, 4, 5);
 }

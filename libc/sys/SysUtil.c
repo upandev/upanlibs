@@ -22,82 +22,18 @@
 # include <syscalldefs.h>
 # include <dtime.h>
 
-void SysUtil_GetDateTime(RTCDateTime* rtcDateTime)
-{
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(rtcDateTime)) ;
-	DO_SYS_CALL(SYS_CALL_UTIL_DTIME) ;
-	__asm__ __volatile__("pop %rax") ;
+void SysUtil_GetDateTime(RTCDateTime* rtcDateTime) {
+  _upanix_syscall(SYS_CALL_UTIL_DTIME, (uint64_t)rtcDateTime, 2, 3, 4, 5);
 }
 
-void SysUtil_Reboot()
-{
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	DO_SYS_CALL(SYS_CALL_UTIL_REBOOT) ;
-	__asm__ __volatile__("pop %rax") ;
+void SysUtil_Reboot() {
+  _upanix_syscall(SYS_CALL_UTIL_REBOOT, 1, 2, 3, 4, 5);
 }
 
-int SysUtil_GetTimeOfDay(struct timeval* pTV)
-{
-	__volatile__ int iRet ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(pTV)) ;
-	DO_SYS_CALL(SYS_CALL_UTIL_TOD) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRet) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-
-	return iRet ;
+int SysUtil_GetTimeOfDay(struct timeval* pTV) {
+  return _upanix_syscall(SYS_CALL_UTIL_TOD, (uint64_t)pTV, 2, 3, 4, 5);
 }
 
-uint32_t SysUtil_GetTimeSinceBoot()
-{
-  __volatile__ int iRet ;
-
-  __asm__ __volatile__("push %rax") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-  __asm__ __volatile__("pushq $0x20") ;
-
-  DO_SYS_CALL(SYS_CALL_UTIL_BTIME) ;
-
-  __asm__ __volatile__("mov %%rax, %0" : "=m"(iRet) : ) ;
-  __asm__ __volatile__("pop %rax") ;
-
-  return iRet ;
+uint32_t SysUtil_GetTimeSinceBoot() {
+  return _upanix_syscall(SYS_CALL_UTIL_BTIME, 1, 2, 3, 4, 5);
 }

@@ -22,415 +22,80 @@
 # include <syscalldefs.h>
 # include <fs.h>
 
-int SysFS_ChangeDirectory(const char* szDirPath)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(szDirPath)) ;
-	DO_SYS_CALL(SYS_CALL_CHANGE_DIR) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysFS_ChangeDirectory(const char* szDirPath) {
+  return _upanix_syscall(SYS_CALL_CHANGE_DIR, (uint64_t)szDirPath, 2, 3, 4, 5);
 }
 
-void SysFS_PWD(char** uiReturnDirPathAddress)
-{
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(uiReturnDirPathAddress)) ;
-	DO_SYS_CALL(SYS_CALL_PWD) ;
-	__asm__ __volatile__("pop %rax") ;
+void SysFS_PWD(char** uiReturnDirPathAddress) {
+  _upanix_syscall(SYS_CALL_PWD, (uint64_t)uiReturnDirPathAddress, 2, 3, 4, 5);
 }
 
-int SysFS_CWD(char* uiReturnDirPathAddress, int len)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"((uintptr_t)len)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(uiReturnDirPathAddress)) ;
-	DO_SYS_CALL(SYS_CALL_CWD) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysFS_CWD(char* uiReturnDirPathAddress, int len) {
+  return _upanix_syscall(SYS_CALL_CWD, (uint64_t)uiReturnDirPathAddress, (uint64_t)len, 3, 4, 5);
 }
 
-int SysFS_CreateDirectory(const char* szDirPath, unsigned short usAttribute)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"((uintptr_t)usAttribute)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(szDirPath)) ;
-	DO_SYS_CALL(SYS_CALL_MKDIR) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysFS_CreateDirectory(const char* szDirPath, unsigned short usAttribute) {
+  return _upanix_syscall(SYS_CALL_MKDIR, (uint64_t)szDirPath, (uint64_t)usAttribute, 3, 4, 5);
 }
 
-int SysFS_DeleteDirectory(const char* szDirPath)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(szDirPath)) ;
-	DO_SYS_CALL(SYS_CALL_RMDIR) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysFS_DeleteDirectory(const char* szDirPath) {
+  return _upanix_syscall(SYS_CALL_RMDIR, (uint64_t)szDirPath, 2, 3, 4, 5);
 }
 
-int SysFS_GetDirContent(const char* szDirPath, FS_Node** pDirList, int* iListSize)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(iListSize)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(pDirList)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(szDirPath)) ;
-	DO_SYS_CALL(SYS_CALL_GET_DIR_LIST) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysFS_GetDirContent(const char* szDirPath, FS_Node** pDirList, int* iListSize) {
+  return _upanix_syscall(SYS_CALL_GET_DIR_LIST, (uint64_t)szDirPath, (uint64_t)pDirList, (uint64_t)iListSize, 4, 5);
 }
 
-int SysFS_CreateFile(const char* szDirPath, unsigned short usAttribute)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"((uintptr_t)usAttribute)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(szDirPath)) ;
-	DO_SYS_CALL(SYS_CALL_FILE_CREATE) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysFS_CreateFile(const char* szDirPath, unsigned short usAttribute) {
+  return _upanix_syscall(SYS_CALL_FILE_CREATE, (uint64_t)szDirPath, (uint64_t)usAttribute, 3, 4, 5);
 }
 
-int SysFS_FileOpen(const char* szFileName, byte bMode)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"((uintptr_t)bMode)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(szFileName)) ;
-	DO_SYS_CALL(SYS_CALL_FILE_OPEN) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysFS_FileOpen(const char* szFileName, byte bMode) {
+  return _upanix_syscall(SYS_CALL_FILE_OPEN, (uint64_t)szFileName, (uint64_t)bMode, 3, 4, 5);
 }
 
-int SysFS_FileClose(int fd)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(fd)) ;
-	DO_SYS_CALL(SYS_CALL_FILE_CLOSE) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysFS_FileClose(int fd) {
+  return _upanix_syscall(SYS_CALL_FILE_CLOSE, (uint64_t)fd, 2, 3, 4, 5);
 }
 
-int SysFS_FileRead(int fd, void* buf, int len)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(len)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(buf)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(fd)) ;
-	DO_SYS_CALL(SYS_CALL_FILE_READ) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysFS_FileRead(int fd, void* buf, int len) {
+  return _upanix_syscall(SYS_CALL_FILE_READ, (uint64_t)fd, (uint64_t)buf, (uint64_t)len, 4, 5);
 }
 
-int SysFS_FileWrite(int fd, const void* buf, int len)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(len)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(buf)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(fd)) ;
-	DO_SYS_CALL(SYS_CALL_FILE_WRITE) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysFS_FileWrite(int fd, const void* buf, int len) {
+  return _upanix_syscall(SYS_CALL_FILE_WRITE, (uint64_t)fd, (uint64_t)buf, (uint64_t)len, 4, 5);
 }
 
 void SysFS_FileSelect(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors) {
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(readyIODescriptors)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(waitIODescriptors)) ;
-	DO_SYS_CALL(SYS_CALL_FILE_SELECT) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
+  _upanix_syscall(SYS_CALL_FILE_SELECT, (uint64_t)waitIODescriptors, (uint64_t)readyIODescriptors, 3, 4, 5);
 }
 
-int SysFS_FileSeek(int fd, int offSet, int seekType)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(seekType)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(offSet)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(fd)) ;
-	DO_SYS_CALL(SYS_CALL_FILE_SEEK) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysFS_FileSeek(int fd, int offSet, int seekType) {
+  return _upanix_syscall(SYS_CALL_FILE_SEEK, (uint64_t)fd, (uint64_t)offSet, (uint64_t)seekType, 4, 5);
 }
 
-int SysFS_FileTell(int fd)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(fd)) ;
-	DO_SYS_CALL(SYS_CALL_FILE_TELL) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysFS_FileTell(int fd) {
+  return _upanix_syscall(SYS_CALL_FILE_TELL, (uint64_t)fd, 2, 3, 4, 5);
 }
 
-int SysFS_FileOpenMode(int fd)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(fd)) ;
-	DO_SYS_CALL(SYS_CALL_FILE_MODE) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysFS_FileOpenMode(int fd) {
+  return _upanix_syscall(SYS_CALL_FILE_MODE, (uint64_t)fd, 2, 3, 4, 5);
 }
 
-int SysFS_FileStat(const char* szFileName, struct stat* pFileStat)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(pFileStat)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(szFileName)) ;
-	DO_SYS_CALL(SYS_CALL_FILE_STAT) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysFS_FileStat(const char* szFileName, struct stat* pFileStat) {
+  return _upanix_syscall(SYS_CALL_FILE_STAT, (uint64_t)szFileName, (uint64_t)pFileStat, 3, 4, 5);
 }
 
-int SysFS_FileStatFD(int iFD, struct stat* pFileStat)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(pFileStat)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(iFD)) ;
-	DO_SYS_CALL(SYS_CALL_FILE_STAT_FD) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysFS_FileStatFD(int iFD, struct stat* pFileStat) {
+  return _upanix_syscall(SYS_CALL_FILE_STAT_FD, (uint64_t)iFD, (uint64_t)pFileStat, 3, 4, 5);
 }
 
-int SysFS_FileAccess(const char* szFileName, int mode)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(mode)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(szFileName)) ;
-	DO_SYS_CALL(SYS_CALL_FILE_ACCESS) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysFS_FileAccess(const char* szFileName, int mode) {
+  return _upanix_syscall(SYS_CALL_FILE_ACCESS, (uint64_t)szFileName, (uint64_t)mode, 3, 4, 5);
 }
 
-int SysFS_Dup2(int oldFD, int newFD)
-{
-	__volatile__ int iRetStatus ;
-
-	__asm__ __volatile__("push %rax") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-	__asm__ __volatile__("pushq $0x20") ;
-
-	__asm__ __volatile__("pushq %0" : : "rm"(newFD)) ;
-	__asm__ __volatile__("pushq %0" : : "rm"(oldFD)) ;
-	DO_SYS_CALL(SYS_CALL_FILE_DUP2) ;
-
-	__asm__ __volatile__("mov %%rax, %0" : "=m"(iRetStatus) : ) ;
-	__asm__ __volatile__("pop %rax") ;
-	return iRetStatus ;
+int SysFS_Dup2(int oldFD, int newFD) {
+  return _upanix_syscall(SYS_CALL_FILE_DUP2, (uint64_t)oldFD, (uint64_t)newFD, 3, 4, 5);
 }
 
 int read(int fd, void* buf, int len)

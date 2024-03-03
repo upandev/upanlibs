@@ -33,10 +33,6 @@ extern "C" {
 # include <drive.h>
 #include "cdisplay.h"
 
-#define DO_SYS_CALL(SYS_CALL_ID) \
-__asm__ __volatile__("pushq %0" : : "i"(SYS_CALL_ID)); \
-__asm__ __volatile__("syscall");
-
 uint64_t _upanix_syscall(uint64_t sysCallId, uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4, uint64_t p5);
 
 /*********************************** SYS CALL NUMBERS *******************************/
