@@ -46,7 +46,7 @@ int SysProcess_IsProcessAlive(int iProcessID) {
 }
 
 void SysProcess_Exit(int iExitStatus) {
-  _upanix_syscall(SYS_CALL_PROCESS_ALIVE, (uint64_t)iExitStatus, 2, 3, 4, 5);
+  _upanix_syscall(SYS_CALL_PROCESS_EXIT, (uint64_t)iExitStatus, 2, 3, 4, 5);
 }
 
 void SysProcess_Yield() {
