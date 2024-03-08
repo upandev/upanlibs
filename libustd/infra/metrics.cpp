@@ -71,6 +71,15 @@ namespace upan {
     return double(sum) / count;
   }
 
+  upan::vector<upan::string> metrics::kpis() {
+    mutex_guard g(_mutexStats);
+    upan::vector<upan::string> names;
+    for(auto& e : _stats) {
+      names.push_back(e.first);
+    }
+    return names;
+  }
+
   metrics::stats::stats() : _count(0), _sum(0) {}
 
   void metrics::stats::start() {
@@ -82,15 +91,15 @@ namespace upan {
     ++_count;
   }
 
-  uint32_t metrics::stats::count() {
+  uint32_t metrics::stats::count() const {
     return _count;
   }
 
-  uint32_t metrics::stats::sum() {
+  uint32_t metrics::stats::sum() const {
     return _sum;
   }
 
-  double metrics::stats::avg() {
+  double metrics::stats::avg() const {
     return double(_sum) / _count;
   }
 }

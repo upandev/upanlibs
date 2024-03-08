@@ -26,6 +26,7 @@
 #include <ustring.h>
 #include <atomicop.h>
 #include <mutex.h>
+#include <vector.h>
 
 namespace upan {
   class metrics {
@@ -40,9 +41,9 @@ namespace upan {
       void start();
       void end();
 
-      uint32_t count();
-      uint32_t sum();
-      double avg();
+      uint32_t count() const;
+      uint32_t sum() const;
+      double avg() const;
 
     private:
       uint32_t _tick;
@@ -60,6 +61,7 @@ namespace upan {
     uint32_t count(const string& name);
     double avg(const string& name);
 
+    upan::vector<upan::string> kpis();
   private:
     typedef map<int, stats> STAT_MAP;
     typedef map<string, STAT_MAP> STAT_PID_MAP;
