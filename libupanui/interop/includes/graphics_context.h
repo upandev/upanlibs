@@ -30,7 +30,7 @@ namespace upanui {
     class graphics_context {
     public:
       static void init();
-      static void destroy();
+      static void destroy(GraphicsContext*);
       static GraphicsContext& instance();
     };
 

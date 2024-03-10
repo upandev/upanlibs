@@ -34,7 +34,7 @@ namespace upanui {
       _instance = new GraphicsContext();
     }
 
-    void graphics_context::destroy() {
+    void graphics_context::destroy(GraphicsContext* gc = nullptr) {
       if (_instance) {
         delete _instance;
         _instance = nullptr;

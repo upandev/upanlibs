@@ -29,8 +29,8 @@ namespace upanui {
     interop::graphics_context::init();
   }
 
-  void GraphicsContext::Destroy() {
-    interop::graphics_context::destroy();
+  void GraphicsContext::Destroy(GraphicsContext* gc) {
+    interop::graphics_context::destroy(gc);
   }
 
   GraphicsContext& GraphicsContext::Instance() {
@@ -62,13 +62,13 @@ namespace upanui {
   }
 
   UIRoot& GraphicsContext::initUIRoot(const int x, const int y, const uint32_t width, const uint32_t height, const bool autoRefresh) {
-    if (_rootCanvas.get() != nullptr) {
+    if (_uiObjectManager.get() != nullptr) {
       throw upan::exception(XLOC, "UIRoot is already initialized!");
     }
-    _rootCanvas.reset(new UIRoot(x, y, width, height));
-    _uiObjectManager.reset(new UIObjectManager(*_rootCanvas, autoRefresh));
+    UIRoot& rootCanvas = *new UIRoot(x, y, width, height);
+    _uiObjectManager.reset(new UIObjectManager(rootCanvas, autoRefresh));
     initEventManager();
-    return *_rootCanvas;
+    return rootCanvas;
   }
 
   EventManager& GraphicsContext::initEventManager() {

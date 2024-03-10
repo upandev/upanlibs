@@ -38,7 +38,8 @@ namespace upanui {
 
   public:
     static void Init();
-    static void Destroy();
+    //the gc param is primarily for kernel processes. read more about it in upanix
+    static void Destroy(GraphicsContext* gc = nullptr);
     static GraphicsContext& Instance();
 
     Frame& frame() {
@@ -60,7 +61,6 @@ namespace upanui {
   private:
     upan::uniq_ptr<Frame> _frame;
     upan::uniq_ptr<EventManager> _evenManager;
-    upan::uniq_ptr<UIRoot> _rootCanvas;
     upan::uniq_ptr<UIObjectManager> _uiObjectManager;
 
     friend class interop::graphics_context;
