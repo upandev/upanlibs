@@ -25,7 +25,7 @@
 #include <exception.h>
 
 namespace upan {
-  thread::thread() : _state(not_running), _error(upan::option<upan::error>::empty()) {
+  thread::thread() : _state(not_running), _error(upan::option<upan::error>::empty()), _pid(-1) {
   }
 
   thread::~thread() {
@@ -58,7 +58,7 @@ namespace upan {
     switch(_state.get()) {
       case not_running:
         _state.set(running);
-        exect(thread_callback, this);
+        _pid = exect(thread_callback, this);
         break;
       case paused:
         _state.set(running);
@@ -98,7 +98,8 @@ namespace upan {
   void thread::stop() {
     if (_state.get() != not_running && _state.get() != stopped) {
       _state.set(stopping);
-      while(_state.get() != stopped) {
+
+      while(_state.get() != stopped && isprocessalive(_pid)) {
         sleepms(10);
       }
     }

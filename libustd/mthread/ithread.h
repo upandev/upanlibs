@@ -65,6 +65,7 @@ namespace upan {
       atomic::integral<state_t> _state;
       mutex _t_mutex;
       upan::option<upan::error> _error;
+      int _pid;
 
       friend class _thread_termination_guard;
     };
