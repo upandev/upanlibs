@@ -70,8 +70,8 @@ class list
     T& operator[](int index) const;
     template <typename LAMBDA>
     void foreach(const LAMBDA& lambda) const {
-      for(auto i = begin(); i != end(); ++i) {
-        lambda(*i);
+      for(auto i = begin(); i != end();) {
+        lambda(*i++);
       }
     }
 
