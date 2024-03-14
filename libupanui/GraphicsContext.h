@@ -58,6 +58,12 @@ namespace upanui {
 
     UIObjectManager& uiObjectManager();
 
+    class Transaction {
+    public:
+      Transaction();
+      ~Transaction();
+    };
+
   private:
     upan::uniq_ptr<Frame> _frame;
     upan::uniq_ptr<EventManager> _evenManager;

@@ -100,4 +100,14 @@ namespace upanui {
     }
     return *_uiObjectManager;
   }
+
+  GraphicsContext::Transaction::Transaction() {
+    GraphicsContext::Instance()._uiObjectManager->_autoRefreshHandler.pause();
+    GraphicsContext::Instance()._uiObjectManager->drawLock().lock();
+  }
+
+  GraphicsContext::Transaction::~Transaction() {
+    GraphicsContext::Instance()._uiObjectManager->drawLock().unlock();
+    GraphicsContext::Instance()._uiObjectManager->_autoRefreshHandler.start();
+  }
 }
