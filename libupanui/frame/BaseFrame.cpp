@@ -32,10 +32,11 @@ namespace upanui {
   void BaseFrame::fillRect(int sx, int sy, uint32_t width, uint32_t height, uint32_t color) {
     const int ex = upan::min(_viewport.width(), sx + width) - 1;
     const int ey = upan::min(_viewport.height(), sy + height) - 1;
+    auto buffer = _frameBuffer.buffer();
     for(auto y = sy; y <= ey; ++y) {
       auto yOffset = y * _frameBuffer.width();
       for(auto x = sx; x <= ex; ++x) {
-        _frameBuffer.buffer()[x + yOffset] = color;
+        buffer[x + yOffset] = color;
       }
     }
   }
