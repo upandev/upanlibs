@@ -57,10 +57,6 @@ void SysProcess_Sleep(unsigned milisec) {
   _upanix_syscall(SYS_CALL_PROCESS_SLEEP, (uint64_t)milisec, 2, 3, 4, 5);
 }
 
-int SysProcess_GetPID() {
-  return _upanix_syscall(SYS_CALL_PROCESS_PID, 1, 2, 3, 4, 5);
-}
-
 int SysProcess_GetEnv(const char* szVar, char* retVal) {
   return _upanix_syscall(SYS_CALL_PROCESS_GET_ENV, (uint64_t)szVar, (uint64_t)retVal, 3, 4, 5);
 }

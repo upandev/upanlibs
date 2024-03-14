@@ -20,44 +20,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <syscalldefs.h>
+#pragma once
 
-static void thread_entry_caller(thread_entry_func_p tmain, void* arg) {
-  tmain(arg);
-  exit(0);
-}
+#include <mosstd.h>
 
-int exect(thread_entry_func_p entryPoint, void* arg) {
-  return SysProcess_ThreadExec((uintptr_t)thread_entry_caller, (uintptr_t)entryPoint, arg);
-}
+namespace upan {
+    class thread_context {
+    public:
+      static constexpr uint64_t SHARED_ADDRESS = THREAD_LOCAL_SHARED_ADDRESS;
 
-int childalive(int pid) {
-  return SysProcess_IsChildAlive(pid) ;
-}
+      thread_context& instance() {
+        static thread_context _instance;
+        return _instance;
+      }
 
-int isprocessalive(int pid) {
-  return SysProcess_IsProcessAlive(pid);
-}
+      int get_pid() const { return _tls->_pid; }
 
-int iskernel() {
-  return SysProcess_IsKernel();
-}
+    private:
+      thread_context() : _tls((_thread_local_space*)SHARED_ADDRESS) {}
 
-void sleep(uint32_t seconds) {
-  SysProcess_Sleep(seconds * 1000);
-}
-
-void sleepms(uint32_t milliseconds) {
-  SysProcess_Sleep(milliseconds);
-}
-
-int getpid() {
-  _thread_local_space* tls = (_thread_local_space*)(THREAD_LOCAL_SHARED_ADDRESS);
-  return tls->_pid;
-}
-
-void yield() {
-  SysProcess_Yield();
+      _thread_local_space* _tls;
+    };
 }

@@ -23,8 +23,15 @@
 #define _UPANIX_STD_H_
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #define pid_t int
+
+#define THREAD_LOCAL_SHARED_ADDRESS (512UL * 1024 * 1024 * 1024)
+
+typedef struct {
+  pid_t _pid;
+} PACKED _thread_local_space;
 
 #if defined __cplusplus
 extern "C" {
@@ -81,7 +88,6 @@ void yield();
 
 extern void SysProcess_WaitPID(int iProcessID) ;
 extern void SysProcess_Exit(int iExitStatus) ;
-extern int SysProcess_GetPID() ;
 extern int SysProcess_GetProcList(PS** pProcList, unsigned* uiListSize) ;
 extern void SysProcess_FreeProcListMem(PS* pProcList, unsigned uiListSize) ;
 

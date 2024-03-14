@@ -95,7 +95,6 @@ typedef enum
 		SYS_CALL_PROCESS_EXIT,
     SYS_CALL_PROCESS_YIELD,
 		SYS_CALL_PROCESS_SLEEP,
-		SYS_CALL_PROCESS_PID,
 		SYS_CALL_PROCESS_GET_ENV,
 		SYS_CALL_PROCESS_SET_ENV,
 		SYS_CALL_PROCESS_GET_PS_LIST,
@@ -167,7 +166,6 @@ void SysProcess_WaitPID(int iProcessID);
 void SysProcess_Exit(int iExitStatus);
 void SysProcess_Yield();
 void SysProcess_Sleep(unsigned milisec);
-int SysProcess_GetPID();
 int SysProcess_GetEnv(const char* szVar, char* retVal);
 int SysProcess_SetEnv(const char* szVar, const char* szVal);
 int SysProcess_GetProcList(PS** pProcList, unsigned* uiListSize);
