@@ -33,6 +33,7 @@ namespace upanui {
     int y() const override { return 0; }
     uint32_t width() const override;
     uint32_t height() const override;
+    uint32_t scrollHeight() const override { return height(); }
     uint32_t backgroundColor() const override { return 0; }
     uint32_t backgroundColorForDraw() const override { return 0; }
     uint8_t  backgroundColorAlpha() const override { return 0; }
@@ -121,6 +122,7 @@ namespace upanui {
     void hscroll(int columns) override {}
     void registerVerticalScroller(VerticalScroller&) override {}
     void removeVerticalScroller() override {}
+    upan::option<VerticalScroller&> getVerticalScroller() override { return upan::option<VerticalScroller&>::empty(); }
 
     void notifyChange(const ChangeState changeState) override {}
     void setChangeState(const ChangeState) override {}

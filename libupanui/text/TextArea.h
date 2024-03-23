@@ -86,8 +86,9 @@ namespace upanui {
   private:
     TextArea(int x, int y, uint32_t width, uint32_t height);
     ~TextArea();
+
     void doDraw() override;
-    void vscroll(int rows, int scrollableHeight) override {}
+    void vscroll(int rows, int scrollableHeight) override;
     void onKeyboardEvent(const KeyboardEvent& event) override;
 
     void clearArea(int x, int  y, uint32_t width, uint32_t height);
@@ -173,15 +174,12 @@ namespace upanui {
 
     class Line {
     public:
-      Line(uint8_t defaultHeight) : _width(MIN_CURSOR_WIDTH_BUFFER), _maxHeight(defaultHeight), _wrapped(false) {}
+      Line(uint8_t defaultHeight) : _width(MIN_CURSOR_WIDTH_BUFFER), _maxChHeight(defaultHeight), _wrapped(false) {}
       void insert(int pos, Character& ch);
       void remove(int from, int last);
 
       uint32_t width() const { return _width; }
-      uint8_t maxHeight() const { return _maxHeight; }
-      void maxHeight(uint8_t maxHeight) {
-        _maxHeight = maxHeight;
-      }
+      uint8_t lineHeight() const { return _maxChHeight + DEFAULT_LINE_SPACE; }
       bool wrapped() const { return _wrapped; }
       void wrapped(bool wrapped) {
         _wrapped = wrapped;
@@ -191,9 +189,10 @@ namespace upanui {
       Character* characters(int i) const { return _characters[i]; }
     private:
       const int MIN_CURSOR_WIDTH_BUFFER = 8;
+      const int DEFAULT_LINE_SPACE = 4;
       Characters _characters;
       uint32_t _width;
-      uint8_t _maxHeight;
+      uint8_t _maxChHeight;
       bool _wrapped;
     };
 
@@ -227,10 +226,15 @@ namespace upanui {
       bool _showCursorToggle;
     };
 
+    void init();
     usfn::Context& getUSFNContext(usfn::PreloadedFonts fontType);
     void validateCursorPos() const;
     void updateCursor(int x, int y);
     void updateCursor(bool showCursor);
+
+    uint32_t scrollHeight() const override;
+    void changeScrollHeight(int delta);
+
     void insert(TextArea::Line& line, int lineX, int lineY, const TextArea::Characters& characters);
     void wrapremovech(int x, int y, int& deletedLine);
     void lineremovech(int y, int baseY);
@@ -238,6 +242,8 @@ namespace upanui {
 
   private:
     static const uint8_t MAX_FONT_SIZE = 128;
+
+    uint32_t _textAreaHeight;
 
     upan::vector<Line*> _lines;
 

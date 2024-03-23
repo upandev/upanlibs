@@ -77,7 +77,7 @@ namespace upanui {
   void VerticalScroller::caliberateScrollbar() {
     const int minScrollBarHeight = _scrollBarWidth / 2;
     const int scrollBarMaxRunway = _scrollBarMaxHeight - minScrollBarHeight;
-    const int scrollContentHeight = _scrollableChild.value().height() - height();
+    const int scrollContentHeight = _scrollableChild.value().scrollHeight() - height();
     _scrollMultiplier = 8;
     int scrollBarRequiredRunway = scrollContentHeight / _scrollMultiplier;
     while(scrollBarRequiredRunway > scrollBarMaxRunway) {

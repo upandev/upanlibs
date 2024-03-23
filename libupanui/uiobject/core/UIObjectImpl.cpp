@@ -215,9 +215,9 @@ namespace upanui {
     if (newY > 0) {
       newY = 0;
     } else {
-      int h = (int)height() + newY;
+      int h = (int)scrollHeight() + newY;
       if (h < scrollableHeight) {
-        newY = scrollableHeight - (int)height();
+        newY = scrollableHeight - (int)scrollHeight();
       }
     }
     y(newY);

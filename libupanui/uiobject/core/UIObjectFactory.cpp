@@ -125,6 +125,7 @@ namespace upanui {
   TextArea& UIObjectFactory::createTextArea(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
     auto& textArea = *new TextArea(x, y, width, height);
     parent.add(textArea);
+    textArea.init();
     return textArea;
   }
 

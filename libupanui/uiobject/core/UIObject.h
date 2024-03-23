@@ -55,6 +55,7 @@ namespace upanui {
     virtual int y() const = 0;
     virtual uint32_t width() const = 0;
     virtual uint32_t height() const = 0;
+    virtual uint32_t scrollHeight() const = 0;
     virtual uint32_t backgroundColor() const = 0;
     virtual uint32_t backgroundColorForDraw() const = 0;
     virtual uint8_t  backgroundColorAlpha() const = 0;
@@ -104,6 +105,7 @@ namespace upanui {
     virtual void hscroll(int columns) = 0;
     virtual void registerVerticalScroller(VerticalScroller& verticalScroller) = 0;
     virtual void removeVerticalScroller() = 0;
+    virtual upan::option<VerticalScroller&> getVerticalScroller() = 0;
 
     virtual void notifyChange(const ChangeState changeState) = 0;
     virtual void setChangeState(const ChangeState changeState) = 0;
