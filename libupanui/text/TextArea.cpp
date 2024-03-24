@@ -28,8 +28,6 @@
 #include <VerticalScroller.h>
 
 namespace upanui {
-  constexpr int DEFAULT_FONT_SIZE = 16;
-  constexpr int DEFAULT_SIDE_MARGIN = 8;
   TextArea::TextArea(int x, int y, uint32_t width, uint32_t height) : RectangleCanvas(x, y, width, height),
     _textAreaHeight(0), _currentFontSize(DEFAULT_FONT_SIZE), _currentFontType(usfn::PreloadedFonts::VGA16), _currentStyle(usfn::STYLE_REGULAR),
     _currentFGColor(0x000000), _currentBGColor(0xFFFFFF),
@@ -509,11 +507,19 @@ namespace upanui {
         break;
 
       case Keyboard_CTRL_B:
-        _currentStyle = usfn::STYLE_BOLD;
+        if (_currentStyle & usfn::STYLE_BOLD) {
+          _currentStyle &= ~(usfn::STYLE_BOLD);
+        } else {
+          _currentStyle |= usfn::STYLE_BOLD;
+        }
         break;
 
       case Keyboard_CTRL_I:
-        _currentStyle = usfn::STYLE_ITALIC;
+        if (_currentStyle & usfn::STYLE_ITALIC) {
+          _currentStyle &= ~(usfn::STYLE_ITALIC);
+        } else {
+          _currentStyle |= usfn::STYLE_ITALIC;
+        }
         break;
 
       case Keyboard_CTRL_W:
@@ -522,6 +528,19 @@ namespace upanui {
 
       case Keyboard_CTRL_G:
         _currentBGColor = 0x00FF00;
+        break;
+
+      case Keyboard_CTRL_A:
+        _currentFontSize *= 2;
+        if (_currentFontSize > 80) {
+          _currentFontSize = 80;
+        }
+        break;
+
+      case Keyboard_CTRL_Q:
+        _currentFontSize /= 2;
+        if (_currentFontSize < 16)
+          _currentFontSize = 16;
         break;
 
       default:
@@ -541,6 +560,7 @@ namespace upanui {
     if (topY > height()) {
       return;
     }
+
     auto drawX = DEFAULT_SIDE_MARGIN;
     auto& characters = line.characters();
     for(int i = 0; i < charX; ++i) {
@@ -560,11 +580,14 @@ namespace upanui {
           .fg = _currentFGColor | GCoreFunctions::ALPHA_MASK,
           .bg = backgroundColor() | GCoreFunctions::ALPHA_MASK
       };
-      //getUSFNContext(getCurrentFontType()).RenderCharacter(buf, ch->getCh());
+
       fillCharacterBG(drawX, topY, line.lineHeight() + 1, ch);
+
       char str[2] = { (char)ch.getCh(), '\0'};
-      getUSFNContext(ch.getFontType(), ch.getFontSize(), ch.getStyle()).RenderText(buf, str, true, false);
-      drawX += characters[charX]->getChWidth();
+      auto& sfnContext = getUSFNContext(ch.getFontType(), ch.getFontSize(), ch.getStyle());
+      sfnContext.RenderText(buf, str, true, false);
+
+      drawX += ch.getChWidth();
     }
   }
 

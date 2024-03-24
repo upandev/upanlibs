@@ -84,6 +84,9 @@ namespace upanui {
     }
 
   private:
+    static constexpr int DEFAULT_FONT_SIZE = 16;
+    static constexpr int DEFAULT_SIDE_MARGIN = 8;
+
     TextArea(int x, int y, uint32_t width, uint32_t height);
     ~TextArea();
 
@@ -110,7 +113,18 @@ namespace upanui {
       }
 
       uint8_t getChWidth() const {
-        return _fontSize / 2;
+        auto w = _fontSize / 2;
+        const auto e = _fontSize / DEFAULT_FONT_SIZE;
+
+        if (_style & usfn::STYLE_BOLD) {
+          w += e;
+          if (_style & usfn::STYLE_ITALIC) {
+            w += e * 2;
+          }
+        } else if (_style & usfn::STYLE_ITALIC) {
+          w += e;
+        }
+        return w;
       }
 
       uint8_t getChHeight() const {
