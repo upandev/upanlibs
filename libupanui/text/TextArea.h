@@ -227,10 +227,11 @@ namespace upanui {
     };
 
     void init();
-    usfn::Context& getUSFNContext(usfn::PreloadedFonts fontType);
+    usfn::Context& getUSFNContext(usfn::PreloadedFonts fontType, uint8_t fontSize, uint16_t fontStyle);
     void validateCursorPos() const;
     void updateCursor(int x, int y);
     void updateCursor(bool showCursor);
+    void fillCharacterBG(int x, int  y, uint32_t height, const Character& ch);
 
     uint32_t scrollHeight() const override;
     void changeScrollHeight(int delta);
@@ -247,7 +248,7 @@ namespace upanui {
 
     upan::vector<Line*> _lines;
 
-    typedef upan::map<usfn::PreloadedFonts, usfn::Context*> FontContextMap;
+    typedef upan::map<uint64_t, usfn::Context*> FontContextMap;
     FontContextMap _fontContexts;
 
     uint8_t _currentFontSize;

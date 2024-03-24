@@ -32,7 +32,7 @@ namespace upanui {
   constexpr int DEFAULT_SIDE_MARGIN = 8;
   TextArea::TextArea(int x, int y, uint32_t width, uint32_t height) : RectangleCanvas(x, y, width, height),
     _textAreaHeight(0), _currentFontSize(DEFAULT_FONT_SIZE), _currentFontType(usfn::PreloadedFonts::VGA16), _currentStyle(usfn::STYLE_REGULAR),
-    _currentFGColor(0x000000 | GCoreFunctions::ALPHA_MASK), _currentBGColor(0xFFFFFF | GCoreFunctions::ALPHA_MASK),
+    _currentFGColor(0x000000), _currentBGColor(0xFFFFFF),
     _maxLineCharWidth(width - DEFAULT_SIDE_MARGIN * 2), _cursorBlinkThread(*this) {
     if (width <= DEFAULT_SIDE_MARGIN * 2) {
       throw upan::exception(XLOC, "TextArea should have a min width > 8");
@@ -50,7 +50,7 @@ namespace upanui {
   }
 
   void TextArea::init() {
-    backgroundColor(_currentBGColor);
+    backgroundColor(0xFFFFFF | GCoreFunctions::ALPHA_MASK);
     auto curLine = new Line(_currentFontSize);
     _lines.push_back(curLine);
     _textBuffer.initLocal(width(), MAX_FONT_SIZE * 2 + height());
@@ -62,15 +62,16 @@ namespace upanui {
     UIObjectImpl::captureMouseEvents(true);
   }
 
-  usfn::Context& TextArea::getUSFNContext(usfn::PreloadedFonts fontType) {
-    auto i = _fontContexts.find(fontType);
+  usfn::Context& TextArea::getUSFNContext(usfn::PreloadedFonts fontType, uint8_t fontSize, uint16_t fontStyle) {
+    const uint64_t fontContextType = fontType | fontSize << 8 | fontStyle << 16;
+    auto i = _fontContexts.find(fontContextType);
     if (i != _fontContexts.end()) {
       return *(i->second);
     }
     auto context = new usfn::Context();
     context->Load(upanui::usfn::Context::GetPreloadedFont(fontType));
-    context->Select(upanui::usfn::FAMILY_ANY, nullptr, upanui::usfn::STYLE_REGULAR, _currentFontSize);
-    _fontContexts.insert(FontContextMap::value_type(fontType, context));
+    context->Select(upanui::usfn::FAMILY_ANY, nullptr, fontStyle, fontSize);
+    _fontContexts.insert(FontContextMap::value_type(fontContextType, context));
     return *context;
   }
 
@@ -461,10 +462,14 @@ namespace upanui {
     _textBuffer.fill(x, y + MAX_FONT_SIZE, width, height, backgroundColorWithAlpha());
   }
 
+  void TextArea::fillCharacterBG(int x, int  y, uint32_t height, const Character& ch) {
+    _textBuffer.fill(x, y + MAX_FONT_SIZE, ch.getChWidth(), height, ch.getBgColor() | (backgroundColorAlpha() << 24));
+  }
+
   void TextArea::onKeyboardEvent(const KeyboardEvent& event) {
     upan::mutex_guard g(_drawMutex);
     validateCursorPos();
-    auto ch = event.getData().getCh();
+    auto ch = event.getData().getRch();
     switch (ch) {
       case Keyboard_ENTER:
         enter();
@@ -503,6 +508,22 @@ namespace upanui {
         moveend();
         break;
 
+      case Keyboard_CTRL_B:
+        _currentStyle = usfn::STYLE_BOLD;
+        break;
+
+      case Keyboard_CTRL_I:
+        _currentStyle = usfn::STYLE_ITALIC;
+        break;
+
+      case Keyboard_CTRL_W:
+        _currentBGColor = 0xFFFFFF;
+        break;
+
+      case Keyboard_CTRL_G:
+        _currentBGColor = 0x00FF00;
+        break;
+
       default:
         insert(ch);
         break;
@@ -528,20 +549,21 @@ namespace upanui {
     clearArea(drawX, topY, width() - drawX, line.lineHeight() + 1);
 
     for(int i = charX; i < characters.size(); ++i) {
-      auto ch = characters[i];
+      const auto& ch = *characters[i];
       usfn::FrameBuffer buf = {
           .ptr = (uint8_t*)_textBuffer.buffer(),
           .w = (int16_t)_textBuffer.width(),
           .h = (int16_t)_textBuffer.height(),
           .p = (uint16_t)_textBuffer.pitch(),
           .x = (int16_t)drawX,
-          .y = (int16_t)(baseDrawY + MAX_FONT_SIZE - 1 - ch->getChHeight()),
+          .y = (int16_t)(baseDrawY + MAX_FONT_SIZE - 1 - ch.getChHeight()),
           .fg = _currentFGColor | GCoreFunctions::ALPHA_MASK,
-          .bg = _currentBGColor | GCoreFunctions::ALPHA_MASK
+          .bg = backgroundColor() | GCoreFunctions::ALPHA_MASK
       };
       //getUSFNContext(getCurrentFontType()).RenderCharacter(buf, ch->getCh());
-      char str[2] = { (char)ch->getCh(), '\0'};
-      getUSFNContext(getCurrentFontType()).RenderText(buf, str, true, false);
+      fillCharacterBG(drawX, topY, line.lineHeight() + 1, ch);
+      char str[2] = { (char)ch.getCh(), '\0'};
+      getUSFNContext(ch.getFontType(), ch.getFontSize(), ch.getStyle()).RenderText(buf, str, true, false);
       drawX += characters[charX]->getChWidth();
     }
   }
@@ -555,7 +577,7 @@ namespace upanui {
 
   void TextArea::updateCursor(bool showCursor) {
     upan::mutex_guard g(_drawMutex);
-    const auto color = showCursor ? _currentFGColor : _currentBGColor;
+    const auto color = (showCursor ? _currentFGColor : _currentBGColor) | GCoreFunctions::ALPHA_MASK;
     _textBuffer.fill(_cursorPos.x() + 1, _cursorPos.y() + MAX_FONT_SIZE - 1, _currentFontSize / 2 - 1, 1, color);
   }
 
