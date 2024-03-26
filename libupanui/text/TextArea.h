@@ -86,6 +86,8 @@ namespace upanui {
   private:
     static constexpr int DEFAULT_FONT_SIZE = 16;
     static constexpr int DEFAULT_SIDE_MARGIN = 8;
+    static constexpr uint32_t DEFAULT_BG_COLOR = 0xFFFFFF;
+    static constexpr uint32_t DEFAULT_FG_COLOR = 0;
 
     TextArea(int x, int y, uint32_t width, uint32_t height);
     ~TextArea();
@@ -243,7 +245,7 @@ namespace upanui {
     void init();
     usfn::Context& getUSFNContext(usfn::PreloadedFonts fontType, uint8_t fontSize, uint16_t fontStyle);
     void validateCursorPos() const;
-    void updateCursor(int x, int y);
+    void updateCursorPosition(int charPosX, int charPosY, int cursorPosX, int cursorPosY);
     void updateCursor(bool showCursor);
     void fillCharacterBG(int x, int  y, uint32_t height, const Character& ch);
 

@@ -30,7 +30,7 @@
 namespace upanui {
   TextArea::TextArea(int x, int y, uint32_t width, uint32_t height) : RectangleCanvas(x, y, width, height),
     _textAreaHeight(0), _currentFontSize(DEFAULT_FONT_SIZE), _currentFontType(usfn::PreloadedFonts::VGA16), _currentStyle(usfn::STYLE_REGULAR),
-    _currentFGColor(0x000000), _currentBGColor(0xFFFFFF),
+    _currentFGColor(DEFAULT_FG_COLOR), _currentBGColor(DEFAULT_BG_COLOR),
     _maxLineCharWidth(width - DEFAULT_SIDE_MARGIN * 2), _cursorBlinkThread(*this) {
     if (width <= DEFAULT_SIDE_MARGIN * 2) {
       throw upan::exception(XLOC, "TextArea should have a min width > 8");
@@ -168,12 +168,10 @@ namespace upanui {
 
     if (line->size() == _characterPos.x()) {
       //This means the new character inserted has moved to the next line
-      _characterPos.set(1, _characterPos.y());
-      updateCursor(newCh->getChWidth() + DEFAULT_SIDE_MARGIN, _cursorPos.y());
+      updateCursorPosition(1, _characterPos.y(), newCh->getChWidth() + DEFAULT_SIDE_MARGIN, _cursorPos.y());
       movedown();
     } else {
-      _characterPos.set(_characterPos.x() + 1, _characterPos.y());
-      updateCursor(_cursorPos.x() + newCh->getChWidth(), _cursorPos.y());
+      updateCursorPosition(_characterPos.x() + 1, _characterPos.y(), _cursorPos.x() + newCh->getChWidth(), _cursorPos.y());
     }
   }
 
@@ -354,15 +352,15 @@ namespace upanui {
       }
       cursorX += ch->getChWidth();
     }
-    _characterPos.set(charX, _characterPos.y() - 1);
 
     if (cursorY >= prevLine->lineHeight()) {
-      updateCursor(cursorX, cursorY);
+      updateCursorPosition(charX, _characterPos.y() - 1, cursorX, cursorY);
     } else {
       auto srcY = MAX_FONT_SIZE + cursorY;
       auto destY = MAX_FONT_SIZE + prevLine->lineHeight();
 
       updateCursor(false);
+      _characterPos.set(charX, _characterPos.y() - 1);
 
       memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + srcY * width(), (height() - cursorY) * width() * _textBuffer.bytesPerPixel());
       RenderLine(*prevLine, 0, prevLine->lineHeight());
@@ -387,14 +385,15 @@ namespace upanui {
       }
       cursorX += ch->getChWidth();
     }
-    _characterPos.set(charX, _characterPos.y() + 1);
+    //_characterPos.set(charX, _characterPos.y() + 1);
     int overflowY = _cursorPos.y() + nextLine->lineHeight() - (height() - 1);
     if (overflowY < 0) {
-      updateCursor(cursorX, _cursorPos.y() + nextLine->lineHeight());
+      updateCursorPosition(charX, _characterPos.y() + 1, cursorX, _cursorPos.y() + nextLine->lineHeight());
     } else {
       auto srcY = MAX_FONT_SIZE + overflowY;
 
       updateCursor(false);
+      _characterPos.set(charX, _characterPos.y() + 1);
 
       memmove(_textBuffer.buffer() + MAX_FONT_SIZE * width(), _textBuffer.buffer() + srcY * width(), (_cursorPos.y() - overflowY) * width() * _textBuffer.bytesPerPixel());
       RenderLine(*nextLine, 0, height() - 1);
@@ -413,9 +412,10 @@ namespace upanui {
       moveend();
       return;
     }
-    _characterPos.set(_characterPos.x() - 1, _characterPos.y());
+
     auto curLine = _lines[_characterPos.y()];
-    updateCursor(_cursorPos.x() - curLine->characters()[_characterPos.x()]->getChWidth(), _cursorPos.y());
+    updateCursorPosition(_characterPos.x() - 1, _characterPos.y(),
+                         _cursorPos.x() - curLine->characters()[_characterPos.x() - 1]->getChWidth(), _cursorPos.y());
   }
 
   void TextArea::moveright() {
@@ -428,16 +428,17 @@ namespace upanui {
       movedown();
       return;
     }
-    _characterPos.set(_characterPos.x() + 1, _characterPos.y());
-    updateCursor(_cursorPos.x() + curLine->characters()[_characterPos.x() - 1]->getChWidth(), _cursorPos.y());
+
+    updateCursorPosition(_characterPos.x() + 1, _characterPos.y(),
+                         _cursorPos.x() + curLine->characters()[_characterPos.x()]->getChWidth(), _cursorPos.y());
   }
 
   void TextArea::movehome() {
     if (_characterPos.x() == 0) {
       return;
     }
-    _characterPos.set(0, _characterPos.y());
-    updateCursor(DEFAULT_SIDE_MARGIN, _cursorPos.y());
+
+    updateCursorPosition(0, _characterPos.y(), DEFAULT_SIDE_MARGIN, _cursorPos.y());
   }
 
   void TextArea::moveend() {
@@ -452,8 +453,8 @@ namespace upanui {
       cursorX += curLine->characters()[charX]->getChWidth();
       ++charX;
     }
-    _characterPos.set(charX, _characterPos.y());
-    updateCursor(cursorX, _cursorPos.y());
+    //_characterPos.set(charX, _characterPos.y());
+    updateCursorPosition(charX, _characterPos.y(), cursorX, _cursorPos.y());
   }
 
   void TextArea::clearArea(int x, int  y, uint32_t width, uint32_t height) {
@@ -591,16 +592,25 @@ namespace upanui {
     }
   }
 
-  void TextArea::updateCursor(int x, int y) {
+  void TextArea::updateCursorPosition(int charPosX, int charPosY, int cursorPosX, int cursorPosY) {
     upan::mutex_guard g(_drawMutex);
     updateCursor(false);
-    _cursorPos.set(x, y);
+    _characterPos.set(charPosX, charPosY);
+    _cursorPos.set(cursorPosX, cursorPosY);
     updateCursor(true);
   }
 
   void TextArea::updateCursor(bool showCursor) {
     upan::mutex_guard g(_drawMutex);
-    const auto color = (showCursor ? _currentFGColor : _currentBGColor) | GCoreFunctions::ALPHA_MASK;
+
+    auto color = (showCursor ? DEFAULT_FG_COLOR : DEFAULT_BG_COLOR);
+    auto& line = *_lines[_characterPos.y()];
+    if (_characterPos.x() < line.characters().size()) {
+      const auto ch = line.characters(_characterPos.x());
+      color = (showCursor ? ch->getFgColor() : ch->getBgColor());
+    }
+    color |= GCoreFunctions::ALPHA_MASK;
+
     _textBuffer.fill(_cursorPos.x() + 1, _cursorPos.y() + MAX_FONT_SIZE - 1, _currentFontSize / 2 - 1, 1, color);
   }
 
