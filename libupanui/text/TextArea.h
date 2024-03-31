@@ -95,7 +95,7 @@ namespace upanui {
     void doDraw() override;
 
     int scrollY() const override { return _scrollY; }
-    void updateScrollY(int sy);
+    int updateScrollY(int sy);
     uint32_t scrollHeight() const override;
     void changeScrollHeight(int delta);
     void vscroll(int rows, int scrollableHeight) override;

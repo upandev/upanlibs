@@ -614,15 +614,16 @@ namespace upanui {
     _textBuffer.fill(_cursorPos.x() + 1, _cursorPos.y() + MAX_FONT_SIZE - 1, _currentFontSize / 2 - 1, 1, color);
   }
 
-  void TextArea::updateScrollY(int sy) {
-    const int newScrollY = _scrollY + sy;
+  int TextArea::updateScrollY(int sy) {
+    int newScrollY = _scrollY + sy;
     if (newScrollY < 0) {
-      _scrollY = 0;
+      newScrollY = 0;
     } else if (newScrollY >= _scrollHeight) {
-      _scrollY = _scrollHeight - 1;
-    } else {
-      _scrollY = newScrollY;
+      newScrollY = _scrollHeight - 1;
     }
+    const int rows = newScrollY - _scrollY;
+    _scrollY = newScrollY;
+    return rows;
   }
 
   uint32_t TextArea::scrollHeight() const {
@@ -670,7 +671,7 @@ namespace upanui {
 
   void TextArea::vscroll(int rows, int scrollableHeight) {
     rows = -rows;
-    updateScrollY(rows);
+    rows = updateScrollY(rows);
     if (rows > 0) {
       int lineTopY;
       int lineIndex;
