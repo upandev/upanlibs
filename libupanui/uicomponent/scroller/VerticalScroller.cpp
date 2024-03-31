@@ -86,7 +86,7 @@ namespace upanui {
     }
     const int scrollBarHeight = _scrollBarMaxHeight - scrollBarRequiredRunway;
     _scrollBar->height(scrollBarHeight);
-    _scrollBar->y((-_scrollableChild.value().y() / _scrollMultiplier) + _scrollBarMinY);
+    updateScrollPosition(_scrollableChild.value().scrollY(), true);
   }
 
   void VerticalScroller::add(UIObject &child) {
@@ -101,38 +101,46 @@ namespace upanui {
     RectangleCanvas::add(child);
   }
 
+  void VerticalScroller::updateScrollPosition(int newY, bool directionUp) {
+    const int scrollNewY = newY / _scrollMultiplier + ((newY % _scrollMultiplier) == 0 ? 0 : directionUp ? -1 : 1);
+    setScrollPosition(scrollNewY + _scrollBarMinY);
+  }
+
+  void VerticalScroller::setScrollPosition(int newY) {
+    if (newY != _scrollBar->y()) {
+      if (newY < _scrollBarMinY) {
+        newY = _scrollBarMinY;
+      } else if (int(newY + _scrollBar->height()) >= _scrollBarMaxY) {
+        newY = _scrollBarMaxY - (int)_scrollBar->height();
+      }
+      _scrollBar->y(newY);
+    }
+  }
+
   void VerticalScroller::handleMouseEvent(upanui::UIObject &sender, const upanui::MouseEvent &event) {
     const auto &e = event.getData();
     if (e.leftButtonState() == MouseData::State::PRESSED || e.leftButtonState() == MouseData::State::HOLD) {
-      _scrollableChild.ifPresent([&](UIObject &child) {
-        int newY = _scrollBar->y();
-        if (&sender == _scrollUpBt) {
-          newY -= 1;
-        } else if (&sender == _scrollDownBt) {
-          newY += 1;
-        } else if (&sender == _scrollBar) {
-          const int mouseViewY = event.viewY();
-          if (mouseViewY >= int(_scrollUpBt->drawY() + _scrollBarWidth) && mouseViewY < _scrollDownBt->drawY()) {
-            newY = _scrollBar->y() - event.getData().deltaY();
-          }
-        } else if (&sender == _scrollerCanvas && e.leftButtonState() == MouseData::State::PRESSED) {
-          newY = event.viewY() - _scrollerCanvas->drawY();
-          const int bottomY = _scrollBar->y() + _scrollBar->height();
-          if (newY > bottomY) {
-            newY = _scrollBar->y() + (newY - bottomY);
-          }
+      int newY = _scrollBar->y();
+      if (&sender == _scrollUpBt) {
+        newY -= 1;
+      } else if (&sender == _scrollDownBt) {
+        newY += 1;
+      } else if (&sender == _scrollBar) {
+        const int mouseViewY = event.viewY();
+        if (mouseViewY >= int(_scrollUpBt->drawY() + _scrollBarWidth) && mouseViewY < _scrollDownBt->drawY()) {
+          newY = _scrollBar->y() - event.getData().deltaY();
         }
-        if (newY != _scrollBar->y()) {
-          if (newY < _scrollBarMinY) {
-            newY = _scrollBarMinY;
-          } else if (int(newY + _scrollBar->height()) >= _scrollBarMaxY) {
-            newY = _scrollBarMaxY - (int)_scrollBar->height();
-          }
-          const int delta = _scrollBar->y() - newY;
-          _scrollBar->y(newY);
-          child.vscroll(delta * _scrollMultiplier, height());
+      } else if (&sender == _scrollerCanvas && e.leftButtonState() == MouseData::State::PRESSED) {
+        newY = event.viewY() - _scrollerCanvas->drawY();
+        const int bottomY = _scrollBar->y() + _scrollBar->height();
+        if (newY > bottomY) {
+          newY = _scrollBar->y() + (newY - bottomY);
         }
-      });
+      }
+      const int oldScrollY = _scrollBar->y();
+      setScrollPosition(newY);
+      const int deltaY = oldScrollY - _scrollBar->y();
+      _scrollableChild.ifPresent([&](UIObject& child) { child.vscroll(deltaY * _scrollMultiplier, height()); });
     }
   }
 }

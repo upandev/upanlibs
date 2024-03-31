@@ -46,7 +46,6 @@ namespace upanui {
     int y() const override { return _y; }
     uint32_t width() const override { return _width; }
     uint32_t height() const override { return _height; }
-    uint32_t scrollHeight() const override { return height(); }
     uint32_t backgroundColor() const override { return _bgColor; }
     uint32_t backgroundColorForDraw() const override { return _bgColor; }
     uint8_t  backgroundColorAlpha() const override { return _bgAlpha; }
@@ -93,6 +92,8 @@ namespace upanui {
       _captureMouseEvents = val;
     }
 
+    int scrollY() const override { return -y(); }
+    uint32_t scrollHeight() const override { return height(); }
     void vscroll(int rows, int scrollableHeight) override;
     void hscroll(int columns) override;
     void registerVerticalScroller(VerticalScroller& verticalScroller) override;

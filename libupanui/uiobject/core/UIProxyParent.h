@@ -33,7 +33,6 @@ namespace upanui {
     int y() const override { return 0; }
     uint32_t width() const override;
     uint32_t height() const override;
-    uint32_t scrollHeight() const override { return height(); }
     uint32_t backgroundColor() const override { return 0; }
     uint32_t backgroundColorForDraw() const override { return 0; }
     uint8_t  backgroundColorAlpha() const override { return 0; }
@@ -118,6 +117,8 @@ namespace upanui {
       throw upan::exception(XLOC, "unsupported event handlers for UIProxyParent");
     }
 
+    int scrollY() const override { return -y(); }
+    uint32_t scrollHeight() const override { return height(); }
     void vscroll(int rows, int scrollableHeight) override {}
     void hscroll(int columns) override {}
     void registerVerticalScroller(VerticalScroller&) override {}

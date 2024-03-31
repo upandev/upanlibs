@@ -93,6 +93,11 @@ namespace upanui {
     ~TextArea();
 
     void doDraw() override;
+
+    int scrollY() const override { return _scrollY; }
+    void updateScrollY(int sy);
+    uint32_t scrollHeight() const override;
+    void changeScrollHeight(int delta);
     void vscroll(int rows, int scrollableHeight) override;
     void onKeyboardEvent(const KeyboardEvent& event) override;
 
@@ -249,18 +254,22 @@ namespace upanui {
     void updateCursor(bool showCursor);
     void fillCharacterBG(int x, int  y, uint32_t height, const Character& ch);
 
-    uint32_t scrollHeight() const override;
-    void changeScrollHeight(int delta);
-
     void insert(TextArea::Line& line, int lineX, int lineY, const TextArea::Characters& characters);
     void wrapremovech(int x, int y, int& deletedLine);
     void lineremovech(int y, int baseY);
     void RenderLine(const Line& line, int charX, int baseDrawY);
 
+    typedef struct {
+      int _lineIndex;
+      int _lineTopY;
+    } VirtualYInfo;
+    VirtualYInfo getLineAtVirtualY(int virtualY);
+
   private:
     static const uint8_t MAX_FONT_SIZE = 128;
 
-    uint32_t _textAreaHeight;
+    int _scrollY;
+    int _scrollHeight;
 
     upan::vector<Line*> _lines;
 

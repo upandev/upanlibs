@@ -30,6 +30,7 @@
 #include <VerticalScroller.h>
 #include <Image.h>
 #include <TextArea.h>
+#include <typeinfo.h>
 
 namespace upanui {
   RectangleCanvas& UIObjectFactory::createRectangleCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
@@ -123,7 +124,11 @@ namespace upanui {
   }
 
   TextArea& UIObjectFactory::createTextArea(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
-    auto& textArea = *new TextArea(x, y, width, height);
+    uint32_t actualHeight = height;
+    if (typeid(parent) == typeid(VerticalScroller)) {
+      actualHeight = parent.height();
+    }
+    auto& textArea = *new TextArea(x, y, width, actualHeight);
     parent.add(textArea);
     textArea.init();
     return textArea;
