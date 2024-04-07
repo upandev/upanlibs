@@ -291,7 +291,7 @@ namespace upanui {
       int baseY = _cursorPos.y() - line->lineHeight();
       for (int i = _characterPos.y(); i < _lines.size(); ++i) {
         auto l = _lines[i];
-        if (baseY >= (height() - 1)) {
+        if (baseY >= ((int)height() - 1)) {
           break;
         }
         baseY += l->lineHeight();
@@ -716,6 +716,7 @@ namespace upanui {
         RenderLineTopDown(getLineAtVirtualY(_scrollY, 0));
       }
       _cursorPos.set(_cursorPos.x(), _cursorPos.y() + (scrollDown ? -rows : rows));
+      notifyChange(ChangeState::Content);
     }
     updateCursor(true);
   }
