@@ -77,6 +77,25 @@ namespace upanui {
     return *context;
   }
 
+  void TextArea::scrollToCursor() {
+    int rows;
+    bool scrollUp;
+    if (_cursorPos.y() < 0) {
+      rows =  -(_cursorPos.y() - _lines[_characterPos.y()]->lineHeight() + 1);
+      scrollUp = true;
+    } else if (_cursorPos.y() >= height()) {
+      rows =  -(_cursorPos.y() - (int)height() + 1);
+      scrollUp = false;
+    } else {
+      return;
+    }
+
+    vscroll(rows, (int)height());
+    getVerticalScroller().ifPresent([&](VerticalScroller &verticalScroller) {
+      verticalScroller.updateScrollPosition(_scrollY, scrollUp);
+    });
+  }
+
   void TextArea::validateCursorPos() const {
     if (_characterPos.y() >= _lines.size()) {
       throw upan::exception(XLOC, "invalid cursor row:%u", _characterPos.y());
@@ -99,14 +118,14 @@ namespace upanui {
 
     curLine.remove(_characterPos.x(), curLine.characters().size());
     curLine.wrapped(false);
-    RenderLine(curLine, _characterPos.x(), _cursorPos.y());
+    renderLine(curLine, _characterPos.x(), _cursorPos.y());
 
     auto newCursorY = _cursorPos.y() + newLine.lineHeight();
     if (newCursorY < height()) {
       auto srcY = MAX_FONT_SIZE + _cursorPos.y() + 1;
       auto destY = MAX_FONT_SIZE + newCursorY + 1;
       memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + srcY * width(), (height() - newCursorY - 1) * width() * _textBuffer.bytesPerPixel());
-      RenderLine(newLine, 0, newCursorY);
+      renderLine(newLine, 0, newCursorY);
     }
 
     changeScrollHeight(newLine.lineHeight());
@@ -153,7 +172,7 @@ namespace upanui {
 
     auto cursorY = _cursorPos.y();
     for(int i = _characterPos.y(); i < _lines.size(); ++i) {
-      RenderLine(*_lines[i], 0, cursorY);
+      renderLine(*_lines[i], 0, cursorY);
       if (!_lines[i]->wrapped()) { break; }
       if (cursorY >= height()) { break; }
       cursorY += _lines[i]->lineHeight();
@@ -263,7 +282,7 @@ namespace upanui {
 
       for (int lastLineTopY = destYOnCanvas; lastLineTopY < height() && lastLineIndex != -1 && lastLineIndex < _lines.size();) {
         auto lastLine = _lines[lastLineIndex];
-        RenderLine(*lastLine, 0, lastLineTopY + lastLine->lineHeight() - 1);
+        renderLine(*lastLine, 0, lastLineTopY + lastLine->lineHeight() - 1);
         lastLineTopY += lastLine->lineHeight();
         ++lastLineIndex;
       }
@@ -295,7 +314,7 @@ namespace upanui {
           break;
         }
         baseY += l->lineHeight();
-        RenderLine(*l, 0, baseY);
+        renderLine(*l, 0, baseY);
         if (!l->wrapped()) {
           break;
         }
@@ -315,7 +334,7 @@ namespace upanui {
         }
       } else {
         line->remove(_characterPos.x(), _characterPos.x() + 1);
-        RenderLine(*line, _characterPos.x(), _cursorPos.y());
+        renderLine(*line, _characterPos.x(), _cursorPos.y());
       }
     }
   }
@@ -362,7 +381,7 @@ namespace upanui {
       memmove(_textBuffer.buffer() + destY * width(),
               _textBuffer.buffer() + srcY * width(),
               (height() - destCursorY - 1) * width() * _textBuffer.bytesPerPixel());
-      RenderLine(*prevLine, 0, destCursorY);
+      renderLine(*prevLine, 0, destCursorY);
 
       _cursorPos.set(cursorX, destCursorY);
       updateCursor(true);
@@ -401,7 +420,7 @@ namespace upanui {
       _characterPos.set(charX, _characterPos.y() + 1);
 
       memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + srcY * width(), (_cursorPos.y() - overflowY) * width() * _textBuffer.bytesPerPixel());
-      RenderLine(*nextLine, 0, height() - 1);
+      renderLine(*nextLine, 0, height() - 1);
 
       _cursorPos.set(cursorX, height() - 1);
       updateCursor(true);
@@ -478,6 +497,7 @@ namespace upanui {
   void TextArea::onKeyboardEvent(const KeyboardEvent& event) {
     upan::mutex_guard g(_drawMutex);
     validateCursorPos();
+    scrollToCursor();
     auto ch = event.getData().getRch();
     switch (ch) {
       case Keyboard_ENTER:
@@ -566,7 +586,7 @@ namespace upanui {
     drawBuffer().copy(_textBuffer.buffer() + MAX_FONT_SIZE * _textBuffer.width(), width(), height(), true);
   }
 
-  void TextArea::RenderLine(const Line& line, int charX, int baseDrawY) {
+  void TextArea::renderLine(const Line& line, int charX, int baseDrawY) {
     int topY = baseDrawY - line.lineHeight() + 1;
     if (topY >= (int)height()) {
       return;
@@ -671,18 +691,18 @@ namespace upanui {
     return info;
   }
 
-  void TextArea::RenderLineTopDown(const VirtualYInfo& info) {
+  void TextArea::renderLineTopDown(const VirtualYInfo& info) {
     for(int ty = info._lineTopY, li = info._lineIndex; ty < (int)height() && li < _lines.size(); ++li) {
       auto& line = _lines[li];
       ty += line->lineHeight();
-      RenderLine(*line, 0, ty - 1);
+      renderLine(*line, 0, ty - 1);
     }
   }
 
-  void TextArea::RenderLineBottomUp(const VirtualYInfo& info) {
+  void TextArea::renderLineBottomUp(const VirtualYInfo& info) {
     for(int by = info._lineBaseY, li = info._lineIndex; by >= 0 && li >= 0; --li) {
       auto& line = _lines[li];
-      RenderLine(*line, 0, by);
+      renderLine(*line, 0, by);
       by -= line->lineHeight();
     }
   }
@@ -702,7 +722,7 @@ namespace upanui {
           memmove(_textBuffer.buffer() + destY * width(),
                   _textBuffer.buffer() + srcY * width(),
                   moveLength * width() * _textBuffer.bytesPerPixel());
-          RenderLineTopDown(getLineAtVirtualY(_scrollY, moveLength - 1));
+          renderLineTopDown(getLineAtVirtualY(_scrollY, moveLength - 1));
         } else {
           const int srcY = MAX_FONT_SIZE;
           const int destY = MAX_FONT_SIZE + rows;
@@ -710,10 +730,10 @@ namespace upanui {
           memmove(_textBuffer.buffer() + destY * width(),
                   _textBuffer.buffer() + srcY * width(),
                   moveLength * width() * _textBuffer.bytesPerPixel());
-          RenderLineBottomUp(getLineAtVirtualY(_scrollY, rows - 1));
+          renderLineBottomUp(getLineAtVirtualY(_scrollY, rows - 1));
         }
       } else {
-        RenderLineTopDown(getLineAtVirtualY(_scrollY, 0));
+        renderLineTopDown(getLineAtVirtualY(_scrollY, 0));
       }
       _cursorPos.set(_cursorPos.x(), _cursorPos.y() + (scrollDown ? -rows : rows));
       notifyChange(ChangeState::Content);

@@ -250,8 +250,16 @@ namespace upanui {
       bool _showCursorToggle;
     };
 
+    typedef struct {
+      int _lineIndex;
+      int _lineTopY;
+      int _lineBaseY;
+    } VirtualYInfo;
+
+  private:
     void init();
     usfn::Context& getUSFNContext(usfn::PreloadedFonts fontType, uint8_t fontSize, uint16_t fontStyle);
+    void scrollToCursor();
     void validateCursorPos() const;
     void updateCursorPosition(int charPosX, int charPosY, int cursorPosX, int cursorPosY);
     void updateCursor(bool showCursor);
@@ -260,16 +268,11 @@ namespace upanui {
     void insert(TextArea::Line& line, int lineX, int lineY, const TextArea::Characters& characters);
     void wrapremovech(int x, int y, int& deletedLine);
     void lineremovech(int y, int baseY);
-    void RenderLine(const Line& line, int charX, int baseDrawY);
+    void renderLine(const Line& line, int charX, int baseDrawY);
 
-    typedef struct {
-      int _lineIndex;
-      int _lineTopY;
-      int _lineBaseY;
-    } VirtualYInfo;
     VirtualYInfo getLineAtVirtualY(int baseY, int rows);
-    void RenderLineTopDown(const VirtualYInfo& info);
-    void RenderLineBottomUp(const VirtualYInfo& info);
+    void renderLineTopDown(const VirtualYInfo& info);
+    void renderLineBottomUp(const VirtualYInfo& info);
 
   private:
     static const uint8_t MAX_FONT_SIZE = 128;
