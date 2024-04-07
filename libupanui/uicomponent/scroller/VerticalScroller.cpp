@@ -74,10 +74,10 @@ namespace upanui {
     _childCheck = true;
   }
 
-  void VerticalScroller::caliberateScrollbar() {
+  void VerticalScroller::caliberateScrollbar(bool directionUp) {
     const int minScrollBarHeight = _scrollBarWidth / 2;
     const int scrollBarMaxRunway = _scrollBarMaxHeight - minScrollBarHeight;
-    const int scrollContentHeight = _scrollableChild.value().scrollHeight() - height();
+    const int scrollContentHeight = _scrollableChild.value().scrollHeight() >= (int)height() ? (int)_scrollableChild.value().scrollHeight() - (int)height() : 0;
     _scrollMultiplier = 8;
     int scrollBarRequiredRunway = scrollContentHeight / _scrollMultiplier;
     while(scrollBarRequiredRunway > scrollBarMaxRunway) {
@@ -86,7 +86,7 @@ namespace upanui {
     }
     const int scrollBarHeight = _scrollBarMaxHeight - scrollBarRequiredRunway;
     _scrollBar->height(scrollBarHeight);
-    updateScrollPosition(_scrollableChild.value().scrollY(), true);
+    updateScrollPosition(_scrollableChild.value().scrollY(), directionUp);
   }
 
   void VerticalScroller::add(UIObject &child) {
@@ -96,7 +96,7 @@ namespace upanui {
       }
       _scrollableChild = upan::option<UIObject &>(child);
       child.registerVerticalScroller(*this);
-      caliberateScrollbar();
+      caliberateScrollbar(true);
     }
     RectangleCanvas::add(child);
   }
@@ -139,8 +139,18 @@ namespace upanui {
       }
       const int oldScrollY = _scrollBar->y();
       setScrollPosition(newY);
-      const int deltaY = oldScrollY - _scrollBar->y();
-      _scrollableChild.ifPresent([&](UIObject& child) { child.vscroll(deltaY * _scrollMultiplier, height()); });
+
+      _scrollableChild.ifPresent([&](UIObject& child) {
+        int scrollRows = (oldScrollY - _scrollBar->y()) * _scrollMultiplier;
+
+        if (_scrollBar->y() == _scrollBarMinY) {
+          scrollRows = child.scrollY() - 0;
+        } else if (int(_scrollBar->y() + _scrollBar->height()) == _scrollBarMaxY) {
+          int totalRows = (int)child.scrollHeight() - child.scrollY();
+          scrollRows = (int)height() - totalRows;
+        }
+        child.vscroll(scrollRows, (int)height());
+      });
     }
   }
 }

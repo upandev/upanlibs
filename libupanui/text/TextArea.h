@@ -96,9 +96,12 @@ namespace upanui {
 
     int scrollY() const override { return _scrollY; }
     int updateScrollY(int sy);
-    uint32_t scrollHeight() const override;
+
+    uint32_t scrollHeight() const override { return _scrollHeight; }
     void changeScrollHeight(int delta);
+
     void vscroll(int rows, int scrollableHeight) override;
+
     void onKeyboardEvent(const KeyboardEvent& event) override;
 
     void clearArea(int x, int  y, uint32_t width, uint32_t height);
@@ -262,8 +265,11 @@ namespace upanui {
     typedef struct {
       int _lineIndex;
       int _lineTopY;
+      int _lineBaseY;
     } VirtualYInfo;
-    VirtualYInfo getLineAtVirtualY(int virtualY);
+    VirtualYInfo getLineAtVirtualY(int baseY, int rows);
+    void RenderLineTopDown(const VirtualYInfo& info);
+    void RenderLineBottomUp(const VirtualYInfo& info);
 
   private:
     static const uint8_t MAX_FONT_SIZE = 128;

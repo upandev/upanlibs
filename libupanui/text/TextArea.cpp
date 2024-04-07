@@ -54,7 +54,10 @@ namespace upanui {
     _lines.push_back(curLine);
     _textBuffer.initLocal(width(), MAX_FONT_SIZE * 2 + height());
     _textBuffer.fill(backgroundColorWithAlpha());
-    _cursorPos.set(DEFAULT_SIDE_MARGIN, curLine->lineHeight());
+    //cursor y is within the character pixel block.
+    //the character rendering should ensure that the character is drawn with certain bottom margin
+    //for the cursor to be visible at the last pixel row of the character block.
+    _cursorPos.set(DEFAULT_SIDE_MARGIN, curLine->lineHeight() - 1);
     _characterPos.set(0, 0);
     changeScrollHeight(curLine->lineHeight());
     _cursorBlinkThread.start();
@@ -229,7 +232,7 @@ namespace upanui {
 
   void TextArea::lineremovech(const int y, const int baseY) {
     auto line = _lines[y];
-    auto visibleBaseY = baseY - line->lineHeight();
+    auto visibleBaseY = baseY - line->lineHeight() + 1;
     auto insideCanvas = visibleBaseY < height();
 
     if (y < (_lines.size() - 1) && insideCanvas) {
@@ -239,27 +242,29 @@ namespace upanui {
 
       for (int i = y + 1; i < _lines.size(); ++i) {
         lastLineBaseCursorY += _lines[i]->lineHeight();
-        if (lastLineBaseCursorY >= height()) {
+        if (lastLineBaseCursorY >= (height() - 1)) {
           lastLineIndex = i;
           break;
         }
         copyHeight += _lines[i]->lineHeight();
       }
 
-      const auto destY = MAX_FONT_SIZE + visibleBaseY + 1;
-      const auto srcY = MAX_FONT_SIZE + baseY;
+      const auto destY = MAX_FONT_SIZE + visibleBaseY;
+      const auto srcY = MAX_FONT_SIZE + baseY + 1;
 
-      memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + (srcY + 1) * width(), copyHeight * width() * _textBuffer.bytesPerPixel());
+      memmove(_textBuffer.buffer() + destY * width(),
+              _textBuffer.buffer() + srcY * width(),
+              copyHeight * width() * _textBuffer.bytesPerPixel());
 
       const int destYOnCanvas = destY + copyHeight - MAX_FONT_SIZE;
       if (copyHeight > 0) {
         clearArea(0, destYOnCanvas, width(), height() - destYOnCanvas);
       }
 
-      for (int lastLineBaseY = destYOnCanvas; lastLineBaseY < height() && lastLineIndex != -1 && lastLineIndex < _lines.size();) {
+      for (int lastLineTopY = destYOnCanvas; lastLineTopY < height() && lastLineIndex != -1 && lastLineIndex < _lines.size();) {
         auto lastLine = _lines[lastLineIndex];
-        RenderLine(*lastLine, 0, lastLineBaseY + lastLine->lineHeight());
-        lastLineBaseY += lastLine->lineHeight();
+        RenderLine(*lastLine, 0, lastLineTopY + lastLine->lineHeight() - 1);
+        lastLineTopY += lastLine->lineHeight();
         ++lastLineIndex;
       }
 
@@ -267,7 +272,7 @@ namespace upanui {
       changeScrollHeight(-line->lineHeight());
     } else if (_characterPos.y() < y) { //its a no-op if deleting the line where character cursor is
       if (insideCanvas) {
-        clearArea(0, visibleBaseY + 1, width(), line->lineHeight());
+        clearArea(0, visibleBaseY, width(), line->lineHeight());
       }
       _lines.erase(y, y + 1);
       changeScrollHeight(-line->lineHeight());
@@ -279,13 +284,14 @@ namespace upanui {
     if (!line->wrapped() && _characterPos.x() == line->characters().size() && _characterPos.x() > 0) {
       line->wrapped(true);
     }
+
     if (line->wrapped()) {
       int deletedLine = -1;
       wrapremovech(_characterPos.x(), _characterPos.y(), deletedLine);
       int baseY = _cursorPos.y() - line->lineHeight();
       for (int i = _characterPos.y(); i < _lines.size(); ++i) {
         auto l = _lines[i];
-        if (baseY > height()) {
+        if (baseY >= (height() - 1)) {
           break;
         }
         baseY += l->lineHeight();
@@ -296,7 +302,7 @@ namespace upanui {
       }
 
       if (deletedLine > 0) {
-        int baseY = _cursorPos.y() - line->lineHeight();
+        baseY = _cursorPos.y() - line->lineHeight();
         for (int i = _characterPos.y(); i <= deletedLine; ++i) {
           baseY += _lines[i]->lineHeight();
         }
@@ -343,22 +349,25 @@ namespace upanui {
       cursorX += ch->getChWidth();
     }
 
-    if (cursorY >= prevLine->lineHeight()) {
+    if (cursorY >= (prevLine->lineHeight() - 1)) {
       updateCursorPosition(charX, _characterPos.y() - 1, cursorX, cursorY);
     } else {
-      auto srcY = MAX_FONT_SIZE + cursorY;
-      auto destY = MAX_FONT_SIZE + prevLine->lineHeight();
+      int destCursorY = prevLine->lineHeight() - 1;
+      auto srcY = MAX_FONT_SIZE + cursorY + 1;
+      auto destY = MAX_FONT_SIZE + destCursorY + 1;
 
       updateCursor(false);
       _characterPos.set(charX, _characterPos.y() - 1);
 
-      memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + srcY * width(), (height() - cursorY) * width() * _textBuffer.bytesPerPixel());
-      RenderLine(*prevLine, 0, prevLine->lineHeight());
+      memmove(_textBuffer.buffer() + destY * width(),
+              _textBuffer.buffer() + srcY * width(),
+              (height() - destCursorY - 1) * width() * _textBuffer.bytesPerPixel());
+      RenderLine(*prevLine, 0, destCursorY);
 
-      _cursorPos.set(cursorX, prevLine->lineHeight());
+      _cursorPos.set(cursorX, destCursorY);
       updateCursor(true);
 
-      updateScrollY(-(prevLine->lineHeight() - cursorY));
+      updateScrollY(-(destCursorY - cursorY));
       getVerticalScroller().ifPresent([this](VerticalScroller &verticalScroller) {
         verticalScroller.updateScrollPosition(_scrollY, true);
       });
@@ -381,22 +390,23 @@ namespace upanui {
       cursorX += ch->getChWidth();
     }
 
-    int overflowY = _cursorPos.y() + nextLine->lineHeight() - (height() - 1);
+    int overflowY = _cursorPos.y() + nextLine->lineHeight() - height();
     if (overflowY < 0) {
       updateCursorPosition(charX, _characterPos.y() + 1, cursorX, _cursorPos.y() + nextLine->lineHeight());
     } else {
-      auto srcY = MAX_FONT_SIZE + overflowY;
+      auto srcY = MAX_FONT_SIZE + overflowY + 1;
+      int destY = MAX_FONT_SIZE;
 
       updateCursor(false);
       _characterPos.set(charX, _characterPos.y() + 1);
 
-      memmove(_textBuffer.buffer() + MAX_FONT_SIZE * width(), _textBuffer.buffer() + srcY * width(), (_cursorPos.y() - overflowY) * width() * _textBuffer.bytesPerPixel());
+      memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + srcY * width(), (_cursorPos.y() - overflowY) * width() * _textBuffer.bytesPerPixel());
       RenderLine(*nextLine, 0, height() - 1);
 
       _cursorPos.set(cursorX, height() - 1);
       updateCursor(true);
 
-      updateScrollY(overflowY);
+      updateScrollY(overflowY + 1);
       getVerticalScroller().ifPresent([this](VerticalScroller &verticalScroller) {
         verticalScroller.updateScrollPosition(_scrollY, false);
       });
@@ -557,8 +567,8 @@ namespace upanui {
   }
 
   void TextArea::RenderLine(const Line& line, int charX, int baseDrawY) {
-    int topY = baseDrawY - line.lineHeight();
-    if (topY > (int)height()) {
+    int topY = baseDrawY - line.lineHeight() + 1;
+    if (topY >= (int)height()) {
       return;
     }
 
@@ -567,7 +577,7 @@ namespace upanui {
     for(int i = 0; i < charX; ++i) {
       drawX += characters[i]->getChWidth();
     }
-    clearArea(drawX, topY, width() - drawX, line.lineHeight() + 1);
+    clearArea(drawX, topY, width() - drawX, line.lineHeight());
 
     for(int i = charX; i < characters.size(); ++i) {
       const auto& ch = *characters[i];
@@ -577,7 +587,10 @@ namespace upanui {
           .h = (int16_t)_textBuffer.height(),
           .p = (uint16_t)_textBuffer.pitch(),
           .x = (int16_t)drawX,
-          .y = (int16_t)(baseDrawY + MAX_FONT_SIZE - 1 - ch.getChHeight()),
+              //character height is less than the line height because line height is padded with line spacing
+              //therefore, it is not required do a +1 on baseDrawY unlike how it is done while calculating topY using line height
+              //Remember, baseDrawY is same as the cursor Y which is the bottom Y of the character block
+          .y = (int16_t)(baseDrawY + MAX_FONT_SIZE - ch.getChHeight()),
           .fg = _currentFGColor | GCoreFunctions::ALPHA_MASK,
           .bg = backgroundColor() | GCoreFunctions::ALPHA_MASK
       };
@@ -611,7 +624,9 @@ namespace upanui {
     }
     color |= GCoreFunctions::ALPHA_MASK;
 
-    _textBuffer.fill(_cursorPos.x() + 1, _cursorPos.y() + MAX_FONT_SIZE - 1, _currentFontSize / 2 - 1, 1, color);
+    if (_cursorPos.y() >= 0 && _cursorPos.y() < height()) {
+      _textBuffer.fill(_cursorPos.x() + 1, _cursorPos.y() + MAX_FONT_SIZE - 1, _currentFontSize / 2 - 1, 1, color);
+    }
   }
 
   int TextArea::updateScrollY(int sy) {
@@ -626,110 +641,83 @@ namespace upanui {
     return rows;
   }
 
-  uint32_t TextArea::scrollHeight() const {
-    if (_scrollHeight < height()) {
-      return height();
-    } else {
-      return _scrollHeight;
-    }
-  }
-
   void TextArea::changeScrollHeight(int delta) {
-    auto oldScrollHeight = scrollHeight();
+    auto oldScrollHeight = _scrollHeight;
 
-    int newHeight = _scrollHeight + delta;
-    if (newHeight < 0) {
-      _scrollHeight = 0;
-    } else {
-      _scrollHeight = newHeight;
-    }
-
-    auto newScrollHeight = scrollHeight();
-
-    if (oldScrollHeight != newScrollHeight) {
-      getVerticalScroller().ifPresent([](VerticalScroller &verticalScroller) {
-        verticalScroller.caliberateScrollbar();
+    const int newHeight = _scrollHeight + delta;
+    _scrollHeight = newHeight < 0 ? 0 : newHeight;
+    if (_scrollHeight != oldScrollHeight) {
+      getVerticalScroller().ifPresent([&delta](VerticalScroller &verticalScroller) {
+        verticalScroller.caliberateScrollbar(delta >= 0);
       });
     }
   }
 
-  TextArea::VirtualYInfo TextArea::getLineAtVirtualY(const int virtualY) {
+  TextArea::VirtualYInfo TextArea::getLineAtVirtualY(const int baseY, const int rows) {
+    const int virtualY = baseY + rows;
     int lineIndex;
     int y;
     for (lineIndex = 0, y = 0; lineIndex < _lines.size(); ++lineIndex) {
       int ny = y + _lines[lineIndex]->lineHeight();
-      if (ny > virtualY) {
+      if (ny > virtualY || lineIndex == (_lines.size() - 1)) {
         break;
       }
       y = ny;
     }
     VirtualYInfo info;
     info._lineIndex = lineIndex;
-    info._lineTopY = y;
+    info._lineTopY = y - baseY;
+    info._lineBaseY = info._lineTopY + _lines[lineIndex]->lineHeight() - 1;
     return info;
   }
 
-  void TextArea::vscroll(int rows, int scrollableHeight) {
-    rows = -rows;
-    rows = updateScrollY(rows);
-    if (rows > 0) {
-      int lineTopY;
-      int lineIndex;
-      if (rows < scrollableHeight) {
-        const int srcY = MAX_FONT_SIZE + rows;
-        const int destY = MAX_FONT_SIZE;
-        const int moveLength = scrollableHeight - rows;
-        memmove(_textBuffer.buffer() + destY * width(),
-                _textBuffer.buffer() + srcY * width(),
-                moveLength * width() * _textBuffer.bytesPerPixel());
-
-        const auto& info = getLineAtVirtualY(_scrollY + moveLength - 1);
-        lineIndex = info._lineIndex;
-        lineTopY = info._lineTopY - _scrollY;
-      } else {
-        const auto& info = getLineAtVirtualY(_scrollY);
-        lineIndex = info._lineIndex;
-        lineTopY = -(_scrollY - info._lineTopY);
-      }
-
-      for(int ty = lineTopY, li = lineIndex; ty < scrollableHeight && li < _lines.size(); ++li) {
-        auto& line = _lines[li];
-        ty += line->lineHeight();
-        RenderLine(*line, 0, ty);
-      }
-    } else if (rows < 0) {
-      rows = -rows;
-      int lineTopY;
-      int lineIndex;
-      if (rows < scrollableHeight) {
-        const int srcY = MAX_FONT_SIZE;
-        const int destY = MAX_FONT_SIZE + rows;
-        const int moveLength = scrollableHeight - rows;
-        memmove(_textBuffer.buffer() + destY * width(),
-                _textBuffer.buffer() + srcY * width(),
-                moveLength * width() * _textBuffer.bytesPerPixel());
-
-        const auto& info = getLineAtVirtualY(_scrollY + rows);
-        lineIndex = info._lineIndex;
-        const int lineBaseY = info._lineTopY - _scrollY + _lines[lineIndex]->lineHeight();
-
-        for(int by = lineBaseY, li = lineIndex; by >= 0 && li >= 0; --li) {
-          auto& line = _lines[li];
-          RenderLine(*line, 0, by + 1);
-          by -= line->lineHeight();
-        }
-      } else {
-        const auto& info = getLineAtVirtualY(_scrollY);
-        lineIndex = info._lineIndex;
-        lineTopY = -(_scrollY - info._lineTopY);
-
-        for(int ty = lineTopY, li = lineIndex; ty < scrollableHeight && li < _lines.size(); ++li) {
-          auto& line = _lines[li];
-          ty += line->lineHeight();
-          RenderLine(*line, 0, ty);
-        }
-      }
+  void TextArea::RenderLineTopDown(const VirtualYInfo& info) {
+    for(int ty = info._lineTopY, li = info._lineIndex; ty < (int)height() && li < _lines.size(); ++li) {
+      auto& line = _lines[li];
+      ty += line->lineHeight();
+      RenderLine(*line, 0, ty - 1);
     }
+  }
+
+  void TextArea::RenderLineBottomUp(const VirtualYInfo& info) {
+    for(int by = info._lineBaseY, li = info._lineIndex; by >= 0 && li >= 0; --li) {
+      auto& line = _lines[li];
+      RenderLine(*line, 0, by);
+      by -= line->lineHeight();
+    }
+  }
+
+  void TextArea::vscroll(int rows, int scrollableHeight) {
+    upan::mutex_guard g(_drawMutex);
+    updateCursor(false);
+    rows = -rows;
+    const bool scrollDown = rows > 0;
+    rows = abs(updateScrollY(rows));
+    if (rows > 0) {
+      if (rows < scrollableHeight) {
+        if (scrollDown) {
+          const int srcY = MAX_FONT_SIZE + rows;
+          const int destY = MAX_FONT_SIZE;
+          const int moveLength = scrollableHeight - rows;
+          memmove(_textBuffer.buffer() + destY * width(),
+                  _textBuffer.buffer() + srcY * width(),
+                  moveLength * width() * _textBuffer.bytesPerPixel());
+          RenderLineTopDown(getLineAtVirtualY(_scrollY, moveLength - 1));
+        } else {
+          const int srcY = MAX_FONT_SIZE;
+          const int destY = MAX_FONT_SIZE + rows;
+          const int moveLength = scrollableHeight - rows;
+          memmove(_textBuffer.buffer() + destY * width(),
+                  _textBuffer.buffer() + srcY * width(),
+                  moveLength * width() * _textBuffer.bytesPerPixel());
+          RenderLineBottomUp(getLineAtVirtualY(_scrollY, rows - 1));
+        }
+      } else {
+        RenderLineTopDown(getLineAtVirtualY(_scrollY, 0));
+      }
+      _cursorPos.set(_cursorPos.x(), _cursorPos.y() + (scrollDown ? -rows : rows));
+    }
+    updateCursor(true);
   }
 
   void TextArea::Line::insert(int pos, Character &ch) {
