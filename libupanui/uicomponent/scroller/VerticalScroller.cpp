@@ -23,7 +23,7 @@
 #include <VerticalScroller.h>
 #include <UIObjectFactory.h>
 #include <IconButton.h>
-#include <dtime.h>
+#include <GraphicsContext.h>
 
 namespace upanui {
   VerticalScroller::VerticalScroller(int x, int y,
@@ -150,6 +150,10 @@ namespace upanui {
           scrollRows = height() - totalRows;
         }
         child.vscroll(scrollRows, height());
+      });
+    } else {
+      _scrollableChild.ifPresent([this](UIObject &child) {
+        gc().setFocus(child);
       });
     }
   }
