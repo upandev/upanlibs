@@ -110,7 +110,7 @@ namespace upanui {
     if (newY != _scrollBar->y()) {
       if (newY < _scrollBarMinY) {
         newY = _scrollBarMinY;
-      } else if (int(newY + _scrollBar->height()) >= _scrollBarMaxY) {
+      } else if ((newY + _scrollBar->height()) >= _scrollBarMaxY) {
         newY = _scrollBarMaxY - _scrollBar->height();
       }
       _scrollBar->y(newY);

@@ -666,9 +666,19 @@ namespace upanui {
 
     const int newHeight = _scrollHeight + delta;
     _scrollHeight = newHeight < 0 ? 0 : newHeight;
+    bool adjustScrollY = false;
     if (_scrollHeight != oldScrollHeight) {
-      getVerticalScroller().ifPresent([&delta](VerticalScroller &verticalScroller) {
+      const int visibleScrollHeight = _scrollHeight - _scrollY;
+      if (visibleScrollHeight < height() && _scrollY != 0) {
+        const int rows = height() - visibleScrollHeight;
+        vscroll(rows, height());
+        adjustScrollY = true;
+      }
+      getVerticalScroller().ifPresent([this, delta, adjustScrollY](VerticalScroller &verticalScroller) {
         verticalScroller.caliberateScrollbar(delta >= 0);
+        if (adjustScrollY) {
+          verticalScroller.updateScrollPosition(_scrollY, true);
+        }
       });
     }
   }
