@@ -25,7 +25,7 @@
 #include <GCoreFunctions.h>
 
 namespace upanui {
-  RectangleCanvas::RectangleCanvas(const int x, const int y, const uint32_t width, const uint32_t height)
+  RectangleCanvas::RectangleCanvas(int x, int y, int32_t width, int32_t height)
   : Canvas(x, y, width, height), _layout(*this) {
   }
 

@@ -24,7 +24,7 @@
 #include "GCoreFunctions.h"
 
 namespace upanui {
-  UILeafElement::UILeafElement(const int x, const int y, const uint32_t width, const uint32_t height)
+  UILeafElement::UILeafElement(int x, int y, int width, int height)
     : UIElement(x, y, width, height) {
   }
 

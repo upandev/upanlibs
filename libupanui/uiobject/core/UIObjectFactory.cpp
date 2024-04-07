@@ -33,66 +33,66 @@
 #include <typeinfo.h>
 
 namespace upanui {
-  RectangleCanvas& UIObjectFactory::createRectangleCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
+  RectangleCanvas& UIObjectFactory::createRectangleCanvas(UIObject& parent, int x, int y, int width, int height) {
     auto& canvas = *new RectangleCanvas(x, y, width, height);
     parent.add(canvas);
     return canvas;
   }
 
-  RoundCanvas& UIObjectFactory::createRoundCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
+  RoundCanvas& UIObjectFactory::createRoundCanvas(UIObject& parent, int x, int y, int width, int height) {
     auto& canvas = *new RoundCanvas(x, y, width, height);
     parent.add(canvas);
     return canvas;
   }
 
   ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const Image& image, ImageComposeType composeType,
-                                                  const int x, const int y, const uint32_t width, const uint32_t height) {
+                                                  int x, int y, int width, int height) {
     auto& canvas = *new ImageCanvas(image, composeType, x, y, width, height);
     parent.add(canvas);
     return canvas;
   }
 
-  ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const Image& image, const int x, const int y, const uint32_t width, const uint32_t height) {
+  ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const Image& image, int x, int y, int width, int height) {
     return createImageCanvas(parent, image, ImageComposeType::FIT_IN, x, y, width, height);
   }
 
-  ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const Image& image, const int x, const int y) {
+  ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const Image& image, int x, int y) {
     return createImageCanvas(parent, image, ImageComposeType::FIT_IN, x, y, image.width(), image.height());
   }
 
   ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const ImageResource& imageResource, ImageComposeType composeType,
-                                                  const int x, const int y, const uint32_t width, const uint32_t height) {
+                                                  int x, int y, int width, int height) {
     auto& canvas = *new ImageCanvas(&imageResource.create(), composeType, x, y, width, height);
     parent.add(canvas);
     return canvas;
   }
 
   ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const ImageResource& imageResource,
-                                                  const int x, const int y, const uint32_t width, const uint32_t height) {
+                                                  int x, int y, int width, int height) {
     return createImageCanvas(parent, imageResource, ImageComposeType::FIT_IN, x, y, width, height);
   }
 
-  ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const ImageResource& imageResource, const int x, const int y) {
+  ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const ImageResource& imageResource, int x, int y) {
     Image& image = imageResource.create();
     auto& canvas = *new ImageCanvas(&image, ImageComposeType::FIT_IN, x, y, image.width(), image.height());
     parent.add(canvas);
     return canvas;
   }
 
-  Line& UIObjectFactory::createLine(UIObject& parent, const int x1, const int y1, const int x2, const int y2, const uint32_t thickness) {
+  Line& UIObjectFactory::createLine(UIObject& parent, int x1, int y1, int x2, int y2, int thickness) {
     auto& line = *new Line(x1, y1, x2, y2, thickness);
     parent.add(line);
     return line;
   }
 
-  Button& UIObjectFactory::createButton(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
+  Button& UIObjectFactory::createButton(UIObject& parent, int x, int y, int width, int height) {
     auto& button = *new Button(x, y, width, height);
     parent.add(button);
     return button;
   }
 
   IconButton& UIObjectFactory::createIconButton(UIObject& parent, const ImageResource& imageResource, ImageComposeType composeType,
-                                                const int x, const int y, const uint32_t width, const uint32_t height) {
+                                                int x, int y, int width, int height) {
     auto& button = *new IconButton(imageResource, composeType, x, y, width, height);
     parent.add(button);
     button.init();
@@ -100,12 +100,12 @@ namespace upanui {
   }
 
   IconButton& UIObjectFactory::createIconButton(UIObject& parent, const ImageResource& imageResource,
-                                                const int x, const int y, const uint32_t width, const uint32_t height) {
+                                                int x, int y, int width, int height) {
     return createIconButton(parent, imageResource, ImageComposeType::FIT_IN, x, y, width, height);
   }
 
-  Label& UIObjectFactory::createLabel(UIObject& parent, const int x, const int y,
-                                      const uint32_t width, const uint32_t height,
+  Label& UIObjectFactory::createLabel(UIObject& parent, int x, int y,
+                                      int width, int height,
                                       const upan::string& str, uint32_t fgColor,
                                       usfn::PreloadedFonts fontType,
                                       int fontFamily, int fontStyle, int fontSize) {
@@ -114,17 +114,17 @@ namespace upanui {
     return label;
   }
 
-  VerticalScroller& UIObjectFactory::createVerticalScroller(UIObject& parent, const int x, const int y,
-                                                            const uint32_t width, const uint32_t height,
-                                                            const uint32_t scrollBarWidth) {
+  VerticalScroller& UIObjectFactory::createVerticalScroller(UIObject& parent, int x, int y,
+                                                            int width, int height,
+                                                            int scrollBarWidth) {
     auto& scroller = *new VerticalScroller(x, y, width, height, scrollBarWidth);
     parent.add(scroller);
     scroller.init();
     return scroller;
   }
 
-  TextArea& UIObjectFactory::createTextArea(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height) {
-    uint32_t actualHeight = height;
+  TextArea& UIObjectFactory::createTextArea(UIObject& parent, int x, int y, int width, int height) {
+    int actualHeight = height;
     if (typeid(parent) == typeid(VerticalScroller)) {
       actualHeight = parent.height();
     }

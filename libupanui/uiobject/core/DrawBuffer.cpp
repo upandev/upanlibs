@@ -45,7 +45,7 @@ namespace upanui {
     _type = BufferType::Null;
   }
 
-  void DrawBuffer::initFrom(const DrawBuffer& parent, const int xOffset, const int yOffset, const uint32_t visualWidth, const uint32_t visualHeight) {
+  void DrawBuffer::initFrom(const DrawBuffer& parent, int xOffset, int yOffset, int visualWidth, int visualHeight) {
     clear();
     if (parent.isNull()) {
       return;
@@ -58,7 +58,7 @@ namespace upanui {
     _type = BufferType::Derived;
   }
 
-  void DrawBuffer::initFrom(uint32_t* buffer, const uint32_t width, const uint32_t height) {
+  void DrawBuffer::initFrom(uint32_t* buffer, int width, int height) {
     clear();
     _buffer = buffer;
     _width = _vWidth = width;
@@ -73,7 +73,7 @@ namespace upanui {
     }
   }
 
-  bool DrawBuffer::initLocal(const uint32_t width, const uint32_t height) {
+  bool DrawBuffer::initLocal(int width, int height) {
     const auto bufSize = width * height;
     if (_type == BufferType::Local && _width == width && _height == height) {
       return false;
@@ -107,7 +107,7 @@ namespace upanui {
     memcpy(buffer(), src, len);
   }
 
-  void DrawBuffer::copy(int sx, int sy, const uint32_t* src, uint32_t srcWidth, uint32_t copyWidth, uint32_t copyHeight, bool directSet) {
+  void DrawBuffer::copy(int sx, int sy, const uint32_t* src, int srcWidth, int copyWidth, int copyHeight, bool directSet) {
     GCoreFunctions::PixelCache pixelCache;
     const int ex = upan::min(_vWidth, sx + copyWidth);
     const int ey = upan::min(_vHeight, sy + copyHeight);
@@ -124,7 +124,7 @@ namespace upanui {
     }
   }
 
-  void DrawBuffer::copy(const uint32_t* src, uint32_t width, uint32_t height, bool directSet) {
+  void DrawBuffer::copy(const uint32_t* src, int width, int height, bool directSet) {
     copy(0, 0, src, width, width, height, directSet);
   }
 
@@ -138,7 +138,7 @@ namespace upanui {
     }
   }
 
-  void DrawBuffer::fill(int sx, int sy, uint32_t fillWidth, uint32_t fillHeight, uint32_t color) {
+  void DrawBuffer::fill(int sx, int sy, int fillWidth, int fillHeight, uint32_t color) {
     const int ex = upan::min(_vWidth, sx + fillWidth) - 1;
     const int ey = upan::min(_vHeight, sy + fillHeight) - 1;
     for(auto y = sy; y <= ey; ++y) {

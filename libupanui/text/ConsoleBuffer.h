@@ -31,18 +31,18 @@ namespace upanui {
 
   class ConsoleBuffer {
   private:
-    ConsoleBuffer(IConsole& console, byte* buffer, uint32_t rows, uint32_t columns, bool selfManagedBuffer);
+    ConsoleBuffer(IConsole& console, byte* buffer, int rows, int columns, bool selfManagedBuffer);
   public:
     static constexpr int START_CURSOR_POS = -1;
     static constexpr int NO_BYTES_PER_CHARACTER = 2;
 
-    ConsoleBuffer(IConsole& console, byte* buffer, uint32_t rows, uint32_t columns);
-    ConsoleBuffer(IConsole& console, unsigned rows, unsigned columns);
+    ConsoleBuffer(IConsole& console, byte* buffer, int rows, int columns);
+    ConsoleBuffer(IConsole& console, int rows, int columns);
     ~ConsoleBuffer();
 
-    unsigned getBufferSize() const { return _bufSize; }
-    unsigned maxRows() const { return _maxRows; }
-    unsigned maxColumns() const { return _maxColumns; }
+    int getBufferSize() const { return _bufSize; }
+    int maxRows() const { return _maxRows; }
+    int maxColumns() const { return _maxColumns; }
 
     int getCurPos() const { return _cursorPos; }
     void setCurPos(int curPos, bool updateCursorOnScreen);
@@ -57,7 +57,7 @@ namespace upanui {
     void refresh();
 
     void rawCharacter(byte ch, const CharStyle& attr, bool updateCursorOnScreen);
-    void rawCharacterArea(const MChar* src, uint32_t rows, uint32_t cols, int curPos);
+    void rawCharacterArea(const MChar* src, int rows, int cols, int curPos);
     void character(char ch, const CharStyle& attr);
 
   private:
@@ -75,9 +75,9 @@ namespace upanui {
     IConsole& _console;
     byte* _buffer;
     int _cursorPos;
-    const unsigned _bufSize;
-    const unsigned _maxRows;
-    const unsigned _maxColumns;
+    const int _bufSize;
+    const int _maxRows;
+    const int _maxColumns;
     const bool _selfManagedBuffer;
   };
 }

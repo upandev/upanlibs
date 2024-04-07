@@ -35,13 +35,13 @@ namespace upanui {
     uint32_t thickness() const { return _thickness; }
 
     void updateXY(const int x1, const int y1, const int x2, const int y2);
-    void updateThickness(const uint32_t thickness);
+    void updateThickness(int thickness);
 
     bool isRectangularShape() override { return false; }
 
   protected:
     virtual ~Line() {}
-    Line(const int x1, const int y1, const int x2, const int y2, const uint32_t thickness);
+    Line(int x1, int y1, int x2, int y2, int thickness);
     void doDraw() override;
 
   private:
@@ -56,7 +56,7 @@ namespace upanui {
 
     class Spec {
     public:
-      void calculate(const int x1, const int y1, const int x2, const int y2, const uint32_t thickness);
+      void calculate(const int x1, const int y1, const int x2, const int y2, int thickness);
 
       int sx() const { return _sx; }
       int sy() const { return _sy; }
@@ -87,7 +87,7 @@ namespace upanui {
     int _y1;
     int _x2;
     int _y2;
-    uint32_t _thickness;
+    int _thickness;
     Spec _spec;
     GCoreFunctions::PixelCache _pixelCache;
 

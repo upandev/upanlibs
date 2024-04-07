@@ -45,11 +45,11 @@ namespace upanui {
       _y = y;
     }
 
-    uint32_t width() const {
+    int width() const {
       return _image.width();
     }
 
-    uint32_t height() const {
+    int height() const {
       return _image.height();
     }
 
@@ -59,7 +59,7 @@ namespace upanui {
 
   private:
     Image _image;
-    __volatile__ int _x;
-    __volatile__ int _y;
+    int _x;
+    int _y;
   };
 }

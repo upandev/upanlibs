@@ -107,14 +107,14 @@ namespace upanui {
     }
 
     GCoreFunctions::PixelCache pixelCache;
-    for(auto y = 0u; y < parent().height(); ++y) {
+    for(auto y = 0; y < parent().height(); ++y) {
       auto yOffset = y * drawBuffer.width();
       if (y < parent().borderThickness() || (parent().height() - y) <= parent().borderThickness()) {
-        for(auto x = 0u; x < parent().width(); ++x) {
+        for(auto x = 0; x < parent().width(); ++x) {
           GCoreFunctions::setPixel(drawBuffer.at(x + yOffset), brColor, pixelCache, drawBuffer.isLocal());
         }
       } else {
-        for(auto x = 0u; x < parent().borderThickness(); ++x) {
+        for(auto x = 0; x < parent().borderThickness(); ++x) {
           GCoreFunctions::setPixel(drawBuffer.at(x + yOffset), brColor, pixelCache, drawBuffer.isLocal());
         }
         for(auto x = parent().borderThickness(); x < parent().width() - parent().borderThickness(); ++x) {

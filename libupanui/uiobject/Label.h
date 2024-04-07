@@ -44,8 +44,8 @@ namespace upanui {
 
   protected:
     virtual ~Label() {}
-    Label(const int x, const int y,
-          const uint32_t width, const uint32_t height,
+    Label(int x, int y,
+          int width, int height,
           const upan::string& str,
           uint32_t fgColor,
           usfn::PreloadedFonts fontType,

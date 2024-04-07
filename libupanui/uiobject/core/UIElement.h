@@ -28,7 +28,7 @@
 namespace upanui {
   class UIElement : public UIObjectImpl {
   protected:
-    UIElement(const int x, const int y, const uint32_t width, const uint32_t height);
+    UIElement(int x, int y, int32_t width, int32_t height);
     ~UIElement();
 
     int drawX() const override;

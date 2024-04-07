@@ -28,7 +28,7 @@
 namespace upanui {
   class UIRoot : public UIObjectImpl {
   private:
-    UIRoot(const int x, const int y, const uint32_t width, const uint32_t height);
+    UIRoot(int x, int y, int width, int height);
 
   protected:
     int drawX() const override;

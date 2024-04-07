@@ -24,7 +24,7 @@
 #include "GCoreFunctions.h"
 
 namespace upanui {
-  UIElement::UIElement(const int x, const int y, const uint32_t width, const uint32_t height)
+  UIElement::UIElement(int x, int y, int32_t width, int32_t height)
     : UIObjectImpl(x, y, width, height) {
   }
 

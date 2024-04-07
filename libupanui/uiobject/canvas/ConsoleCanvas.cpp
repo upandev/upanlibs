@@ -27,7 +27,7 @@
 #include <GraphicsContext.h>
 
 namespace upanui {
-  ConsoleCanvas::ConsoleCanvas(uint32_t maxRows, uint32_t maxColumns)
+  ConsoleCanvas::ConsoleCanvas(int maxRows, int maxColumns)
     : UIElement(0, 0, GraphicsContext::Instance().frame().frameBuffer().width(), GraphicsContext::Instance().frame().frameBuffer().height()),
       _cursorPos(0),
       _charStyle(CharStyle::WHITE_ON_BLACK()),
@@ -56,11 +56,11 @@ namespace upanui {
     _cursorBlinkThread.stop();
   }
 
-  uint32_t ConsoleCanvas::maxRows() const {
+  int ConsoleCanvas::maxRows() const {
     return _consoleBuffer.maxRows();
   }
 
-  uint32_t ConsoleCanvas::maxColumns() const {
+  int ConsoleCanvas::maxColumns() const {
     return _consoleBuffer.maxColumns();
   }
 
@@ -72,7 +72,7 @@ namespace upanui {
     _consoleBuffer.rawCharacter(ch, style, updateCursorOnScreen);
   }
 
-  void ConsoleCanvas::rawputa(const MChar* src, uint32_t rows, uint32_t columns, int curPos) {
+  void ConsoleCanvas::rawputa(const MChar* src, int rows, int columns, int curPos) {
     _consoleBuffer.rawCharacterArea(src, rows, columns, curPos);
   }
 
@@ -139,7 +139,7 @@ namespace upanui {
   }
 
   void ConsoleCanvas::putCursor(bool show) {
-    if ((uint32_t)_cursorPos >= _consoleBuffer.maxRows() * _consoleBuffer.maxColumns()) {
+    if (_cursorPos >= _consoleBuffer.maxRows() * _consoleBuffer.maxColumns()) {
       return;
     }
 

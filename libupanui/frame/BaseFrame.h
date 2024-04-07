@@ -32,7 +32,7 @@ namespace upanui {
     virtual ~BaseFrame() {}
 
     void copy(const void* src, int len);
-    void fillRect(int sx, int sy, uint32_t width, uint32_t height, uint32_t color);
+    void fillRect(int sx, int sy, int width, int height, uint32_t color);
 
     upanui::FrameBuffer& frameBuffer() {
       return _frameBuffer;
@@ -45,7 +45,7 @@ namespace upanui {
     virtual void touch() = 0;
 
   protected:
-    bool _updateViewport(int x, int y, uint32_t width, uint32_t height);
+    bool _updateViewport(int x, int y, int width, int height);
 
   private:
     upanui::FrameBuffer _frameBuffer;

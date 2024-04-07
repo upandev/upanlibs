@@ -214,7 +214,7 @@ namespace upanui {
     class iHeader {
     public:
       unsigned num_channels() const;
-      int calculate_scanline_width(uint32_t width, size_t& scanline_width) const;
+      int calculate_scanline_width(uint32_t swidth, size_t& scanline_width) const;
       int calculate_image_width(int fmt, size_t& len) const;
       int calculate_image_size(int fmt, size_t& len) const;
 

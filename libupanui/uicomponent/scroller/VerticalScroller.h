@@ -32,7 +32,7 @@ namespace upanui {
     void updateScrollPosition(int newY, bool directionUp);
 
   private:
-    VerticalScroller(const int x, const int y, const uint32_t width, const uint32_t height, const uint32_t scrollBarWidth);
+    VerticalScroller(int x, int y, int width, int height, int scrollBarWidth);
     virtual ~VerticalScroller();
 
     void init();
@@ -53,10 +53,10 @@ namespace upanui {
     friend class UIObjectFactory;
 
   private:
-    uint32_t _scrollBarWidth;
+    int _scrollBarWidth;
     int _scrollBarMinY;
     int _scrollBarMaxY;
-    uint32_t _scrollBarMaxHeight;
+    int _scrollBarMaxHeight;
     int _scrollMultiplier;
 
     ScrollerMouseHandler* _mouseHandler;

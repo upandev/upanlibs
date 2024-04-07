@@ -32,9 +32,9 @@ namespace upanui {
   class ImageCanvas : public RectangleCanvas {
   public:
     ImageCanvas(const Image& image, ImageComposeType composeType,
-                const int x, const int y, const uint32_t width, const uint32_t height);
+                int x, int y, int width, int height);
     ImageCanvas(Image* inImage, ImageComposeType composeType,
-                const int x, const int y, const uint32_t width, const uint32_t height);
+                int x, int y, int width, int height);
 
     void setImage(const Image& image);
 

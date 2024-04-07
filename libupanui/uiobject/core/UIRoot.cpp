@@ -25,7 +25,7 @@
 #include <GCoreFunctions.h>
 
 namespace upanui {
-  UIRoot::UIRoot(const int x, const int y, const uint32_t width, const uint32_t height)
+  UIRoot::UIRoot(int x, int y, int width, int height)
   : UIObjectImpl(x, y, width, height),
     _layout(*this) {
     gc().frame().updateViewport(x, y, width, height);

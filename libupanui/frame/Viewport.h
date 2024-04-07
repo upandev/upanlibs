@@ -27,7 +27,7 @@
 namespace upanui {
   class Viewport {
   public:
-    Viewport(int x, int y, uint32_t width, uint32_t height) : _x(x), _y(y), _width(width), _height(height) {}
+    Viewport(int x, int y, int width, int height) : _x(x), _y(y), _width(width), _height(height) {}
     Viewport(const ViewportInfo& viewportInfo) : _x(viewportInfo._x), _y(viewportInfo._y), _width(viewportInfo._width), _height(viewportInfo._height) {}
 
     int x1() const {
@@ -46,32 +46,32 @@ namespace upanui {
       return _y + _height;
     }
 
-    void x1(uint32_t val) {
+    void x1(int val) {
       _x = val;
     }
 
-    void y1(uint32_t val) {
+    void y1(int val) {
       _y = val;
     }
 
-    uint32_t width() const {
+    int width() const {
       return _width;
     }
-    void width(uint32_t width) {
+    void width(int width) {
       _width = width;
     }
 
-    uint32_t height() const {
+    int height() const {
       return _height;
     }
-    void height(uint32_t height) {
+    void height(int height) {
       _height = height;
     }
 
   private:
     int _x;
     int _y;
-    uint32_t _width;
-    uint32_t _height;
+    int _width;
+    int _height;
   };
 }

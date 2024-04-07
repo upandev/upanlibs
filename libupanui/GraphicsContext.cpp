@@ -61,7 +61,7 @@ namespace upanui {
     return initUIRoot(_frame->viewport().x1(), _frame->viewport().y1(), _frame->viewport().width(), _frame->viewport().height(), false);
   }
 
-  UIRoot& GraphicsContext::initUIRoot(const int x, const int y, const uint32_t width, const uint32_t height, const bool autoRefresh) {
+  UIRoot& GraphicsContext::initUIRoot(int x, int y, int width, int height, const bool autoRefresh) {
     if (_uiObjectManager.get() != nullptr) {
       throw upan::exception(XLOC, "UIRoot is already initialized!");
     }

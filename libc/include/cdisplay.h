@@ -38,18 +38,18 @@ typedef struct {
 } MChar;
 
 typedef struct {
-  uint32_t _pitch;
-  uint32_t _width;
-  uint32_t _height;
-  uint32_t _bpp;
+  int _pitch;
+  int _width;
+  int _height;
+  int _bpp;
   uint32_t* _frameBuffer;
 } FrameBufferInfo;
 
 typedef struct {
   int _x;
   int _y;
-  uint32_t _width;
-  uint32_t _height;
+  int _width;
+  int _height;
 } ViewportInfo;
 
 extern void	SysDisplay_MoveCursor(int n) ;

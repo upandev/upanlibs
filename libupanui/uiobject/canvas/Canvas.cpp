@@ -26,7 +26,7 @@
 #include <GCoreFunctions.h>
 
 namespace upanui {
-  Canvas::Canvas(const int x, const int y, const uint32_t width, const uint32_t height)
+  Canvas::Canvas(int x, int y, int32_t width, int32_t height)
     : UIElement(x, y, width, height) {
   }
 

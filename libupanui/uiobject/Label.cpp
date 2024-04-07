@@ -26,8 +26,8 @@
 #include <TextWriter.h>
 
 namespace upanui {
-  Label::Label(const int x, const int y,
-               const uint32_t width, const uint32_t height,
+  Label::Label(int x, int y,
+               int width, int height,
                const upan::string& str,
                uint32_t fgColor,
                usfn::PreloadedFonts fontType,

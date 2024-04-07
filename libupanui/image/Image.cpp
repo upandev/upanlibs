@@ -24,7 +24,7 @@
 #include <GCoreFunctions.h>
 
 namespace upanui {
-  Image::Image(const uint32_t width, const uint32_t height, uint32_t* imageData) : _width(width), _height(height), _imageData(imageData) {
+  Image::Image(int width, int height, uint32_t* imageData) : _width(width), _height(height), _imageData(imageData) {
     calculateHasAlpha();
   }
 
@@ -34,7 +34,7 @@ namespace upanui {
     memcpy(_imageData.get(), image.data(), size * sizeof(uint32_t));
   }
 
-  Image::Image(const Image& image, const uint32_t width, const uint32_t height) : _width(image.width()), _height(image.height()), _imageData(nullptr) {
+  Image::Image(const Image& image, int width, int height) : _width(image.width()), _height(image.height()), _imageData(nullptr) {
     auto size = _width * _height;
     _imageData.reset(new uint32_t[size]);
     memcpy(_imageData.get(), image.data(), size * sizeof(uint32_t));
@@ -42,7 +42,7 @@ namespace upanui {
     resize(width, height);
   }
 
-  void Image::resize(const uint32_t width, const uint32_t height) {
+  void Image::resize(int width, int height) {
     if (width == _width && height == _height) {
       return;
     }
@@ -60,15 +60,15 @@ namespace upanui {
 
     const double fa = 1.0 / (fx * fy);
 
-    for(uint32_t y = 0; y < destHeight; ++y) {
-      for(uint32_t x = 0; x < destWidth; ++x) {
+    for(int y = 0; y < destHeight; ++y) {
+      for(int x = 0; x < destWidth; ++x) {
         double dr = 0;
         double dg = 0;
         double db = 0;
         double da = 0;
 
         double scy = y * fy;
-        auto sy = (uint32_t)scy;
+        int sy = (int)scy;
 
         for(double sfy = fy; GCoreFunctions::dcompare(sfy, 0.0) != 0 && sy < srcHeight;) {
           auto dy = sy + 1 - scy;
@@ -92,7 +92,7 @@ namespace upanui {
           }
 
           double scx = x * fx;
-          auto sx = (uint32_t)scx;
+          int sx = (int)scx;
           for (double sfx = fx; GCoreFunctions::dcompare(sfx, 0.0) != 0 && sx < srcWidth;) {
             auto dx = sx + 1 - scx;
             const auto pxcmp = GCoreFunctions::dcompare(dx, sfx);
@@ -138,7 +138,7 @@ namespace upanui {
   void Image::calculateHasAlpha() {
     const auto size = _width * _height;
     auto data = _imageData.get();
-    uint32_t i;
+    int i;
     for(i = 0; i < size; ++i) {
       const uint32_t p = data[i];
       if ((p & GCoreFunctions::ALPHA_MASK) != GCoreFunctions::ALPHA_MASK) {

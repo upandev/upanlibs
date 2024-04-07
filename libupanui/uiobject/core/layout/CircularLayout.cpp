@@ -11,8 +11,8 @@ namespace upanui {
     const auto cx2 = cx1 + child.width() - 1;
     const auto cy2 = cy1 + child.height() - 1;
 
-    const auto outerRadius = (parent().width() / 2) - 1;
-    const auto innerRadius = outerRadius - parent().borderThickness();
+    const int outerRadius = (parent().width() / 2) - 1;
+    const int innerRadius = outerRadius - parent().borderThickness();
 
     const int cx = parent().width() / 2 - 1;
     const int cy = cx;
@@ -152,8 +152,8 @@ namespace upanui {
 
   void CircularLayout::fill() {
     //TODO: optimize by caching drawbuffer
-    const auto outerCircleRadius = (parent().width() / 2) - 1;
-    const auto innerCircleRadius = outerCircleRadius - parent().borderThickness();
+    const int outerCircleRadius = (parent().width() / 2) - 1;
+    const int innerCircleRadius = outerCircleRadius - parent().borderThickness();
     if (outerCircleRadius > innerCircleRadius) {
       fill(parent().borderColorAlpha(), parent().borderColor(), 0, outerCircleRadius);
     }

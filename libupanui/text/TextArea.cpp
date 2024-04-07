@@ -28,11 +28,11 @@
 #include <VerticalScroller.h>
 
 namespace upanui {
-  TextArea::TextArea(int x, int y, uint32_t width, uint32_t height) : RectangleCanvas(x, y, width, height),
-                                                                      _scrollHeight(0), _scrollY(0),
-                                                                      _currentFontSize(DEFAULT_FONT_SIZE), _currentFontType(usfn::PreloadedFonts::VGA16), _currentStyle(usfn::STYLE_REGULAR),
-                                                                      _currentFGColor(DEFAULT_FG_COLOR), _currentBGColor(DEFAULT_BG_COLOR),
-                                                                      _maxLineCharWidth(width - DEFAULT_SIDE_MARGIN * 2), _cursorBlinkThread(*this) {
+  TextArea::TextArea(int x, int y, int width, int height) : RectangleCanvas(x, y, width, height),
+    _scrollY(0), _scrollHeight(0),
+    _currentFontSize(DEFAULT_FONT_SIZE), _currentFontType(usfn::PreloadedFonts::VGA16), _currentStyle(usfn::STYLE_REGULAR),
+    _currentFGColor(DEFAULT_FG_COLOR), _currentBGColor(DEFAULT_BG_COLOR),
+    _maxLineCharWidth(width - DEFAULT_SIDE_MARGIN * 2), _cursorBlinkThread(*this) {
     if (width <= DEFAULT_SIDE_MARGIN * 2) {
       throw upan::exception(XLOC, "TextArea should have a min width > 8");
     }
@@ -84,13 +84,13 @@ namespace upanui {
       rows =  -(_cursorPos.y() - _lines[_characterPos.y()]->lineHeight() + 1);
       scrollUp = true;
     } else if (_cursorPos.y() >= height()) {
-      rows =  -(_cursorPos.y() - (int)height() + 1);
+      rows =  -(_cursorPos.y() - height() + 1);
       scrollUp = false;
     } else {
       return;
     }
 
-    vscroll(rows, (int)height());
+    vscroll(rows, height());
     getVerticalScroller().ifPresent([&](VerticalScroller &verticalScroller) {
       verticalScroller.updateScrollPosition(_scrollY, scrollUp);
     });
@@ -225,7 +225,7 @@ namespace upanui {
     auto ny = y + 1;
     if (ny < _lines.size()) {
       auto nextLine = _lines[ny];
-      int availWidth = (int)_maxLineCharWidth - line->width();
+      int availWidth = _maxLineCharWidth - line->width();
       bool deletedFromNextLine = false;
       while (nextLine->size() > 0) {
         auto ch = nextLine->characters(0);
@@ -486,11 +486,11 @@ namespace upanui {
     updateCursorPosition(charX, _characterPos.y(), cursorX, _cursorPos.y());
   }
 
-  void TextArea::clearArea(int x, int  y, uint32_t width, uint32_t height) {
+  void TextArea::clearArea(int x, int  y, int width, int height) {
     _textBuffer.fill(x, y + MAX_FONT_SIZE, width, height, backgroundColorWithAlpha());
   }
 
-  void TextArea::fillCharacterBG(int x, int  y, uint32_t height, const Character& ch) {
+  void TextArea::fillCharacterBG(int x, int  y, int height, const Character& ch) {
     _textBuffer.fill(x, y + MAX_FONT_SIZE, ch.getChWidth(), height, ch.getBgColor() | (backgroundColorAlpha() << 24));
   }
 
@@ -588,7 +588,7 @@ namespace upanui {
 
   void TextArea::renderLine(const Line& line, int charX, int baseDrawY) {
     int topY = baseDrawY - line.lineHeight() + 1;
-    if (topY >= (int)height()) {
+    if (topY >= height()) {
       return;
     }
 
@@ -692,7 +692,7 @@ namespace upanui {
   }
 
   void TextArea::renderLineTopDown(const VirtualYInfo& info) {
-    for(int ty = info._lineTopY, li = info._lineIndex; ty < (int)height() && li < _lines.size(); ++li) {
+    for(int ty = info._lineTopY, li = info._lineIndex; ty < height() && li < _lines.size(); ++li) {
       auto& line = _lines[li];
       ty += line->lineHeight();
       renderLine(*line, 0, ty - 1);

@@ -36,7 +36,7 @@ namespace upanui {
 
     parser->decode_image(out, out_size, PngParser::PNG_FMT_RGBA8, 0);
 
-    for(int i = 0; i < out_size; i += 4) {
+    for(auto i = 0; i < out_size; i += 4) {
       byte x = out[i + 2];
       out[i + 2] = out[i];
       out[i] = x;

@@ -27,20 +27,20 @@
 namespace upanui {
   class Image {
   public:
-    Image(const uint32_t width, const uint32_t height, uint32_t* imageData);
+    Image(int width, int height, uint32_t* imageData);
     Image(const Image&);
-    Image(const Image& image, const uint32_t width, const uint32_t height);
-    ~Image() {}
+    Image(const Image& image, int width, int height);
+    virtual ~Image() {}
 
     bool hasAlpha() const {
       return _hasAlpha;
     }
 
-    uint32_t width() const {
+    int width() const {
       return _width;
     }
 
-    uint32_t height() const {
+    int height() const {
       return _height;
     }
 
@@ -48,14 +48,14 @@ namespace upanui {
       return const_cast<Image*>(this)->_imageData.get();
     }
 
-    void resize(const uint32_t width, const uint32_t height);
+    void resize(int width, int height);
 
   private:
     void calculateHasAlpha();
 
     bool _hasAlpha;
-    uint32_t _width;
-    uint32_t _height;
+    int _width;
+    int _height;
     //assuming 4 bytes per pixel
     upan::uniq_ptr<uint32_t> _imageData;
   };

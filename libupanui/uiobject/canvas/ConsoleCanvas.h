@@ -36,14 +36,14 @@ namespace upanui {
     ~ConsoleCanvas();
 
   public:
-    ConsoleCanvas(uint32_t maxRows, uint32_t maxColumns);
+    ConsoleCanvas(int maxRows, int maxColumns);
     ConsoleCanvas();
 
-    uint32_t maxRows() const;
-    uint32_t maxColumns() const;
+    int maxRows() const;
+    int maxColumns() const;
 
     void rawputc(byte ch, const CharStyle& style, bool updateCursorOnScreen);
-    void rawputa(const MChar* src, uint32_t rows, uint32_t columns, int curPos);
+    void rawputa(const MChar* src, int rows, int columns, int curPos);
     void puts(const char* msg, const upanui::CharStyle& style);
     void puts(const char* msg);
     void putc(const char ch, const upanui::CharStyle& style);

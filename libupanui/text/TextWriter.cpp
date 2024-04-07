@@ -35,7 +35,7 @@ namespace upanui {
     _yCharScale = 16;
   }
 
-  void TextWriter::drawChar(upanui::UIObject& parent, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg) {
+  void TextWriter::drawChar(upanui::UIObject& parent, byte ch, int x, int y, unsigned fg, unsigned bg) {
     if (_usfnContext) {
       try {
         drawUSFNChar(parent, ch, x, y, fg, bg);
@@ -66,7 +66,7 @@ namespace upanui {
     parent.draw();
   }
 
-  void TextWriter::drawUSFNChar(upanui::UIObject& parent, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg) {
+  void TextWriter::drawUSFNChar(upanui::UIObject& parent, byte ch, int x, int y, unsigned fg, unsigned bg) {
     //for SSFN, y is the baseline, the characters are drawn above y and hence add yScale to y --> this is only for Render() which is used for GUI
     //we don't have to do it for a standard text console display using RenderCharacter()
     //++y;
@@ -97,9 +97,9 @@ namespace upanui {
   //TODO: initialize y and x scale as class members and base all calculations on y/x scale instead of assuming/hardcoding
   void TextWriter::scrollDown(upanui::UIObject& parent) {
     auto& drawBuffer = parent.drawBuffer();
-    const uint32_t maxSize = drawBuffer.width() * drawBuffer.height();
+    const int maxSize = drawBuffer.width() * drawBuffer.height();
     //1 line = 16 rows as we are scaling y axis by 16
-    const uint32_t oneLine = drawBuffer.width() * _yCharScale;
+    const int oneLine = drawBuffer.width() * _yCharScale;
 
     drawBuffer.copy((void*)((uintptr_t)drawBuffer.buffer() + oneLine * drawBuffer.bytesPerPixel()), (maxSize - oneLine) * drawBuffer.bytesPerPixel());
 
@@ -107,7 +107,7 @@ namespace upanui {
     parent.draw();
   }
 
-  void TextWriter::drawCursor(upanui::UIObject& parent, uint32_t x, uint32_t y, uint32_t color) {
+  void TextWriter::drawCursor(upanui::UIObject& parent, int x, int y, uint32_t color) {
     x *= _xCharScale;
     y *= _yCharScale;
     parent.drawBuffer().fill(x + 1, y + _yCharScale - 1, _xCharScale - 1, 1, color | GCoreFunctions::ALPHA_MASK);

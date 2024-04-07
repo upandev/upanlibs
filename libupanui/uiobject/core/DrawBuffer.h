@@ -32,15 +32,15 @@ namespace upanui {
     ~DrawBuffer();
 
     void clear();
-    void initFrom(const DrawBuffer& parent, const int xOffset, const int yOffset, const uint32_t visualWidth, const uint32_t visualHeight);
-    void initFrom(uint32_t* buffer, const uint32_t width, const uint32_t height);
-    bool initLocal(const uint32_t width, const uint32_t height);
+    void initFrom(const DrawBuffer& parent, int xOffset, int yOffset, int visualWidth, int visualHeight);
+    void initFrom(uint32_t* buffer, int width, int height);
+    bool initLocal(int width, int height);
     void initLocal(const FrameBuffer& frameBuffer);
 
-    uint32_t width() const { return _width; }
-    uint32_t height() const { return _height; }
-    uint32_t bytesPerPixel() const { return sizeof(uint32_t); }
-    uint32_t pitch() const { return width() * bytesPerPixel(); }
+    int width() const { return _width; }
+    int height() const { return _height; }
+    int bytesPerPixel() const { return sizeof(uint32_t); }
+    int pitch() const { return width() * bytesPerPixel(); }
     bool isLocal() const { return _type == BufferType::Local || _type == BufferType::ForceLocal; }
     bool isNull() const { return _type == BufferType::Null; }
     uint32_t* buffer() const { return _buffer; }
@@ -49,19 +49,19 @@ namespace upanui {
     void cleanBuffer();
 
     void copy(const void* src, int len);
-    void copy(int sx, int sy, const uint32_t* src, uint32_t srcWidth, uint32_t copyWidth, uint32_t copyHeight, bool directSet);
-    void copy(const uint32_t* src, uint32_t width, uint32_t height, bool directSet);
+    void copy(int sx, int sy, const uint32_t* src, int srcWidth, int copyWidth, int copyHeight, bool directSet);
+    void copy(const uint32_t* src, int width, int height, bool directSet);
     void copy(DrawBuffer& src);
-    void fill(int sx, int sy, uint32_t fillWidth, uint32_t fillHeight, uint32_t color);
+    void fill(int sx, int sy, int fillWidth, int fillHeight, uint32_t color);
     void fill(uint32_t color);
 
   private:
     enum BufferType { Null, Local, ForceLocal, Derived };
     BufferType _type;
     uint32_t* _buffer;
-    uint32_t _width;
-    uint32_t _height;
-    uint32_t _vWidth;
-    uint32_t _vHeight;
+    int _width;
+    int _height;
+    int _vWidth;
+    int _vHeight;
   };
 }

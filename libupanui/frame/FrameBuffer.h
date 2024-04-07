@@ -33,7 +33,7 @@ namespace upanui {
     FrameBuffer(const FrameBuffer& frameBuffer) : _frameBufferInfo(frameBuffer._frameBufferInfo) {
     }
 
-    FrameBuffer(uint32_t* buffer, uint32_t width, uint32_t height) {
+    FrameBuffer(uint32_t* buffer, int width, int height) {
       _frameBufferInfo._width = width;
       _frameBufferInfo._height = height;
       _frameBufferInfo._frameBuffer = buffer;
@@ -41,23 +41,23 @@ namespace upanui {
       _frameBufferInfo._pitch = width * 4;
     }
 
-    uint32_t width() const {
+    int width() const {
       return _frameBufferInfo._width;
     }
 
-    uint32_t height() const {
+    int height() const {
       return _frameBufferInfo._height;
     }
 
-    uint32_t pitch() const {
+    int pitch() const {
       return _frameBufferInfo._pitch;
     }
 
-    uint32_t bpp() const {
+    int bpp() const {
       return _frameBufferInfo._bpp;
     }
 
-    uint32_t bytesPerPixel() const {
+    int bytesPerPixel() const {
       return _frameBufferInfo._bpp / 8;
     }
 

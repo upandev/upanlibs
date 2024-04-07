@@ -32,11 +32,11 @@
 namespace upanui {
   class TerminalConsole : public UIElement, public IConsole {
   private:
-    TerminalConsole(uint32_t maxRows, uint32_t maxColumns);
+    TerminalConsole(int maxRows, int maxColumns);
     static TerminalConsole* _instance;
 
   public:
-    static TerminalConsole& Create(uint32_t maxRows, uint32_t maxColumns);
+    static TerminalConsole& Create(int maxRows, int maxColumns);
     static TerminalConsole& Create();
     static TerminalConsole& Instance();
 

@@ -34,15 +34,15 @@ namespace upanui {
     void setFontContext(usfn::Context* c) {
       _usfnContext = c;
     }
-    void drawChar(upanui::UIObject& parent, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg);
+    void drawChar(upanui::UIObject& parent, byte ch, int x, int y, unsigned fg, unsigned bg);
     void scrollDown(upanui::UIObject& parent);
-    void drawCursor(upanui::UIObject& parent, uint32_t x, uint32_t y, uint32_t color);
+    void drawCursor(upanui::UIObject& parent, int x, int y, uint32_t color);
 
   private:
-    void drawUSFNChar(upanui::UIObject& parent, byte ch, unsigned x, unsigned y, unsigned fg, unsigned bg);
+    void drawUSFNChar(upanui::UIObject& parent, byte ch, int x, int y, unsigned fg, unsigned bg);
 
     usfn::Context* _usfnContext;
-    uint32_t _xCharScale;
-    uint32_t _yCharScale;
+    int _xCharScale;
+    int _yCharScale;
   };
 }

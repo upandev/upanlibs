@@ -24,11 +24,11 @@
 #include <GraphicsContext.h>
 
 namespace upanui {
-  uint32_t UIProxyParent::width() const {
+  int UIProxyParent::width() const {
     return GraphicsContext::Instance().frame().frameBuffer().width();
   }
 
-  uint32_t UIProxyParent::height() const {
+  int32_t UIProxyParent::height() const {
     return GraphicsContext::Instance().frame().frameBuffer().height();
   }
 }

@@ -89,7 +89,7 @@ namespace upanui {
     static constexpr uint32_t DEFAULT_BG_COLOR = 0xFFFFFF;
     static constexpr uint32_t DEFAULT_FG_COLOR = 0;
 
-    TextArea(int x, int y, uint32_t width, uint32_t height);
+    TextArea(int x, int y, int width, int32_t height);
     ~TextArea();
 
     void doDraw() override;
@@ -97,14 +97,14 @@ namespace upanui {
     int scrollY() const override { return _scrollY; }
     int updateScrollY(int sy);
 
-    uint32_t scrollHeight() const override { return _scrollHeight; }
+    int scrollHeight() const override { return _scrollHeight; }
     void changeScrollHeight(int delta);
 
     void vscroll(int rows, int scrollableHeight) override;
 
     void onKeyboardEvent(const KeyboardEvent& event) override;
 
-    void clearArea(int x, int  y, uint32_t width, uint32_t height);
+    void clearArea(int x, int  y, int32_t width, int32_t height);
 
   private:
     class Character {
@@ -202,20 +202,20 @@ namespace upanui {
       void insert(int pos, Character& ch);
       void remove(int from, int last);
 
-      uint32_t width() const { return _width; }
+      int width() const { return _width; }
       uint8_t lineHeight() const { return _maxChHeight + DEFAULT_LINE_SPACE; }
       bool wrapped() const { return _wrapped; }
       void wrapped(bool wrapped) {
         _wrapped = wrapped;
       }
-      uint32_t size() const { return _characters.size(); }
+      int size() const { return _characters.size(); }
       const upan::vector<Character*>& characters() const { return _characters; }
       Character* characters(int i) const { return _characters[i]; }
     private:
       const int MIN_CURSOR_WIDTH_BUFFER = 8;
       const int DEFAULT_LINE_SPACE = 4;
       Characters _characters;
-      uint32_t _width;
+      int _width;
       uint8_t _maxChHeight;
       bool _wrapped;
     };
@@ -263,7 +263,7 @@ namespace upanui {
     void validateCursorPos() const;
     void updateCursorPosition(int charPosX, int charPosY, int cursorPosX, int cursorPosY);
     void updateCursor(bool showCursor);
-    void fillCharacterBG(int x, int  y, uint32_t height, const Character& ch);
+    void fillCharacterBG(int x, int  y, int32_t height, const Character& ch);
 
     void insert(TextArea::Line& line, int lineX, int lineY, const TextArea::Characters& characters);
     void wrapremovech(int x, int y, int& deletedLine);
@@ -277,20 +277,19 @@ namespace upanui {
   private:
     static const uint8_t MAX_FONT_SIZE = 128;
 
-    int _scrollY;
-    int _scrollHeight;
-
     upan::vector<Line*> _lines;
 
     typedef upan::map<uint64_t, usfn::Context*> FontContextMap;
     FontContextMap _fontContexts;
 
+    int _scrollY;
+    int _scrollHeight;
     uint8_t _currentFontSize;
     uint8_t _currentFontType;
     uint16_t _currentStyle;
     uint32_t _currentFGColor;
     uint32_t _currentBGColor;
-    uint32_t _maxLineCharWidth;
+    int _maxLineCharWidth;
     Position _characterPos;
     Position _cursorPos;
     DrawBuffer _textBuffer;

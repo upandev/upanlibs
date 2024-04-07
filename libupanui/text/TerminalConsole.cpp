@@ -31,7 +31,7 @@
 namespace upanui {
   TerminalConsole* TerminalConsole::_instance = nullptr;
 
-  TerminalConsole::TerminalConsole(uint32_t maxRows, uint32_t maxColumns)
+  TerminalConsole::TerminalConsole(int maxRows, int maxColumns)
     : UIElement(0, 0, GraphicsContext::Instance().frame().frameBuffer().width(), GraphicsContext::Instance().frame().frameBuffer().height()),
       _cursorPos(0),
       _charStyle(CharStyle::WHITE_ON_BLACK()),
@@ -54,7 +54,7 @@ namespace upanui {
     _readerThread.start();
   }
 
-  TerminalConsole& TerminalConsole::Create(uint32_t maxRows, uint32_t maxColumns) {
+  TerminalConsole& TerminalConsole::Create(int maxRows, int maxColumns) {
     if (_instance != nullptr) {
       throw upan::exception(XLOC, "TerminalConsole is already created!");
     }
@@ -143,7 +143,7 @@ namespace upanui {
   }
 
   void TerminalConsole::putCursor(bool show) {
-    if ((uint32_t)_cursorPos >= _consoleBuffer.maxRows() * _consoleBuffer.maxColumns()) {
+    if (_cursorPos >= _consoleBuffer.maxRows() * _consoleBuffer.maxColumns()) {
       return;
     }
 

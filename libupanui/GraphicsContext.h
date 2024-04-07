@@ -48,7 +48,7 @@ namespace upanui {
 
     UIRoot& initUIRoot();
     UIRoot& initUIRootWithoutAutoRefresh();
-    UIRoot& initUIRoot(const int x, const int y, const uint32_t width, const uint32_t height, const bool autoRefresh);
+    UIRoot& initUIRoot(int x, int y, int width, int height, const bool autoRefresh);
 
     EventManager& initEventManager();
     EventManager& eventManager();

@@ -29,7 +29,7 @@ namespace upanui {
   : _frameBuffer(frameBuffer), _viewport(viewport) {
   }
 
-  void BaseFrame::fillRect(int sx, int sy, uint32_t width, uint32_t height, uint32_t color) {
+  void BaseFrame::fillRect(int sx, int sy, int width, int height, uint32_t color) {
     const int ex = upan::min(_viewport.width(), sx + width) - 1;
     const int ey = upan::min(_viewport.height(), sy + height) - 1;
     auto buffer = _frameBuffer.buffer();
@@ -41,7 +41,7 @@ namespace upanui {
     }
   }
 
-  bool BaseFrame::_updateViewport(int x, int y, uint32_t width, uint32_t height) {
+  bool BaseFrame::_updateViewport(int x, int y, int width, int height) {
     if (_viewport.x1() != x || _viewport.y1() != y || _viewport.width() != width || _viewport.height() != height) {
       _viewport.x1(x);
       _viewport.y1(y);

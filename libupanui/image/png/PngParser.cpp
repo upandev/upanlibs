@@ -307,14 +307,14 @@ namespace upanui {
     return 0;
   }
 
-  /* Calculate scanline width in bits, round up to the nearest byte */
-  int PngParser::iHeader::calculate_scanline_width(uint32_t width, size_t& scanline_width) const {
-    if (!width) return PngParser::PNG_EINTERNAL;
+  /* Calculate scanline swidth in bits, round up to the nearest byte */
+  int PngParser::iHeader::calculate_scanline_width(uint32_t swidth, size_t& scanline_width) const {
+    if (!swidth) return PngParser::PNG_EINTERNAL;
 
     size_t res = num_channels() * bit_depth;
 
-    if (res > SIZE_MAX / width) return PNG_EOVERFLOW;
-    res = res * width;
+    if (res > SIZE_MAX / swidth) return PNG_EOVERFLOW;
+    res = res * swidth;
 
     res += 15; /* Filter byte + 7 for rounding */
 

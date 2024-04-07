@@ -26,7 +26,7 @@
 #include <utility.h>
 
 namespace upanui {
-  Line::Line(const int x1, const int y1, const int x2, const int y2, const uint32_t thickness)
+  Line::Line(int x1, int y1, int x2, int y2, int thickness)
       : UILeafElement(upan::min(x1, x2), upan::min(y1, y2), abs(x2 - x1), abs(y2 - y1)),
         _x1(x1), _y1(y1), _x2(x2), _y2(y2), _thickness(thickness) {
     updateLayoutArea();
@@ -223,7 +223,7 @@ namespace upanui {
     notifyChange(ChangeState::Size);
   }
 
-  void Line::updateThickness(const uint32_t thickness) {
+  void Line::updateThickness(int thickness) {
     _thickness = thickness;
     updateLayoutArea();
     notifyChange(ChangeState::Content);
@@ -244,7 +244,7 @@ namespace upanui {
     height(maxY - minY + 1);
   }
 
-  void Line::Spec::calculate(const int x1, const int y1, const int x2, const int y2, const uint32_t thickness) {
+  void Line::Spec::calculate(const int x1, const int y1, const int x2, const int y2, int thickness) {
     const int ady = abs(y2 - y1);
     const int adx = abs(x2 - x1);
 

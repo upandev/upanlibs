@@ -39,30 +39,30 @@ namespace upanui {
 
   class UIObjectImpl : public UIObject {
   protected:
-    UIObjectImpl(const int x, const int y, const uint32_t width, const uint32_t height);
+    UIObjectImpl(int32_t x, int32_t y, int32_t width, int32_t height);
 
   public:
     int x() const override { return _x; }
     int y() const override { return _y; }
-    uint32_t width() const override { return _width; }
-    uint32_t height() const override { return _height; }
+    int width() const override { return _width; }
+    int height() const override { return _height; }
     uint32_t backgroundColor() const override { return _bgColor; }
     uint32_t backgroundColorForDraw() const override { return _bgColor; }
     uint8_t  backgroundColorAlpha() const override { return _bgAlpha; }
     uint32_t borderColor() const override { return _brColor; }
     uint8_t  borderColorAlpha() const { return _brAlpha; }
-    uint32_t borderThickness() const override { return _borderThickness; }
+    int borderThickness() const override { return _borderThickness; }
 
-    void x(const int) override;
-    void y(const int) override;
-    void xy(const int x, const int y) override;
-    void width(const uint32_t) override;
-    void height(const uint32_t) override;
+    void x(int) override;
+    void y(int) override;
+    void xy(int x, int y) override;
+    void width(int) override;
+    void height(int) override;
     void backgroundColor(const uint32_t color) override;
     void backgroundColorAlpha(const uint8_t) override;
     void borderColor(const uint32_t) override;
     void borderColorAlpha(const uint8_t) override;
-    void borderThickness(const uint32_t) override;
+    void borderThickness(int thickness) override;
 
     UIObject& parent() const override;
     const upan::list<UIObject*>& children() override;
@@ -93,7 +93,7 @@ namespace upanui {
     }
 
     int scrollY() const override { return -y(); }
-    uint32_t scrollHeight() const override { return height(); }
+    int scrollHeight() const override { return height(); }
     void vscroll(int rows, int scrollableHeight) override;
     void hscroll(int columns) override;
     void registerVerticalScroller(VerticalScroller& verticalScroller) override;
@@ -142,13 +142,13 @@ namespace upanui {
   private:
     int _x;
     int _y;
-    uint32_t _width;
-    uint32_t _height;
+    int _width;
+    int _height;
     uint32_t _bgColor;
     uint8_t _bgAlpha;
     uint32_t _brColor;
     uint8_t _brAlpha;
-    uint32_t _borderThickness;
+    int _borderThickness;
     bool _lockChangeNotification;
     upan::option<MouseEventHandler&> _mouseEventHandler;
     bool _captureMouseEvents;

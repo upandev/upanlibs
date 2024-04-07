@@ -43,38 +43,37 @@ namespace upanui {
 
   class UIObjectFactory {
   public:
-    static RectangleCanvas& createRectangleCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height);
-    static RoundCanvas& createRoundCanvas(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height);
+    static RectangleCanvas& createRectangleCanvas(UIObject& parent, int x, int y, int width, int height);
+    static RoundCanvas& createRoundCanvas(UIObject& parent, int x, int y, int width, int height);
 
     static ImageCanvas& createImageCanvas(UIObject& parent, const Image& image, ImageComposeType composeType,
-                                          const int x, const int y, const uint32_t width, const uint32_t height);
+                                          int x, int y, int width, int height);
     static ImageCanvas& createImageCanvas(UIObject& parent, const Image& image,
-                                          const int x, const int y, const uint32_t width, const uint32_t height);
-    ImageCanvas& createImageCanvas(UIObject& parent, const Image& image, const int x, const int y);
+                                          int x, int y, int width, int height);
+    ImageCanvas& createImageCanvas(UIObject& parent, const Image& image, int x, int y);
     static ImageCanvas& createImageCanvas(UIObject& parent, const ImageResource& imageResource, ImageComposeType composeType,
-                                          const int x, const int y, const uint32_t width, const uint32_t height);
+                                          int x, int y, int width, int height);
     static ImageCanvas& createImageCanvas(UIObject& parent, const ImageResource& imageResource,
-                                          const int x, const int y, const uint32_t width, const uint32_t height);
-    static ImageCanvas& createImageCanvas(UIObject& parent, const ImageResource& imageResource, const int x, const int y);
+                                          int x, int y, int width, int height);
+    static ImageCanvas& createImageCanvas(UIObject& parent, const ImageResource& imageResource, int x, int y);
 
-    static Line& createLine(UIObject& parent, const int x1, const int y1, const int x2, const int y2, const uint32_t thickness);
+    static Line& createLine(UIObject& parent, int x1, int y1, int x2, int y2, int thickness);
 
-    static Button& createButton(UIObject& parent, const int x, const int y, const uint32_t width, const uint32_t height);
+    static Button& createButton(UIObject& parent, int x, int y, int width, int height);
     static IconButton& createIconButton(UIObject& parent, const ImageResource& imageResource, ImageComposeType composeType,
-                                        const int x, const int y, const uint32_t width, const uint32_t height);
+                                        int x, int y, int width, int height);
     static IconButton& createIconButton(UIObject& parent, const ImageResource& imageResource,
-                                        const int x, const int y, const uint32_t width, const uint32_t height);
+                                        int x, int y, int width, int height);
 
-    static Label& createLabel(UIObject& parent, const int x, const int y,
-                              const uint32_t width, const uint32_t height,
+    static Label& createLabel(UIObject& parent, int x, int y,
+                              int width, int height,
                               const upan::string& str, uint32_t fgColor,
                               usfn::PreloadedFonts fontType,
                               int fontFamily, int fontStyle, int fontSize);
 
-    static VerticalScroller& createVerticalScroller(UIObject& parent, const int x, const int y,
-                                                    const uint32_t width, const uint32_t height,
-                                                    const uint32_t scrollBarWidth);
-    static TextArea& createTextArea(UIObject& parent, const int x, const int y,
-                                    const uint32_t width, const uint32_t height);
+    static VerticalScroller& createVerticalScroller(UIObject& parent, int x, int y,
+                                                    int width, int height,
+                                                    int scrollBarWidth);
+    static TextArea& createTextArea(UIObject& parent, int x, int y, int width, int height);
   };
 }

@@ -53,25 +53,25 @@ namespace upanui {
 
     virtual int x() const = 0;
     virtual int y() const = 0;
-    virtual uint32_t width() const = 0;
-    virtual uint32_t height() const = 0;
+    virtual int width() const = 0;
+    virtual int height() const = 0;
     virtual uint32_t backgroundColor() const = 0;
     virtual uint32_t backgroundColorForDraw() const = 0;
     virtual uint8_t  backgroundColorAlpha() const = 0;
     virtual uint32_t borderColor() const = 0;
     virtual uint8_t borderColorAlpha() const = 0;
-    virtual uint32_t borderThickness() const = 0;
+    virtual int borderThickness() const = 0;
 
-    virtual void x(const int) = 0;
-    virtual void y(const int) = 0;
+    virtual void x(int) = 0;
+    virtual void y(int) = 0;
     virtual void xy(int, int) = 0;
-    virtual void width(const uint32_t) = 0;
-    virtual void height(const uint32_t) = 0;
+    virtual void width(int) = 0;
+    virtual void height(int) = 0;
     virtual void backgroundColor(const uint32_t color) = 0;
     virtual void backgroundColorAlpha(const uint8_t) = 0;
     virtual void borderColor(const uint32_t) = 0;
     virtual void borderColorAlpha(const uint8_t) = 0;
-    virtual void borderThickness(const uint32_t) = 0;
+    virtual void borderThickness(int) = 0;
 
     virtual int drawX() const = 0;
     virtual int drawY() const = 0;
@@ -101,7 +101,7 @@ namespace upanui {
     virtual void registerMouseEventHandler(MouseEventHandler& handler) = 0;
 
     virtual int scrollY() const = 0;
-    virtual uint32_t scrollHeight() const = 0;
+    virtual int scrollHeight() const = 0;
     virtual void vscroll(int rows, int scrollableHeight) = 0;
     virtual void hscroll(int columns) = 0;
     virtual void registerVerticalScroller(VerticalScroller& verticalScroller) = 0;

@@ -93,7 +93,7 @@ namespace upanui {
     upan::mutex _uiObjectTreeMutex;
     upan::mutex _uiObjectQueueMutex;
 
-    const int MAX_OBJECTS_UPDATE_QUEUE = 20;
+    const size_t MAX_OBJECTS_UPDATE_QUEUE = 20;
     upan::list<UIObject*> _modifiedUIObjects;
     AutoRefreshHandler _autoRefreshHandler;
     upan::uniq_ptr<UIProxyParent> _proxyParent;

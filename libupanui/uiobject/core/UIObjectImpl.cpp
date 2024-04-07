@@ -27,7 +27,7 @@
 #include <VerticalScroller.h>
 
 namespace upanui {
-  UIObjectImpl::UIObjectImpl(const int x, const int y, const uint32_t width, const uint32_t height)
+  UIObjectImpl::UIObjectImpl(int x, int y, int32_t width, int32_t height)
     : _x(x), _y(y), _width(width), _height(height),
       _bgColor(0), _bgAlpha(GCoreFunctions::MAX_ALPHA), _brColor(0xFFFFFF),
       _brAlpha(GCoreFunctions::MAX_ALPHA), _borderThickness(0), _lockChangeNotification(false),
@@ -61,7 +61,7 @@ namespace upanui {
     }
   }
 
-  void UIObjectImpl::width(const uint32_t width) {
+  void UIObjectImpl::width(int32_t width) {
     if (_width != width) {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _width = width;
@@ -69,7 +69,7 @@ namespace upanui {
     }
   }
 
-  void UIObjectImpl::height(const uint32_t height) {
+  void UIObjectImpl::height(int32_t height) {
     if (_height != height) {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _height = height;
@@ -122,7 +122,7 @@ namespace upanui {
     }
   }
 
-  void UIObjectImpl::borderThickness(const uint32_t thickness) {
+  void UIObjectImpl::borderThickness(int thickness) {
     if (_borderThickness != thickness) {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _borderThickness = thickness;
@@ -185,7 +185,7 @@ namespace upanui {
   bool UIObjectImpl::inside(const int x, const int y) const {
     const int objX = drawX();
     const int objY = drawY();
-    return x >= objX && x < (int)(objX + _width) && y >= objY && y <= (int)(objY + _height);
+    return x >= objX && x < (objX + _width) && y >= objY && y <= (objY + _height);
   }
 
   upan::option<UIObject&> UIObjectImpl::uiObjectUnderCursor(const int x, const int y) {
@@ -215,9 +215,9 @@ namespace upanui {
     if (newY > 0) {
       newY = 0;
     } else {
-      int h = (int)scrollHeight() + newY;
+      int h = scrollHeight() + newY;
       if (h < scrollableHeight) {
-        newY = scrollableHeight - (int)scrollHeight();
+        newY = scrollableHeight - scrollHeight();
       }
     }
     y(newY);

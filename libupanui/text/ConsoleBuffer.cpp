@@ -29,20 +29,20 @@
 namespace upanui {
 
 //delegating constructor
-ConsoleBuffer::ConsoleBuffer(IConsole& console, byte* buffer, unsigned rows, unsigned columns, bool selfManagedBuffer) :
+ConsoleBuffer::ConsoleBuffer(IConsole& console, byte* buffer, int rows, int columns, bool selfManagedBuffer) :
   _console(console), _buffer(buffer), _cursorPos(0), _bufSize(rows * columns * ConsoleBuffer::NO_BYTES_PER_CHARACTER),
   _maxRows(rows), _maxColumns(columns), _selfManagedBuffer(selfManagedBuffer) {
-  for(uint32_t i = 0; i < _bufSize; i += NO_BYTES_PER_CHARACTER) {
+  for(int i = 0; i < _bufSize; i += NO_BYTES_PER_CHARACTER) {
     _buffer[i] = ' ';
     _buffer[i + 1] = CharStyle::WHITE_ON_BLACK();
   }
 }
 
-ConsoleBuffer::ConsoleBuffer(IConsole& console, byte* buffer, unsigned rows, unsigned columns) :
+ConsoleBuffer::ConsoleBuffer(IConsole& console, byte* buffer, int rows, int columns) :
   ConsoleBuffer(console, buffer, rows, columns, false) {
 }
 
-ConsoleBuffer::ConsoleBuffer(IConsole& console, unsigned rows, unsigned columns) :
+ConsoleBuffer::ConsoleBuffer(IConsole& console, int rows, int columns) :
     ConsoleBuffer(console, new byte[rows * columns * ConsoleBuffer::NO_BYTES_PER_CHARACTER], rows, columns, true) {
 }
 
@@ -53,7 +53,7 @@ ConsoleBuffer::~ConsoleBuffer() {
 }
 
 void ConsoleBuffer::clear() {
-  for(uint32_t i = 0; i < _bufSize; i += NO_BYTES_PER_CHARACTER) {
+  for(auto i = 0; i < _bufSize; i += NO_BYTES_PER_CHARACTER) {
     putChar(i, ' ', CharStyle::WHITE_ON_BLACK());
   }
   setCurPos(0, true);
@@ -67,7 +67,7 @@ void ConsoleBuffer::_setCurPos(int curPos, bool updateCursorOnScreen) {
 }
 
 void ConsoleBuffer::setCurPos(int curPos, bool updateCursorOnScreen) {
-  if(curPos >= 0 && curPos < (int)(_maxRows * _maxColumns)) {
+  if(curPos >= 0 && curPos < (_maxRows * _maxColumns)) {
     _setCurPos(curPos, updateCursorOnScreen);
   }
 }
@@ -85,7 +85,7 @@ void ConsoleBuffer::nextLine() {
 void ConsoleBuffer::clearLine(int iStartPos) {
   if(iStartPos == START_CURSOR_POS)
     iStartPos = getCurPos();
-  else if(!(iStartPos >= 0 && iStartPos < (int)_maxColumns))
+  else if(!(iStartPos >= 0 && iStartPos < _maxColumns))
     iStartPos = getCurPos();
 
   for(int i = iStartPos * 2; (i % (_maxColumns * 2)) != 0; i += 2)
@@ -93,11 +93,11 @@ void ConsoleBuffer::clearLine(int iStartPos) {
   setCurPos(iStartPos, true);
 }
 
-void ConsoleBuffer::rawCharacterArea(const MChar* src, uint32_t rows, uint32_t cols, int curPos) {
+void ConsoleBuffer::rawCharacterArea(const MChar* src, int rows, int cols, int curPos) {
   setCurPos(curPos, false);
   int i = 0;
-  for(auto r = 0u; r < rows; ++r) {
-    for(auto c = 0u; c < cols; ++c) {
+  for(auto r = 0; r < rows; ++r) {
+    for(auto c = 0; c < cols; ++c) {
       rawCharacter(src[i]._ch, src[i]._attr, false);
       ++i;
     }
@@ -155,7 +155,7 @@ void ConsoleBuffer::putChar(int iPos, byte ch, byte attr) {
 }
 
 void ConsoleBuffer::scrollDown() {
-  if(getCurPos() < (int) (_maxRows * _maxColumns))
+  if(getCurPos() < (_maxRows * _maxColumns))
     return;
 
   const unsigned NO_OF_DISPLAY_BYTES = (_maxRows - 1) * _maxColumns * NO_BYTES_PER_CHARACTER;
