@@ -24,6 +24,7 @@
 
 #include <RectangleCanvas.h>
 #include <MouseEventHandler.h>
+#include <uniq_ptr.h>
 
 namespace upanui {
   class VerticalScroller : public RectangleCanvas {
@@ -59,7 +60,7 @@ namespace upanui {
     int _scrollBarMaxHeight;
     int _scrollMultiplier;
 
-    ScrollerMouseHandler* _mouseHandler;
+    upan::uniq_ptr<ScrollerMouseHandler> _mouseHandler;
     UIObject* _scrollerCanvas;
     UIObject* _scrollUpBt;
     UIObject* _scrollDownBt;

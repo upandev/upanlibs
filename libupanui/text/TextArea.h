@@ -23,10 +23,12 @@
 #pragma once
 
 #include <RectangleCanvas.h>
+#include <MouseEventHandler.h>
 #include <map.h>
 #include <vector.h>
 #include <mutex.h>
 #include <timer_thread.h>
+#include <uniq_ptr.h>
 
 namespace upanui {
 
@@ -256,6 +258,18 @@ namespace upanui {
       int _lineBaseY;
     } VirtualYInfo;
 
+    void handleMouseEvent(upanui::UIObject& sender, const upanui::MouseEvent& event);
+
+    class TextAreaMouseHandler : public MouseEventHandler {
+    public:
+      explicit TextAreaMouseHandler(TextArea &parent) : _parent(parent) {}
+      void onEvent(upanui::UIObject &uiObject, const upanui::MouseEvent &event) override {
+        _parent.handleMouseEvent(uiObject, event);
+      }
+    private:
+      TextArea& _parent;
+    };
+
   private:
     void init();
     usfn::Context& getUSFNContext(usfn::PreloadedFonts fontType, uint8_t fontSize, uint16_t fontStyle);
@@ -263,6 +277,7 @@ namespace upanui {
     void validateCursorPos() const;
     void updateCursorPosition(int charPosX, int charPosY, int cursorPosX, int cursorPosY);
     void updateCursor(bool showCursor);
+    void resolveCursor(int x, int y);
     void fillCharacterBG(int x, int  y, int32_t height, const Character& ch);
 
     void insert(TextArea::Line& line, int lineX, int lineY, const TextArea::Characters& characters);
@@ -295,6 +310,7 @@ namespace upanui {
     DrawBuffer _textBuffer;
     upan::mutex _drawMutex;
     CursorBlink _cursorBlinkThread;
+    upan::uniq_ptr<TextAreaMouseHandler> _mouseHandler;
 
     friend class UIObjectFactory;
   };

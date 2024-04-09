@@ -40,7 +40,6 @@ namespace upanui {
   }
 
   VerticalScroller::~VerticalScroller() {
-    delete _mouseHandler;
   }
 
   void VerticalScroller::init() {
@@ -65,7 +64,7 @@ namespace upanui {
     captureMouseEvents(true);
     _scrollerCanvas->captureMouseEvents(true);
 
-    _mouseHandler = new ScrollerMouseHandler(*this);
+    _mouseHandler.reset(new ScrollerMouseHandler(*this));
     _scrollUpBt->registerMouseEventHandler(*_mouseHandler);
     _scrollDownBt->registerMouseEventHandler(*_mouseHandler);
     _scrollBar->registerMouseEventHandler(*_mouseHandler);

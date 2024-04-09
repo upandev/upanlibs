@@ -32,7 +32,7 @@ namespace upanui {
     _scrollY(0), _scrollHeight(0),
     _currentFontSize(DEFAULT_FONT_SIZE), _currentFontType(usfn::PreloadedFonts::VGA16), _currentStyle(usfn::STYLE_REGULAR),
     _currentFGColor(DEFAULT_FG_COLOR), _currentBGColor(DEFAULT_BG_COLOR),
-    _maxLineCharWidth(width - DEFAULT_SIDE_MARGIN * 2), _cursorBlinkThread(*this) {
+    _maxLineCharWidth(width - DEFAULT_SIDE_MARGIN * 2), _cursorBlinkThread(*this), _mouseHandler(nullptr) {
     if (width <= DEFAULT_SIDE_MARGIN * 2) {
       throw upan::exception(XLOC, "TextArea should have a min width > 8");
     }
@@ -61,7 +61,10 @@ namespace upanui {
     _characterPos.set(0, 0);
     changeScrollHeight(curLine->lineHeight());
     _cursorBlinkThread.start();
+
     UIObjectImpl::captureMouseEvents(true);
+    _mouseHandler.reset(new TextAreaMouseHandler(*this));
+    registerMouseEventHandler(*_mouseHandler);
   }
 
   usfn::Context& TextArea::getUSFNContext(usfn::PreloadedFonts fontType, uint8_t fontSize, uint16_t fontStyle) {
@@ -749,6 +752,35 @@ namespace upanui {
       notifyChange(ChangeState::Content);
     }
     updateCursor(true);
+  }
+
+  void TextArea::resolveCursor(int x, int y) {
+    const auto& info = getLineAtVirtualY(_scrollY, y);
+    const int charPosY = info._lineIndex;
+    const int curPosY = info._lineBaseY;
+
+    auto line = _lines[charPosY];
+    int charPosX = 0;
+    int curPosX = DEFAULT_SIDE_MARGIN;
+
+    while(charPosX < line->characters().size()) {
+      auto ch = line->characters(charPosX);
+      int nposX = curPosX + ch->getChWidth();
+      if (nposX > x) {
+        break;
+      }
+      curPosX = nposX;
+      ++charPosX;
+    }
+    updateCursorPosition(charPosX, charPosY, curPosX, curPosY);
+  }
+
+  void TextArea::handleMouseEvent(upanui::UIObject &sender, const upanui::MouseEvent &event) {
+    const auto &e = event.getData();
+    if (e.anyButtonPressed()) {
+      resolveCursor(event.viewX() - drawX(), event.viewY() - drawY());
+    } else {
+    }
   }
 
   void TextArea::Line::insert(int pos, Character &ch) {
