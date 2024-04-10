@@ -27,12 +27,12 @@ namespace upanui {
   public:
     enum State { NORMAL, PRESSED, HOLD, RELEASED };
 
-    MouseData(int x, int y, int deltaX, int deltaY, State leftButtonState, State rightButtonState, State middleButtonState)
+    MouseData(int x, int y, int deltaX, int deltaY, State leftButtonState, State rightButtonState, State middleButtonState, bool shiftPressed, bool ctrlPressed)
       : _x(x), _y(y), _deltaX(deltaX), _deltaY(deltaY),
-        _leftButtonState(leftButtonState), _rightButtonState(rightButtonState), _middleButtonState(middleButtonState), _padding(0) {
+        _leftButtonState(leftButtonState), _rightButtonState(rightButtonState), _middleButtonState(middleButtonState), _shiftPressed(shiftPressed), _ctrlPressed(ctrlPressed) {
     }
 
-    MouseData() : MouseData(0, 0, 0, 0, NORMAL, NORMAL, NORMAL) {
+    MouseData() : MouseData(0, 0, 0, 0, NORMAL, NORMAL, NORMAL, false, false) {
     }
 
     int x() const {
@@ -63,6 +63,14 @@ namespace upanui {
       return static_cast<State>(_middleButtonState);
     }
 
+    bool isShiftPressed() const {
+      return _shiftPressed;
+    }
+
+    bool isCtrlPressed() const {
+      return _ctrlPressed;
+    }
+
     bool isNormalMove() const {
       return leftButtonState() == NORMAL || rightButtonState() == NORMAL || middleButtonState() == NORMAL;
     }
@@ -86,11 +94,11 @@ namespace upanui {
       && _middleButtonState == r._middleButtonState;
     }
 
-    MouseData transition(int deltaX, int deltaY, bool leftPressed, bool rightPressed, bool middlePressed) const {
+    MouseData transition(int deltaX, int deltaY, bool leftPressed, bool rightPressed, bool middlePressed, bool shiftPressed, bool ctrlPressed) const {
       return {_x + deltaX, _y - deltaY, deltaX, deltaY,
         transitionState(leftButtonState(), leftPressed),
         transitionState(rightButtonState(), rightPressed),
-        transitionState(middleButtonState(), middlePressed)};
+        transitionState(middleButtonState(), middlePressed), shiftPressed, ctrlPressed};
     }
 
   private:
@@ -113,6 +121,7 @@ namespace upanui {
     uint8_t _leftButtonState:2;
     uint8_t _rightButtonState:2;
     uint8_t _middleButtonState:2;
-    uint8_t _padding:2;
+    uint8_t _shiftPressed:1;
+    uint8_t _ctrlPressed:1;
   } PACKED;
 }
