@@ -52,6 +52,7 @@ namespace upanui {
     backgroundColor(0xFFFFFF | GCoreFunctions::ALPHA_MASK);
     auto curLine = new Line(_currentFontSize);
     _lines.push_back(curLine);
+    _selectedArea.setPresent(false);
     _textBuffer.initLocal(width(), MAX_FONT_SIZE * 2 + height());
     _textBuffer.fill(backgroundColorWithAlpha());
     //cursor y is within the character pixel block.
@@ -121,14 +122,14 @@ namespace upanui {
 
     curLine.remove(_characterPos.x(), curLine.characters().size());
     curLine.wrapped(false);
-    renderLine(curLine, _characterPos.x(), _cursorPos.y());
+    renderLine(curLine, _characterPos.x(), _characterPos.y(), _cursorPos.y());
 
     auto newCursorY = _cursorPos.y() + newLine.lineHeight();
     if (newCursorY < height()) {
       auto srcY = MAX_FONT_SIZE + _cursorPos.y() + 1;
       auto destY = MAX_FONT_SIZE + newCursorY + 1;
       memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + srcY * width(), (height() - newCursorY - 1) * width() * _textBuffer.bytesPerPixel());
-      renderLine(newLine, 0, newCursorY);
+      renderLine(newLine, 0, _characterPos.y() + 1, newCursorY);
     }
 
     changeScrollHeight(newLine.lineHeight());
@@ -175,7 +176,7 @@ namespace upanui {
 
     auto cursorY = _cursorPos.y();
     for(int i = _characterPos.y(); i < _lines.size(); ++i) {
-      renderLine(*_lines[i], 0, cursorY);
+      renderLine(*_lines[i], 0, i, cursorY);
       if (!_lines[i]->wrapped()) { break; }
       if (cursorY >= height()) { break; }
       cursorY += _lines[i]->lineHeight();
@@ -285,7 +286,7 @@ namespace upanui {
 
       for (int lastLineTopY = destYOnCanvas; lastLineTopY < height() && lastLineIndex != -1 && lastLineIndex < _lines.size();) {
         auto lastLine = _lines[lastLineIndex];
-        renderLine(*lastLine, 0, lastLineTopY + lastLine->lineHeight() - 1);
+        renderLine(*lastLine, 0, lastLineIndex, lastLineTopY + lastLine->lineHeight() - 1);
         lastLineTopY += lastLine->lineHeight();
         ++lastLineIndex;
       }
@@ -317,7 +318,7 @@ namespace upanui {
           break;
         }
         baseY += l->lineHeight();
-        renderLine(*l, 0, baseY);
+        renderLine(*l, 0, i, baseY);
         if (!l->wrapped()) {
           break;
         }
@@ -337,7 +338,7 @@ namespace upanui {
         }
       } else {
         line->remove(_characterPos.x(), _characterPos.x() + 1);
-        renderLine(*line, _characterPos.x(), _cursorPos.y());
+        renderLine(*line, _characterPos.x(), _characterPos.y(), _cursorPos.y());
       }
     }
   }
@@ -384,7 +385,7 @@ namespace upanui {
       memmove(_textBuffer.buffer() + destY * width(),
               _textBuffer.buffer() + srcY * width(),
               (height() - destCursorY - 1) * width() * _textBuffer.bytesPerPixel());
-      renderLine(*prevLine, 0, destCursorY);
+      renderLine(*prevLine, 0, _characterPos.y(), destCursorY);
 
       _cursorPos.set(cursorX, destCursorY);
       updateCursor(true);
@@ -423,7 +424,7 @@ namespace upanui {
       _characterPos.set(charX, _characterPos.y() + 1);
 
       memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + srcY * width(), (_cursorPos.y() - overflowY) * width() * _textBuffer.bytesPerPixel());
-      renderLine(*nextLine, 0, height() - 1);
+      renderLine(*nextLine, 0, _characterPos.y(), height() - 1);
 
       _cursorPos.set(cursorX, height() - 1);
       updateCursor(true);
@@ -493,20 +494,67 @@ namespace upanui {
     _textBuffer.fill(x, y + MAX_FONT_SIZE, width, height, backgroundColorWithAlpha());
   }
 
-  void TextArea::fillCharacterBG(int x, int  y, int height, const Character& ch) {
-    _textBuffer.fill(x, y + MAX_FONT_SIZE, ch.getChWidth(), height, ch.getBgColor() | (backgroundColorAlpha() << 24));
+  void TextArea::fillCharacterBG(int x, int y, int cx, int cy, int height, const Character &ch) {
+    const static uint32_t selectedAreaBGColor = 0x81B3F0 | GCoreFunctions::ALPHA_MASK;
+    const uint32_t bgColor = _selectedArea.isPresent() && _selectedArea.inRange(cx, cy) ? selectedAreaBGColor : (ch.getBgColor() | (backgroundColorAlpha() << 24));
+    _textBuffer.fill(x, y + MAX_FONT_SIZE, ch.getChWidth(), height, bgColor);
+  }
+
+  void TextArea::unselectArea() {
+    //unselect the selected area
+    _selectedArea.setPresent(false);
+    renderLineRange(_selectedArea.p1(), _selectedArea.p2());
+  }
+
+  void TextArea::updateSelectedArea(bool isSelectionOn, bool isSelectKey, const Position &prevCharPos) {
+    if (!isSelectionOn) {
+      if (_selectedArea.isPresent() && isSelectKey) {
+        unselectArea();
+      }
+    } else {
+      if (!isSelectKey) {
+        return;
+      }
+
+      const Position newCharPos = _characterPos;
+      Position rp1, rp2;
+      if (_selectedArea.isPresent()) {
+        _selectedArea.setRange(_selectedArea.pivot(), newCharPos);
+        if (prevCharPos <= newCharPos) {
+          rp1 = prevCharPos;
+          rp2 = newCharPos;
+        } else {
+          rp1 = newCharPos;
+          rp2 = prevCharPos;
+        }
+      } else {
+        _selectedArea.setPresent(true);
+        _selectedArea.setPivot(prevCharPos);
+        _selectedArea.setRange(prevCharPos, newCharPos);
+        rp1 = _selectedArea.p1();
+        rp2 = _selectedArea.p2();
+      }
+
+      renderLineRange(rp1, rp2);
+    }
   }
 
   void TextArea::onKeyboardEvent(const KeyboardEvent& event) {
     upan::mutex_guard g(_drawMutex);
     validateCursorPos();
-    scrollToCursor();
-    auto ch = event.getData().getRch();
-    switch (ch) {
-      case Keyboard_ENTER:
-        enter();
-        break;
 
+    const Position prevCharPos = _characterPos;
+    auto ch = event.getData().getRch();
+
+    if (isSelectKey(ch) || !is_command_key(ch)
+      || ch == Keyboard_ENTER
+      || ch == Keyboard_DEL
+      || ch == Keyboard_KEY_DEL
+      || ch == Keyboard_BACKSPACE) {
+      scrollToCursor();
+    }
+
+    switch (ch) {
       case Keyboard_KEY_UP:
         moveup();
         break;
@@ -523,6 +571,18 @@ namespace upanui {
         moveright();
         break;
 
+      case Keyboard_KEY_HOME:
+        movehome();
+        break;
+
+      case Keyboard_KEY_END:
+        moveend();
+        break;
+
+      case Keyboard_ENTER:
+        enter();
+        break;
+
       case Keyboard_DEL:
       case Keyboard_KEY_DEL:
         removech();
@@ -530,14 +590,6 @@ namespace upanui {
 
       case Keyboard_BACKSPACE:
         backspace();
-        break;
-
-      case Keyboard_KEY_HOME:
-        movehome();
-        break;
-
-      case Keyboard_KEY_END:
-        moveend();
         break;
 
       case Keyboard_CTRL_B:
@@ -581,6 +633,8 @@ namespace upanui {
         insert(ch);
         break;
     }
+
+    updateSelectedArea(event.getData().isShiftPressed(), isSelectKey(ch), prevCharPos);
     notifyChange(ChangeState::Content);
   }
 
@@ -589,9 +643,9 @@ namespace upanui {
     drawBuffer().copy(_textBuffer.buffer() + MAX_FONT_SIZE * _textBuffer.width(), width(), height(), true);
   }
 
-  void TextArea::renderLine(const Line& line, int charX, int baseDrawY) {
+  void TextArea::renderLine(const Line &line, int charX, int charY, int baseDrawY) {
     int topY = baseDrawY - line.lineHeight() + 1;
-    if (topY >= height()) {
+    if (topY >= height() || baseDrawY < 0) {
       return;
     }
 
@@ -618,7 +672,7 @@ namespace upanui {
           .bg = backgroundColor() | GCoreFunctions::ALPHA_MASK
       };
 
-      fillCharacterBG(drawX, topY, line.lineHeight() + 1, ch);
+      fillCharacterBG(drawX, topY, i, charY, line.lineHeight() + 1, ch);
 
       char str[2] = { (char)ch.getCh(), '\0'};
       auto& sfnContext = getUSFNContext(ch.getFontType(), ch.getFontSize(), ch.getStyle());
@@ -686,6 +740,14 @@ namespace upanui {
     }
   }
 
+  int TextArea::getLineBaseY(int lineIndex) {
+    int baseY = -1;
+    for(int i = 0; i <= lineIndex && i < _lines.size(); ++i) {
+      baseY += _lines[i]->lineHeight();
+    }
+    return baseY;
+  }
+
   TextArea::VirtualYInfo TextArea::getLineAtVirtualY(const int baseY, const int rows) {
     const int virtualY = baseY + rows;
     int lineIndex;
@@ -708,15 +770,24 @@ namespace upanui {
     for(int ty = info._lineTopY, li = info._lineIndex; ty < height() && li < _lines.size(); ++li) {
       auto& line = _lines[li];
       ty += line->lineHeight();
-      renderLine(*line, 0, ty - 1);
+      renderLine(*line, 0, li, ty - 1);
     }
   }
 
   void TextArea::renderLineBottomUp(const VirtualYInfo& info) {
     for(int by = info._lineBaseY, li = info._lineIndex; by >= 0 && li >= 0; --li) {
       auto& line = _lines[li];
-      renderLine(*line, 0, by);
+      renderLine(*line, 0, li, by);
       by -= line->lineHeight();
+    }
+  }
+
+  void TextArea::renderLineRange(const Position& p1, const Position p2) {
+    int lineBaseY = getLineBaseY(p1.y()) - _scrollY;
+    for (int y = p1.y(); y <= p2.y() && y < _lines.size(); ++y) {
+      auto line = _lines[y];
+      renderLine(*line, 0, y, lineBaseY);
+      lineBaseY += line->lineHeight();
     }
   }
 
@@ -754,7 +825,7 @@ namespace upanui {
     updateCursor(true);
   }
 
-  void TextArea::resolveCursor(int x, int y) {
+  void TextArea::moveCursor(bool isSelectionOn, int x, int y) {
     const auto& info = getLineAtVirtualY(_scrollY, y);
     const int charPosY = info._lineIndex;
     const int curPosY = info._lineBaseY;
@@ -772,15 +843,62 @@ namespace upanui {
       curPosX = nposX;
       ++charPosX;
     }
+
+    const Position prevCharPos = _characterPos;
     updateCursorPosition(charPosX, charPosY, curPosX, curPosY);
+    scrollToCursor();
+    updateSelectedArea(isSelectionOn, true, prevCharPos);
+
+    notifyChange(ChangeState::Content);
   }
 
   void TextArea::handleMouseEvent(upanui::UIObject &sender, const upanui::MouseEvent &event) {
     const auto &e = event.getData();
-    if (e.anyButtonPressed()) {
-      resolveCursor(event.viewX() - drawX(), event.viewY() - drawY());
-    } else {
+    if (e.anyButtonPressed() || e.anyButtonHeld()) {
+      moveCursor(e.isShiftPressed() || e.anyButtonHeld(), event.viewX() - drawX(), event.viewY() - drawY());
     }
+  }
+
+  bool TextArea::isSelectKey(uint8_t ch) {
+    static const upan::set<KeyboardKeys> selectKeys({
+      Keyboard_KEY_UP,
+      Keyboard_KEY_DOWN,
+      Keyboard_KEY_RIGHT,
+      Keyboard_KEY_LEFT,
+      Keyboard_KEY_HOME,
+      Keyboard_KEY_END
+    });
+
+    return selectKeys.exists((KeyboardKeys)ch);
+  }
+
+  void TextArea::SelectedArea::setRange(const Position& pa, const Position& pb) {
+    if (pa <= pb) {
+      _p1 = pa;
+      _p2 = pb;
+    } else {
+      _p1 = pb;
+      _p2 = pa;
+    }
+    if (_p1 == _p2) {
+      _present = false;
+    }
+  }
+
+  bool TextArea::SelectedArea::inRange(int x, int y) {
+    if (y == _p1.y() && x < _p1.x()) {
+      return false;
+    }
+
+    if (y == _p2.y() && x >= _p2.x()) {
+      return false;
+    }
+
+    if (y < _p1.y() || y > _p2.y()) {
+      return false;
+    }
+
+    return true;
   }
 
   void TextArea::Line::insert(int pos, Character &ch) {
