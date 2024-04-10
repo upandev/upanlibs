@@ -24,34 +24,36 @@
 #include <exception.h>
 #include <pair.h>
 #include <_tree.h>
-#include <std_stuff.h>
 
-namespace upan {
-
-template <typename K>
-class _set_type
-{
+namespace std {
+  template<typename T>
+  class initializer_list {
   public:
-    typedef const K value_type;
-    typedef const K key_type;
-    struct _key_accessor
-    {
-      const K& operator()(const K& key) const { return key; }
-    };
-};
+    using value_type = T;
+    using reference = const T &;
+    using const_reference = const T &;
+    using size_type = size_t;
+    using iterator = const T *;
+    using const_iterator = const T *;
 
-template <typename K>
-class set : public _tree<_set_type<K>>
-{
-public:
-  set() {}
-  set(const std::initializer_list<K> l) {
-    for(auto i : l) {
-      this->insert(i);
-    }
-  }
-  typedef _tree<_set_type<K>> _parent_;
-  typedef typename _parent_::value_type value_type;
-};
+  private:
+    iterator _begin;
+    size_type _size;
 
+    // The compiler can call a private constructor.
+    constexpr initializer_list(const_iterator begin, size_type size)
+            : _begin(begin), _size(size) {}
+
+  public:
+    constexpr initializer_list() noexcept: _begin(nullptr), _size(0) {}
+
+    // Number of elements.
+    constexpr size_type size() const noexcept { return _size; }
+
+    // First element.
+    constexpr const_iterator begin() const noexcept { return _begin; }
+
+    // One past the last element.
+    constexpr const_iterator end() const noexcept { return begin() + size(); }
+  };
 };
