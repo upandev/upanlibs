@@ -303,7 +303,7 @@ namespace upanui {
 
       void setPivot(const Position& pivot) { _pivot = pivot; }
       void setRange(const Position& pa, const Position& pb);
-      bool inRange(int x, int y);
+      bool inRange(int x, int y) const;
 
     private:
       Position _pivot;
@@ -320,6 +320,7 @@ namespace upanui {
     void updateCursorPosition(int charPosX, int charPosY, int cursorPosX, int cursorPosY);
     void updateCursor(bool showCursor);
     void moveCursor(bool isSelectionOn, int x, int y);
+    uint32_t getChBgColor(int cx, int cy, const Character& ch) const;
     void fillCharacterBG(int x, int y, int cx, int cy, int height, const Character &ch);
 
     void insert(TextArea::Line& line, int lineX, int lineY, const TextArea::Characters& characters);

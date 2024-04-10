@@ -128,7 +128,9 @@ namespace upanui {
     if (newCursorY < height()) {
       auto srcY = MAX_FONT_SIZE + _cursorPos.y() + 1;
       auto destY = MAX_FONT_SIZE + newCursorY + 1;
-      memmove(_textBuffer.buffer() + destY * width(), _textBuffer.buffer() + srcY * width(), (height() - newCursorY - 1) * width() * _textBuffer.bytesPerPixel());
+      memmove(_textBuffer.buffer() + destY * width(),
+              _textBuffer.buffer() + srcY * width(),
+              (height() - newCursorY - 1) * width() * _textBuffer.bytesPerPixel());
       renderLine(newLine, 0, _characterPos.y() + 1, newCursorY);
     }
 
@@ -494,10 +496,13 @@ namespace upanui {
     _textBuffer.fill(x, y + MAX_FONT_SIZE, width, height, backgroundColorWithAlpha());
   }
 
-  void TextArea::fillCharacterBG(int x, int y, int cx, int cy, int height, const Character &ch) {
+  uint32_t TextArea::getChBgColor(int cx, int cy, const Character& ch) const {
     const static uint32_t selectedAreaBGColor = 0x81B3F0 | GCoreFunctions::ALPHA_MASK;
-    const uint32_t bgColor = _selectedArea.isPresent() && _selectedArea.inRange(cx, cy) ? selectedAreaBGColor : (ch.getBgColor() | (backgroundColorAlpha() << 24));
-    _textBuffer.fill(x, y + MAX_FONT_SIZE, ch.getChWidth(), height, bgColor);
+    return _selectedArea.isPresent() && _selectedArea.inRange(cx, cy) ? selectedAreaBGColor : (ch.getBgColor() | (backgroundColorAlpha() << 24));
+  }
+
+  void TextArea::fillCharacterBG(int x, int y, int cx, int cy, int height, const Character &ch) {
+    _textBuffer.fill(x, y + MAX_FONT_SIZE, ch.getChWidth(), height, getChBgColor(cx, cy, ch));
   }
 
   void TextArea::unselectArea() {
@@ -672,7 +677,7 @@ namespace upanui {
           .bg = backgroundColor() | GCoreFunctions::ALPHA_MASK
       };
 
-      fillCharacterBG(drawX, topY, i, charY, line.lineHeight() + 1, ch);
+      fillCharacterBG(drawX, topY, i, charY, line.lineHeight(), ch);
 
       char str[2] = { (char)ch.getCh(), '\0'};
       auto& sfnContext = getUSFNContext(ch.getFontType(), ch.getFontSize(), ch.getStyle());
@@ -697,7 +702,7 @@ namespace upanui {
     auto& line = *_lines[_characterPos.y()];
     if (_characterPos.x() < line.characters().size()) {
       const auto ch = line.characters(_characterPos.x());
-      color = (showCursor ? ch->getFgColor() : ch->getBgColor());
+      color = (showCursor ? ch->getFgColor() : getChBgColor(_characterPos.x(), _characterPos.y(), *ch));
     }
     color |= GCoreFunctions::ALPHA_MASK;
 
@@ -885,7 +890,7 @@ namespace upanui {
     }
   }
 
-  bool TextArea::SelectedArea::inRange(int x, int y) {
+  bool TextArea::SelectedArea::inRange(int x, int y) const {
     if (y == _p1.y() && x < _p1.x()) {
       return false;
     }
