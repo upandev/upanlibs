@@ -75,7 +75,7 @@ namespace upanui {
       _height = height;
       notifyChange(ChangeState::Size);
       _verticalScroller.ifPresent([](VerticalScroller& verticalScroller) {
-        verticalScroller.caliberateScrollbar(true);
+        verticalScroller.caliberateScrollbar();
       });
     }
   }

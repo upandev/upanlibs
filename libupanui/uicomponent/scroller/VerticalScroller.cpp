@@ -73,7 +73,7 @@ namespace upanui {
     _childCheck = true;
   }
 
-  void VerticalScroller::caliberateScrollbar(bool directionUp) {
+  void VerticalScroller::caliberateScrollbar() {
     const int minScrollBarHeight = _scrollBarWidth / 2;
     const int scrollBarMaxRunway = _scrollBarMaxHeight - minScrollBarHeight;
     const int scrollContentHeight = _scrollableChild.value().scrollHeight() >= height() ? _scrollableChild.value().scrollHeight() - height() : 0;
@@ -85,7 +85,7 @@ namespace upanui {
     }
     const int scrollBarHeight = _scrollBarMaxHeight - scrollBarRequiredRunway;
     _scrollBar->height(scrollBarHeight);
-    updateScrollPosition(_scrollableChild.value().scrollY(), directionUp);
+    updateScrollPosition(_scrollableChild.value().scrollY());
   }
 
   void VerticalScroller::add(UIObject &child) {
@@ -95,13 +95,13 @@ namespace upanui {
       }
       _scrollableChild = upan::option<UIObject &>(child);
       child.registerVerticalScroller(*this);
-      caliberateScrollbar(true);
+      caliberateScrollbar();
     }
     RectangleCanvas::add(child);
   }
 
-  void VerticalScroller::updateScrollPosition(int newY, bool directionUp) {
-    const int scrollNewY = newY / _scrollMultiplier + ((newY % _scrollMultiplier) == 0 ? 0 : directionUp ? -1 : 1);
+  void VerticalScroller::updateScrollPosition(int newY) {
+    const int scrollNewY = newY / _scrollMultiplier;
     setScrollPosition(scrollNewY + _scrollBarMinY);
   }
 

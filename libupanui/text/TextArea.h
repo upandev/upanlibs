@@ -312,8 +312,21 @@ namespace upanui {
       bool _present;
     };
 
+    class ScrollerChanges {
+    public:
+      ScrollerChanges() : _calibrate(false), _adjustScrollY(false), _scrollY(0) {}
+      void capture(bool calibrate, bool adjustScrollY, int scrollY);
+      void apply(VerticalScroller&);
+
+    private:
+      bool _calibrate;
+      bool _adjustScrollY;
+      int _scrollY;
+    };
+
   private:
     void init();
+    void processKeyboardEvent(const KeyboardEvent& event);
     usfn::Context& getUSFNContext(usfn::PreloadedFonts fontType, uint8_t fontSize, uint16_t fontStyle);
     void scrollToCursor();
     void validateCursorPos() const;
@@ -329,12 +342,15 @@ namespace upanui {
     void renderLine(const Line &line, int charX, int charY, int baseDrawY);
 
     int getLineBaseY(int lineIndex);
+    int getLineBaseX(int charX, int lineIndex);
     VirtualYInfo getLineAtVirtualY(int baseY, int rows);
     void renderLineTopDown(const VirtualYInfo& info);
     void renderLineBottomUp(const VirtualYInfo& info);
-    void renderLineRange(const Position& p1, const Position p2);
+    void renderLineRange(const Position& p1, const Position& p2);
 
-    bool isSelectKey(uint8_t);
+    void deleteSelectedArea();
+    bool isSelectKey(uint8_t) const;
+    bool isTextModifyKey(uint8_t ch) const;
     void unselectArea();
     void updateSelectedArea(bool isSelectionOn, bool isSelectKey, const Position &prevCharPos);
 
@@ -361,6 +377,7 @@ namespace upanui {
     CursorBlink _cursorBlinkThread;
     upan::uniq_ptr<TextAreaMouseHandler> _mouseHandler;
     SelectedArea _selectedArea;
+    ScrollerChanges _scrollerChanges;
 
     friend class UIObjectFactory;
   };

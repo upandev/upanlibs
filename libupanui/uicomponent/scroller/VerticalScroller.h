@@ -29,8 +29,8 @@
 namespace upanui {
   class VerticalScroller : public RectangleCanvas {
   public:
-    void caliberateScrollbar(bool directionUp);
-    void updateScrollPosition(int newY, bool directionUp);
+    void caliberateScrollbar();
+    void updateScrollPosition(int newY);
 
   private:
     VerticalScroller(int x, int y, int width, int height, int scrollBarWidth);
