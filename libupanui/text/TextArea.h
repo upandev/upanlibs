@@ -338,7 +338,7 @@ namespace upanui {
 
     void insert(TextArea::Line& line, int lineX, int lineY, const TextArea::Characters& characters);
     void wrapremovech(int x, int y, int& deletedLine);
-    void lineremovech(int y, int baseY);
+    void lineremovech(const int y);
     void renderLine(const Line &line, int charX, int charY, int baseDrawY);
 
     int getLineBaseY(int lineIndex);

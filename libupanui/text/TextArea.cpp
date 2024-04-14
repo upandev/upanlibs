@@ -268,10 +268,18 @@ namespace upanui {
     }
   }
 
-  void TextArea::lineremovech(const int y, const int baseY) {
+  void TextArea::lineremovech(const int y) {
+    const int baseY = getLineBaseY(y);
     auto line = _lines[y];
     auto visibleBaseY = baseY - line->lineHeight() + 1;
     auto insideCanvas = visibleBaseY < height();
+
+    if (y > 0) {
+      auto prevLine = _lines[y - 1];
+      if (prevLine->wrapped()) {
+        prevLine->wrapped(line->wrapped());
+      }
+    }
 
     if (y < (_lines.size() - 1) && insideCanvas) {
       int copyHeight = 0;
@@ -308,12 +316,14 @@ namespace upanui {
 
       _lines.erase(y, y + 1);
       changeScrollHeight(-line->lineHeight());
+      delete line;
     } else if (_characterPos.y() < y) { //its a no-op if deleting the line where character cursor is
       if (insideCanvas) {
         clearArea(0, visibleBaseY, width(), line->lineHeight());
       }
       _lines.erase(y, y + 1);
       changeScrollHeight(-line->lineHeight());
+      delete line;
     }
   }
 
@@ -340,16 +350,12 @@ namespace upanui {
       }
 
       if (deletedLine > 0) {
-        baseY = _cursorPos.y() - line->lineHeight();
-        for (int i = _characterPos.y(); i <= deletedLine; ++i) {
-          baseY += _lines[i]->lineHeight();
-        }
-        lineremovech(deletedLine, baseY);
+        lineremovech(deletedLine);
       }
     } else {
       if (_characterPos.x() == line->characters().size()) {
         if (_characterPos.x() == 0) {
-          lineremovech(_characterPos.y(), _cursorPos.y());
+          lineremovech(_characterPos.y());
         }
       } else {
         line->remove(_characterPos.x(), _characterPos.x() + 1);
@@ -920,13 +926,11 @@ namespace upanui {
     if (_selectedArea.p1().y() == _selectedArea.p2().y()) {
       charCount = _selectedArea.p2().x() - _selectedArea.p1().x();
     } else {
-      for(int y = _selectedArea.p1().y() + 1; y < _selectedArea.p2().y(); ++y) {
-        auto line = _lines[y];
-        charCount += line->size();
-        if (!line->wrapped()) {
-          //newline
-          ++charCount;
-        }
+      const int deleteLineY = _selectedArea.p1().y() + 1;
+      int lineCountToDelete = _selectedArea.p2().y() - deleteLineY;
+      while(lineCountToDelete > 0) {
+        lineremovech(deleteLineY);
+        --lineCountToDelete;
       }
       auto line1 = _lines[_selectedArea.p1().y()];
       charCount += (line1->size() - _selectedArea.p1().x()) + (line1->wrapped() ? 0 : 1);
