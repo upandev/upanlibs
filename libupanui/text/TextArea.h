@@ -34,16 +34,19 @@ namespace upanui {
 
   class TextArea : public RectangleCanvas {
   public:
-    void enter();
     void moveup();
     void movedown();
     void moveleft();
     void moveright();
     void movehome();
     void moveend();
-    void insert(uint16_t ch);
+    void insert(uint8_t ch);
     void removech();
     void backspace();
+    void selectAll();
+    void cutSelection();
+    void copySelection();
+    void paste();
 
     uint8_t getCurrentFontSize() const {
       return _currentFontSize;
@@ -196,12 +199,12 @@ namespace upanui {
       uint32_t _bgColor;
     } PACKED;
 
-    typedef upan::vector<Character*> Characters;
+    typedef upan::vector<Character> Characters;
 
     class Line {
     public:
       Line(uint8_t defaultHeight) : _width(MIN_CURSOR_WIDTH_BUFFER), _maxChHeight(defaultHeight), _wrapped(false) {}
-      void insert(int pos, Character& ch);
+      void insert(int pos, const Character &ch);
       void remove(int from, int last);
 
       int width() const { return _width; }
@@ -211,8 +214,8 @@ namespace upanui {
         _wrapped = wrapped;
       }
       int size() const { return _characters.size(); }
-      const upan::vector<Character*>& characters() const { return _characters; }
-      Character* characters(int i) const { return _characters[i]; }
+      const Characters& characters() const { return _characters; }
+      const Character& characters(int i) const { return _characters[i]; }
     private:
       const int MIN_CURSOR_WIDTH_BUFFER = 8;
       const int DEFAULT_LINE_SPACE = 4;
@@ -327,6 +330,8 @@ namespace upanui {
   private:
     void init();
     void processKeyboardEvent(const KeyboardEvent& event);
+    void insert(const Character& ch);
+    void enter();
     usfn::Context& getUSFNContext(usfn::PreloadedFonts fontType, uint8_t fontSize, uint16_t fontStyle);
     void scrollToCursor();
     void validateCursorPos() const;
@@ -348,9 +353,10 @@ namespace upanui {
     void renderLineBottomUp(const VirtualYInfo& info);
     void renderLineRange(const Position& p1, const Position& p2);
 
-    void deleteSelectedArea();
     bool isSelectKey(uint8_t) const;
     bool isTextModifyKey(uint8_t ch) const;
+    bool isInsertableKey(uint16_t ch) const;
+    void deleteSelectedArea();
     void unselectArea();
     void updateSelectedArea(bool isSelectionOn, bool isSelectKey, const Position &prevCharPos);
 
@@ -378,6 +384,7 @@ namespace upanui {
     upan::uniq_ptr<TextAreaMouseHandler> _mouseHandler;
     SelectedArea _selectedArea;
     ScrollerChanges _scrollerChanges;
+    Characters _copyBuffer;
 
     friend class UIObjectFactory;
   };

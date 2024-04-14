@@ -107,7 +107,6 @@ namespace upanui {
   }
 
   void TextArea::enter() {
-    deleteSelectedArea();
     Line& curLine = *_lines[_characterPos.y()];
 
     Line* prevLine = (_characterPos.y() > 0) ? _lines[_characterPos.y() - 1] : nullptr;
@@ -122,7 +121,7 @@ namespace upanui {
     _lines.insert(_characterPos.y() + 1, &newLine);
 
     for(int i = _characterPos.x(), j = 0; i < curLine.size(); ++i, ++j) {
-      newLine.insert(j, *curLine.characters()[i]);
+      newLine.insert(j, curLine.characters()[i]);
     }
 
     newLine.wrapped(curLine.wrapped());
@@ -151,19 +150,105 @@ namespace upanui {
     }
   }
 
-  void TextArea::insert(uint16_t ch) {
-    if (is_command_key(ch)) {
+  void TextArea::selectAll() {
+    _selectedArea.setPresent(false);
+
+    if (_lines.empty()) {
+      return;
+    }
+
+    if (_lines.size() == 1 && _lines[0]->size() == 0) {
+      return;
+    }
+
+    Position p1, p2;
+    p1.set(0, 0);
+    p2.set(_lines[_lines.size() - 1]->size(), _lines.size() - 1);
+    _selectedArea.setPresent(true);
+    _selectedArea.setPivot(p1);
+    _selectedArea.setRange(p1, p2);
+
+    renderLineRange(p1, p2);
+  }
+
+  void TextArea::cutSelection() {
+    copySelection();
+    deleteSelectedArea();
+  }
+
+  void TextArea::copySelection() {
+    _copyBuffer.clear();
+
+    if (!_selectedArea.isPresent()) {
+      return;
+    }
+
+    if (_selectedArea.p1().y() == _selectedArea.p2().y()) {
+      auto line = _lines[_selectedArea.p1().y()];
+
+      for(int x = _selectedArea.p1().x(); x < _selectedArea.p2().x() && x < line->size(); ++x) {
+        _copyBuffer.push_back(line->characters(x));
+      }
+    } else {
+      const Character newLineCharacter(Keyboard_ENTER, _currentFontSize, _currentFontType, _currentStyle, _currentFGColor, _currentBGColor);
+      {
+        auto line1 = _lines[_selectedArea.p1().y()];
+        for (int x = _selectedArea.p1().x(); x < line1->size(); ++x) {
+          _copyBuffer.push_back(line1->characters(x));
+        }
+        if (!line1->wrapped()) {
+          _copyBuffer.push_back(newLineCharacter);
+        }
+      }
+
+      {
+        for (int y = _selectedArea.p1().y() + 1; y < _selectedArea.p2().y(); ++y) {
+          auto line = _lines[y];
+          for (const auto &ch : line->characters()) {
+            _copyBuffer.push_back(ch);
+          }
+          if (!line->wrapped()) {
+            _copyBuffer.push_back(newLineCharacter);
+          }
+        }
+      }
+
+      {
+        auto line2 = _lines[_selectedArea.p2().y()];
+        for (int x = 0; x < _selectedArea.p2().x() && x < line2->size(); ++x) {
+          _copyBuffer.push_back(line2->characters(x));
+        }
+      }
+    }
+  }
+
+  void TextArea::paste() {
+    for(const auto& ch : _copyBuffer) {
+      insert(ch);
+    }
+  }
+
+  void TextArea::insert(uint8_t ch) {
+    if (!isInsertableKey(ch)) {
       return;
     }
 
     deleteSelectedArea();
-    auto newCh = new Character(ch, _currentFontSize, _currentFontType, _currentStyle, _currentFGColor, _currentBGColor);
+    Character newCh(ch, _currentFontSize, _currentFontType, _currentStyle, _currentFGColor, _currentBGColor);
+    insert(newCh);
+  }
+
+  void TextArea::insert(const Character& ch) {
+    if (ch.getCh() == Keyboard_ENTER) {
+      enter();
+      return;
+    }
 
     auto line = _lines[_characterPos.y()];
     auto origLineCount = _lines.size();
 
     Characters characters;
-    characters.push_back(newCh);
+    characters.push_back(ch);
     insert(*line, _characterPos.x(), _characterPos.y(), characters);
 
     auto hasNewLine = _lines.size() != origLineCount;
@@ -199,16 +284,16 @@ namespace upanui {
 
     if (line->size() == _characterPos.x()) {
       //This means the new character inserted has moved to the next line
-      updateCursorPosition(1, _characterPos.y(), newCh->getChWidth() + DEFAULT_SIDE_MARGIN, _cursorPos.y());
+      updateCursorPosition(1, _characterPos.y(), ch.getChWidth() + DEFAULT_SIDE_MARGIN, _cursorPos.y());
       movedown();
     } else {
-      updateCursorPosition(_characterPos.x() + 1, _characterPos.y(), _cursorPos.x() + newCh->getChWidth(), _cursorPos.y());
+      updateCursorPosition(_characterPos.x() + 1, _characterPos.y(), _cursorPos.x() + ch.getChWidth(), _cursorPos.y());
     }
   }
 
   void TextArea::insert(TextArea::Line& line, int lineX, int lineY, const TextArea::Characters& characters) {
     for(int i = 0; i < characters.size(); ++i) {
-      line.insert(lineX + i, *characters[i]);
+      line.insert(lineX + i, characters[i]);
     }
 
     Characters wrapCharacters;
@@ -248,9 +333,9 @@ namespace upanui {
       bool deletedFromNextLine = false;
       while (nextLine->size() > 0) {
         auto ch = nextLine->characters(0);
-        if (ch->getChWidth() < availWidth) {
-          line->insert(line->size(), *ch);
-          availWidth -= ch->getChWidth();
+        if (ch.getChWidth() < availWidth) {
+          line->insert(line->size(), ch);
+          availWidth -= ch.getChWidth();
           wrapremovech(0, ny, deletedLine);
           deletedFromNextLine = true;
         } else {
@@ -387,10 +472,10 @@ namespace upanui {
     int charX = 0;
     for (; charX < characters.size(); ++charX) {
       auto ch = characters[charX];
-      if ((cursorX + ch->getChWidth()) > _cursorPos.x()) {
+      if ((cursorX + ch.getChWidth()) > _cursorPos.x()) {
         break;
       }
-      cursorX += ch->getChWidth();
+      cursorX += ch.getChWidth();
     }
 
     if (cursorY >= (prevLine->lineHeight() - 1)) {
@@ -426,10 +511,10 @@ namespace upanui {
     int charX = 0;
     for (; charX < characters.size(); ++charX) {
       auto ch = characters[charX];
-      if ((cursorX + ch->getChWidth()) > _cursorPos.x()) {
+      if ((cursorX + ch.getChWidth()) > _cursorPos.x()) {
         break;
       }
-      cursorX += ch->getChWidth();
+      cursorX += ch.getChWidth();
     }
 
     int overflowY = _cursorPos.y() + nextLine->lineHeight() - height();
@@ -465,7 +550,7 @@ namespace upanui {
 
     auto curLine = _lines[_characterPos.y()];
     updateCursorPosition(_characterPos.x() - 1, _characterPos.y(),
-                         _cursorPos.x() - curLine->characters()[_characterPos.x() - 1]->getChWidth(), _cursorPos.y());
+                         _cursorPos.x() - curLine->characters()[_characterPos.x() - 1].getChWidth(), _cursorPos.y());
   }
 
   void TextArea::moveright() {
@@ -480,7 +565,7 @@ namespace upanui {
     }
 
     updateCursorPosition(_characterPos.x() + 1, _characterPos.y(),
-                         _cursorPos.x() + curLine->characters()[_characterPos.x()]->getChWidth(), _cursorPos.y());
+                         _cursorPos.x() + curLine->characters()[_characterPos.x()].getChWidth(), _cursorPos.y());
   }
 
   void TextArea::movehome() {
@@ -500,7 +585,7 @@ namespace upanui {
     auto cursorX = _cursorPos.x();
     auto charX = _characterPos.x();
     while(charX < curLine->size()) {
-      cursorX += curLine->characters()[charX]->getChWidth();
+      cursorX += curLine->characters()[charX].getChWidth();
       ++charX;
     }
 
@@ -617,10 +702,6 @@ namespace upanui {
         moveend();
         break;
 
-      case Keyboard_ENTER:
-        enter();
-        break;
-
       case Keyboard_DEL:
       case Keyboard_KEY_DEL:
         if (_selectedArea.isPresent()) {
@@ -638,6 +719,22 @@ namespace upanui {
         }
         break;
 
+      case Keyboard_CTRL_A:
+        selectAll();
+        break;
+
+      case Keyboard_CTRL_X:
+        cutSelection();
+        break;
+
+      case Keyboard_CTRL_C:
+        copySelection();
+        break;
+
+      case Keyboard_CTRL_V:
+        paste();
+        break;
+
       case Keyboard_CTRL_B:
         if (_currentStyle & usfn::STYLE_BOLD) {
           _currentStyle &= ~(usfn::STYLE_BOLD);
@@ -652,27 +749,6 @@ namespace upanui {
         } else {
           _currentStyle |= usfn::STYLE_ITALIC;
         }
-        break;
-
-      case Keyboard_CTRL_W:
-        _currentBGColor = 0xFFFFFF;
-        break;
-
-      case Keyboard_CTRL_G:
-        _currentBGColor = 0x00FF00;
-        break;
-
-      case Keyboard_CTRL_A:
-        _currentFontSize *= 2;
-        if (_currentFontSize > 80) {
-          _currentFontSize = 80;
-        }
-        break;
-
-      case Keyboard_CTRL_Q:
-        _currentFontSize /= 2;
-        if (_currentFontSize < 16)
-          _currentFontSize = 16;
         break;
 
       default:
@@ -698,12 +774,12 @@ namespace upanui {
     auto drawX = DEFAULT_SIDE_MARGIN;
     auto& characters = line.characters();
     for(int i = 0; i < charX; ++i) {
-      drawX += characters[i]->getChWidth();
+      drawX += characters[i].getChWidth();
     }
     clearArea(drawX, topY, width() - drawX, line.lineHeight());
 
     for(int i = charX; i < characters.size(); ++i) {
-      const auto& ch = *characters[i];
+      const auto& ch = characters[i];
       usfn::FrameBuffer buf = {
           .ptr = (uint8_t*)_textBuffer.buffer(),
           .w = (int16_t)_textBuffer.width(),
@@ -743,7 +819,7 @@ namespace upanui {
     auto& line = *_lines[_characterPos.y()];
     if (_characterPos.x() < line.characters().size()) {
       const auto ch = line.characters(_characterPos.x());
-      color = (showCursor ? ch->getFgColor() : getChBgColor(_characterPos.x(), _characterPos.y(), *ch));
+      color = (showCursor ? ch.getFgColor() : getChBgColor(_characterPos.x(), _characterPos.y(), ch));
     }
     color |= GCoreFunctions::ALPHA_MASK;
 
@@ -793,7 +869,7 @@ namespace upanui {
     const auto line = _lines[lineIndex];
     int baseX = DEFAULT_SIDE_MARGIN;
     for(int i = 0; i < charX && i < line->size(); ++i) {
-      baseX += line->characters(i)->getChWidth();
+      baseX += line->characters(i).getChWidth();
     }
     return baseX;
   }
@@ -886,7 +962,7 @@ namespace upanui {
 
     while(charPosX < line->characters().size()) {
       auto ch = line->characters(charPosX);
-      int nposX = curPosX + ch->getChWidth();
+      int nposX = curPosX + ch.getChWidth();
       if (nposX > x) {
         break;
       }
@@ -960,6 +1036,10 @@ namespace upanui {
     return !is_command_key(ch) || ch == Keyboard_ENTER || ch == Keyboard_DEL || ch == Keyboard_KEY_DEL || ch == Keyboard_BACKSPACE;
   }
 
+  bool TextArea::isInsertableKey(uint16_t ch) const {
+    return !is_command_key(ch) || ch == Keyboard_ENTER;
+  }
+
   void TextArea::SelectedArea::setRange(const Position& pa, const Position& pb) {
     if (pa <= pb) {
       _p1 = pa;
@@ -989,8 +1069,8 @@ namespace upanui {
     return true;
   }
 
-  void TextArea::Line::insert(int pos, Character &ch) {
-    _characters.insert(pos, &ch);
+  void TextArea::Line::insert(int pos, const Character &ch) {
+    _characters.insert(pos, ch);
     _width += ch.getChWidth();
     if (_characters.size() == 1) {
       _maxChHeight = ch.getChHeight();
@@ -1003,6 +1083,7 @@ namespace upanui {
     if (from >= _characters.size()) {
       return;
     }
+
     _characters.erase(from, last);
     _width = MIN_CURSOR_WIDTH_BUFFER;
     // if the line is empty then leave the lineHeight to whatever it was before
@@ -1011,8 +1092,8 @@ namespace upanui {
       _maxChHeight = 0;
     }
     for (auto ch : _characters) {
-      _width += ch->getChWidth();
-      _maxChHeight = upan::max(_maxChHeight, ch->getChHeight());
+      _width += ch.getChWidth();
+      _maxChHeight = upan::max(_maxChHeight, ch.getChHeight());
     }
   }
 
