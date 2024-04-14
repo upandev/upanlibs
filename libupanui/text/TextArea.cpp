@@ -952,6 +952,8 @@ namespace upanui {
   }
 
   void TextArea::moveCursor(bool isSelectionOn, int x, int y) {
+    upan::mutex_guard g(_drawMutex);
+
     const auto& info = getLineAtVirtualY(_scrollY, y);
     const int charPosY = info._lineIndex;
     const int curPosY = info._lineBaseY;
@@ -982,6 +984,7 @@ namespace upanui {
     const auto &e = event.getData();
     if (e.anyButtonPressed() || e.anyButtonHeld()) {
       moveCursor(e.isShiftPressed() || e.anyButtonHeld(), event.viewX() - drawX(), event.viewY() - drawY());
+      getVerticalScroller().ifPresent([this](VerticalScroller& verticalScroller) { _scrollerChanges.apply(verticalScroller); });
     }
   }
 
