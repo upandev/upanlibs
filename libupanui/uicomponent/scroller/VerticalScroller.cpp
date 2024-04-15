@@ -56,7 +56,7 @@ namespace upanui {
     _scrollDownBt = &UIObjectFactory::createIconButton(*_scrollerCanvas, PngImageResource::DOWN, 0, _scrollBarMaxY, _scrollBarWidth, _scrollBarWidth);
     _scrollDownBt->backgroundColor(0xFFFAABB);
 
-    _scrollBar = &UIObjectFactory::createRectangleCanvas(*_scrollerCanvas, 0, _scrollBarMinY, _scrollBarWidth, _scrollBarWidth);
+    _scrollBar = &UIObjectFactory::createRectangleCanvas(*_scrollerCanvas, 0, _scrollBarMinY, _scrollBarWidth, _scrollBarMaxHeight);
     _scrollBar->borderThickness(1);
     _scrollBar->borderColor(0x000000);
     _scrollBar->backgroundColor(0xFAD7A0);
@@ -78,13 +78,18 @@ namespace upanui {
     const int scrollBarMaxRunway = _scrollBarMaxHeight - minScrollBarHeight;
     const int scrollContentHeight = _scrollableChild.value().scrollHeight() >= height() ? _scrollableChild.value().scrollHeight() - height() : 0;
     _scrollMultiplier = 8;
-    int scrollBarRequiredRunway = scrollContentHeight / _scrollMultiplier;
-    while(scrollBarRequiredRunway > scrollBarMaxRunway) {
-      _scrollMultiplier <<= 1;
-      scrollBarRequiredRunway = scrollContentHeight / _scrollMultiplier;
+    const int scrollBarRequiredRunway = scrollContentHeight / _scrollMultiplier;
+//    while(scrollBarRequiredRunway > scrollBarMaxRunway) {
+//      _scrollMultiplier <<= 1;
+//      scrollBarRequiredRunway = scrollContentHeight / _scrollMultiplier;
+//    }
+    if (scrollBarRequiredRunway > scrollBarMaxRunway) {
+      _scrollMultiplier = scrollContentHeight / (_scrollBarMaxHeight - _scrollBar->height());
+    } else {
+      const int scrollBarHeight = _scrollBarMaxHeight - scrollBarRequiredRunway;
+      _scrollBar->height(scrollBarHeight);
     }
-    const int scrollBarHeight = _scrollBarMaxHeight - scrollBarRequiredRunway;
-    _scrollBar->height(scrollBarHeight);
+
     updateScrollPosition(_scrollableChild.value().scrollY());
   }
 

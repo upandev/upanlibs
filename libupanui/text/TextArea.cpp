@@ -1036,7 +1036,13 @@ namespace upanui {
   }
 
   bool TextArea::isTextModifyKey(uint8_t ch) const {
-    return !is_command_key(ch) || ch == Keyboard_ENTER || ch == Keyboard_DEL || ch == Keyboard_KEY_DEL || ch == Keyboard_BACKSPACE;
+    return !is_command_key(ch)
+    || ch == Keyboard_ENTER
+    || ch == Keyboard_DEL
+    || ch == Keyboard_KEY_DEL
+    || ch == Keyboard_BACKSPACE
+    || ch == Keyboard_CTRL_V
+    || ch == Keyboard_CTRL_X;
   }
 
   bool TextArea::isInsertableKey(uint16_t ch) const {
