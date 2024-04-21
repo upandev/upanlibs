@@ -40,6 +40,8 @@ namespace upanui {
     void moveright();
     void movehome();
     void moveend();
+    void pageup();
+    void pagedown();
     void insert(uint8_t ch);
     void removech();
     void backspace();
@@ -203,6 +205,9 @@ namespace upanui {
 
     class Line {
     public:
+      static const int MIN_CURSOR_WIDTH_BUFFER = 8;
+      static const int DEFAULT_LINE_SPACE = 4;
+
       Line(uint8_t defaultHeight) : _width(MIN_CURSOR_WIDTH_BUFFER), _maxChHeight(defaultHeight), _wrapped(false) {}
       void insert(int pos, const Character &ch);
       void remove(int from, int last);
@@ -217,8 +222,6 @@ namespace upanui {
       const Characters& characters() const { return _characters; }
       const Character& characters(int i) const { return _characters[i]; }
     private:
-      const int MIN_CURSOR_WIDTH_BUFFER = 8;
-      const int DEFAULT_LINE_SPACE = 4;
       Characters _characters;
       int _width;
       uint8_t _maxChHeight;

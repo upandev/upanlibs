@@ -596,6 +596,32 @@ namespace upanui {
     _textBuffer.fill(x, y + MAX_FONT_SIZE, width, height, backgroundColorWithAlpha());
   }
 
+  void TextArea::pageup() {
+    const int curLineTopY = (_cursorPos.y() + 1 - _lines[_characterPos.y()]->lineHeight());
+    const int rows = height() - curLineTopY;
+
+    vscroll(rows, height());
+
+    const auto& info = getLineAtVirtualY(_scrollY, 0);
+    updateCursorPosition(0, info._lineIndex, DEFAULT_SIDE_MARGIN, info._lineBaseY);
+
+    _scrollerChanges.capture(false, true, _scrollY);
+  }
+
+  void TextArea::pagedown() {
+    const int curLineTopY = (_cursorPos.y() + 1 - _lines[_characterPos.y()]->lineHeight());
+    const int rows = height() + curLineTopY;
+    const bool lastPage = (_scrollHeight - curLineTopY - _scrollY) <= height();
+
+    vscroll(-rows, height());
+
+    const auto& info = getLineAtVirtualY(_scrollY, lastPage ? height() : 0);
+    updateCursorPosition(0, info._lineIndex, DEFAULT_SIDE_MARGIN, info._lineBaseY);
+    moveend();
+
+    _scrollerChanges.capture(false, true, _scrollY);
+  }
+
   uint32_t TextArea::getChBgColor(int cx, int cy, const Character& ch) const {
     const static uint32_t selectedAreaBGColor = 0x81B3F0 | GCoreFunctions::ALPHA_MASK;
     return _selectedArea.isPresent() && _selectedArea.inRange(cx, cy) ? selectedAreaBGColor : (ch.getBgColor() | (backgroundColorAlpha() << 24));
@@ -700,6 +726,14 @@ namespace upanui {
 
       case Keyboard_KEY_END:
         moveend();
+        break;
+
+      case Keyboard_KEY_PG_UP:
+        pageup();
+        break;
+
+      case Keyboard_KEY_PG_DOWN:
+        pagedown();
         break;
 
       case Keyboard_DEL:
@@ -829,12 +863,19 @@ namespace upanui {
   }
 
   int TextArea::updateScrollY(int sy) {
-    int newScrollY = _scrollY + sy;
-    if (newScrollY < 0) {
-      newScrollY = 0;
-    } else if (newScrollY >= _scrollHeight) {
-      newScrollY = _scrollHeight - 1;
+    int newScrollY = _scrollY;
+    if (sy < 0) {
+      newScrollY = _scrollY + sy;
+      if (newScrollY < 0) {
+        newScrollY = 0;
+      }
+    } else {
+      const int availableRows = _scrollHeight - (_scrollY + height());
+      if (availableRows > 0) {
+        newScrollY = _scrollY + upan::min(availableRows, sy);
+      }
     }
+
     const int rows = newScrollY - _scrollY;
     _scrollY = newScrollY;
     return rows;
@@ -1029,7 +1070,9 @@ namespace upanui {
       Keyboard_KEY_RIGHT,
       Keyboard_KEY_LEFT,
       Keyboard_KEY_HOME,
-      Keyboard_KEY_END
+      Keyboard_KEY_END,
+      Keyboard_KEY_PG_UP,
+      Keyboard_KEY_PG_DOWN
     });
 
     return selectKeys.exists((KeyboardKeys)ch);
