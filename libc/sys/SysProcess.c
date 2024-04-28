@@ -37,6 +37,10 @@ void SysProcess_WaitPID(int iProcessID) {
   _upanix_syscall(SYS_CALL_PROCESS_WAIT_PID, (uint64_t)iProcessID, 2, 3, 4, 5);
 }
 
+void SysProcess_WaitOnLock(uint64_t lockAddress, int oldVal, int newVal) {
+  _upanix_syscall(SYS_CALL_PROCESS_WAIT_ON_LOCK, lockAddress, oldVal, newVal, 4, 5);
+}
+
 int SysProcess_IsChildAlive(int iProcessID) {
   return _upanix_syscall(SYS_CALL_PROCESS_CHILD_ALIVE, (uint64_t)iProcessID, 2, 3, 4, 5);
 }

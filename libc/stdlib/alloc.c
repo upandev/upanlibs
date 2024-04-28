@@ -23,7 +23,7 @@
 # include <stdlib.h>
 # include <string.h>
 
-extern int SysMemory_Alloc(void** addr, unsigned uiSizeInBytes) ;
+extern int SysMemory_AlignedAlloc(void** addr, uint32_t alignment, uint32_t uiSizeInBytes);
 extern int SysMemory_Free(void* uiAddress) ;
 extern int SysMemory_GetAllocSize(void* address, size_t* size) ;
 
@@ -34,12 +34,15 @@ void* calloc(size_t n, size_t s)
 	return a ;
 }
 
-void* malloc(size_t sizeInBytes)
-{
+void* aligned_alloc(size_t alignment, size_t sizeInBytes) {
   void* addr;
-	if(SysMemory_Alloc(&addr, sizeInBytes) < 0)
+  if(SysMemory_AlignedAlloc(&addr, alignment, sizeInBytes) < 0)
     return NULL;
   return addr;
+}
+
+void* malloc(size_t sizeInBytes) {
+  return aligned_alloc(0, sizeInBytes);
 }
 
 void free(void* address)

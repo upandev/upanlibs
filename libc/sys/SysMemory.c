@@ -21,8 +21,8 @@
  */
 # include <syscalldefs.h>
 
-int SysMemory_Alloc(void** addr, unsigned uiSizeInBytes) {
-  return _upanix_syscall(SYS_CALL_ALLOC, (uint64_t)addr, (uint64_t)uiSizeInBytes, 3, 4, 5);
+int SysMemory_AlignedAlloc(void** addr, uint32_t alignment, uint32_t uiSizeInBytes) {
+  return _upanix_syscall(SYS_CALL_ALIGNED_ALLOC, (uint64_t)addr, alignment, uiSizeInBytes, 4, 5);
 }
 
 int SysMemory_Free(void* uiAddress) {

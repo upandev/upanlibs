@@ -82,7 +82,7 @@ typedef enum
 	SYS_CALL_FILE_END,
 
 	SYS_CALL_MEM_START = 400,
-		SYS_CALL_ALLOC,
+    SYS_CALL_ALIGNED_ALLOC,
 		SYS_CALL_FREE,
 		SYS_CALL_GET_ALLOC_SIZE,
 	SYS_CALL_MEM_END,
@@ -92,6 +92,7 @@ typedef enum
 		SYS_CALL_PROCESS_EXEC,
 		SYS_CALL_THREAD_EXEC,
 		SYS_CALL_PROCESS_WAIT_PID,
+    SYS_CALL_PROCESS_WAIT_ON_LOCK,
 		SYS_CALL_PROCESS_EXIT,
     SYS_CALL_PROCESS_YIELD,
 		SYS_CALL_PROCESS_SLEEP,
@@ -157,12 +158,13 @@ int SysFS_FileOpenMode(int fd);
 int SysFS_FileStat(const char* szFileName, struct stat* pFileStat);
 int SysFS_FileStatFD(int iFD, struct stat* pFileStat);
 
-int SysMemory_Alloc(void** addr, unsigned uiSizeInBytes);
+int SysMemory_AlignedAlloc(void** addr, uint32_t alignment, uint32_t uiSizeInBytes);
 int SysMemory_Free(void* uiAddress);
 int SysMemory_GetAllocSize(void* address, size_t* size);
 int SysProcess_Exec(const char* szFileName, int iNoOfArgs, const char *const szArgList[]);
 int SysProcess_ThreadExec(uintptr_t threadCaller, uintptr_t entryAddress, void* arg);
 void SysProcess_WaitPID(int iProcessID);
+void SysProcess_WaitOnLock(uint64_t lockAddress, int newVal, int curVal);
 void SysProcess_Exit(int iExitStatus);
 void SysProcess_Yield();
 void SysProcess_Sleep(unsigned milisec);

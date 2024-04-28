@@ -27,23 +27,19 @@
 
 namespace upan{
     class mutex {
-      private:
-      atomic::integral<uint32_t> _lock;
-      __volatile__ int _processID;
-      __volatile__ int _lockCount;
+    private:
+      void* _alloc_mem_lock;
+      atomic::integral<int>* _lock;
+      int _lockCount;
 
       static const int FREE_MUTEX = -999;
     public:
       mutex();
       ~mutex();
 
-      bool lock(bool bBlock = true);
+      void lock();
       bool unlock();
       bool unlock(int pid);
-
-    private:
-      void acquire();
-      void release();
     };
 
     class mutex_guard {

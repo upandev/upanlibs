@@ -45,65 +45,33 @@
 #include <atomicop.h>
 #include <stdlib.h>
 #include <mosstd.h>
+#include <newalloc.h>
 
 namespace upan {
-  mutex::mutex() : _lock(0), _processID(FREE_MUTEX), _lockCount(0) {
+  mutex::mutex() : _alloc_mem_lock(nullptr), _lock(nullptr), _lockCount(0) {
+    _alloc_mem_lock = aligned_alloc(4, sizeof(upan::atomic::integral<int>));
+    _lock = new (_alloc_mem_lock)upan::atomic::integral<int>(0);
   }
 
   mutex::~mutex() {
+    free(_alloc_mem_lock);
   }
 
-  void mutex::acquire() {
-    while (true) {
-      if (_lock.set(1) == 0) {
-        break;
-      }
-      yield();
-    }
-  }
-
-  void mutex::release() {
-    _lock.set(0);
-  }
-
-  bool mutex::lock(bool bBlock) {
+  void mutex::lock() {
     if (iskernel()) {
-      return false;
+      return;
     }
 
-    __volatile__ int val;
-
-    while (true) {
-      acquire();
-
-      val = getpid();
-
-      if (_processID != FREE_MUTEX && _processID != val) {
-        if (isprocessalive(_processID)) {
-          release();
-
-          if (!bBlock)
-            return false;
-
-          yield();
-          continue;
-        } else {
-          _processID = FREE_MUTEX;
-        }
-      }
-
-      if (_processID == FREE_MUTEX) {
-        _processID = val;
-        _lockCount = 1;
-      } else {
-        ++_lockCount;
-      }
-
-      release();
-      break;
+    const int newVal = getpid();
+    const int oldVal = _lock->compare_set(FREE_MUTEX, newVal);
+    if (oldVal == FREE_MUTEX) {
+      _lockCount = 1;
+    } else if (oldVal == newVal) {
+      ++_lockCount;
+    } else {
+      waitonlock((uint64_t)_lock, FREE_MUTEX, newVal);
+      _lockCount = 1;
     }
-
-    return true;
   }
 
   bool mutex::unlock() {
@@ -111,23 +79,17 @@ namespace upan {
       return false;
     }
 
-    acquire();
-
-    __volatile__ int pid = getpid();
-
-    if (_processID != pid) {
-      release();
+    if (_lock->get() != getpid()) {
       return false;
     }
 
     if (_lockCount > 0) {
       --_lockCount;
-      if (!_lockCount) {
-        _processID = FREE_MUTEX;
-      }
     }
 
-    release();
+    if (!_lockCount) {
+      _lock->set(FREE_MUTEX);
+    }
 
     return true;
   }
@@ -137,16 +99,11 @@ namespace upan {
       return false;
     }
 
-    acquire();
-
-    if (_processID != pid) {
-      release();
+    if (_lock->get() != pid) {
       return false;
     }
 
-    _processID = FREE_MUTEX;
-
-    release();
+    _lock->set(FREE_MUTEX);
 
     return true;
   }

@@ -61,3 +61,7 @@ int getpid() {
 void yield() {
   SysProcess_Yield();
 }
+
+void waitonlock(uint64_t lockAddress, int oldVal, int newVal) {
+  SysProcess_WaitOnLock(lockAddress, oldVal, newVal);
+}

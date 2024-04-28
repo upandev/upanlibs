@@ -28,14 +28,19 @@ namespace upan {
     namespace atomic {
       class op {
       public:
-        static uint32_t swap(__volatile__ uint32_t &iLock, uint32_t val);
-        static uint32_t add(__volatile__ uint32_t &var, uint32_t val);
+        static uint32_t compare_swap(volatile uint32_t &iLock, uint32_t oldVal, uint32_t newVal);
+        static uint32_t swap(volatile uint32_t &iLock, uint32_t val);
+        static uint32_t add(volatile uint32_t &var, uint32_t val);
       };
 
       template <class T>
       class integral {
       public:
         integral(T val) : _val(static_cast<uint32_t>(val)) {}
+
+        T compare_set(T oldVal, T newVal) {
+          return static_cast<T>(op::compare_swap(_val, static_cast<uint32_t>(oldVal), static_cast<uint32_t>(newVal)));
+        }
 
         T set(T val) {
           return static_cast<T>(op::swap(_val, static_cast<uint32_t>(val)));

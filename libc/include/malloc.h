@@ -28,6 +28,7 @@
 extern "C" {
 #endif
 
+void* aligned_alloc(size_t alignment, size_t sizeInBytes);
 void* malloc(size_t sizeInBytes) ;
 void* calloc(size_t n, size_t s) ;
 void* realloc(void* ptr, size_t s) ;

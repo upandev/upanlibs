@@ -24,7 +24,11 @@
 
 namespace upan {
   namespace atomic {
-    uint32_t op::swap(__volatile__ uint32_t &iLock, uint32_t val) {
+    uint32_t op::compare_swap(volatile uint32_t &iLock, uint32_t oldVal, uint32_t newVal) {
+      return __sync_val_compare_and_swap(&iLock, oldVal, newVal);
+    }
+
+    uint32_t op::swap(volatile uint32_t &iLock, uint32_t val) {
       __asm__ __volatile__ ("lock xchgl %0, %1"
       : "=r" ( val )
       : "m"( iLock ), "0" (val)
@@ -33,7 +37,7 @@ namespace upan {
       return val;
     }
 
-    uint32_t op::add(__volatile__ uint32_t &var, uint32_t val) {
+    uint32_t op::add(volatile uint32_t &var, uint32_t val) {
       __asm__ __volatile__ ("lock xaddl %0, %1"
       : "=r"(val)
       : "m"( var ), "0" (val)
