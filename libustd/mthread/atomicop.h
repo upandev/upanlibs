@@ -36,7 +36,7 @@ namespace upan {
       template <class T>
       class integral {
       public:
-        integral(T val) : _val(static_cast<uint32_t>(val)) {}
+        explicit integral(T val) : _val(static_cast<uint32_t>(val)) {}
 
         T compare_set(T oldVal, T newVal) {
           return static_cast<T>(op::compare_swap(_val, static_cast<uint32_t>(oldVal), static_cast<uint32_t>(newVal)));

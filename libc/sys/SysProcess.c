@@ -79,12 +79,12 @@ void SysProcess_FreeProcListMem(PS* pProcList, unsigned uiListSize) {
 
 int exec(const char* szFileName, ...)
 {
-	__volatile__ int iProcessID ;
-	__volatile__ int argc ;
+  int iProcessID ;
+  int argc ;
 	char** argv = NULL ;
 
-	__volatile__ int i ;
-	__volatile__ uintptr_t* ref = (uintptr_t*)&szFileName + 1 ;
+	int i ;
+	uintptr_t* ref = (uintptr_t*)&szFileName + 1 ;
 	for(argc = 0; *(ref + argc); argc++) ;
 
 	if(argc)

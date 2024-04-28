@@ -50,7 +50,7 @@
 namespace upan {
   mutex::mutex() : _alloc_mem_lock(nullptr), _lock(nullptr), _lockCount(0) {
     _alloc_mem_lock = aligned_alloc(4, sizeof(upan::atomic::integral<int>));
-    _lock = new (_alloc_mem_lock)upan::atomic::integral<int>(0);
+    _lock = new (_alloc_mem_lock)upan::atomic::integral<int>(FREE_MUTEX);
   }
 
   mutex::~mutex() {
