@@ -62,6 +62,18 @@ void yield() {
   SysProcess_Yield();
 }
 
+void waitpid(int pid) {
+  SysProcess_WaitPID(pid);
+}
+
 void waitonlock(uint64_t lockAddress, int oldVal, int newVal) {
   SysProcess_WaitOnLock(lockAddress, oldVal, newVal);
+}
+
+void waitqueue(int id, void* mutex) {
+  SysProcess_WaitQueue(id, mutex);
+}
+
+void waitdequeue(int id, bool all) {
+  SysProcess_WaitDequeue(id, all);
 }

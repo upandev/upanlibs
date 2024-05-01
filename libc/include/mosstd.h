@@ -46,6 +46,7 @@ typedef enum
   WAIT_INT_WITH_TIMEOUT,
 	WAIT_CHILD,
   WAIT_LOCK,
+  WAIT_QUEUE,
 	WAIT_RESOURCE,
 	WAIT_KERNEL_SERVICE,
   WAIT_EVENT,
@@ -86,14 +87,15 @@ int isprocessalive(int pid);
 int iskernel();
 int getpid();
 void yield();
+void waitpid(int pid);
 void waitonlock(uint64_t lockAddress, int oldVal, int newVal);
+void waitqueue(int id, void* mutex);
+void waitdequeue(int id, bool all);
 
-extern void SysProcess_WaitPID(int iProcessID) ;
 extern void SysProcess_Exit(int iExitStatus) ;
 extern int SysProcess_GetProcList(PS** pProcList, unsigned* uiListSize) ;
 extern void SysProcess_FreeProcListMem(PS* pProcList, unsigned uiListSize) ;
 
-#define waitpid(pid) SysProcess_WaitPID(pid)
 #define _exit(exit_status) SysProcess_Exit(exit_status)
 #define getpslist(pslist, size) SysProcess_GetProcList(pslist, size)
 #define freepslist(pslist, size) SysProcess_FreeProcListMem(pslist, size)
