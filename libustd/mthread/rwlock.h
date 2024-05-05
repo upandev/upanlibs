@@ -22,32 +22,54 @@
 
 #pragma once
 
-#include <mutex.h>
-#include <mosstd.h>
+#include <condition_variable.h>
 
 namespace upan {
-  class condition_variable final {
-  private:
-    static atomic::integral<int> _global_cv_id_seq;
-
+  class rwlock {
   public:
-    condition_variable();
-    ~condition_variable() = default;
+    rwlock() : _readers_count(0), _active_writer(false) {}
 
-    void wait(mutex &m);
-
-    template<typename LAMBDA>
-    void wait(mutex &m, const LAMBDA &condition) {
-      while (!condition()) {
-        wait(m);
-      }
-    }
-
-    void notify_one();
-
-    void notify_all();
+    void read_lock();
+    void read_unlock();
+    void write_lock();
+    void write_unlock();
 
   private:
-    const int _id;
+    upan::mutex _m;
+    upan::condition_variable _cv;
+    int _readers_count;
+    bool _active_writer;
+  };
+
+  class rlock_gaurd {
+  private:
+    rlock_gaurd() = delete;
+  public:
+    rlock_gaurd(rwlock& lock) : _lock(lock) {
+      _lock.read_lock();
+    }
+    rlock_gaurd(const rwlock& lock) : rlock_gaurd(const_cast<rwlock&>(lock)) {
+    }
+    ~rlock_gaurd() {
+      _lock.read_unlock();
+    }
+  private:
+    rwlock& _lock;
+  };
+
+  class wlock_gaurd {
+  private:
+    wlock_gaurd() = delete;
+  public:
+    wlock_gaurd(rwlock& lock) : _lock(lock) {
+      _lock.write_lock();
+    }
+    wlock_gaurd(const rwlock& lock) : wlock_gaurd(const_cast<rwlock&>(lock)) {
+    }
+    ~wlock_gaurd() {
+      _lock.write_unlock();
+    }
+  private:
+    rwlock& _lock;
   };
 }

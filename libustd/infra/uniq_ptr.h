@@ -19,8 +19,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef _UPAN_UNIQ_PTR_H_
-#define _UPAN_UNIQ_PTR_H_
+#pragma once
 
 #include <string.h>
 #include <ctype.h>
@@ -30,33 +29,29 @@
 
 namespace upan {
 
-template <typename T>
-class uniq_ptr
-{
+  template<typename T>
+  class uniq_ptr {
   private:
-    void destroy()
-    {
-      if(_owner && _ptr != nullptr)
-      {
+    void destroy() {
+      if (_owner && _ptr != nullptr) {
         delete _ptr;
         _ptr = nullptr;
       }
     }
 
   public:
-    uniq_ptr(T* ptr) : _ptr(ptr), _owner(true)
-    {
+    uniq_ptr(T *ptr) : _ptr(ptr), _owner(true) {
     }
 
     uniq_ptr() : _ptr(nullptr), _owner(true) {
 
     }
 
-    uniq_ptr(uniq_ptr&& r) : _ptr(r.get()), _owner(true) {
+    uniq_ptr(uniq_ptr &&r) : _ptr(r.get()), _owner(true) {
       r.disown();
     }
 
-    uniq_ptr& operator=(uniq_ptr&& r) noexcept {
+    uniq_ptr &operator=(uniq_ptr &&r) noexcept {
       destroy();
       _ptr = r.get();
       _owner = true;
@@ -64,110 +59,104 @@ class uniq_ptr
       return *this;
     }
 
-    uniq_ptr(const uniq_ptr&) = delete;
-    uniq_ptr& operator=(const uniq_ptr&) = delete;
+    uniq_ptr(const uniq_ptr &) = delete;
 
-    ~uniq_ptr()
-    {
+    uniq_ptr &operator=(const uniq_ptr &) = delete;
+
+    ~uniq_ptr() {
       destroy();
     }
 
     void disown() { _owner = false; }
 
-    T* get() { return _ptr; }
-    const T* get() const { return _ptr; }
+    T *get() { return _ptr; }
 
-    T* operator->() { return get(); }
-    const T* operator->() const { return get(); }
+    const T *get() const { return _ptr; }
 
-    T& operator*() { return *get(); }
-    const T& operator*() const { return *get(); }
+    T *operator->() { return get(); }
 
-    T* release()
-    {
+    const T *operator->() const { return get(); }
+
+    T &operator*() { return *get(); }
+
+    const T &operator*() const { return *get(); }
+
+    T *release() {
       auto r = _ptr;
       _ptr = nullptr;
       return r;
     }
 
-    void reset(T* newPtr)
-    {
-      if(_ptr != newPtr)
-      {
+    void reset(T *newPtr) {
+      if (_ptr != newPtr) {
         destroy();
         _ptr = newPtr;
       }
     }
 
-    upan::option<T&> toOption() {
+    upan::option<T &> toOption() {
       if (_ptr) {
-        return upan::option<T&>(*_ptr);
+        return upan::option<T &>(*_ptr);
       } else {
-        return upan::option<T&>::empty();
+        return upan::option<T &>::empty();
       }
     }
 
   private:
-    T* _ptr;
+    T *_ptr;
     bool _owner;
-};
+  };
 
-template <typename T>
-class uniq_ptr<T[]>
-{
+  template<typename T>
+  class uniq_ptr<T[]> {
   private:
-    uniq_ptr(const uniq_ptr&) = delete;
-    uniq_ptr& operator=(const uniq_ptr&) = delete;
+    uniq_ptr(const uniq_ptr &) = delete;
 
-    void destroy()
-    {
-      if(_owner)
-      {
+    uniq_ptr &operator=(const uniq_ptr &) = delete;
+
+    void destroy() {
+      if (_owner) {
         delete[] _ptr;
         _ptr = nullptr;
       }
     }
 
   public:
-    uniq_ptr(T* ptr) : _ptr(ptr), _owner(true) {
+    uniq_ptr(T *ptr) : _ptr(ptr), _owner(true) {
     }
 
     uniq_ptr() : _ptr(nullptr), _owner(true) {
     }
-    ~uniq_ptr()
-    {
+
+    ~uniq_ptr() {
       destroy();
     }
 
     void disown() { _owner = false; }
 
-    T* get() { return _ptr; }
-    const T* get() const { return _ptr; }
+    T *get() { return _ptr; }
 
-    T& operator[](int index) { return _ptr[index]; }
-    const T& operator[](int index) const { return _ptr[index]; }
+    const T *get() const { return _ptr; }
 
-    T* release()
-    {
+    T &operator[](int index) { return _ptr[index]; }
+
+    const T &operator[](int index) const { return _ptr[index]; }
+
+    T *release() {
       auto r = _ptr;
       _ptr = nullptr;
       return r;
     }
 
-    void reset(T* newPtr)
-    {
-      if(_ptr != newPtr)
-      {
+    void reset(T *newPtr) {
+      if (_ptr != newPtr) {
         destroy();
         _ptr = newPtr;
       }
     }
 
   private:
-    T* _ptr;
+    T *_ptr;
     bool _owner;
-};
-
-};
-
-#endif
+  };
+}

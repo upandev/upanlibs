@@ -61,6 +61,7 @@ include_directories(${PROJECT_SOURCE_DIR}/libustd/algo)
 include_directories(${PROJECT_SOURCE_DIR}/libustd/infra)
 include_directories(${PROJECT_SOURCE_DIR}/libustd/mem)
 include_directories(${PROJECT_SOURCE_DIR}/libustd/mthread)
+include_directories(${PROJECT_SOURCE_DIR}/libustd/stream)
 
 include_directories(${PROJECT_SOURCE_DIR}/libgccucore/i386)
 include_directories(${PROJECT_SOURCE_DIR}/libgccucore/zlib)

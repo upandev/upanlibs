@@ -20,46 +20,31 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#pragma once
+#include <rwlock.h>
 
-#include <stdint.h>
-#include <atomicop.h>
+namespace upan {
+  void rwlock::read_lock() {
+    mutex_guard g(_m);
+    _cv.wait(_m, [this] { return !_active_writer; });
+    ++_readers_count;
+  }
 
-namespace upan{
-    class mutex {
-    private:
-      void* _alloc_mem_lock;
-      atomic::integral<int>* _lock;
-      int _lockCount;
+  void rwlock::read_unlock() {
+    mutex_guard g(_m);
+    if (--_readers_count == 0) {
+      _cv.notify_one();
+    }
+  }
 
-      static const int FREE_MUTEX = -999;
-    public:
-      mutex();
-      ~mutex();
+  void rwlock::write_lock() {
+    mutex_guard g(_m);
+    _cv.wait(_m, [this] { return _readers_count == 0 && !_active_writer; });
+    _active_writer = true;
+  }
 
-      mutex(const mutex&) = delete;
-      mutex(mutex&) = delete;
-      mutex& operator=(const mutex&) = delete;
-      mutex& operator=(mutex&) = delete;
-
-      void lock();
-      bool unlock();
-      bool unlock(int pid);
-    };
-
-    class mutex_guard {
-    private:
-      mutex_guard() = delete;
-    public:
-      mutex_guard(mutex& m) : _m(m) {
-        _m.lock();
-      }
-      mutex_guard(const mutex& m) : mutex_guard(const_cast<mutex&>(m)) {
-      }
-      ~mutex_guard() {
-        _m.unlock();
-      }
-    private:
-      mutex& _m;
-    };
+  void rwlock::write_unlock() {
+    mutex_guard g(_m);
+    _active_writer = false;
+    _cv.notify_all();
+  }
 }
