@@ -110,6 +110,70 @@ namespace upan {
   };
 
   template <typename Good>
-  upan::result<Good> good(const Good& value) { return upan::result<Good>(value); }
+  class result<Good&> {
+  protected:
+    Good* _value;
+    upan::error* _error;
 
+  public:
+    result(Good& value) : _value(&value), _error(nullptr) {}
+    result(const upan::error& err) : _error(new upan::error(err)) {}
+    ~result() {
+      delete _error;
+    }
+
+    static result<Good&> bad(const char * __restrict fmsg, ...) {
+      va_list arg;
+      va_start(arg, fmsg);
+      auto r = result<Good&>(upan::error(fmsg, arg));
+      va_end(arg);
+      return r;
+    }
+
+    bool isBad() const { return _error != nullptr; }
+    bool isGood() const { return !isBad(); }
+
+    Good& goodValue() const {
+      if(_error)
+        throw exception(XLOC, "Result is bad - can't get Good value");
+      return *_value;
+    }
+
+    Good& goodValueOrThrow(const char* fileName, unsigned lineNo) const {
+      if(_error)
+        throw exception(fileName, lineNo, *_error);
+      return *_value;
+    }
+
+    Good& goodValueOrElse(Good& defaultValue) const {
+      if(_error)
+        return defaultValue;
+      return *_value;
+    }
+
+    template <typename LAMBDA>
+    bool onGood(const LAMBDA& lambdaf) {
+      if(_error)
+        return false;
+      lambdaf(*_value);
+      return true;
+    }
+
+    const upan::error& badValue() const {
+      if(!_error)
+        throw exception(XLOC, "result is Good - can't get Error");
+      return *_error;
+    }
+
+    template <typename LAMBDA>
+    bool onBad(const LAMBDA& lambdaf)     {
+      if(isGood())
+        return false;
+      lambdaf(*_error);
+      return true;
+    }
+  };
+
+  template <typename Good>
+  upan::result<Good> good(const Good& value) { return upan::result<Good>(value); }
 }
