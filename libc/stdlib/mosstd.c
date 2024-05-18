@@ -77,3 +77,27 @@ void waitqueue(int id, void* mutex) {
 void waitdequeue(int id, bool all) {
   SysProcess_WaitDequeue(id, all);
 }
+
+int chdrive(const char* szDriveName) {
+  return SysDrive_ChangeDrive(szDriveName);
+}
+
+int get_drive_list(DriveStat** pDriveList, int* iListSize) {
+  return SysDrive_ShowDrives(pDriveList, iListSize);
+}
+
+int mount(const char* szDriveName) {
+  return SysDrive_Mount(szDriveName);
+}
+
+int umount(const char* szDriveName) {
+  return SysDrive_UnMount(szDriveName);
+}
+
+int format(const char* szDriveName) {
+  return SysDrive_Format(szDriveName);
+}
+
+int getcurdrive(DriveStat* pDriveStat) {
+  return SysDrive_GetCurrentDriveStat(pDriveStat);
+}

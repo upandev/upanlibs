@@ -71,19 +71,12 @@ typedef struct
 	unsigned long	ulUsedSize ;
 } DriveStat;
 
-extern int SysDrive_ChangeDrive(const char* szDriveName) ;
-extern int SysDrive_ShowDrives(DriveStat** pDriveList, int* iListSize) ;
-extern int SysDrive_Mount(const char* szDriveName) ;
-extern int SysDrive_UnMount(const char* szDriveName) ;
-extern int SysDrive_Format(const char* szDriveName) ;
-extern int SysDrive_GetCurrentDriveStat(DriveStat* pDriveStat) ;
-
-#define chdrive(drive) SysDrive_ChangeDrive(drive)
-#define get_drive_list(drive_list, list_size) SysDrive_ShowDrives(drive_list, list_size)
-#define mount(drive) SysDrive_Mount(drive) 
-#define umount(drive) SysDrive_UnMount(drive) 
-#define format(drive) SysDrive_Format(drive) 
-#define getcurdrive(pdrive) SysDrive_GetCurrentDriveStat(pdrive)
+int chdrive(const char* szDriveName) ;
+int get_drive_list(DriveStat** pDriveList, int* iListSize) ;
+int mount(const char* szDriveName) ;
+int umount(const char* szDriveName) ;
+int format(const char* szDriveName) ;
+int getcurdrive(DriveStat* pDriveStat) ;
 
 #if defined __cplusplus
 }
