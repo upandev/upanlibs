@@ -93,22 +93,21 @@ typedef struct
 } PACKED FS_Node;
 
 /* This is same as FileSystem_FileStat in Upanix Source and must be maintained in consistent with that */
-struct stat
-{
-	int 	    st_dev;     /* ID of device containing file */
-	int     	st_ino;     /* inode number */
-	unsigned short    	st_mode;    /* protection */
-	int   		st_nlink;   /* number of hard links */
-	int     	st_uid;     /* user ID of owner */
-	int     	st_gid;     /* group ID of owner */
-	int     	st_rdev;    /* device ID (if special file) */
-	unsigned    st_size;    /* total size, in bytes */
-	unsigned	st_blksize; /* blocksize for filesystem I/O */
-	unsigned  	st_blocks;  /* number of blocks allocated */
+struct stat {
+  int 	    st_dev;     /* ID of device containing file */
+  int     	st_ino;     /* inode number */
+  uint16_t 	st_mode;    /* protection */
+  int   		st_nlink;   /* number of hard links */
+  int     	st_uid;     /* user ID of owner */
+  int     	st_gid;     /* group ID of owner */
+  int     	st_rdev;    /* device ID (if special file) */
+  uint32_t  st_size;    /* total size, in bytes */
+  uint32_t  st_blksize; /* blocksize for filesystem I/O */
+  uint32_t  st_blocks;  /* number of blocks allocated */
 
-	struct timeval    	st_atime;   /* time of last access */
-	struct timeval    	st_mtime;   /* time of last modification */
-	struct timeval   	st_ctime;   /* time of last status change */
+  struct timeval st_atime;   /* time of last access */
+  struct timeval st_mtime;   /* time of last modification */
+  struct timeval st_ctime;   /* time of last status change */
 } ;
 
 extern int SysFS_ChangeDirectory(const char* szDirPath) ;
