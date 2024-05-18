@@ -30,4 +30,44 @@ const char string::operator[](int index) const {
   return c_str()[index];
 }
 
+int string::find(const upan::string& str) const {
+  int s = 0;
+
+  while (true) {
+    const int remaining = _len - s;
+    if (remaining < str.length()) {
+      return -1;
+    }
+
+    int i;
+    const char *in = str.c_str();
+    for (i = 0; i < str.length(); ++i) {
+      if (_buffer[s + i] != in[i]) {
+        break;
+      }
+    }
+
+    if (i == str.length()) {
+      return s;
+    } else {
+      ++s;
+    }
+  }
+}
+
+string string::substr(int start, int len) const {
+  if (start < 0 || len <= 0 || start >= _len) {
+    return "";
+  }
+  const int remaining = _len - start;
+  if (len > remaining) {
+    len = remaining;
+  }
+  return {_buffer + start, len};
+}
+
+string string::substr(int start) const {
+  return substr(start, _len - start);
+}
+
 };

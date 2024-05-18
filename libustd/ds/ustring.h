@@ -150,6 +150,9 @@ public:
   int length() const { return _len; }
 
   const char operator[](int index) const;
+  int find(const upan::string& str) const;
+  string substr(int start, int len) const;
+  string substr(int start) const;
 
 private:
   void init()
