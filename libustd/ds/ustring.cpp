@@ -30,7 +30,24 @@ const char string::operator[](int index) const {
   return c_str()[index];
 }
 
+int string::find(char c) const {
+  for(int i = 0; i < _len; ++i) {
+    if (_buffer[i] == c) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 int string::find(const upan::string& str) const {
+  if (str.length() == 0) {
+    return -1;
+  }
+
+  if (str.length() == 1) {
+    return find(str[0]);
+  }
+
   int s = 0;
 
   while (true) {
