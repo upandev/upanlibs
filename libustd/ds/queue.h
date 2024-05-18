@@ -156,9 +156,9 @@ bool queue<T>::push_back(const T& data)
 }
 
 template <typename T>
-void queue<T>::clear()
-{
-  _count = _readEnd = _writeEnd = 0;
+void queue<T>::clear() {
+  _readEnd = _writeEnd = 0;
+  _count.set(0);
 }
 
 };
