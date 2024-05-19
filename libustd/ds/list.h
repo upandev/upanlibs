@@ -383,7 +383,7 @@ T& list<T>::back()
 template <typename T>
 const T& list<T>::back() const
 {
-  const_cast<list<T>*>(this)->back();
+  return const_cast<list<T>*>(this)->back();
 }
 
 template <typename T>
