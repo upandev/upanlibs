@@ -21,6 +21,7 @@
  */
 
 #include <exception.h>
+#include <list.h>
 
 namespace upan {
 
@@ -85,6 +86,24 @@ string string::substr(int start, int len) const {
 
 string string::substr(int start) const {
   return substr(start, _len - start);
+}
+
+void string::tokenize(const upan::string& delim, bool filterEmpty, list<string>& tokens) const {
+  upan::string nextToken = *this;
+  while(true) {
+    int pos = nextToken.find(delim);
+    if (pos < 0) {
+      if (!filterEmpty || nextToken.length() > 0) {
+        tokens.push_back(nextToken);
+      }
+      break;
+    }
+    const upan::string& firstToken = nextToken.substr(0, pos);
+    if (!filterEmpty || firstToken.length() > 0) {
+      tokens.push_back(firstToken);
+    }
+    nextToken = nextToken.substr(pos + delim.length());
+  }
 }
 
 };

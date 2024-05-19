@@ -41,7 +41,7 @@ class vector
     typedef const vector_iterator const_iterator;
 
     vector();
-    explicit vector(const int reservce);
+    explicit vector(const int reserve);
     vector(const vector<T>& rhs);
     vector(vector<T>&& rhs);
     ~vector();

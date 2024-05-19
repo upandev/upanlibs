@@ -19,8 +19,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef _UPAN_STRING_H_
-#define _UPAN_STRING_H_
+#pragma once
 
 #include <string.h>
 #include <stdio.h>
@@ -28,8 +27,9 @@
 
 namespace upan {
 
-class string
-{
+template <typename T> class list;
+
+class string {
 public:
   string()
   {
@@ -148,12 +148,14 @@ public:
   }
 
   int length() const { return _len; }
+  bool empty() const { return _len == 0; }
 
   const char operator[](int index) const;
   int find(char c) const;
   int find(const upan::string& str) const;
   string substr(int start, int len) const;
   string substr(int start) const;
+  void tokenize(const upan::string& delim, bool filterEmpty, list<string>& tokens) const;
 
 private:
   void init()
@@ -189,5 +191,3 @@ public:
 };
 
 };
-
-#endif
