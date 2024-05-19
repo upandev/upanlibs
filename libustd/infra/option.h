@@ -26,88 +26,97 @@
 namespace upan {
 
 template <typename T>
-class option
-{
-  protected:
-    bool _isEmpty;
-    T _value;
-    option() : _isEmpty(true) {}
+class option {
+protected:
+  bool _isEmpty;
+  T _value;
 
-  public:
-    explicit option(const T& value) : _isEmpty(false), _value(value) {}
-    
-    static option<T> empty() {
-      return option<T>();
-    }
-    bool isEmpty() const { return _isEmpty; }
+  option() : _isEmpty(true) {}
 
-    const T& value() const {
-      if(_isEmpty)
-        throw exception(XLOC, "Option is empty");
-      return _value;
-    }
+public:
+  explicit option(const T& value) : _isEmpty(false), _value(value) {}
 
-    template <typename R, typename LAMBDA>
-    upan::option<R> map(const LAMBDA& mapLambda) {
-      if (_isEmpty) {
-        return upan::option<R>::empty();
-      }
-      return upan::option<R>(mapLambda(_value));
-    }
+  static option<T> empty() {
+    return option<T>();
+  }
 
-    template <typename R, typename LAMBDA>
-    upan::option<R> flatMap(const LAMBDA& mapLambda) {
-      if (_isEmpty) {
-        return upan::option<R>::empty();
-      }
-      return mapLambda(*_value);
-    }
+  bool isEmpty() const { return _isEmpty; }
 
-    const T& valueOrThrow(const upan::string& fileName, unsigned lineNo, const upan::error& error) const {
-      if(_isEmpty)
-        throw upan::exception(fileName, lineNo, error);
-      return _value;
-    }
+  T& value() {
+    if (_isEmpty)
+      throw exception(XLOC, "Option is empty");
+    return _value;
+  }
 
-    const T& valueOrElse(const T& defaultValue) const {
-      if(_isEmpty)
-        return defaultValue;
-      return _value;
-    }
+  const T& value() const {
+    if (_isEmpty)
+      throw exception(XLOC, "Option is empty");
+    return _value;
+  }
 
-    template <typename LAMBDA>
-    bool ifPresent(const LAMBDA& lambdaf) {
-      if(isEmpty())
-        return false;
-      lambdaf(_value);
-      return true;
+  template<typename R, typename LAMBDA>
+  upan::option<R> map(const LAMBDA& mapLambda) {
+    if (_isEmpty) {
+      return upan::option<R>::empty();
     }
+    return upan::option<R>(mapLambda(_value));
+  }
+
+  template<typename R, typename LAMBDA>
+  upan::option<R> flatMap(const LAMBDA& mapLambda) {
+    if (_isEmpty) {
+      return upan::option<R>::empty();
+    }
+    return mapLambda(*_value);
+  }
+
+  const T& valueOrThrow(const upan::string& fileName, unsigned lineNo, const upan::error& error) const {
+    if (_isEmpty)
+      throw upan::exception(fileName, lineNo, error);
+    return _value;
+  }
+
+  const T& valueOrElse(const T& defaultValue) const {
+    if (_isEmpty)
+      return defaultValue;
+    return _value;
+  }
+
+  template<typename LAMBDA>
+  bool ifPresent(const LAMBDA& lambdaf) {
+    if (isEmpty())
+      return false;
+    lambdaf(_value);
+    return true;
+  }
 };
 
 template <typename T>
-class option<T&>
-{
+class option<T&> {
 protected:
   bool _isEmpty;
   T* _value;
+
   option() : _isEmpty(true), _value(nullptr) {}
 
 public:
   explicit option(T& value) : _isEmpty(false), _value(&value) {}
+
   explicit option(T* value) : _isEmpty(value == nullptr), _value(value) {}
 
   static option<T&> empty() {
     return option<T&>();
   }
+
   bool isEmpty() const { return _isEmpty; }
 
   T& value() const {
-    if(_isEmpty)
+    if (_isEmpty)
       throw exception(XLOC, "Option is empty");
     return *_value;
   }
 
-  template <typename R, typename LAMBDA>
+  template<typename R, typename LAMBDA>
   upan::option<R> map(const LAMBDA& mapLambda) {
     if (_isEmpty) {
       return upan::option<R>::empty();
@@ -115,7 +124,7 @@ public:
     return upan::option<R>(mapLambda(*_value));
   }
 
-  template <typename R, typename LAMBDA>
+  template<typename R, typename LAMBDA>
   upan::option<R> flatMap(const LAMBDA& mapLambda) {
     if (_isEmpty) {
       return upan::option<R>::empty();
@@ -124,20 +133,20 @@ public:
   }
 
   T& valueOrThrow(const upan::string& fileName, unsigned lineNo, const upan::string& error) const {
-    if(_isEmpty)
+    if (_isEmpty)
       throw exception(fileName, lineNo, error);
     return *_value;
   }
 
   T& valueOrElse(T& defaultValue) const {
-    if(_isEmpty)
+    if (_isEmpty)
       return defaultValue;
     return *_value;
   }
 
-  template <typename LAMBDA>
+  template<typename LAMBDA>
   bool ifPresent(const LAMBDA& lambdaf) {
-    if(isEmpty())
+    if (isEmpty())
       return false;
     lambdaf(*_value);
     return true;
