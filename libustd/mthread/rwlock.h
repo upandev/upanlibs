@@ -23,11 +23,14 @@
 #pragma once
 
 #include <condition_variable.h>
+#include <map.h>
 
 namespace upan {
   class rwlock {
+  private:
+    static const int NO_ACTIVE_WRITER = -1;
   public:
-    rwlock() : _readers_count(0), _active_writer(false) {}
+    rwlock() : _active_writer(NO_ACTIVE_WRITER), _active_writer_lock_count(0) {}
 
     void read_lock();
     void read_unlock();
@@ -37,8 +40,9 @@ namespace upan {
   private:
     upan::mutex _m;
     upan::condition_variable _cv;
-    int _readers_count;
-    bool _active_writer;
+    upan::map<int, int> _readers;
+    int _active_writer;
+    int _active_writer_lock_count;
   };
 
   class rlock_gaurd {

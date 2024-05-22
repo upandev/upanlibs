@@ -101,3 +101,75 @@ int format(const char* szDriveName) {
 int getcurdrive(DriveStat* pDriveStat) {
   return SysDrive_GetCurrentDriveStat(pDriveStat);
 }
+
+int read(int fd, void* buf, int len) {
+  return SysFS_FileRead(fd, buf, len) ;
+}
+
+int write(int fd, const void* buf, int len) {
+  return SysFS_FileWrite(fd, buf, len) ;
+}
+
+void select(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors) {
+  SysFS_FileSelect(waitIODescriptors, readyIODescriptors);
+}
+
+int lseek(int fd, int offset, int seekType) {
+  return SysFS_FileSeek(fd, offset, seekType) ;
+}
+
+unsigned tell(int fd) {
+  return SysFS_FileTell(fd) ;
+}
+
+int getomode(int fd) {
+  return SysFS_FileOpenMode(fd) ;
+}
+
+int create(const char* file_path, unsigned short file_attr) {
+  return SysFS_CreateFile(file_path, file_attr) ;
+}
+
+int open(const char* file_name, byte mode) {
+  return SysFS_FileOpen(file_name, mode) ;
+}
+
+int close(int fd) {
+  return SysFS_FileClose(fd) ;
+}
+
+int unlink(const char* filePath) {
+  return SysFS_DeleteDirectory(filePath);
+}
+
+int mkdir(const char* dirPath, uint16_t attr) {
+  return SysFS_CreateDirectory(dirPath, attr);
+}
+
+int get_dir_content(const char* dirPath, struct stat_ex** dirList, int* size) {
+  return SysFS_GetDirContent(dirPath, dirList, size);
+}
+
+int stat(const char* szFileName, struct stat* pFileStat) {
+  return SysFS_FileStat(szFileName, pFileStat) ;
+}
+
+int fstat(int iFD, struct stat* pFileStat) {
+  return SysFS_FileStatFD(iFD, pFileStat) ;
+}
+
+int access(const char* szFileName, int mode) {
+  return SysFS_FileAccess(szFileName, mode);
+}
+
+int dup2(int oldFD, int newFD) {
+  return SysFS_Dup2(oldFD, newFD) ;
+}
+
+int getcwd(char* buf, size_t size) {
+  return SysFS_CWD(buf, size) ;
+}
+
+int chdir(const char* dirPath) {
+  return SysFS_ChangeDirectory(dirPath);
+}

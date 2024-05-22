@@ -25,26 +25,64 @@
 namespace upan {
   void rwlock::read_lock() {
     mutex_guard g(_m);
-    _cv.wait(_m, [this] { return !_active_writer; });
-    ++_readers_count;
+
+    const auto pid = getpid();
+
+    _cv.wait(_m, [&] {
+      return _active_writer == NO_ACTIVE_WRITER || _active_writer == pid;
+    });
+
+    ++_readers[pid];
   }
 
   void rwlock::read_unlock() {
     mutex_guard g(_m);
-    if (--_readers_count == 0) {
+
+    const auto pid = getpid();
+
+    auto i = _readers.find(pid);
+    if (i == _readers.end()) {
+      //throw upan::exception(XLOC, "read unlock called on unknown pid: %d", pid);
+      return;
+    }
+
+    --(i->second);
+
+    if (i->second == 0) {
+      _readers.erase(i);
+    }
+
+    if (_readers.empty() && _active_writer == NO_ACTIVE_WRITER) {
       _cv.notify_one();
     }
   }
 
   void rwlock::write_lock() {
     mutex_guard g(_m);
-    _cv.wait(_m, [this] { return _readers_count == 0 && !_active_writer; });
-    _active_writer = true;
+
+    const auto pid = getpid();
+
+    _cv.wait(_m, [&] {
+      return _active_writer == pid || (_active_writer == NO_ACTIVE_WRITER && _readers.empty());
+    });
+
+    _active_writer = pid;
+    ++_active_writer_lock_count;
   }
 
   void rwlock::write_unlock() {
     mutex_guard g(_m);
-    _active_writer = false;
-    _cv.notify_all();
+
+    const auto pid = getpid();
+
+    if (_active_writer != pid) {
+      return;
+    }
+
+    --_active_writer_lock_count;
+    if (_active_writer_lock_count == 0) {
+      _active_writer = NO_ACTIVE_WRITER;
+      _cv.notify_all();
+    }
   }
 }

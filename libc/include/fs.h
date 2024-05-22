@@ -56,6 +56,7 @@
 #define FILE_TYPE(attr) (attr & FILE_TYPE_MASK)
 
 #define S_ISDIR(attr) (FILE_TYPE(attr) == ATTR_TYPE_DIRECTORY)
+#define S_ISFILE(attr) (FILE_TYPE(attr) == ATTR_TYPE_FILE)
 
 #define	SEEK_SET 0
 #define	SEEK_CUR 1
@@ -77,20 +78,6 @@ typedef enum
 	O_RD_NONBLOCK = 128,
 	O_WR_NONBLOCK = 256
 } FileModes ;
-
-typedef struct
-{
-  byte            _name[33] ;
-  struct timeval  _createdTime ;
-  struct timeval  _accessedTime ;
-  struct timeval  _modifiedTime ;
-  byte            _parentSectorPos ;
-  unsigned short  _attribute ;
-  unsigned        _size ;
-  unsigned        _startSectorID ;
-  unsigned        _parentSectorID ;
-  int             _userID ;
-} PACKED FS_Node;
 
 /* This is same as FileSystem_FileStat in Upanix Source and must be maintained in consistent with that */
 struct stat {
@@ -115,27 +102,13 @@ struct stat_ex {
   struct stat _stat;
 };
 
-extern int SysFS_ChangeDirectory(const char* szDirPath) ;
-extern void SysFS_PWD(char** uiReturnDirPathAddress) ;
-extern int SysFS_CreateDirectory(const char* szDirPath, unsigned short usAttribute) ;
-extern int SysFS_DeleteDirectory(const char* szDirPath) ;
-extern int SysFS_GetDirContent(const char* szDirPath, FS_Node** pDirList, int* iListSize) ;
-extern int SysFS_CreateFile(const char* szDirPath, unsigned short usAttribute) ;
-extern int SysFS_FileOpen(const char* szFileName, byte bMode) ;
-extern int SysFS_FileClose(int fd) ;
-extern int SysFS_FileRead(int fd, void* buf, int len) ;
-extern int SysFS_FileWrite(int fd, const void* buf, int len) ;
-extern void SysFS_FileSelect(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors);
-
-#define chdir(dir_path) SysFS_ChangeDirectory(dir_path)
-#define getpwd(pwd_addr) SysFS_PWD(pwd_addr)
-#define mkdir(dir_path, dir_attr) SysFS_CreateDirectory(dir_path, dir_attr)
-#define unlink(dir_path) SysFS_DeleteDirectory(dir_path)
-#define get_dir_content(dir_path, dirlist, listsize) SysFS_GetDirContent(dir_path, dirlist, listsize)
-
 int create(const char* file_path, unsigned short file_attr) ;
 int open(const char* file_name, byte mode) ;
 int close(int fd) ;
+int unlink(const char* filePath);
+
+int mkdir(const char* dirPath, uint16_t attr);
+int get_dir_content(const char* dirPath, struct stat_ex** dirList, int* size);
 
 int read(int fd, void* buf, int len) ;
 int write(int fd, const void* buf, int len) ;
@@ -147,7 +120,8 @@ int fstat(int iFD, struct stat* pFileStat) ;
 int getomode(int fd) ;
 int access(const char* szFileName, int mode) ;
 int dup2(int oldFD, int newFD) ;
-int getcwd(char* buf, size_t size) ;
+int getcwd(char* buf, size_t size);
+int chdir(const char* dirPath);
 
 #if defined __cplusplus
 }

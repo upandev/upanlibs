@@ -26,10 +26,6 @@ int SysFS_ChangeDirectory(const char* szDirPath) {
   return _upanix_syscall(SYS_CALL_CHANGE_DIR, (uint64_t)szDirPath, 2, 3, 4, 5);
 }
 
-void SysFS_PWD(char** uiReturnDirPathAddress) {
-  _upanix_syscall(SYS_CALL_PWD, (uint64_t)uiReturnDirPathAddress, 2, 3, 4, 5);
-}
-
 int SysFS_CWD(char* uiReturnDirPathAddress, int len) {
   return _upanix_syscall(SYS_CALL_CWD, (uint64_t)uiReturnDirPathAddress, (uint64_t)len, 3, 4, 5);
 }
@@ -42,8 +38,8 @@ int SysFS_DeleteDirectory(const char* szDirPath) {
   return _upanix_syscall(SYS_CALL_RMDIR, (uint64_t)szDirPath, 2, 3, 4, 5);
 }
 
-int SysFS_GetDirContent(const char* szDirPath, FS_Node** pDirList, int* iListSize) {
-  return _upanix_syscall(SYS_CALL_GET_DIR_LIST, (uint64_t)szDirPath, (uint64_t)pDirList, (uint64_t)iListSize, 4, 5);
+int SysFS_GetDirContent(const char* szDirPath, struct stat_ex** dirList, int* size) {
+  return _upanix_syscall(SYS_CALL_GET_DIR_LIST, (uint64_t)szDirPath, (uint64_t)dirList, (uint64_t)size, 4, 5);
 }
 
 int SysFS_CreateFile(const char* szDirPath, unsigned short usAttribute) {
@@ -97,73 +93,3 @@ int SysFS_FileAccess(const char* szFileName, int mode) {
 int SysFS_Dup2(int oldFD, int newFD) {
   return _upanix_syscall(SYS_CALL_FILE_DUP2, (uint64_t)oldFD, (uint64_t)newFD, 3, 4, 5);
 }
-
-int read(int fd, void* buf, int len)
-{
-	return SysFS_FileRead(fd, buf, len) ;
-}
-
-int write(int fd, const void* buf, int len)
-{
-	return SysFS_FileWrite(fd, buf, len) ;
-}
-
-void select(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors) {
-	return SysFS_FileSelect(waitIODescriptors, readyIODescriptors);
-}
-
-int lseek(int fd, int offset, int seekType)
-{
-	return SysFS_FileSeek(fd, offset, seekType) ;
-}
-
-unsigned tell(int fd)
-{
-	return SysFS_FileTell(fd) ;
-}
-
-int getomode(int fd)
-{
-	return SysFS_FileOpenMode(fd) ;
-}
-
-int create(const char* file_path, unsigned short file_attr)
-{
-	return SysFS_CreateFile(file_path, file_attr) ;
-}
-
-int open(const char* file_name, byte mode)
-{
-	return SysFS_FileOpen(file_name, mode) ;
-}
-
-int close(int fd)
-{
-	return SysFS_FileClose(fd) ;
-}
-
-int stat(const char* szFileName, struct stat* pFileStat)
-{
-	return SysFS_FileStat(szFileName, pFileStat) ;
-}
-
-int fstat(int iFD, struct stat* pFileStat)
-{
-	return SysFS_FileStatFD(iFD, pFileStat) ;
-}
-
-int access(const char* szFileName, int mode)
-{
-	return SysFS_FileAccess(szFileName, mode);
-}
-
-int dup2(int oldFD, int newFD)
-{
-	return SysFS_Dup2(oldFD, newFD) ;
-}
-
-int getcwd(char* buf, size_t size)
-{
-	return SysFS_CWD(buf, size) ;
-}
-

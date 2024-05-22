@@ -61,7 +61,6 @@ typedef enum
 	
 	SYS_CALL_FILE_START = 200,
 		SYS_CALL_CHANGE_DIR,
-		SYS_CALL_PWD,
 		SYS_CALL_CWD,
 		SYS_CALL_MKDIR,
 		SYS_CALL_RMDIR,
@@ -145,10 +144,9 @@ int SysDrive_Format(const char* szDriveName);
 int SysDrive_GetCurrentDriveStat(DriveStat* pDriveStat);
 
 int SysFS_ChangeDirectory(const char* szDirPath);
-void SysFS_PWD(char** uiReturnDirPathAddress);
 int SysFS_CreateDirectory(const char* szDirPath, unsigned short usAttribute);
 int SysFS_DeleteDirectory(const char* szDirPath);
-int SysFS_GetDirContent(const char* szDirPath, FS_Node** pDirList, int* iListSize);
+int SysFS_GetDirContent(const char* szDirPath, struct stat_ex** dirList, int* size);
 int SysFS_CreateFile(const char* szDirPath, unsigned short usAttribute);
 int SysFS_FileOpen(const char* szFileName, byte bMode);
 int SysFS_FileClose(int fd);
@@ -159,6 +157,10 @@ int SysFS_FileTell(int fd);
 int SysFS_FileOpenMode(int fd);
 int SysFS_FileStat(const char* szFileName, struct stat* pFileStat);
 int SysFS_FileStatFD(int iFD, struct stat* pFileStat);
+int SysFS_Dup2(int oldFD, int newFD);
+int SysFS_CWD(char* uiReturnDirPathAddress, int len);
+int SysFS_FileAccess(const char* szFileName, int mode);
+void SysFS_FileSelect(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors);
 
 int SysMemory_AlignedAlloc(void** addr, uint32_t alignment, uint32_t uiSizeInBytes);
 int SysMemory_Free(void* uiAddress);
