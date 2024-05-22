@@ -108,7 +108,12 @@ struct stat {
   struct timeval st_atime;   /* time of last access */
   struct timeval st_mtime;   /* time of last modification */
   struct timeval st_ctime;   /* time of last status change */
-} ;
+};
+
+struct stat_ex {
+  char _name[33];
+  struct stat _stat;
+};
 
 extern int SysFS_ChangeDirectory(const char* szDirPath) ;
 extern void SysFS_PWD(char** uiReturnDirPathAddress) ;

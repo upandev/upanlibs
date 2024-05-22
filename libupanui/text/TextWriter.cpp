@@ -41,8 +41,8 @@ namespace upanui {
         drawUSFNChar(parent, ch, x, y, fg, bg);
         return;
       } catch(upan::exception& e) {
-        _usfnContext = nullptr;
-        printf("failed to render character using usfn: %s", e.ErrorMsg().c_str());
+        //_usfnContext = nullptr;
+        //printf("failed to render character using usfn: %s", e.ErrorMsg().c_str());
       }
     }
     x *= _xCharScale;
