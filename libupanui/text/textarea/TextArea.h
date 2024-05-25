@@ -29,6 +29,11 @@
 #include <mutex.h>
 #include <timer_thread.h>
 #include <uniq_ptr.h>
+#include <UIPosition.h>
+#include <Character.h>
+#include <TextLine.h>
+#include <usfncontexts.h>
+#include <TextBuffer.h>
 
 namespace upanui {
 
@@ -91,7 +96,6 @@ namespace upanui {
     }
 
   private:
-    static constexpr int DEFAULT_FONT_SIZE = 16;
     static constexpr int DEFAULT_SIDE_MARGIN = 8;
     static constexpr uint32_t DEFAULT_BG_COLOR = 0xFFFFFF;
     static constexpr uint32_t DEFAULT_FG_COLOR = 0;
@@ -111,164 +115,7 @@ namespace upanui {
 
     void onKeyboardEvent(const KeyboardEvent& event) override;
 
-    void clearArea(int x, int  y, int32_t width, int32_t height);
-
   private:
-    class Character {
-    public:
-      Character(uint16_t ch, uint8_t fontSize, uint8_t fontType,
-                uint16_t style, uint32_t fgColor, uint32_t bgColor) :
-                _ch(ch), _fontSize(fontSize), _fontType(fontType),
-                _style(style), _fgColor(fgColor), _bgColor(bgColor) {}
-
-      uint16_t getCh() const {
-        return _ch;
-      }
-
-      uint8_t getFontSize() const {
-        return _fontSize;
-      }
-
-      uint8_t getChWidth() const {
-        auto w = _fontSize / 2;
-        const auto e = _fontSize / DEFAULT_FONT_SIZE;
-
-        if (_style & usfn::STYLE_BOLD) {
-          w += e;
-          if (_style & usfn::STYLE_ITALIC) {
-            w += e * 2;
-          }
-        } else if (_style & usfn::STYLE_ITALIC) {
-          w += e;
-        }
-        return w;
-      }
-
-      uint8_t getChHeight() const {
-        return _fontSize;
-      }
-
-      usfn::PreloadedFonts getFontType() const {
-        return (usfn::PreloadedFonts)_fontType;
-      }
-
-      uint16_t getStyle() const {
-        return _style;
-      }
-
-      uint32_t getFgColor() const {
-        return _fgColor;
-      }
-
-      uint32_t getBgColor() const {
-        return _bgColor;
-      }
-
-      void setCh(uint16_t ch) {
-        _ch = ch;
-      }
-
-      void setFontSize(uint8_t fontSize) {
-        _fontSize = fontSize;
-      }
-
-      void setFontType(usfn::PreloadedFonts fontType) {
-        _fontType = fontType;
-      }
-
-      void setStyle(uint16_t style) {
-        _style = style;
-      }
-
-      void setFgColor(uint32_t fgColor) {
-        _fgColor = fgColor;
-      }
-
-      void setBgColor(uint32_t bgColor) {
-        _bgColor = bgColor;
-      }
-
-    private:
-      uint16_t _ch;
-      uint8_t _padding1;
-      uint8_t _fontSize;
-
-      uint8_t _fontType;
-      uint8_t _padding2;
-      uint16_t _style;
-
-      uint32_t _fgColor;
-      uint32_t _bgColor;
-    } PACKED;
-
-    typedef upan::vector<Character> Characters;
-
-    class Line {
-    public:
-      static const int MIN_CURSOR_WIDTH_BUFFER = 8;
-      static const int DEFAULT_LINE_SPACE = 4;
-
-      Line(uint8_t defaultHeight) : _width(MIN_CURSOR_WIDTH_BUFFER), _maxChHeight(defaultHeight), _wrapped(false) {}
-      void insert(int pos, const Character &ch);
-      void remove(int from, int last);
-
-      int width() const { return _width; }
-      uint8_t lineHeight() const { return _maxChHeight + DEFAULT_LINE_SPACE; }
-      bool wrapped() const { return _wrapped; }
-      void wrapped(bool wrapped) {
-        _wrapped = wrapped;
-      }
-      int size() const { return _characters.size(); }
-      const Characters& characters() const { return _characters; }
-      const Character& characters(int i) const { return _characters[i]; }
-    private:
-      Characters _characters;
-      int _width;
-      uint8_t _maxChHeight;
-      bool _wrapped;
-    };
-
-    class Position {
-    public:
-      Position() : _x(0), _y(0) {}
-
-      int x() const {
-        return _x;
-      }
-
-      int y() const {
-        return _y;
-      }
-
-      void set(int x, int y) {
-        _x = x;
-        _y = y;
-      }
-
-      bool operator==(const Position& p) const {
-        return _x == p._x && _y == p._y;
-      }
-
-      bool operator<(const Position& p) const {
-        return _y == p._y ? _x < p._x : _y < p._y;
-      }
-
-      bool operator<=(const Position& p) const {
-        return (*this < p) || (*this == p);
-      }
-
-      bool operator>(const Position& p) const {
-        return !(*this <= p);
-      }
-
-      bool operator>=(const Position& p) const {
-        return !(*this < p);
-      }
-
-    private:
-      int _x;
-      int _y;
-    };
 
     class CursorBlink : public upan::timer_thread {
     public:
@@ -303,18 +150,18 @@ namespace upanui {
       bool isPresent() const { return _present; }
       void setPresent(bool present) { _present = present; }
 
-      Position pivot() const { return _pivot; }
-      Position p1() const { return _p1; }
-      Position p2() const { return _p2; }
+      UIPosition pivot() const { return _pivot; }
+      UIPosition p1() const { return _p1; }
+      UIPosition p2() const { return _p2; }
 
-      void setPivot(const Position& pivot) { _pivot = pivot; }
-      void setRange(const Position& pa, const Position& pb);
+      void setPivot(const UIPosition& pivot) { _pivot = pivot; }
+      void setRange(const UIPosition& pa, const UIPosition& pb);
       bool inRange(int x, int y) const;
 
     private:
-      Position _pivot;
-      Position _p1;
-      Position _p2;
+      UIPosition _pivot;
+      UIPosition _p1;
+      UIPosition _p2;
       bool _present;
     };
 
@@ -335,42 +182,33 @@ namespace upanui {
     void processKeyboardEvent(const KeyboardEvent& event);
     void insert(const Character& ch);
     void enter();
-    usfn::Context& getUSFNContext(usfn::PreloadedFonts fontType, uint8_t fontSize, uint16_t fontStyle);
     void scrollToCursor();
     void validateCursorPos() const;
     void updateCursorPosition(int charPosX, int charPosY, int cursorPosX, int cursorPosY);
     void updateCursor(bool showCursor);
     void moveCursor(bool isSelectionOn, int x, int y);
     uint32_t getChBgColor(int cx, int cy, const Character& ch) const;
-    void fillCharacterBG(int x, int y, int cx, int cy, int height, const Character &ch);
 
-    void insert(TextArea::Line& line, int lineX, int lineY, const TextArea::Characters& characters);
+    void insert(TextLine& line, int lineX, int lineY, const Characters& characters);
     void wrapremovech(int x, int y, int& deletedLine);
     void lineremovech(const int y);
-    void renderLine(const Line &line, int charX, int charY, int baseDrawY);
+    void renderLine(const TextLine &line, int charX, int charY, int baseDrawY);
 
     int getLineBaseY(int lineIndex);
     int getLineBaseX(int charX, int lineIndex);
     VirtualYInfo getLineAtVirtualY(int baseY, int rows);
     void renderLineTopDown(const VirtualYInfo& info);
     void renderLineBottomUp(const VirtualYInfo& info);
-    void renderLineRange(const Position& p1, const Position& p2);
+    void renderLineRange(const UIPosition& p1, const UIPosition& p2);
 
     bool isSelectKey(uint8_t) const;
     bool isTextModifyKey(uint8_t ch) const;
     bool isInsertableKey(uint16_t ch) const;
     void deleteSelectedArea();
     void unselectArea();
-    void updateSelectedArea(bool isSelectionOn, bool isSelectKey, const Position &prevCharPos);
+    void updateSelectedArea(bool isSelectionOn, bool isSelectKey, const UIPosition &prevCharPos);
 
   private:
-    static const uint8_t MAX_FONT_SIZE = 128;
-
-    upan::vector<Line*> _lines;
-
-    typedef upan::map<uint64_t, usfn::Context*> FontContextMap;
-    FontContextMap _fontContexts;
-
     int _scrollY;
     int _scrollHeight;
     uint8_t _currentFontSize;
@@ -379,15 +217,17 @@ namespace upanui {
     uint32_t _currentFGColor;
     uint32_t _currentBGColor;
     int _maxLineCharWidth;
-    Position _characterPos;
-    Position _cursorPos;
-    DrawBuffer _textBuffer;
+    UIPosition _characterPos;
+    UIPosition _cursorPos;
     upan::mutex _drawMutex;
     CursorBlink _cursorBlinkThread;
     upan::uniq_ptr<TextAreaMouseHandler> _mouseHandler;
     SelectedArea _selectedArea;
     ScrollerChanges _scrollerChanges;
     Characters _copyBuffer;
+    upan::vector<TextLine*> _lines;
+    usfn::Contexts _fontContexts;
+    TextBuffer _textBuffer;
 
     friend class UIObjectFactory;
   };
