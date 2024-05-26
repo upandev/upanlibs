@@ -36,7 +36,6 @@ namespace upanui {
     private:
       typedef upan::map<uint64_t, usfn::Context*> FontContextMap;
       FontContextMap _fontContexts;
-
     };
   }
 }

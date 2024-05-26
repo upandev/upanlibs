@@ -31,32 +31,31 @@ namespace upanui {
   TextArea::TextArea(int x, int y, int width, int height) : RectangleCanvas(x, y, width, height),
     _scrollY(0), _scrollHeight(0),
     _currentFontSize(Character::DEFAULT_FONT_SIZE), _currentFontType(usfn::PreloadedFonts::VGA16), _currentStyle(usfn::STYLE_REGULAR),
-    _currentFGColor(DEFAULT_FG_COLOR), _currentBGColor(DEFAULT_BG_COLOR),
-    _maxLineCharWidth(width - DEFAULT_SIDE_MARGIN * 2), _cursorBlinkThread(*this), _mouseHandler(nullptr) {
-    if (width <= DEFAULT_SIDE_MARGIN * 2) {
-      throw upan::exception(XLOC, "TextArea should have a min width > 8");
-    }
+    _currentFGColor(DEFAULT_FG_COLOR), _currentBGColor(DEFAULT_BG_COLOR), _leftMargin(0),
+    _maxLineCharWidth(width), _cursorBlinkThread(*this), _mouseHandler(nullptr), _lines(*this) {
   }
 
   TextArea::~TextArea() {
-    for(auto i : _lines) {
-      delete i;
-    }
     _cursorBlinkThread.stop();
   }
 
-  void TextArea::init() {
+  void TextArea::init(int leftMargin) {
+    _leftMargin = leftMargin;
+    _maxLineCharWidth = width() - leftMargin * 2;
+    if (width() <= _leftMargin * 2) {
+      throw upan::exception(XLOC, "TextArea should have a min width > 8");
+    }
+
     backgroundColor(0xFFFFFF | GCoreFunctions::ALPHA_MASK);
-    auto curLine = new TextLine(_currentFontSize);
-    _lines.push_back(curLine);
+    auto& curLine = _lines.add(0);
     _selectedArea.setPresent(false);
     _textBuffer.init(width(), height(), backgroundColorWithAlpha());
     //cursor y is within the character pixel block.
     //the character rendering should ensure that the character is drawn with certain bottom margin
     //for the cursor to be visible at the last pixel row of the character block.
-    _cursorPos.set(DEFAULT_SIDE_MARGIN, curLine->lineHeight() - 1);
+    _cursorPos.set(_leftMargin, curLine.lineHeight() - 1);
     _characterPos.set(0, 0);
-    changeScrollHeight(curLine->lineHeight());
+    changeScrollHeight(curLine.lineHeight());
     _cursorBlinkThread.start();
 
     UIObjectImpl::captureMouseEvents(true);
@@ -67,7 +66,7 @@ namespace upanui {
   void TextArea::scrollToCursor() {
     int rows;
     if (_cursorPos.y() < 0) {
-      rows =  -(_cursorPos.y() - _lines[_characterPos.y()]->lineHeight() + 1);
+      rows =  -(_cursorPos.y() - _lines.get(_characterPos.y()).lineHeight() + 1);
     } else if (_cursorPos.y() >= height()) {
       rows =  -(_cursorPos.y() - height() + 1);
     } else {
@@ -83,25 +82,23 @@ namespace upanui {
       throw upan::exception(XLOC, "invalid cursor row:%u", _characterPos.y());
     }
 
-    const auto line = _lines[_characterPos.y()];
-    if (_characterPos.x() > line->size()) {
+    if (_characterPos.x() > _lines.get(_characterPos.y()).size()) {
       throw upan::exception(XLOC, "invalid cursor column:%u @ line:%u", _characterPos.x(), _characterPos.y());
     }
   }
 
   void TextArea::enter() {
-    TextLine& curLine = *_lines[_characterPos.y()];
+    auto& curLine = _lines.get(_characterPos.y());
 
-    TextLine* prevLine = (_characterPos.y() > 0) ? _lines[_characterPos.y() - 1] : nullptr;
-    if (_characterPos.x() == 0) {
-      if (prevLine && prevLine->wrapped()) {
-        prevLine->wrapped(false);
+    if (_characterPos.x() == 0 && _characterPos.y() > 0) {
+      auto& prevLine = _lines.get(_characterPos.y() - 1);
+      if (prevLine.wrapped()) {
+        prevLine.wrapped(false);
         return;
       }
     }
 
-    TextLine& newLine = *new TextLine(_currentFontSize);
-    _lines.insert(_characterPos.y() + 1, &newLine);
+    auto& newLine = _lines.add(_characterPos.y() + 1);
 
     for(int i = _characterPos.x(), j = 0; i < curLine.size(); ++i, ++j) {
       newLine.insert(j, curLine.characters()[i]);
@@ -110,12 +107,12 @@ namespace upanui {
     newLine.wrapped(curLine.wrapped());
     curLine.remove(_characterPos.x(), curLine.characters().size());
     curLine.wrapped(false);
-    renderLine(curLine, _characterPos.x(), _characterPos.y(), _cursorPos.y());
+    curLine.render(_characterPos.x(), _characterPos.y(), _cursorPos.y());
 
     auto newCursorY = _cursorPos.y() + newLine.lineHeight();
     if (newCursorY < height()) {
       _textBuffer.move(newCursorY + 1, _cursorPos.y() + 1, height() - newCursorY - 1);
-      renderLine(newLine, 0, _characterPos.y() + 1, newCursorY);
+      newLine.render(0, _characterPos.y() + 1, newCursorY);
     }
 
     changeScrollHeight(newLine.lineHeight());
@@ -136,18 +133,18 @@ namespace upanui {
       return;
     }
 
-    if (_lines.size() == 1 && _lines[0]->size() == 0) {
+    if (_lines.size() == 1 && _lines.get(0).size() == 0) {
       return;
     }
 
     UIPosition p1, p2;
     p1.set(0, 0);
-    p2.set(_lines[_lines.size() - 1]->size(), _lines.size() - 1);
+    p2.set(_lines.get(_lines.size() - 1).size(), _lines.size() - 1);
     _selectedArea.setPresent(true);
     _selectedArea.setPivot(p1);
     _selectedArea.setRange(p1, p2);
 
-    renderLineRange(p1, p2);
+    _lines.renderLineRange(p1, p2, _scrollY);
   }
 
   void TextArea::cutSelection() {
@@ -163,39 +160,39 @@ namespace upanui {
     }
 
     if (_selectedArea.p1().y() == _selectedArea.p2().y()) {
-      auto line = _lines[_selectedArea.p1().y()];
+      auto& line = _lines.get(_selectedArea.p1().y());
 
-      for(int x = _selectedArea.p1().x(); x < _selectedArea.p2().x() && x < line->size(); ++x) {
-        _copyBuffer.push_back(line->characters(x));
+      for(int x = _selectedArea.p1().x(); x < _selectedArea.p2().x() && x < line.size(); ++x) {
+        _copyBuffer.push_back(line.characters(x));
       }
     } else {
       const Character newLineCharacter(Keyboard_ENTER, _currentFontSize, _currentFontType, _currentStyle, _currentFGColor, _currentBGColor);
       {
-        auto line1 = _lines[_selectedArea.p1().y()];
-        for (int x = _selectedArea.p1().x(); x < line1->size(); ++x) {
-          _copyBuffer.push_back(line1->characters(x));
+        auto& line1 = _lines.get(_selectedArea.p1().y());
+        for (int x = _selectedArea.p1().x(); x < line1.size(); ++x) {
+          _copyBuffer.push_back(line1.characters(x));
         }
-        if (!line1->wrapped()) {
+        if (!line1.wrapped()) {
           _copyBuffer.push_back(newLineCharacter);
         }
       }
 
       {
         for (int y = _selectedArea.p1().y() + 1; y < _selectedArea.p2().y(); ++y) {
-          auto line = _lines[y];
-          for (const auto &ch : line->characters()) {
+          auto& line = _lines.get(y);
+          for (const auto &ch : line.characters()) {
             _copyBuffer.push_back(ch);
           }
-          if (!line->wrapped()) {
+          if (!line.wrapped()) {
             _copyBuffer.push_back(newLineCharacter);
           }
         }
       }
 
       {
-        auto line2 = _lines[_selectedArea.p2().y()];
-        for (int x = 0; x < _selectedArea.p2().x() && x < line2->size(); ++x) {
-          _copyBuffer.push_back(line2->characters(x));
+        auto& line2 = _lines.get(_selectedArea.p2().y());
+        for (int x = 0; x < _selectedArea.p2().x() && x < line2.size(); ++x) {
+          _copyBuffer.push_back(line2.characters(x));
         }
       }
     }
@@ -223,12 +220,12 @@ namespace upanui {
       return;
     }
 
-    auto line = _lines[_characterPos.y()];
+    auto& line = _lines.get(_characterPos.y());
     auto origLineCount = _lines.size();
 
     Characters characters;
     characters.push_back(ch);
-    insert(*line, _characterPos.x(), _characterPos.y(), characters);
+    insert(line, _characterPos.x(), _characterPos.y(), characters);
 
     auto hasNewLine = _lines.size() != origLineCount;
 
@@ -236,11 +233,11 @@ namespace upanui {
       auto srcCursorY = _cursorPos.y();
       auto destCursorY = _cursorPos.y();
       for (int i = _characterPos.y() + 1; i < _lines.size(); ++i) {
-        auto l = _lines[i];
-        if (l->wrapped()) {
-          srcCursorY += l->lineHeight();
+        auto& l = _lines.get(i);
+        if (l.wrapped()) {
+          srcCursorY += l.lineHeight();
         } else {
-          destCursorY = srcCursorY + l->lineHeight();
+          destCursorY = srcCursorY + l.lineHeight();
           break;
         }
       }
@@ -252,15 +249,16 @@ namespace upanui {
 
     auto cursorY = _cursorPos.y();
     for(int i = _characterPos.y(); i < _lines.size(); ++i) {
-      renderLine(*_lines[i], 0, i, cursorY);
-      if (!_lines[i]->wrapped()) { break; }
+      auto& l = _lines.get(i);
+      l.render(0, i, cursorY);
+      if (!l.wrapped()) { break; }
       if (cursorY >= height()) { break; }
-      cursorY += _lines[i]->lineHeight();
+      cursorY += l.lineHeight();
     }
 
-    if (line->size() == _characterPos.x()) {
+    if (line.size() == _characterPos.x()) {
       //This means the new character inserted has moved to the next line
-      updateCursorPosition(1, _characterPos.y(), ch.getChWidth() + DEFAULT_SIDE_MARGIN, _cursorPos.y());
+      updateCursorPosition(1, _characterPos.y(), ch.getChWidth() + _leftMargin, _cursorPos.y());
       movedown();
     } else {
       updateCursorPosition(_characterPos.x() + 1, _characterPos.y(), _cursorPos.x() + ch.getChWidth(), _cursorPos.y());
@@ -282,35 +280,34 @@ namespace upanui {
     if (!wrapCharacters.empty()) {
       lineY += 1;
       if (line.wrapped()) {
-        auto nextLine = _lines[lineY];
-        insert(*nextLine, 0, lineY, wrapCharacters);
+        auto& nextLine = _lines.get(lineY);
+        insert(nextLine, 0, lineY, wrapCharacters);
       } else {
         line.wrapped(true);
-        auto newLine = new TextLine(_currentFontSize);
-        _lines.insert(lineY, newLine);
-        changeScrollHeight(newLine->lineHeight());
-        insert(*newLine, 0, lineY, wrapCharacters);
+        auto& newLine = _lines.add(lineY);
+        changeScrollHeight(newLine.lineHeight());
+        insert(newLine, 0, lineY, wrapCharacters);
       }
     }
   }
 
   void TextArea::wrapremovech(int x, int y, int& deletedLine) {
-    auto line = _lines[y];
-    line->remove(x, x + 1);
+    auto& line = _lines.get(y);
+    line.remove(x, x + 1);
 
-    if (!line->wrapped()) {
+    if (!line.wrapped()) {
       return;
     }
 
     auto ny = y + 1;
     if (ny < _lines.size()) {
-      auto nextLine = _lines[ny];
-      int availWidth = _maxLineCharWidth - line->width();
+      auto& nextLine = _lines.get(ny);
+      int availWidth = _maxLineCharWidth - line.width();
       bool deletedFromNextLine = false;
-      while (nextLine->size() > 0) {
-        auto ch = nextLine->characters(0);
+      while (nextLine.size() > 0) {
+        auto ch = nextLine.characters(0);
         if (ch.getChWidth() < availWidth) {
-          line->insert(line->size(), ch);
+          line.insert(line.size(), ch);
           availWidth -= ch.getChWidth();
           wrapremovech(0, ny, deletedLine);
           deletedFromNextLine = true;
@@ -319,103 +316,49 @@ namespace upanui {
         }
       }
       //deleting when cursor is at the end of current line which is full - then we need to remove the first char from next line
-      if (!deletedFromNextLine && nextLine->size() > 0 && x == line->size()) {
+      if (!deletedFromNextLine && nextLine.size() > 0 && x == line.size()) {
         wrapremovech(0, ny, deletedLine);
       }
-      if (nextLine->size() == 0) {
-        line->wrapped(false);
+      if (nextLine.size() == 0) {
+        line.wrapped(false);
         deletedLine = ny;
       }
     }
   }
 
-  void TextArea::lineremovech(const int y) {
-    const int baseY = getLineBaseY(y);
-    auto line = _lines[y];
-    auto visibleBaseY = baseY - line->lineHeight() + 1;
-    auto insideCanvas = visibleBaseY < height();
-
-    if (y > 0) {
-      auto prevLine = _lines[y - 1];
-      if (prevLine->wrapped()) {
-        prevLine->wrapped(line->wrapped());
-      }
-    }
-
-    if (y < (_lines.size() - 1) && insideCanvas) {
-      int copyHeight = 0;
-      int lastLineIndex = -1;
-      auto lastLineBaseCursorY = baseY;
-
-      for (int i = y + 1; i < _lines.size(); ++i) {
-        lastLineBaseCursorY += _lines[i]->lineHeight();
-        if (lastLineBaseCursorY >= (height() - 1)) {
-          lastLineIndex = i;
-          break;
-        }
-        copyHeight += _lines[i]->lineHeight();
-      }
-
-      _textBuffer.move(visibleBaseY, baseY + 1, copyHeight);
-
-      const int destYOnCanvas = visibleBaseY + copyHeight;
-      if (copyHeight > 0) {
-        _textBuffer.clear(0, destYOnCanvas, width(), height() - destYOnCanvas);
-      }
-
-      for (int lastLineTopY = destYOnCanvas; lastLineTopY < height() && lastLineIndex != -1 && lastLineIndex < _lines.size();) {
-        auto lastLine = _lines[lastLineIndex];
-        renderLine(*lastLine, 0, lastLineIndex, lastLineTopY + lastLine->lineHeight() - 1);
-        lastLineTopY += lastLine->lineHeight();
-        ++lastLineIndex;
-      }
-
-      _lines.erase(y, y + 1);
-      changeScrollHeight(-line->lineHeight());
-      delete line;
-    } else if (_characterPos.y() < y) { //its a no-op if deleting the line where character cursor is
-      if (insideCanvas) {
-        _textBuffer.clear(0, visibleBaseY, width(), line->lineHeight());
-      }
-      _lines.erase(y, y + 1);
-      changeScrollHeight(-line->lineHeight());
-      delete line;
-    }
-  }
-
   void TextArea::removech() {
-    auto line = _lines[_characterPos.y()];
-    if (!line->wrapped() && _characterPos.x() == line->characters().size() && _characterPos.x() > 0) {
-      line->wrapped(true);
+    auto& line = _lines.get(_characterPos.y());
+    if (!line.wrapped() && _characterPos.x() == line.characters().size() && _characterPos.x() > 0) {
+      line.wrapped(true);
     }
 
-    if (line->wrapped()) {
+    if (line.wrapped()) {
       int deletedLine = -1;
       wrapremovech(_characterPos.x(), _characterPos.y(), deletedLine);
-      int baseY = _cursorPos.y() - line->lineHeight();
+      int baseY = _cursorPos.y() - line.lineHeight();
       for (int i = _characterPos.y(); i < _lines.size(); ++i) {
-        auto l = _lines[i];
+        auto& l = _lines.get(i);
         if (baseY >= ((int)height() - 1)) {
           break;
         }
-        baseY += l->lineHeight();
-        renderLine(*l, 0, i, baseY);
-        if (!l->wrapped()) {
+        baseY += l.lineHeight();
+        l.render(0, i, baseY);
+        if (!l.wrapped()) {
           break;
         }
       }
 
       if (deletedLine > 0) {
-        lineremovech(deletedLine);
+        changeScrollHeight(_lines.removech(deletedLine, _characterPos.y(), _scrollY));
       }
     } else {
-      if (_characterPos.x() == line->characters().size()) {
+      if (_characterPos.x() == line.characters().size()) {
         if (_characterPos.x() == 0) {
-          lineremovech(_characterPos.y());
+          changeScrollHeight(_lines.removech(_characterPos.y(), _characterPos.y(), _scrollY));
         }
       } else {
-        line->remove(_characterPos.x(), _characterPos.x() + 1);
-        renderLine(*line, _characterPos.x(), _characterPos.y(), _cursorPos.y());
+        line.remove(_characterPos.x(), _characterPos.x() + 1);
+        line.render(_characterPos.x(), _characterPos.y(), _cursorPos.y());
       }
     }
   }
@@ -434,12 +377,12 @@ namespace upanui {
     if (_characterPos.y() == 0) {
       return;
     }
-    auto curLine = _lines[_characterPos.y()];
-    auto prevLine = _lines[_characterPos.y() - 1];
+    auto& curLine = _lines.get(_characterPos.y());
+    auto& prevLine = _lines.get(_characterPos.y() - 1);
 
-    const auto& characters = prevLine->characters();
-    auto cursorY = _cursorPos.y() - curLine->lineHeight();
-    int cursorX = DEFAULT_SIDE_MARGIN;
+    const auto& characters = prevLine.characters();
+    auto cursorY = _cursorPos.y() - curLine.lineHeight();
+    int cursorX = _leftMargin;
     int charX = 0;
     for (; charX < characters.size(); ++charX) {
       auto ch = characters[charX];
@@ -449,16 +392,16 @@ namespace upanui {
       cursorX += ch.getChWidth();
     }
 
-    if (cursorY >= (prevLine->lineHeight() - 1)) {
+    if (cursorY >= (prevLine.lineHeight() - 1)) {
       updateCursorPosition(charX, _characterPos.y() - 1, cursorX, cursorY);
     } else {
-      const int destCursorY = prevLine->lineHeight() - 1;
+      const int destCursorY = prevLine.lineHeight() - 1;
 
       updateCursor(false);
       _characterPos.set(charX, _characterPos.y() - 1);
 
       _textBuffer.move(destCursorY + 1, cursorY + 1, height() - destCursorY - 1);
-      renderLine(*prevLine, 0, _characterPos.y(), destCursorY);
+      prevLine.render(0, _characterPos.y(), destCursorY);
 
       _cursorPos.set(cursorX, destCursorY);
       updateCursor(true);
@@ -472,9 +415,9 @@ namespace upanui {
     if ((_characterPos.y()+1) == _lines.size()) {
       return;
     }
-    auto nextLine = _lines[_characterPos.y() + 1];
-    const auto& characters = nextLine->characters();
-    int cursorX = DEFAULT_SIDE_MARGIN;
+    auto& nextLine = _lines.get(_characterPos.y() + 1);
+    const auto& characters = nextLine.characters();
+    int cursorX = _leftMargin;
     int charX = 0;
     for (; charX < characters.size(); ++charX) {
       auto ch = characters[charX];
@@ -484,15 +427,15 @@ namespace upanui {
       cursorX += ch.getChWidth();
     }
 
-    int overflowY = _cursorPos.y() + nextLine->lineHeight() - height();
+    int overflowY = _cursorPos.y() + nextLine.lineHeight() - height();
     if (overflowY < 0) {
-      updateCursorPosition(charX, _characterPos.y() + 1, cursorX, _cursorPos.y() + nextLine->lineHeight());
+      updateCursorPosition(charX, _characterPos.y() + 1, cursorX, _cursorPos.y() + nextLine.lineHeight());
     } else {
       updateCursor(false);
       _characterPos.set(charX, _characterPos.y() + 1);
 
       _textBuffer.move(0, overflowY + 1, _cursorPos.y() - overflowY);
-      renderLine(*nextLine, 0, _characterPos.y(), height() - 1);
+      nextLine.render(0, _characterPos.y(), height() - 1);
 
       _cursorPos.set(cursorX, height() - 1);
       updateCursor(true);
@@ -512,14 +455,14 @@ namespace upanui {
       return;
     }
 
-    auto curLine = _lines[_characterPos.y()];
+    auto& curLine = _lines.get(_characterPos.y());
     updateCursorPosition(_characterPos.x() - 1, _characterPos.y(),
-                         _cursorPos.x() - curLine->characters()[_characterPos.x() - 1].getChWidth(), _cursorPos.y());
+                         _cursorPos.x() - curLine.characters()[_characterPos.x() - 1].getChWidth(), _cursorPos.y());
   }
 
   void TextArea::moveright() {
-    auto curLine = _lines[_characterPos.y()];
-    if (_characterPos.x() == curLine->size()) {
+    auto& curLine = _lines.get(_characterPos.y());
+    if (_characterPos.x() == curLine.size()) {
       if ((_characterPos.y()+1) == _lines.size()) {
         return;
       }
@@ -529,7 +472,7 @@ namespace upanui {
     }
 
     updateCursorPosition(_characterPos.x() + 1, _characterPos.y(),
-                         _cursorPos.x() + curLine->characters()[_characterPos.x()].getChWidth(), _cursorPos.y());
+                         _cursorPos.x() + curLine.characters()[_characterPos.x()].getChWidth(), _cursorPos.y());
   }
 
   void TextArea::movehome() {
@@ -537,19 +480,19 @@ namespace upanui {
       return;
     }
 
-    updateCursorPosition(0, _characterPos.y(), DEFAULT_SIDE_MARGIN, _cursorPos.y());
+    updateCursorPosition(0, _characterPos.y(), _leftMargin, _cursorPos.y());
   }
 
   void TextArea::moveend() {
-    auto curLine = _lines[_characterPos.y()];
-    if (_characterPos.x() == curLine->size()) {
+    auto& curLine = _lines.get(_characterPos.y());
+    if (_characterPos.x() == curLine.size()) {
       return;
     }
 
     auto cursorX = _cursorPos.x();
     auto charX = _characterPos.x();
-    while(charX < curLine->size()) {
-      cursorX += curLine->characters()[charX].getChWidth();
+    while(charX < curLine.size()) {
+      cursorX += curLine.characters()[charX].getChWidth();
       ++charX;
     }
 
@@ -557,26 +500,26 @@ namespace upanui {
   }
 
   void TextArea::pageup() {
-    const int curLineTopY = (_cursorPos.y() + 1 - _lines[_characterPos.y()]->lineHeight());
+    const int curLineTopY = (_cursorPos.y() + 1 - _lines.get(_characterPos.y()).lineHeight());
     const int rows = height() - curLineTopY;
 
     vscroll(rows, height());
 
-    const auto& info = getLineAtVirtualY(_scrollY, 0);
-    updateCursorPosition(0, info._lineIndex, DEFAULT_SIDE_MARGIN, info._lineBaseY);
+    const auto& info = _lines.getLineInfo(_scrollY, 0);
+    updateCursorPosition(0, info._lineIndex, _leftMargin, info._lineBaseY);
 
     _scrollerChanges.capture(false, true, _scrollY);
   }
 
   void TextArea::pagedown() {
-    const int curLineTopY = (_cursorPos.y() + 1 - _lines[_characterPos.y()]->lineHeight());
+    const int curLineTopY = (_cursorPos.y() + 1 - _lines.get(_characterPos.y()).lineHeight());
     const int rows = height() + curLineTopY;
     const bool lastPage = (_scrollHeight - curLineTopY - _scrollY) <= height();
 
     vscroll(-rows, height());
 
-    const auto& info = getLineAtVirtualY(_scrollY, lastPage ? height() : 0);
-    updateCursorPosition(0, info._lineIndex, DEFAULT_SIDE_MARGIN, info._lineBaseY);
+    const auto& info = _lines.getLineInfo(_scrollY, lastPage ? height() : 0);
+    updateCursorPosition(0, info._lineIndex, _leftMargin, info._lineBaseY);
     moveend();
 
     _scrollerChanges.capture(false, true, _scrollY);
@@ -590,7 +533,7 @@ namespace upanui {
   void TextArea::unselectArea() {
     //unselect the selected area
     _selectedArea.setPresent(false);
-    renderLineRange(_selectedArea.p1(), _selectedArea.p2());
+    _lines.renderLineRange(_selectedArea.p1(), _selectedArea.p2(), _scrollY);
   }
 
   void TextArea::updateSelectedArea(bool isSelectionOn, bool isSelectKey, const UIPosition &prevCharPos) {
@@ -622,7 +565,7 @@ namespace upanui {
         rp2 = _selectedArea.p2();
       }
 
-      renderLineRange(rp1, rp2);
+      _lines.renderLineRange(rp1, rp2, _scrollY);
     }
   }
 
@@ -755,32 +698,6 @@ namespace upanui {
     _textBuffer.copy(drawBuffer());
   }
 
-  void TextArea::renderLine(const TextLine &line, int charX, int charY, int baseDrawY) {
-    int topY = baseDrawY - line.lineHeight() + 1;
-    if (topY >= height() || baseDrawY < 0) {
-      return;
-    }
-
-    auto drawX = DEFAULT_SIDE_MARGIN;
-    auto& characters = line.characters();
-    for(int i = 0; i < charX; ++i) {
-      drawX += characters[i].getChWidth();
-    }
-    _textBuffer.clear(drawX, topY, width() - drawX, line.lineHeight());
-
-    for(int i = charX; i < characters.size(); ++i) {
-      const auto& ch = characters[i];
-      usfn::FrameBuffer buf = _textBuffer.initFrameBuffer(drawX, baseDrawY, ch.getChHeight(), _currentFGColor, backgroundColor());
-      _textBuffer.fill(drawX, topY, ch.getChWidth(), line.lineHeight(), getChBgColor(i, charY, ch));
-
-      char str[2] = { (char)ch.getCh(), '\0'};
-      auto& sfnContext = _fontContexts.get(ch.getFontType(), ch.getFontSize(), ch.getStyle());
-      sfnContext.RenderText(buf, str, true, false);
-
-      drawX += ch.getChWidth();
-    }
-  }
-
   void TextArea::updateCursorPosition(int charPosX, int charPosY, int cursorPosX, int cursorPosY) {
     upan::mutex_guard g(_drawMutex);
     updateCursor(false);
@@ -793,7 +710,7 @@ namespace upanui {
     upan::mutex_guard g(_drawMutex);
 
     auto color = (showCursor ? DEFAULT_FG_COLOR : DEFAULT_BG_COLOR);
-    auto& line = *_lines[_characterPos.y()];
+    auto& line = _lines.get(_characterPos.y());
     if (_characterPos.x() < line.characters().size()) {
       const auto ch = line.characters(_characterPos.x());
       color = (showCursor ? ch.getFgColor() : getChBgColor(_characterPos.x(), _characterPos.y(), ch));
@@ -841,66 +758,6 @@ namespace upanui {
     }
   }
 
-  int TextArea::getLineBaseY(int lineIndex) {
-    int baseY = -1;
-    for(int i = 0; i <= lineIndex && i < _lines.size(); ++i) {
-      baseY += _lines[i]->lineHeight();
-    }
-    return baseY - _scrollY;
-  }
-
-  int TextArea::getLineBaseX(int charX, int lineIndex) {
-    const auto line = _lines[lineIndex];
-    int baseX = DEFAULT_SIDE_MARGIN;
-    for(int i = 0; i < charX && i < line->size(); ++i) {
-      baseX += line->characters(i).getChWidth();
-    }
-    return baseX;
-  }
-
-  TextArea::VirtualYInfo TextArea::getLineAtVirtualY(const int baseY, const int rows) {
-    const int virtualY = baseY + rows;
-    int lineIndex;
-    int y;
-    for (lineIndex = 0, y = 0; lineIndex < _lines.size(); ++lineIndex) {
-      int ny = y + _lines[lineIndex]->lineHeight();
-      if (ny > virtualY || lineIndex == (_lines.size() - 1)) {
-        break;
-      }
-      y = ny;
-    }
-    VirtualYInfo info;
-    info._lineIndex = lineIndex;
-    info._lineTopY = y - baseY;
-    info._lineBaseY = info._lineTopY + _lines[lineIndex]->lineHeight() - 1;
-    return info;
-  }
-
-  void TextArea::renderLineTopDown(const VirtualYInfo& info) {
-    for(int ty = info._lineTopY, li = info._lineIndex; ty < height() && li < _lines.size(); ++li) {
-      auto& line = _lines[li];
-      ty += line->lineHeight();
-      renderLine(*line, 0, li, ty - 1);
-    }
-  }
-
-  void TextArea::renderLineBottomUp(const VirtualYInfo& info) {
-    for(int by = info._lineBaseY, li = info._lineIndex; by >= 0 && li >= 0; --li) {
-      auto& line = _lines[li];
-      renderLine(*line, 0, li, by);
-      by -= line->lineHeight();
-    }
-  }
-
-  void TextArea::renderLineRange(const UIPosition& p1, const UIPosition& p2) {
-    int lineBaseY = getLineBaseY(p1.y());
-    for (int y = p1.y(); y <= p2.y() && y < _lines.size(); ++y) {
-      auto line = _lines[y];
-      renderLine(*line, 0, y, lineBaseY);
-      lineBaseY += line->lineHeight();
-    }
-  }
-
   void TextArea::vscroll(int rows, int scrollableHeight) {
     upan::mutex_guard g(_drawMutex);
     updateCursor(false);
@@ -912,14 +769,14 @@ namespace upanui {
         if (scrollDown) {
           const int moveLength = scrollableHeight - rows;
           _textBuffer.move(0, rows, moveLength);
-          renderLineTopDown(getLineAtVirtualY(_scrollY, moveLength - 1));
+          _lines.renderLineTopDown(_scrollY, moveLength - 1, height());
         } else {
           const int moveLength = scrollableHeight - rows;
           _textBuffer.move(rows, 0, moveLength);
-          renderLineBottomUp(getLineAtVirtualY(_scrollY, rows - 1));
+          _lines.renderLineBottomUp(_scrollY, rows - 1);
         }
       } else {
-        renderLineTopDown(getLineAtVirtualY(_scrollY, 0));
+        _lines.renderLineTopDown(_scrollY, 0, height());
       }
       _cursorPos.set(_cursorPos.x(), _cursorPos.y() + (scrollDown ? -rows : rows));
       notifyChange(ChangeState::Content);
@@ -930,16 +787,16 @@ namespace upanui {
   void TextArea::moveCursor(bool isSelectionOn, int x, int y) {
     upan::mutex_guard g(_drawMutex);
 
-    const auto& info = getLineAtVirtualY(_scrollY, y);
+    const auto& info = _lines.getLineInfo(_scrollY, y);
     const int charPosY = info._lineIndex;
     const int curPosY = info._lineBaseY;
 
-    auto line = _lines[charPosY];
+    auto& line = _lines.get(charPosY);
     int charPosX = 0;
-    int curPosX = DEFAULT_SIDE_MARGIN;
+    int curPosX = _leftMargin;
 
-    while(charPosX < line->characters().size()) {
-      auto ch = line->characters(charPosX);
+    while (charPosX < line.characters().size()) {
+      auto ch = line.characters(charPosX);
       int nposX = curPosX + ch.getChWidth();
       if (nposX > x) {
         break;
@@ -970,8 +827,8 @@ namespace upanui {
     }
 
     const UIPosition& p1 = _selectedArea.p1();
-    const int baseY = getLineBaseY(p1.y());
-    const int baseX = getLineBaseX(p1.x(), p1.y());
+    const int baseY = _lines.getLineBaseY(p1.y(), _scrollY);
+    const int baseX = _lines.getLineBaseX(p1.x(), p1.y(), _leftMargin);
 
     updateCursorPosition(p1.x(), p1.y(), baseX, baseY);
     scrollToCursor();
@@ -984,11 +841,11 @@ namespace upanui {
       const int deleteLineY = _selectedArea.p1().y() + 1;
       int lineCountToDelete = _selectedArea.p2().y() - deleteLineY;
       while(lineCountToDelete > 0) {
-        lineremovech(deleteLineY);
+        changeScrollHeight(_lines.removech(deleteLineY, _characterPos.y(), _scrollY));
         --lineCountToDelete;
       }
-      auto line1 = _lines[_selectedArea.p1().y()];
-      charCount += (line1->size() - _selectedArea.p1().x()) + (line1->wrapped() ? 0 : 1);
+      auto& line1 = _lines.get(_selectedArea.p1().y());
+      charCount += (line1.size() - _selectedArea.p1().x()) + (line1.wrapped() ? 0 : 1);
       charCount += _selectedArea.p2().x();
     }
 

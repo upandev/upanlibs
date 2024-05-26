@@ -31,9 +31,9 @@
 #include <uniq_ptr.h>
 #include <UIPosition.h>
 #include <Character.h>
-#include <TextLine.h>
 #include <usfncontexts.h>
 #include <TextBuffer.h>
+#include <TextLines.h>
 
 namespace upanui {
 
@@ -55,48 +55,20 @@ namespace upanui {
     void copySelection();
     void paste();
 
-    uint8_t getCurrentFontSize() const {
-      return _currentFontSize;
-    }
+    uint8_t currentFontSize() const { return _currentFontSize; }
+    usfn::PreloadedFonts currentFontType() const { return (usfn::PreloadedFonts) _currentFontType; }
+    uint16_t currentStyle() const { return _currentStyle; }
+    uint32_t currentFgColor() const { return _currentFGColor; }
+    uint32_t currentBgColor() const { return _currentBGColor; }
+    int leftMargin() const { return _leftMargin; }
 
-    void setCurrentFontSize(uint8_t currentFontSize) {
-      _currentFontSize = currentFontSize;
-    }
-
-    usfn::PreloadedFonts getCurrentFontType() const {
-      return (usfn::PreloadedFonts) _currentFontType;
-    }
-
-    void setCurrentFontType(usfn::PreloadedFonts currentFontType) {
-      _currentFontType = currentFontType;
-    }
-
-    uint16_t getCurrentStyle() const {
-      return _currentStyle;
-    }
-
-    void setCurrentStyle(uint16_t currentStyle) {
-      _currentStyle = currentStyle;
-    }
-
-    uint32_t getCurrentFgColor() const {
-      return _currentFGColor;
-    }
-
-    void setCurrentFgColor(uint32_t currentFgColor) {
-      _currentFGColor = currentFgColor;
-    }
-
-    uint32_t getCurrentBgColor() const {
-      return _currentBGColor;
-    }
-
-    void setCurrentBgColor(uint32_t currentBgColor) {
-      _currentBGColor = currentBgColor;
-    }
+    void currentFontSize(uint8_t currentFontSize) { _currentFontSize = currentFontSize; }
+    void currentFontType(usfn::PreloadedFonts currentFontType) { _currentFontType = currentFontType; }
+    void currentStyle(uint16_t currentStyle) { _currentStyle = currentStyle; }
+    void currentFgColor(uint32_t currentFgColor) { _currentFGColor = currentFgColor; }
+    void currentBgColor(uint32_t currentBgColor) { _currentBGColor = currentBgColor; }
 
   private:
-    static constexpr int DEFAULT_SIDE_MARGIN = 8;
     static constexpr uint32_t DEFAULT_BG_COLOR = 0xFFFFFF;
     static constexpr uint32_t DEFAULT_FG_COLOR = 0;
 
@@ -124,12 +96,6 @@ namespace upanui {
       TextArea& _textArea;
       bool _showCursorToggle;
     };
-
-    typedef struct {
-      int _lineIndex;
-      int _lineTopY;
-      int _lineBaseY;
-    } VirtualYInfo;
 
     void handleMouseEvent(upanui::UIObject& sender, const upanui::MouseEvent& event);
 
@@ -178,7 +144,7 @@ namespace upanui {
     };
 
   private:
-    void init();
+    void init(int leftMargin);
     void processKeyboardEvent(const KeyboardEvent& event);
     void insert(const Character& ch);
     void enter();
@@ -191,15 +157,6 @@ namespace upanui {
 
     void insert(TextLine& line, int lineX, int lineY, const Characters& characters);
     void wrapremovech(int x, int y, int& deletedLine);
-    void lineremovech(const int y);
-    void renderLine(const TextLine &line, int charX, int charY, int baseDrawY);
-
-    int getLineBaseY(int lineIndex);
-    int getLineBaseX(int charX, int lineIndex);
-    VirtualYInfo getLineAtVirtualY(int baseY, int rows);
-    void renderLineTopDown(const VirtualYInfo& info);
-    void renderLineBottomUp(const VirtualYInfo& info);
-    void renderLineRange(const UIPosition& p1, const UIPosition& p2);
 
     bool isSelectKey(uint8_t) const;
     bool isTextModifyKey(uint8_t ch) const;
@@ -207,6 +164,9 @@ namespace upanui {
     void deleteSelectedArea();
     void unselectArea();
     void updateSelectedArea(bool isSelectionOn, bool isSelectKey, const UIPosition &prevCharPos);
+
+    TextBuffer& textBuffer() { return _textBuffer; }
+    usfn::Contexts& fontContexts() { return _fontContexts; }
 
   private:
     int _scrollY;
@@ -216,6 +176,7 @@ namespace upanui {
     uint16_t _currentStyle;
     uint32_t _currentFGColor;
     uint32_t _currentBGColor;
+    int _leftMargin;
     int _maxLineCharWidth;
     UIPosition _characterPos;
     UIPosition _cursorPos;
@@ -225,10 +186,12 @@ namespace upanui {
     SelectedArea _selectedArea;
     ScrollerChanges _scrollerChanges;
     Characters _copyBuffer;
-    upan::vector<TextLine*> _lines;
     usfn::Contexts _fontContexts;
     TextBuffer _textBuffer;
+    TextLines _lines;
 
+    friend class TextLine;
+    friend class TextLines;
     friend class UIObjectFactory;
   };
 }

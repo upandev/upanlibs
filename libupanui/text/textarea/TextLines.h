@@ -22,40 +22,43 @@
 
 #pragma once
 
-#include "libc/include/stdlib.h"
-#include "Character.h"
+#include <vector.h>
 
 namespace upanui {
   class TextArea;
+  class TextLine;
+  class UIPosition;
 
-  class TextLine {
+  class TextLines {
   public:
-    static const int MIN_CURSOR_WIDTH_BUFFER = 8;
-    static const int DEFAULT_LINE_SPACE = 4;
+    TextLines(TextArea& textArea) : _textArea(textArea) {}
+    ~TextLines();
 
-    TextLine(uint8_t defaultHeight, TextArea& textArea) : _width(MIN_CURSOR_WIDTH_BUFFER), _maxChHeight(defaultHeight), _wrapped(false), _textArea(textArea) {}
-    TextLine(const TextLine&) = delete;
-    TextLine& operator=(const TextLine&) = delete;
+    TextLines(const TextLines&) = delete;
+    TextLines& operator=(const TextLines&) = delete;
 
-    void insert(int pos, const Character& ch);
-    void remove(int from, int last);
+    int size() const { return _lines.size(); }
+    bool empty() const { return _lines.empty(); }
 
-    int width() const { return _width; }
-    uint8_t lineHeight() const { return _maxChHeight + DEFAULT_LINE_SPACE; }
-    bool wrapped() const { return _wrapped; }
-    void wrapped(bool wrapped) { _wrapped = wrapped; }
-    int size() const { return _characters.size(); }
+    TextLine& add(int index);
+    TextLine& get(int index) const;
+    int removech(int y, int characterPosY, int scrollBaseY);
 
-    const Characters& characters() const { return _characters; }
-    const Character& characters(int i) const { return _characters[i]; }
+    typedef struct {
+      int _lineIndex;
+      int _lineTopY;
+      int _lineBaseY;
+    } LineInfo;
 
-    void render(int charX, int charY, int baseDrawY);
+    int getLineBaseY(int lineIndex, int scrollBaseY);
+    int getLineBaseX(int charX, int lineIndex, int leftMargin);
+    LineInfo getLineInfo(int baseY, int rows);
+    void renderLineTopDown(int baseY, int rows, int height);
+    void renderLineBottomUp(int baseY, int rows);
+    void renderLineRange(const UIPosition& p1, const UIPosition& p2, int baseY);
 
   private:
-    Characters _characters;
-    int _width;
-    uint8_t _maxChHeight;
-    bool _wrapped;
+    upan::vector<TextLine*> _lines;
     TextArea& _textArea;
   };
 }

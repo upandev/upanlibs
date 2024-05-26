@@ -20,7 +20,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include "TextLine.h"
+#include <TextLine.h>
+#include <TextArea.h>
 
 namespace upanui {
   void TextLine::insert(int pos, const Character& ch) {
@@ -48,6 +49,35 @@ namespace upanui {
     for (auto ch: _characters) {
       _width += ch.getChWidth();
       _maxChHeight = upan::max(_maxChHeight, ch.getChHeight());
+    }
+  }
+
+  void TextLine::render(int charX, int charY, int baseDrawY) {
+    int topY = baseDrawY - lineHeight() + 1;
+    if (topY >= _textArea.height() || baseDrawY < 0) {
+      return;
+    }
+
+    auto drawX = _textArea.leftMargin();
+    for(int i = 0; i < charX; ++i) {
+      drawX += _characters[i].getChWidth();
+    }
+    _textArea.textBuffer().clear(drawX, topY, width() - drawX, lineHeight());
+
+    for(int i = charX; i < _characters.size(); ++i) {
+      const auto& ch = _characters[i];
+      usfn::FrameBuffer buf = _textArea.textBuffer().initFrameBuffer(drawX,
+                                                                     baseDrawY,
+                                                                     ch.getChHeight(),
+                                                                     _textArea.currentFgColor(),
+                                                                     _textArea.backgroundColor());
+      _textArea.textBuffer().fill(drawX, topY, ch.getChWidth(), lineHeight(), _textArea.getChBgColor(i, charY, ch));
+
+      char str[2] = { (char)ch.getCh(), '\0'};
+      auto& sfnContext = _textArea.fontContexts().get(ch.getFontType(), ch.getFontSize(), ch.getStyle());
+      sfnContext.RenderText(buf, str, true, false);
+
+      drawX += ch.getChWidth();
     }
   }
 }

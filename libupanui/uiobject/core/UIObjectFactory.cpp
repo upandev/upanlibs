@@ -130,7 +130,7 @@ namespace upanui {
     }
     auto& textArea = *new TextArea(x, y, width, actualHeight);
     parent.add(textArea);
-    textArea.init();
+    textArea.init(0);
     return textArea;
   }
 
