@@ -44,6 +44,43 @@ namespace upanui {
     return *_lines[index];
   }
 
+  int TextLines::wrapremovech(int x, int y, int maxLineChWidth) {
+    int deletedLine = -1;
+    auto& line = get(y);
+    line.remove(x, x + 1);
+
+    if (!line.wrapped()) {
+      return deletedLine;
+    }
+
+    auto ny = y + 1;
+    if (ny < _lines.size()) {
+      auto& nextLine = *_lines[ny];
+      int availWidth = maxLineChWidth - line.width();
+      bool deletedFromNextLine = false;
+      while (nextLine.size() > 0) {
+        auto ch = nextLine.characters(0);
+        if (ch.getChWidth() < availWidth) {
+          line.insert(line.size(), ch);
+          availWidth -= ch.getChWidth();
+          wrapremovech(0, ny, maxLineChWidth);
+          deletedFromNextLine = true;
+        } else {
+          break;
+        }
+      }
+      //deleting when cursor is at the end of current line which is full - then we need to remove the first char from next line
+      if (!deletedFromNextLine && nextLine.size() > 0 && x == line.size()) {
+        wrapremovech(0, ny, maxLineChWidth);
+      }
+      if (nextLine.size() == 0) {
+        line.wrapped(false);
+        deletedLine = ny;
+      }
+    }
+    return deletedLine;
+  }
+
   int TextLines::removech(const int y, const int characterPosY, const int scrollBaseY) {
     const int baseY = getLineBaseY(y, scrollBaseY);
     auto& line = get(y);

@@ -156,7 +156,6 @@ namespace upanui {
     uint32_t getChBgColor(int cx, int cy, const Character& ch) const;
 
     void insert(TextLine& line, int lineX, int lineY, const Characters& characters);
-    void wrapremovech(int x, int y, int& deletedLine);
 
     bool isSelectKey(uint8_t) const;
     bool isTextModifyKey(uint8_t ch) const;

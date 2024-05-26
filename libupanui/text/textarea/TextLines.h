@@ -42,6 +42,7 @@ namespace upanui {
 
     TextLine& add(int index);
     TextLine& get(int index) const;
+    int wrapremovech(int x, int y, int maxLineChWidth);
     int removech(int y, int characterPosY, int scrollBaseY);
 
     typedef struct {
