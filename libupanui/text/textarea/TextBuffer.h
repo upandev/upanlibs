@@ -22,17 +22,17 @@
 
 #pragma once
 
-#include "libupanui/uiobject/canvas/RectangleCanvas.h"
-#include "libupanui/events/MouseEventHandler.h"
-#include "libustd/ds/map.h"
-#include "libustd/ds/vector.h"
-#include "libustd/mthread/mutex.h"
-#include "libustd/mthread/timer_thread.h"
-#include "libustd/infra/uniq_ptr.h"
-#include "libupanui/uiobject/core/UIPosition.h"
-#include "Character.h"
-#include "TextLine.h"
-#include "libupanui/text/usfn/usfncontexts.h"
+#include <RectangleCanvas.h>
+#include <MouseEventHandler.h>
+#include <map.h>
+#include <vector.h>
+#include <mutex.h>
+#include <timer_thread.h>
+#include <uniq_ptr.h>
+#include <UIPosition.h>
+#include <Character.h>
+#include <TextLine.h>
+#include <usfncontexts.h>
 
 namespace upanui {
   class TextBuffer {

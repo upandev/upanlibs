@@ -62,7 +62,7 @@ namespace upanui {
     for(int i = 0; i < charX; ++i) {
       drawX += _characters[i].getChWidth();
     }
-    _textArea.textBuffer().clear(drawX, topY, width() - drawX, lineHeight());
+    _textArea.textBuffer().clear(drawX, topY, _textArea.width() - drawX, lineHeight());
 
     for(int i = charX; i < _characters.size(); ++i) {
       const auto& ch = _characters[i];

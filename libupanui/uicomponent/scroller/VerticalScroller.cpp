@@ -48,18 +48,18 @@ namespace upanui {
     }
 
     _scrollerCanvas = &UIObjectFactory::createRectangleCanvas(*this, width() - _scrollBarWidth, 0, _scrollBarWidth, height());
-    _scrollerCanvas->backgroundColor(0xFFFFFF);
+    _scrollerCanvas->backgroundColor(0xd3d3d3);
 
     _scrollUpBt = &UIObjectFactory::createIconButton(*_scrollerCanvas, PngImageResource::UP, 0, 0, _scrollBarWidth, _scrollBarWidth);
-    _scrollUpBt->backgroundColor(0xFFFAABB);
+    _scrollUpBt->backgroundColor(0xbebebe);
 
     _scrollDownBt = &UIObjectFactory::createIconButton(*_scrollerCanvas, PngImageResource::DOWN, 0, _scrollBarMaxY, _scrollBarWidth, _scrollBarWidth);
-    _scrollDownBt->backgroundColor(0xFFFAABB);
+    _scrollDownBt->backgroundColor(0xbebebe);
 
     _scrollBar = &UIObjectFactory::createRectangleCanvas(*_scrollerCanvas, 0, _scrollBarMinY, _scrollBarWidth, _scrollBarMaxHeight);
-    _scrollBar->borderThickness(1);
-    _scrollBar->borderColor(0x000000);
-    _scrollBar->backgroundColor(0xFAD7A0);
+    //_scrollBar->borderThickness(1);
+    //_scrollBar->borderColor(0x000000);
+    _scrollBar->backgroundColor(0xa9a9a9);
 
     captureMouseEvents(true);
     _scrollerCanvas->captureMouseEvents(true);

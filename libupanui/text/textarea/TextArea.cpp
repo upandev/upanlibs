@@ -682,7 +682,7 @@ namespace upanui {
     color |= GCoreFunctions::ALPHA_MASK;
 
     if (_cursorPos.y() >= 0 && _cursorPos.y() < height()) {
-      _textBuffer.fill(_cursorPos.x() + 1, _cursorPos.y() + 1, _currentFontSize / 2 - 1, 1, color);
+      _textBuffer.fill(_cursorPos.x() + 1, _cursorPos.y() - 1, _currentFontSize / 2 - 1, 1, color);
     }
   }
 

@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "libc/include/stdlib.h"
-#include "Character.h"
+#include <stdlib.h>
+#include <Character.h>
 
 namespace upanui {
   class TextArea;

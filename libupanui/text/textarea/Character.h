@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "libc/include/stdlib.h"
-#include "libupanui/text/usfn/usfntypes.h"
-#include "libustd/ds/vector.h"
+#include <stdlib.h>
+#include <usfntypes.h>
+#include <vector.h>
 
 namespace upanui {
   class Character {

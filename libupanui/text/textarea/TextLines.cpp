@@ -33,7 +33,7 @@ namespace upanui {
 
   TextLine& TextLines::add(int index) {
     auto line = new TextLine(_textArea.currentFontSize(), _textArea);
-    _lines.insert(0, line);
+    _lines.insert(index, line);
     return *line;
   }
 
