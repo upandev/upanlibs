@@ -31,6 +31,7 @@
 #include <Image.h>
 #include <TextArea.h>
 #include <typeinfo.h>
+#include <Terminal.h>
 
 namespace upanui {
   RectangleCanvas& UIObjectFactory::createRectangleCanvas(UIObject& parent, int x, int y, int width, int height) {
@@ -128,9 +129,21 @@ namespace upanui {
     if (typeid(parent) == typeid(VerticalScroller)) {
       actualHeight = parent.height();
     }
-    auto& textArea = *new TextArea(x, y, width, actualHeight);
+    auto& textArea = *new TextArea(x, y, width, actualHeight, TextArea::MIN_LEFT_MARGIN);
     parent.add(textArea);
-    textArea.init(8);
+    textArea.init();
     return textArea;
+  }
+
+  Terminal& UIObjectFactory::createTerminal(UIObject& parent, int x, int y, int width, int height,
+                                            const upan::string& prompt, TerminalCommandExecutor& terminalCommandExecutor) {
+    int actualHeight = height;
+    if (typeid(parent) == typeid(VerticalScroller)) {
+      actualHeight = parent.height();
+    }
+    auto& terminal = *new Terminal(x, y, width, actualHeight, TextArea::MIN_LEFT_MARGIN, prompt, terminalCommandExecutor);
+    parent.add(terminal);
+    terminal.initialize();
+    return terminal;
   }
 }

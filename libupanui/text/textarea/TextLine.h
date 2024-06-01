@@ -50,6 +50,7 @@ namespace upanui {
     const Character& characters(int i) const { return _characters[i]; }
 
     void render(int charX, int charY, int baseDrawY);
+    upan::string toString(int pos) const;
 
   private:
     Characters _characters;

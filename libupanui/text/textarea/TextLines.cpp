@@ -153,6 +153,31 @@ namespace upanui {
     return baseX;
   }
 
+  TextLines::LineCursorInfo TextLines::getLineCursorPos(const int x, const int y, const int baseY, const int leftMargin) {
+    const auto& info = getLineInfo(baseY, y);
+    const int charPosY = info._lineIndex;
+    const int curPosY = info._lineBaseY;
+
+    auto& line = get(charPosY);
+    int charPosX = 0;
+    int curPosX = leftMargin;
+
+    while (charPosX < line.characters().size()) {
+      auto ch = line.characters(charPosX);
+      int nposX = curPosX + ch.getChWidth();
+      if (nposX > x) {
+        break;
+      }
+      curPosX = nposX;
+      ++charPosX;
+    }
+
+    LineCursorInfo lineCursorInfo;
+    lineCursorInfo._charPos.set(charPosX, charPosY);
+    lineCursorInfo._curPos.set(curPosX, curPosY);
+    return lineCursorInfo;
+  }
+
   TextLines::LineInfo TextLines::getLineInfo(const int baseY, const int rows) {
     const int virtualY = baseY + rows;
     int lineIndex;

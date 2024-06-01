@@ -23,6 +23,7 @@
 #pragma once
 
 #include <vector.h>
+#include <UIPosition.h>
 
 namespace upanui {
   class TextArea;
@@ -51,8 +52,14 @@ namespace upanui {
       int _lineBaseY;
     } LineInfo;
 
+    typedef struct {
+      UIPosition _charPos;
+      UIPosition _curPos;
+    } LineCursorInfo;
+
     int getLineBaseY(int lineIndex, int scrollBaseY);
     int getLineBaseX(int charX, int lineIndex, int leftMargin);
+    LineCursorInfo getLineCursorPos(int x, int y, int baseY, int leftMargin);
     LineInfo getLineInfo(int baseY, int rows);
     void renderLineTopDown(int baseY, int rows, int height);
     void renderLineBottomUp(int baseY, int rows);

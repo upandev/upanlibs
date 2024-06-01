@@ -109,20 +109,17 @@ public:
     return temp += r;
   }
 
-  string& operator+=(const string& r)
-  {
-    if (r.length() > 0)
-    {
-      _len += r.length();
-      if(_capacity <= _len)
-      {
-        _capacity = (_len + 1) * 1.5;
-        char* temp = new char[_capacity];
-        strcpy(temp, _buffer);
-        delete[] _buffer;
-        _buffer = temp;
-      }
-      strcat(_buffer, r.c_str());
+  string& operator+=(const string& r) {
+    if (r.length() > 0) {
+      expandAndCopy(r.c_str(), r.length());
+    }
+    return *this;
+  }
+
+  string& operator+=(const char* r) {
+    const int rlen = strlen(r);
+    if (rlen > 0) {
+      expandAndCopy(r, rlen);
     }
     return *this;
   }
@@ -164,6 +161,18 @@ private:
     _len = 0;
     _buffer = new char[_capacity];
     _buffer[0] = '\0';
+  }
+
+  void expandAndCopy(const char* r, int rlen) {
+    _len += rlen;
+    if(_capacity <= _len) {
+      _capacity = (_len + 1) * 1.5;
+      char* temp = new char[_capacity];
+      strcpy(temp, _buffer);
+      delete[] _buffer;
+      _buffer = temp;
+    }
+    strcat(_buffer, r);
   }
 
 private:

@@ -41,6 +41,9 @@ namespace upanui {
   class VerticalScroller;
   class TextArea;
 
+  class Terminal;
+  class TerminalCommandExecutor;
+
   class UIObjectFactory {
   public:
     static RectangleCanvas& createRectangleCanvas(UIObject& parent, int x, int y, int width, int height);
@@ -75,5 +78,7 @@ namespace upanui {
                                                     int width, int height,
                                                     int scrollBarWidth);
     static TextArea& createTextArea(UIObject& parent, int x, int y, int width, int height);
+    static Terminal& createTerminal(UIObject& parent, int x, int y, int width, int height,
+                                    const upan::string& prompt, TerminalCommandExecutor& terminalCommandExecutor);
   };
 }

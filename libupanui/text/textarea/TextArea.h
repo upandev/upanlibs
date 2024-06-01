@@ -39,19 +39,15 @@ namespace upanui {
 
   class TextArea : public RectangleCanvas {
   public:
-    void moveup();
+    static constexpr int MIN_LEFT_MARGIN = 8;
+
     void movedown();
-    void moveleft();
     void moveright();
-    void movehome();
-    void moveend();
     void pageup();
     void pagedown();
     void insert(uint8_t ch);
     void removech();
-    void backspace();
     void selectAll();
-    void cutSelection();
     void copySelection();
     void paste();
 
@@ -67,25 +63,51 @@ namespace upanui {
     void currentStyle(uint16_t currentStyle) { _currentStyle = currentStyle; }
     void currentFgColor(uint32_t currentFgColor) { _currentFGColor = currentFgColor; }
     void currentBgColor(uint32_t currentBgColor) { _currentBGColor = currentBgColor; }
+    void leftMargin(int lm);
+
+  protected:
+    TextArea() = delete;
+    TextArea(const TextArea&) = delete;
+
+    TextArea(int x, int y, int width, int height, int leftMargin);
+    virtual ~TextArea();
+
+    void init();
+
+    virtual void enter();
+    virtual void moveup();
+    virtual void moveleft();
+    virtual void movehome();
+    virtual void moveend();
+    virtual void backspace();
+    virtual void cutSelection();
+    virtual void moveCursor(bool shiftPressed, bool mouseHeld, int x, int y);
+    virtual void editSelection();
+
+    UIPosition& characterPos() { return _characterPos; }
+    upan::mutex& drawMutex() { return _drawMutex; }
+    TextLines::LineCursorInfo getLineCursorInfo(int x, int y);
+    void scrollToY(int curPosY, int charPosY);
+    void updateSelectedArea(bool isSelectionOn, bool isSelectKey, const UIPosition& prevCharPos, const UIPosition& newCharPos);
+    void unselectArea();
+    bool isNewLine(uint16_t ch) const;
+    Character createCharacter(uint16_t ch) const;
+    void doInsert(const Character& ch);
+    TextLines& lines() { return _lines; }
 
   private:
     static constexpr uint32_t DEFAULT_BG_COLOR = 0xFFFFFF;
     static constexpr uint32_t DEFAULT_FG_COLOR = 0;
 
-    TextArea(int x, int y, int width, int32_t height);
-    ~TextArea();
-
     void doDraw() override;
-
     int scrollY() const override { return _scrollY; }
     int updateScrollY(int sy);
-
     int scrollHeight() const override { return _scrollHeight; }
     void changeScrollHeight(int delta);
-
     void vscroll(int rows, int scrollableHeight) override;
-
     void onKeyboardEvent(const KeyboardEvent& event) override;
+    void inlinemovehome();
+    void inlinemoveend();
 
   private:
 
@@ -144,15 +166,11 @@ namespace upanui {
     };
 
   private:
-    void init(int leftMargin);
     void processKeyboardEvent(const KeyboardEvent& event);
     void insert(const Character& ch);
-    void enter();
-    void scrollToCursor();
     void validateCursorPos() const;
     void updateCursorPosition(int charPosX, int charPosY, int cursorPosX, int cursorPosY);
     void updateCursor(bool showCursor);
-    void moveCursor(bool isSelectionOn, int x, int y);
     uint32_t getChBgColor(int cx, int cy, const Character& ch) const;
 
     void insert(TextLine& line, int lineX, int lineY, const Characters& characters);
@@ -160,9 +178,6 @@ namespace upanui {
     bool isSelectKey(uint8_t) const;
     bool isTextModifyKey(uint8_t ch) const;
     bool isInsertableKey(uint16_t ch) const;
-    void deleteSelectedArea();
-    void unselectArea();
-    void updateSelectedArea(bool isSelectionOn, bool isSelectKey, const UIPosition &prevCharPos);
 
     TextBuffer& textBuffer() { return _textBuffer; }
     usfn::Contexts& fontContexts() { return _fontContexts; }

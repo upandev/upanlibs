@@ -26,6 +26,7 @@ namespace upanui {
   class UIPosition {
   public:
     UIPosition() : _x(0), _y(0) {}
+    UIPosition(int x, int y) : _x(x), _y(y) {}
 
     int x() const {
       return _x;
