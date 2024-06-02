@@ -26,21 +26,21 @@
 
 namespace upanui {
   UIRoot::UIRoot(int x, int y, int width, int height)
-  : UIObjectImpl(x, y, width, height),
-    _layout(*this) {
+          : UIObjectImpl(x, y, width, height),
+            _layout(*this) {
     gc().frame().updateViewport(x, y, width, height);
     UIObjectImpl::drawBuffer().initLocal(gc().frame().frameBuffer());
   }
 
   void UIRoot::draw() {
     layout().fill();
-    for(auto& child : children()) {
+    for (auto& child: children()) {
       child->drawTopDown();
     }
   }
 
   void UIRoot::drawTopDown() {
-    throw upan::exception(XLOC, "unsupport drawTopDown because UIRoot can't be a child elemenet");
+    throw upan::exception(XLOC, "unsupported drawTopDown() because UIRoot can't be a child element");
   }
 
   void UIRoot::drawToTop() {
@@ -55,6 +55,16 @@ namespace upanui {
     return 0;
   }
 
+  UIObjectImpl::IntersectInfo UIRoot::intersect(int x, int y) const {
+    const auto bgAlpha = backgroundColorAlpha();
+
+    const int x1 = drawX();
+    const int x2 = drawX() + width();
+    const int y1 = drawY();
+    const int y2 = drawY() + height();
+
+    return {bgAlpha != 0, x - x1, x2 - x, y - y1, y2 - y };
+  }
 
   void UIRoot::notifyChange(const ChangeState changeState) {
     if (isChangeNotificationLocked()) {

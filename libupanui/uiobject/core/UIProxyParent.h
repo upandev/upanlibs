@@ -139,6 +139,12 @@ namespace upanui {
     void onMouseFocus() override {}
     void onLoseMouseFocus() override {}
 
+    bool isHResizable() const override { return false; }
+    bool isVResizable() const override { return false; }
+    void setResizable(bool, bool) override {
+      throw upan::exception(XLOC,"unsupported setResizable() for UIProxyParent");
+    }
+
     friend class UIObjectManager;
   };
 }

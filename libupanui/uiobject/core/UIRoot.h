@@ -42,6 +42,7 @@ namespace upanui {
     }
 
     bool isRectangularShape() override { return true; }
+    IntersectInfo intersect(int x, int y) const override;
 
     void notifyChange(const ChangeState changeState) override;
 

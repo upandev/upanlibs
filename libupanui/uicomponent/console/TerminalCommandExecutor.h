@@ -19,24 +19,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
+
 #pragma once
 
-namespace upanui {
-  class Point {
-  public:
-    Point() : Point(0, 0) {}
-    Point(const int x, const int y) : _x(x), _y(y) {}
-    Point(const Point& point) : _x(point.x()), _y(point.y()) {}
-    Point& operator=(const Point& point) {
-      _x = point.x();
-      _y = point.y();
-      return *this;
-    }
+#include <ustring.h>
 
-    int x() const { return _x; }
-    int y() const { return _y; }
-  private:
-    int _x;
-    int _y;
+namespace upanui {
+  class TerminalCommandExecutor {
+  public:
+    TerminalCommandExecutor() {}
+    TerminalCommandExecutor(const TerminalCommandExecutor&) = delete;
+    TerminalCommandExecutor& operator=(const TerminalCommandExecutor&) = delete;
+
+    virtual void execute(const upan::string& cmdLine) = 0;
+    virtual void executeInBackground(const upan::string& cmdLine) = 0;
   };
 }

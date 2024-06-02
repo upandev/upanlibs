@@ -41,12 +41,12 @@ namespace upanui {
     parent().draw();
   }
 
-  bool RoundCanvas::intersect(int x, int y) const {
+  UIObjectImpl::IntersectInfo RoundCanvas::intersect(int x, int y) const {
     const auto bgAlpha = backgroundColorAlpha();
     const auto brAlpha = borderColorAlpha();
 
     if (bgAlpha == 0 && brAlpha == 0) {
-      return false;
+      return {};
     }
 
     const auto outerRadius = (width() / 2) - 1;
@@ -60,14 +60,15 @@ namespace upanui {
     const int d = sqrt(dx * dx + dy * dy);
 
     if (d > outerRadius) {
-      return false;
+      return {};
     }
 
     if (d > innerRadius) {
-      return brAlpha != 0;
+      //TODO: IntersectInfo for Rounded Canvas
+      return { brAlpha != 0, -1, -1, -1, -1 };
     }
 
-    return bgAlpha != 0;
+    return { bgAlpha != 0, -1, -1, -1, -1 };
   }
 
   void RoundCanvas::doDraw() {

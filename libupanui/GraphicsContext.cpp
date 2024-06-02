@@ -101,6 +101,13 @@ namespace upanui {
     return *_uiObjectManager;
   }
 
+  void GraphicsContext::setMouseCursorType(MouseCursorType type) {
+    if (_mouseCursorType != type) {
+      _mouseCursorType = type;
+      set_mouse_cursor_type(_mouseCursorType);
+    }
+  }
+
   GraphicsContext::Transaction::Transaction() {
     GraphicsContext::Instance()._uiObjectManager->_autoRefreshHandler.pause();
     GraphicsContext::Instance()._uiObjectManager->drawLock().lock();

@@ -54,7 +54,11 @@ namespace upanui {
     Image& create() const override;
 
     static const PngImageResource TEST;
-    static const PngImageResource MOUSE_CURSOR;
+    static const PngImageResource MOUSE_POINTER_CURSOR;
+    static const PngImageResource MOUSE_HRESIZER_CURSOR;
+    static const PngImageResource MOUSE_VRESIZER_CURSOR;
+    static const PngImageResource MOUSE_UHVRESIZER_CURSOR;
+    static const PngImageResource MOUSE_DHVRESIZER_CURSOR;
     static const PngImageResource CLOSE;
     static const PngImageResource UP;
     static const PngImageResource DOWN;

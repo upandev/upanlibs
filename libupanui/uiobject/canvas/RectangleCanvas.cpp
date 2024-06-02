@@ -29,24 +29,32 @@ namespace upanui {
   : Canvas(x, y, width, height), _layout(*this) {
   }
 
-  bool RectangleCanvas::intersect(int x, int y) const {
+  UIObjectImpl::IntersectInfo RectangleCanvas::intersect(int x, int y) const {
     const auto bgAlpha = backgroundColorAlpha();
     const auto brThickness = borderThickness();
+
+    const int x1 = drawX();
+    const int x2 = drawX() + width();
+    const int y1 = drawY();
+    const int y2 = drawY() + height();
+
+    const int ix1 = x1 + brThickness;
+    const int ix2 = x2 - brThickness;
+
+    const int iy1 = y1 + brThickness;
+    const int iy2 = y2 - brThickness;
 
     if (brThickness > 0) {
       const auto brAplha = borderColorAlpha();
 
-      const int innerX = drawX() + brThickness;
-      const int innerWidth = width() - 2 * brThickness;
-
-      const int innerY = drawY() + brThickness;
-      const int innerHeight = height() - 2 * brThickness;
-
-      if (x < innerX || x > (innerX + innerWidth) || y < innerY || y > (innerY + innerHeight)) {
-        return brAplha != 0;
+      if (x < ix1 || x > ix2 || y < iy1 || y > iy2) {
+        return { brAplha != 0, x - x1, x2 - x, y - y1, y2 - y };
+      } else {
+        return { bgAlpha != 0, x - ix1, ix2 - x, y - iy1, iy2 - y };
       }
+    } else {
+      return { bgAlpha != 0, x - x1, x2 - x, y - y1, y2 - y };
     }
-    return bgAlpha != 0;
   }
 
   void RectangleCanvas::doDraw() {

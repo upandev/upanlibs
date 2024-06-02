@@ -103,6 +103,13 @@ namespace upanui {
     void setChangeState(const ChangeState) override;
     bool isChangeState(const ChangeState, const bool only) const override;
 
+    bool isHResizable() const override { return _hResizable; }
+    bool isVResizable() const override { return _vResizable; }
+    void setResizable(bool hResizable, bool vResizable) override {
+      _hResizable = hResizable;
+      _vResizable = vResizable;
+    }
+
   protected:
     uint32_t backgroundColorWithAlpha() const {
       return (_bgColor & GCoreFunctions::NO_ALPHA_MASK) | (_bgAlpha << 24);
@@ -114,9 +121,21 @@ namespace upanui {
     void onLoseMouseFocus() override {}
 
     bool inside(int x, int y) const;
-    virtual bool intersect(int x, int y) const {
-      return true;
+    typedef struct IntersectInfo {
+      IntersectInfo() : _intersect(false), _xLeftDelta(0), _xRightDelta(0), _yTopDelta(0), _yBottomDelta(0) {}
+      IntersectInfo(bool i, int xld, int xrd, int yld, int yrd) : _intersect(i), _xLeftDelta(xld), _xRightDelta(xrd), _yTopDelta(yld), _yBottomDelta(yrd) {}
+      bool _intersect;
+      int _xLeftDelta;
+      int _xRightDelta;
+      int _yTopDelta;
+      int _yBottomDelta;
+    } IntersectInfo;
+
+    virtual IntersectInfo intersect(int x, int y) const {
+      return { true, -1, -1, -1, -1 };
     }
+
+    bool activateResizer(const IntersectInfo& intersectInfo);
 
     class ChangeNotificationLock {
     public:
@@ -155,6 +174,8 @@ namespace upanui {
     upan::option<VerticalScroller&> _verticalScroller;
     uint32_t _changeState;
     DrawBuffer _drawBuffer;
+    bool _hResizable;
+    bool _vResizable;
 
     GraphicsContext& _gc;
   };

@@ -31,7 +31,11 @@ extern unsigned _binary_icons_##type##_##name##_##type##_size;
 &_binary_icons_##type##_##name##_##type##_start, (size_t)&_binary_icons_##type##_##name##_##type##_size
 
 DECLARE_IMAGE(test, png)
-DECLARE_IMAGE(mouse_cursor, png)
+DECLARE_IMAGE(mouse_pointer_cursor, png)
+DECLARE_IMAGE(mouse_hresizer_cursor, png)
+DECLARE_IMAGE(mouse_vresizer_cursor, png)
+DECLARE_IMAGE(mouse_uhvresizer_cursor, png)
+DECLARE_IMAGE(mouse_dhvresizer_cursor, png)
 DECLARE_IMAGE(close, png)
 DECLARE_IMAGE(up, png)
 DECLARE_IMAGE(down, png)
@@ -40,12 +44,16 @@ DECLARE_IMAGE(mouse_cursor, bmp)
 
 namespace upanui {
   const PngImageResource PngImageResource::TEST(IMAGE_PARAMS(test, png));
-  const PngImageResource PngImageResource::MOUSE_CURSOR(IMAGE_PARAMS(mouse_cursor, png));
+  const PngImageResource PngImageResource::MOUSE_POINTER_CURSOR(IMAGE_PARAMS(mouse_pointer_cursor, png));
+  const PngImageResource PngImageResource::MOUSE_HRESIZER_CURSOR(IMAGE_PARAMS(mouse_hresizer_cursor, png));
+  const PngImageResource PngImageResource::MOUSE_VRESIZER_CURSOR(IMAGE_PARAMS(mouse_vresizer_cursor, png));
+  const PngImageResource PngImageResource::MOUSE_UHVRESIZER_CURSOR(IMAGE_PARAMS(mouse_uhvresizer_cursor, png));
+  const PngImageResource PngImageResource::MOUSE_DHVRESIZER_CURSOR(IMAGE_PARAMS(mouse_dhvresizer_cursor, png));
   const PngImageResource PngImageResource::CLOSE(IMAGE_PARAMS(close, png));
   const PngImageResource PngImageResource::UP(IMAGE_PARAMS(up, png));
   const PngImageResource PngImageResource::DOWN(IMAGE_PARAMS(down, png));
 
-  const BmpImageResource BmpImageResource::MOUSE_CURSOR(IMAGE_PARAMS(mouse_cursor,bmp));
+  const BmpImageResource BmpImageResource::MOUSE_CURSOR(IMAGE_PARAMS(mouse_cursor, bmp));
 
   Image& PngImageResource::create() const {
     PngEncoder encoder;

@@ -53,6 +53,10 @@ void set_gui_base(bool isGuiBase) {
   SysDisplay_SetGuiBase(isGuiBase);
 }
 
+void set_mouse_cursor_type(MouseCursorType type) {
+  SysDisplay_SetMouseCursorType(type);
+}
+
 void init_term_console() {
   SysDisplay_InitTermConsole();
 }

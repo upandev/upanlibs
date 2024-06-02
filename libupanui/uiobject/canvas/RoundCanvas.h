@@ -44,7 +44,7 @@ namespace upanui {
     }
 
     bool needLocalDrawBuffer() override;
-    bool intersect(int x, int y) const override;
+    IntersectInfo intersect(int x, int y) const override;
 
   private:
     CircularLayout _layout;

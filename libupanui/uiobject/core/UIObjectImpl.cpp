@@ -33,6 +33,7 @@ namespace upanui {
       _brAlpha(GCoreFunctions::MAX_ALPHA), _borderThickness(0), _lockChangeNotification(false),
       _mouseEventHandler(upan::option<MouseEventHandler&>::empty()), _captureMouseEvents(false),
       _verticalScroller(upan::option<VerticalScroller&>::empty()), _changeState(UIObject::ChangeState::Content),
+      _hResizable(false), _vResizable(false),
       _gc(GraphicsContext::Instance()) {
   }
 
@@ -188,19 +189,56 @@ namespace upanui {
     return x >= objX && x < (objX + _width) && y >= objY && y <= (objY + _height);
   }
 
+  bool UIObjectImpl::activateResizer(const IntersectInfo& intersectInfo) {
+    gc().setMouseCursorType(MouseCursorType::NORMAL);
+
+    if (!intersectInfo._intersect) {
+      return false;
+    }
+
+    if (!isHResizable() && !isVResizable()) {
+      return false;
+    }
+
+    const int RESIZER_ZONE_LIMIT = 5;
+    const bool lhresizer = intersectInfo._xLeftDelta >= 0 && intersectInfo._xLeftDelta < RESIZER_ZONE_LIMIT;
+    const bool rhresizer = intersectInfo._xRightDelta >= 0 && intersectInfo._xRightDelta < RESIZER_ZONE_LIMIT;
+    const bool tvresizer = intersectInfo._yTopDelta >= 0 && intersectInfo._yTopDelta < RESIZER_ZONE_LIMIT;
+    const bool bvresizer = intersectInfo._yBottomDelta >= 0 && intersectInfo._yBottomDelta < RESIZER_ZONE_LIMIT;
+
+    if (((lhresizer && tvresizer) || (rhresizer && bvresizer)) && isHResizable() && isVResizable()) {
+      gc().setMouseCursorType(MouseCursorType::DHVRESIZER);
+    } else if (((lhresizer && bvresizer) || (rhresizer && tvresizer)) && isHResizable() && isVResizable()) {
+      gc().setMouseCursorType(MouseCursorType::UHVRESIZER);
+    } else if ((lhresizer || rhresizer) && isHResizable()) {
+      gc().setMouseCursorType(MouseCursorType::HRESIZER);
+    } else if ((tvresizer || bvresizer) && isVResizable()) {
+      gc().setMouseCursorType(MouseCursorType::VRESIZER);
+    } else {
+      return false;
+    }
+    return true;
+  }
+
   upan::option<UIObject&> UIObjectImpl::uiObjectUnderCursor(const int x, const int y) {
+    gc().setMouseCursorType(MouseCursorType::NORMAL);
     if (captureMouseEvents() && inside(x, y)) {
+      const IntersectInfo intersectInfo = intersect(x, y);
+      if (activateResizer(intersectInfo)) {
+        return upan::option<UIObject &>(this);
+      }
+
       for(auto child = children().rbegin(); child != children().rend(); ++child) {
         const upan::option<UIObject&> o = child->uiObjectUnderCursor(x, y);
         if (!o.isEmpty()) {
           return o;
         }
       }
-      if (intersect(x, y)) {
+
+      if (intersectInfo._intersect) {
         return upan::option<UIObject &>(this);
       }
     }
-
     return upan::option<UIObject&>::empty();
   }
 

@@ -186,6 +186,7 @@ namespace upanui {
         _mouseFocusedObject.value().onLoseMouseFocus();
         _mouseFocusedObject = upan::option<UIObject&>::empty();
       }
+      _focusedUIObject = upan::option<UIObject&>::empty();
     } else {
       if (_mouseFocusedObject.isEmpty()) {
         _mouseFocusedObject = eventObject;

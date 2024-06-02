@@ -75,6 +75,10 @@ void SysDisplay_SetGuiBase(bool isGuiBase) {
   _upanix_syscall(SYS_CALL_DISPLAY_SET_GUI_BASE, (uint64_t)isGuiBase, 2, 3, 4, 5);
 }
 
+void SysDisplay_SetMouseCursorType(MouseCursorType mouseCursorType) {
+  _upanix_syscall(SYS_CALL_DISPLAY_SET_MOUSE_CURSOR_TYPE, (uint64_t)mouseCursorType, 2, 3, 4, 5);
+}
+
 void SysDisplay_InitTermConsole() {
   _upanix_syscall(SYS_CALL_DISPLAY_INIT_TERM_CONSOLE, 1, 2, 3, 4, 5);
 }

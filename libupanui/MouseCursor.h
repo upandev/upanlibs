@@ -23,43 +23,44 @@
 
 #include <stdlib.h>
 #include <Image.h>
+#include <uniq_ptr.h>
 
 namespace upanui {
   class MouseCursor {
   public:
-    MouseCursor(const Image& image, const int x, const int y)
-    : _image(image), _x(x), _y(y) {
-    }
+    MouseCursor();
 
-    int x() const {
-      return _x;
-    }
-    void x(const int x) {
-      _x = x;
-    }
+    int realX() const { return _x; }
+    int realY() const { return _y; }
 
-    int y() const {
-      return _y;
-    }
-    void y(const int y) {
-      _y = y;
-    }
+    int drawX() const { return realX() + _xoffset; }
+    int drawY() const { return realY() + _yoffset; }
 
-    int width() const {
-      return _image.width();
-    }
+    void x(int x) { _x = x; }
+    void y(int y) { _y = y; }
 
-    int height() const {
-      return _image.height();
-    }
+    int width() const { return _image->width(); }
+    int height() const { return _image->height(); }
+
+    MouseCursorType type() const { return _type; }
+    void type(MouseCursorType);
 
     const uint32_t* data() const {
-      return const_cast<MouseCursor*>(this)->_image.data();
+      return const_cast<MouseCursor*>(this)->_image->data();
     }
 
   private:
-    Image _image;
+    upan::uniq_ptr<Image> _pointerImg;
+    upan::uniq_ptr<Image> _hresizerImg;
+    upan::uniq_ptr<Image> _vresizerImg;
+    upan::uniq_ptr<Image> _uhvresizerImg;
+    upan::uniq_ptr<Image> _dhvresizerImg;
+    const Image* _image;
+
     int _x;
     int _y;
+    int _xoffset;
+    int _yoffset;
+    MouseCursorType _type;
   };
 }

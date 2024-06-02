@@ -21,7 +21,6 @@
  */
 #pragma once
 
-#include <UIElement.h>
 #include <uniq_ptr.h>
 
 namespace upanui {

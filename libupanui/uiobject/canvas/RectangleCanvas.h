@@ -42,7 +42,7 @@ namespace upanui {
       return _layout;
     }
 
-    bool intersect(int x, int y) const;
+    IntersectInfo intersect(int x, int y) const;
 
   private:
     RectangularLayout _layout;

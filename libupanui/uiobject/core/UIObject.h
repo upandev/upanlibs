@@ -112,6 +112,10 @@ namespace upanui {
     virtual void setChangeState(const ChangeState changeState) = 0;
     virtual bool isChangeState(const ChangeState changeState, const bool only) const = 0;
 
+    virtual bool isHResizable() const = 0;
+    virtual bool isVResizable() const = 0;
+    virtual void setResizable(bool, bool) = 0;
+
   protected:
     virtual ~UIObject() {}
 

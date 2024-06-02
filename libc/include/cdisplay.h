@@ -52,6 +52,11 @@ typedef struct {
   int _height;
 } ViewportInfo;
 
+typedef enum {
+  NORMAL,
+  HRESIZER, VRESIZER, DHVRESIZER, UHVRESIZER
+} MouseCursorType;
+
 extern void	SysDisplay_MoveCursor(int n) ;
 extern void	SysDisplay_ClearLine(int pos) ;
 extern void	SysDisplay_SetCursor(int pos, bool bUpdateCursorOnScreen) ;
@@ -61,6 +66,7 @@ extern void SysDisplay_InitGuiFrame(FrameBufferInfo*);
 extern void SysDisplay_FrameTouch();
 extern void SysDisplay_FrameHasAlpha(bool);
 extern void SysDisplay_SetGuiBase(bool);
+extern void SysDisplay_SetMouseCursorType(MouseCursorType);
 extern void SysDisplay_InitTermConsole();
 extern void SysDisplay_InitGuiEventStream(int fdList[]);
 extern void SysDisplay_SetViewport(const ViewportInfo*);
@@ -79,6 +85,7 @@ void init_gui_frame(FrameBufferInfo* frameBufferInfo);
 void gui_frame_touch();
 void gui_frame_has_alpha(bool hasAlpha);
 void set_gui_base(bool isGuiBase);
+void set_mouse_cursor_type(MouseCursorType type);
 void init_term_console();
 void init_gui_event_stream(int fdList[]);
 void set_viewport(const ViewportInfo*);
