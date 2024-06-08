@@ -58,7 +58,6 @@ namespace upanui {
     void x(int) override;
     void y(int) override;
     void xy(int x, int y) override;
-    void width(int) override;
     void height(int) override;
     void backgroundColor(const uint32_t color) override;
     void backgroundColorAlpha(const uint8_t) override;
@@ -162,7 +161,9 @@ namespace upanui {
       return _drawBuffer;
     }
 
-  protected:
+    bool width(int) override;
+
+  private:
     int _x;
     int _y;
     int _width;

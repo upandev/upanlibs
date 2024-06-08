@@ -90,18 +90,20 @@ namespace upanui {
     GraphicsContext::Instance().frame().updateViewport(x(), y(), width(), height());
   }
 
-  bool UIRoot::resize(ResizeMode resizeMode, int dx, int dy) {
-    if (resizeMode == ResizeMode::NA) {
-      return false;
-    }
-
+  void UIRoot::resize(ResizeMode resizeMode, int dx, int dy) {
+    ChangeNotificationLock cLock(*this);
     switch (resizeMode) {
       case ResizeMode::LEFT:
-        _x += dx;
-        _width -= dx;
+        if (!width(width() - dx)) {
+          return;
+        }
+        x(x() + dx);
         break;
+
       case ResizeMode::RIGHT:
-        _width += dx;
+        if (!width(width() + dx)) {
+          return;
+        }
         break;
     }
 
@@ -110,6 +112,5 @@ namespace upanui {
     }
 
     redraw();
-    return true;
   }
 }

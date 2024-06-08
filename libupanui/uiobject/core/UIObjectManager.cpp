@@ -197,11 +197,9 @@ namespace upanui {
         _mouseFocusedObject = eventObject;
         _mouseFocusedObject.value().onMouseFocus();
       }
-      bool relayEvent = false;
-      if (data.anyButtonHeld()) {
-        relayEvent = dynamic_cast<UIObjectImpl&>(eventObject.value()).resize(GraphicsContext::Instance().getResizeMode(), data.deltaX(), data.deltaY());
-      }
-      if (!relayEvent) {
+      if (data.anyButtonHeld() && GraphicsContext::Instance().getResizeMode() != ResizeMode::NA) {
+        eventObject.value().resize(GraphicsContext::Instance().getResizeMode(), data.deltaX(), data.deltaY());
+      } else {
         const MouseEvent event(data, viewportX, viewportY);
         eventObject.value().onMouseEvent(event);
       }

@@ -64,11 +64,18 @@ namespace upanui {
     }
   }
 
-  void UIObjectImpl::width(int32_t width) {
+  bool UIObjectImpl::width(int32_t width) {
+    if (width < RESIZER_ZONE_LIMIT) {
+      width = RESIZER_ZONE_LIMIT;
+    }
+
     if (_width != width) {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _width = width;
       notifyChange(ChangeState::Size);
+      return true;
+    } else {
+      return false;
     }
   }
 

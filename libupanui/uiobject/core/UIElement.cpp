@@ -87,28 +87,27 @@ namespace upanui {
     }
   }
 
-  bool UIElement::resize(ResizeMode resizeMode, int dx, int dy) {
-    if (resizeMode == ResizeMode::NA) {
-      return false;
-    }
-
+  void UIElement::resize(ResizeMode resizeMode, int dx, int dy) {
     switch (resizeMode) {
+      case ResizeMode::NA:
+        return;
+
       case ResizeMode::LEFT:
-        switch(getHorizontalPlacementType()) {
+        switch (getHorizontalPlacementType()) {
           case HorizontalPlacementType::LEFT_FIXED:
           case HorizontalPlacementType::RIGHT_STRETCHED:
-            resizeMode = ResizeMode::NA;
-            break;
+            return;
 
           case HorizontalPlacementType::ABSOLUTE:
           case HorizontalPlacementType::RIGHT_FIXED:
             x(x() - dx);
-            resizeMode = ResizeMode::NA;
-            break;
+            return;
 
           case HorizontalPlacementType::LEFT_STRETCHED:
           case HorizontalPlacementType::STRETCHED:
-            width(width() - dx);
+            if (!width(width() - dx)) {
+              return;
+            }
             break;
         }
         break;
@@ -118,26 +117,24 @@ namespace upanui {
           case HorizontalPlacementType::ABSOLUTE:
           case HorizontalPlacementType::LEFT_FIXED:
           case HorizontalPlacementType::LEFT_STRETCHED:
-            resizeMode = ResizeMode::NA;
-            break;
+            return;
 
           case HorizontalPlacementType::RIGHT_FIXED:
             x(x() + dx);
-            resizeMode = ResizeMode::NA;
-            break;
+            return;
 
           case HorizontalPlacementType::RIGHT_STRETCHED:
           case HorizontalPlacementType::STRETCHED:
-            width(width() + dx);
+            if (!width(width() + dx)) {
+              return;
+            }
             break;
         }
         break;
     }
 
-    for(auto child = children().rbegin(); child != children().rend(); ++child) {
-      dynamic_cast<UIObjectImpl*>(*child)->resize(resizeMode, dx, dy);
+    for (auto child = children().rbegin(); child != children().rend(); ++child) {
+      child->resize(resizeMode, dx, dy);
     }
-
-    return true;
   }
 }
