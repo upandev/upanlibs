@@ -24,8 +24,8 @@
 #include "GCoreFunctions.h"
 
 namespace upanui {
-  UIElement::UIElement(int x, int y, int32_t width, int32_t height)
-    : UIObjectImpl(x, y, width, height) {
+  UIElement::UIElement(int x, int y, int32_t width, int32_t height, HorizontalPlacementType horizontalPlacementType)
+    : UIObjectImpl(x, y, width, height, horizontalPlacementType) {
   }
 
   UIElement::~UIElement() noexcept {
@@ -47,15 +47,15 @@ namespace upanui {
 
     setChangeState(changeState);
     switch(changeState) {
-      case Position:
+      case ChangeState::Position:
         parent().setChangeState(ChangeState::Content);
         parent().redraw();
         break;
-      case Size:
+      case ChangeState::Size:
         parent().setChangeState(ChangeState::Content);
         parent().redraw();
         break;
-      case Content:
+      case ChangeState::Content:
         redraw();
         break;
     }
@@ -85,5 +85,59 @@ namespace upanui {
         throw upan::exception(XLOC, "Unsupported BoundaryCheckResult: %d", boundaryCheckResult);
       }
     }
+  }
+
+  bool UIElement::resize(ResizeMode resizeMode, int dx, int dy) {
+    if (resizeMode == ResizeMode::NA) {
+      return false;
+    }
+
+    switch (resizeMode) {
+      case ResizeMode::LEFT:
+        switch(getHorizontalPlacementType()) {
+          case HorizontalPlacementType::LEFT_FIXED:
+          case HorizontalPlacementType::RIGHT_STRETCHED:
+            resizeMode = ResizeMode::NA;
+            break;
+
+          case HorizontalPlacementType::ABSOLUTE:
+          case HorizontalPlacementType::RIGHT_FIXED:
+            x(x() - dx);
+            resizeMode = ResizeMode::NA;
+            break;
+
+          case HorizontalPlacementType::LEFT_STRETCHED:
+          case HorizontalPlacementType::STRETCHED:
+            width(width() - dx);
+            break;
+        }
+        break;
+
+      case ResizeMode::RIGHT:
+        switch (getHorizontalPlacementType()) {
+          case HorizontalPlacementType::ABSOLUTE:
+          case HorizontalPlacementType::LEFT_FIXED:
+          case HorizontalPlacementType::LEFT_STRETCHED:
+            resizeMode = ResizeMode::NA;
+            break;
+
+          case HorizontalPlacementType::RIGHT_FIXED:
+            x(x() + dx);
+            resizeMode = ResizeMode::NA;
+            break;
+
+          case HorizontalPlacementType::RIGHT_STRETCHED:
+          case HorizontalPlacementType::STRETCHED:
+            width(width() + dx);
+            break;
+        }
+        break;
+    }
+
+    for(auto child = children().rbegin(); child != children().rend(); ++child) {
+      dynamic_cast<UIObjectImpl*>(*child)->resize(resizeMode, dx, dy);
+    }
+
+    return true;
   }
 }

@@ -26,7 +26,7 @@
 
 namespace upanui {
   UIRoot::UIRoot(int x, int y, int width, int height)
-          : UIObjectImpl(x, y, width, height),
+          : UIObjectImpl(x, y, width, height, HorizontalPlacementType::STRETCHED),
             _layout(*this) {
     gc().frame().updateViewport(x, y, width, height);
     UIObjectImpl::drawBuffer().initLocal(gc().frame().frameBuffer());
@@ -73,16 +73,43 @@ namespace upanui {
 
     setChangeState(changeState);
     switch(changeState) {
-      case Position:
+      case ChangeState::Position:
         gc().frame().updateViewport(x(), y(), width(), height());
         break;
-      case Size:
-        gc().frame().updateViewport(x(), y(), width(), height());
+      case ChangeState::Size:
+        //gc().frame().updateViewport(x(), y(), width(), height());
         redraw();
         break;
-      case Content:
+      case ChangeState::Content:
         redraw();
         break;
     }
+  }
+
+  void UIRoot::updateViewport() {
+    GraphicsContext::Instance().frame().updateViewport(x(), y(), width(), height());
+  }
+
+  bool UIRoot::resize(ResizeMode resizeMode, int dx, int dy) {
+    if (resizeMode == ResizeMode::NA) {
+      return false;
+    }
+
+    switch (resizeMode) {
+      case ResizeMode::LEFT:
+        _x += dx;
+        _width -= dx;
+        break;
+      case ResizeMode::RIGHT:
+        _width += dx;
+        break;
+    }
+
+    for(auto child = children().rbegin(); child != children().rend(); ++child) {
+      child->resize(resizeMode, dx, dy);
+    }
+
+    redraw();
+    return true;
   }
 }

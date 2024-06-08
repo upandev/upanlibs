@@ -111,7 +111,7 @@ namespace upanui {
   void UIObjectManager::queueForRedraw(UIObject& uiObject) {
     upan::mutex_guard g(_uiObjectQueueMutex);
 
-    if (_modifiedUIObjects.size() == MAX_OBJECTS_UPDATE_QUEUE) {
+    if (_modifiedUIObjects.size() == MAX_OBJECTS_UPDATE_QUEUE || (&_rootCanvas == &uiObject)) {
       _modifiedUIObjects.clear();
       _modifiedUIObjects.push_back(&_rootCanvas);
     } else if (_modifiedUIObjects.empty() || _modifiedUIObjects.back() != &uiObject) {
@@ -141,6 +141,7 @@ namespace upanui {
         GraphicsContext::Instance().frame().hasAlpha(_rootCanvas.hasAlpha());
         _recalcHasAlpha = false;
       }
+      _rootCanvas.updateViewport();
       GraphicsContext::Instance().frame().touch();
     }
   }
@@ -196,8 +197,14 @@ namespace upanui {
         _mouseFocusedObject = eventObject;
         _mouseFocusedObject.value().onMouseFocus();
       }
-      const MouseEvent event(data, viewportX, viewportY);
-      eventObject.value().onMouseEvent(event);
+      bool relayEvent = false;
+      if (data.anyButtonHeld()) {
+        relayEvent = dynamic_cast<UIObjectImpl&>(eventObject.value()).resize(GraphicsContext::Instance().getResizeMode(), data.deltaX(), data.deltaY());
+      }
+      if (!relayEvent) {
+        const MouseEvent event(data, viewportX, viewportY);
+        eventObject.value().onMouseEvent(event);
+      }
     }
   }
 }

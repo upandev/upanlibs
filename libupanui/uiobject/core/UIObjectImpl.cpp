@@ -27,13 +27,15 @@
 #include <VerticalScroller.h>
 
 namespace upanui {
-  UIObjectImpl::UIObjectImpl(int x, int y, int32_t width, int32_t height)
+  UIObjectImpl::UIObjectImpl(int x, int y,
+                             int32_t width, int32_t height,
+                             HorizontalPlacementType horizontalPlacementType)
     : _x(x), _y(y), _width(width), _height(height),
       _bgColor(0), _bgAlpha(GCoreFunctions::MAX_ALPHA), _brColor(0xFFFFFF),
       _brAlpha(GCoreFunctions::MAX_ALPHA), _borderThickness(0), _lockChangeNotification(false),
       _mouseEventHandler(upan::option<MouseEventHandler&>::empty()), _captureMouseEvents(false),
-      _verticalScroller(upan::option<VerticalScroller&>::empty()), _changeState(UIObject::ChangeState::Content),
-      _hResizable(false), _vResizable(false),
+      _verticalScroller(upan::option<VerticalScroller&>::empty()), _changeState((int)ChangeState::Content),
+      _hResizable(false), _vResizable(false), _horizontalPlacementType(horizontalPlacementType),
       _gc(GraphicsContext::Instance()) {
   }
 
@@ -190,7 +192,7 @@ namespace upanui {
   }
 
   bool UIObjectImpl::activateResizer(const IntersectInfo& intersectInfo) {
-    gc().setMouseCursorType(MouseCursorType::NORMAL);
+    gc().setResizeMode(ResizeMode::NA);
 
     if (!intersectInfo._intersect) {
       return false;
@@ -200,20 +202,19 @@ namespace upanui {
       return false;
     }
 
-    const int RESIZER_ZONE_LIMIT = 5;
     const bool lhresizer = intersectInfo._xLeftDelta >= 0 && intersectInfo._xLeftDelta < RESIZER_ZONE_LIMIT;
     const bool rhresizer = intersectInfo._xRightDelta >= 0 && intersectInfo._xRightDelta < RESIZER_ZONE_LIMIT;
     const bool tvresizer = intersectInfo._yTopDelta >= 0 && intersectInfo._yTopDelta < RESIZER_ZONE_LIMIT;
     const bool bvresizer = intersectInfo._yBottomDelta >= 0 && intersectInfo._yBottomDelta < RESIZER_ZONE_LIMIT;
 
     if (((lhresizer && tvresizer) || (rhresizer && bvresizer)) && isHResizable() && isVResizable()) {
-      gc().setMouseCursorType(MouseCursorType::DHVRESIZER);
+      gc().setResizeMode((lhresizer && tvresizer) ? ResizeMode::LEFT_TOP : ResizeMode::RIGHT_BOTTOM);
     } else if (((lhresizer && bvresizer) || (rhresizer && tvresizer)) && isHResizable() && isVResizable()) {
-      gc().setMouseCursorType(MouseCursorType::UHVRESIZER);
+      gc().setResizeMode((lhresizer && bvresizer) ? ResizeMode::LEFT_BOTTOM : ResizeMode::RIGHT_TOP);
     } else if ((lhresizer || rhresizer) && isHResizable()) {
-      gc().setMouseCursorType(MouseCursorType::HRESIZER);
+      gc().setResizeMode(lhresizer ? ResizeMode::LEFT : ResizeMode::RIGHT);
     } else if ((tvresizer || bvresizer) && isVResizable()) {
-      gc().setMouseCursorType(MouseCursorType::VRESIZER);
+      gc().setResizeMode(tvresizer ? ResizeMode::TOP : ResizeMode::BOTTOM);
     } else {
       return false;
     }
@@ -221,8 +222,10 @@ namespace upanui {
   }
 
   upan::option<UIObject&> UIObjectImpl::uiObjectUnderCursor(const int x, const int y) {
-    gc().setMouseCursorType(MouseCursorType::NORMAL);
+    gc().setResizeMode(ResizeMode::NA);
+
     if (captureMouseEvents() && inside(x, y)) {
+
       const IntersectInfo intersectInfo = intersect(x, y);
       if (activateResizer(intersectInfo)) {
         return upan::option<UIObject &>(this);
@@ -262,7 +265,7 @@ namespace upanui {
   }
 
   void UIObjectImpl::hscroll(int columns) {
-   x(x() + columns);
+    x(x() + columns);
   }
 
   void UIObjectImpl::registerVerticalScroller(VerticalScroller& verticalScroller) {
@@ -273,15 +276,15 @@ namespace upanui {
     _verticalScroller = upan::option<VerticalScroller&>::empty();
   }
 
-  void UIObjectImpl::setChangeState(const UIObject::ChangeState changeState) {
-    if (changeState == UIObject::ChangeState::Clean) {
-      _changeState = changeState;
+  void UIObjectImpl::setChangeState(const ChangeState changeState) {
+    if (changeState == ChangeState::Clean) {
+      _changeState = (int)changeState;
     } else {
-      _changeState |= changeState;
+      _changeState |= (int)changeState;
     }
   }
 
-  bool UIObjectImpl::isChangeState(UIObject::ChangeState changeState, bool only) const {
-    return (only || changeState == UIObject::ChangeState::Clean) ? _changeState == changeState : _changeState & changeState;
+  bool UIObjectImpl::isChangeState(ChangeState changeState, bool only) const {
+    return (only || changeState == ChangeState::Clean) ? _changeState == (int)changeState : _changeState & (int)changeState;
   }
 }

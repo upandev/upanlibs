@@ -69,7 +69,7 @@ namespace upanui {
     TextArea() = delete;
     TextArea(const TextArea&) = delete;
 
-    TextArea(int x, int y, int width, int height, int leftMargin);
+    TextArea(int x, int y, int width, int height, int leftMargin, HorizontalPlacementType horizontalPlacementType);
     virtual ~TextArea();
 
     void init();

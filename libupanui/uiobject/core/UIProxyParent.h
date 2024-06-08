@@ -97,7 +97,7 @@ namespace upanui {
       throw upan::exception(XLOC, "unsupported (set)captureMouseEvents for UIProxyParent");
     }
 
-    upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) override {
+    upan::option<UIObject&> uiObjectUnderCursor(int x, int y) override {
       throw upan::exception(XLOC, "unsupported uiObjectUnderCursor for UIProxyParent");
     }
 
@@ -144,6 +144,9 @@ namespace upanui {
     void setResizable(bool, bool) override {
       throw upan::exception(XLOC,"unsupported setResizable() for UIProxyParent");
     }
+
+    bool resize(ResizeMode, int, int) override { return false; }
+    HorizontalPlacementType getHorizontalPlacementType() const override { return HorizontalPlacementType::ABSOLUTE; }
 
     friend class UIObjectManager;
   };

@@ -25,13 +25,13 @@
 
 namespace upanui {
   ImageCanvas::ImageCanvas(const Image& image, ImageComposeType composeType,
-                           int x, int y, int width, int height)
-    : RectangleCanvas(x, y, width, height), _image(new Image(image)), _composeType(composeType) {
+                           int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType)
+    : RectangleCanvas(x, y, width, height, horizontalPlacementType), _image(new Image(image)), _composeType(composeType) {
   }
 
   ImageCanvas::ImageCanvas(Image* inImage, ImageComposeType composeType,
-                           int x, int y, int width, int height)
-      : RectangleCanvas(x, y, width, height), _image(inImage), _composeType(composeType) {
+                           int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType)
+      : RectangleCanvas(x, y, width, height, horizontalPlacementType), _image(inImage), _composeType(composeType) {
   }
 
   void ImageCanvas::setImage(const Image& image) {

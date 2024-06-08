@@ -28,7 +28,7 @@
 namespace upanui {
   class UILeafElement : public UIElement {
   protected:
-    UILeafElement(int x, int y, int width, int height);
+    UILeafElement(int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType);
     ~UILeafElement();
 
     void add(UIObject& child) override {

@@ -39,9 +39,11 @@ namespace upanui {
 
   class UIObjectImpl : public UIObject {
   protected:
-    UIObjectImpl(int32_t x, int32_t y, int32_t width, int32_t height);
+    UIObjectImpl(int32_t x, int32_t y, int32_t width, int32_t height, HorizontalPlacementType horizontalPlacementType);
 
   public:
+    const static int RESIZER_ZONE_LIMIT = 5;
+
     int x() const override { return _x; }
     int y() const override { return _y; }
     int width() const override { return _width; }
@@ -82,7 +84,7 @@ namespace upanui {
 
     bool hasAlphaLocal() override;
     bool hasAlpha() override;
-    upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) override;
+    upan::option<UIObject&> uiObjectUnderCursor(int x, int y) override;
 
     bool captureMouseEvents() const override {
       return _captureMouseEvents;
@@ -109,6 +111,8 @@ namespace upanui {
       _hResizable = hResizable;
       _vResizable = vResizable;
     }
+
+    HorizontalPlacementType getHorizontalPlacementType() const override { return _horizontalPlacementType; }
 
   protected:
     uint32_t backgroundColorWithAlpha() const {
@@ -158,7 +162,7 @@ namespace upanui {
       return _drawBuffer;
     }
 
-  private:
+  protected:
     int _x;
     int _y;
     int _width;
@@ -172,10 +176,11 @@ namespace upanui {
     upan::option<MouseEventHandler&> _mouseEventHandler;
     bool _captureMouseEvents;
     upan::option<VerticalScroller&> _verticalScroller;
-    uint32_t _changeState;
+    int _changeState;
     DrawBuffer _drawBuffer;
     bool _hResizable;
     bool _vResizable;
+    HorizontalPlacementType _horizontalPlacementType;
 
     GraphicsContext& _gc;
   };

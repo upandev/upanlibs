@@ -27,6 +27,7 @@
 #include <option.h>
 #include <set.h>
 #include <list.h>
+#include <UIEnums.h>
 
 namespace upanui {
   class GraphicsContext;
@@ -44,13 +45,6 @@ namespace upanui {
     UIObject& operator=(const UIObject&) = delete;
 
   public:
-    enum ChangeState {
-      Clean = 0,
-      Position = 1,
-      Size = 2,
-      Content = 4
-    };
-
     virtual int x() const = 0;
     virtual int y() const = 0;
     virtual int width() const = 0;
@@ -89,7 +83,7 @@ namespace upanui {
     virtual bool isRectangularShape() = 0;
     virtual bool hasAlphaLocal() = 0;
     virtual bool hasAlpha() = 0;
-    virtual upan::option<UIObject&> uiObjectUnderCursor(const int x, const int y) = 0;
+    virtual upan::option<UIObject&> uiObjectUnderCursor(int x, int y) = 0;
 
     virtual Layout& layout() = 0;
     virtual DrawBuffer& drawBuffer() = 0;
@@ -115,6 +109,8 @@ namespace upanui {
     virtual bool isHResizable() const = 0;
     virtual bool isVResizable() const = 0;
     virtual void setResizable(bool, bool) = 0;
+    virtual bool resize(ResizeMode resizeMode, int dx, int dy) = 0;
+    virtual HorizontalPlacementType getHorizontalPlacementType() const = 0;
 
   protected:
     virtual ~UIObject() {}

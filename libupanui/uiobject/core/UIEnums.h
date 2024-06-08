@@ -19,47 +19,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-
 #pragma once
 
-#include <RectangleCanvas.h>
-
 namespace upanui {
-  class Button : public RectangleCanvas {
-  public:
-    uint32_t hoverColor() const {
-      return _hoverColor;
-    }
+    enum class ChangeState {
+      Clean = 0,
+      Position = 1,
+      Size = 2,
+      Content = 4
+    };
 
-    void hoverColor(uint32_t color) {
-      _hoverColor = color;
-    }
+  enum class ResizeMode {
+    NA,
+    LEFT, RIGHT, TOP, BOTTOM,
+    LEFT_TOP, LEFT_BOTTOM, RIGHT_TOP, RIGHT_BOTTOM
+  };
 
-    uint32_t clickColor() const {
-      return _clickColor;
-    }
-
-    void clickColor(uint32_t color) {
-      _clickColor = color;
-    }
-
-  protected:
-    virtual ~Button() {}
-    Button(int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType);
-
-    uint32_t backgroundColorForDraw() const override;
-
-    void onKeyboardEvent(const KeyboardEvent& event) override;
-    void onMouseEvent(const MouseEvent& event) override;
-    void onMouseFocus() override;
-    void onLoseMouseFocus() override;
-
-  private:
-    uint32_t _hoverColor;
-    uint32_t _clickColor;
-    bool _hover;
-    bool _leftClickHold;
-
-    friend class UIObjectFactory;
+  enum class HorizontalPlacementType {
+    ABSOLUTE, LEFT_FIXED, RIGHT_FIXED, STRETCHED, LEFT_STRETCHED, RIGHT_STRETCHED
   };
 }

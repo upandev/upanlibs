@@ -27,8 +27,8 @@
 namespace upanui {
   IconButton::IconButton(const ImageResource& imageResource, const ImageComposeType composeType,
                          int x, int y,
-                         int width, int height)
-    : Button(x, y, width, height), _imageResource(imageResource), _composeType(composeType) {
+                         int width, int height, HorizontalPlacementType horizontalPlacementType)
+    : Button(x, y, width, height, horizontalPlacementType), _imageResource(imageResource), _composeType(composeType) {
   }
 
   void IconButton::init() {
@@ -45,7 +45,7 @@ namespace upanui {
       const int ix = (width() - iw) / 2;
       const int iy = (height() - ih) / 2;
 
-      UIObjectFactory::createImageCanvas(*this, _imageResource, _composeType, ix, iy, iw, ih);
+      UIObjectFactory::createImageCanvas(*this, _imageResource, _composeType, ix, iy, iw, ih, HorizontalPlacementType::ABSOLUTE);
     }
     notifyChange(ChangeState::Content);
   }

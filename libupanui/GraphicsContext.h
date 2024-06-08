@@ -55,9 +55,8 @@ namespace upanui {
 
     upan::option<UIObject&> setFocus(UIObject&);
     void setGuiBase(bool isGuiBase);
-
-    MouseCursorType mouseCursorType() const { return _mouseCursorType; }
-    void setMouseCursorType(MouseCursorType type);
+    ResizeMode getResizeMode() const { return _resizeMode; }
+    void setResizeMode(ResizeMode resizeMode);
 
     UIObjectManager& uiObjectManager();
 
@@ -71,7 +70,7 @@ namespace upanui {
     upan::uniq_ptr<Frame> _frame;
     upan::uniq_ptr<EventManager> _evenManager;
     upan::uniq_ptr<UIObjectManager> _uiObjectManager;
-    MouseCursorType _mouseCursorType;
+    ResizeMode _resizeMode;
 
     friend class interop::graphics_context;
   };

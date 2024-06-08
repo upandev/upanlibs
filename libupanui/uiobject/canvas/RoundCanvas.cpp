@@ -26,8 +26,8 @@
 #include "GCoreFunctions.h"
 
 namespace upanui {
-  RoundCanvas::RoundCanvas(int x, int y, int32_t width, int32_t height)
-  : Canvas(x, y, (width & 1 ? width + 1 : width), (height & 1 ? height + 1 : height)), _layout(*this) {
+  RoundCanvas::RoundCanvas(int x, int y, int32_t width, int32_t height, HorizontalPlacementType horizontalPlacementType)
+  : Canvas(x, y, (width & 1 ? width + 1 : width), (height & 1 ? height + 1 : height), horizontalPlacementType), _layout(*this) {
   }
 
   bool RoundCanvas::needLocalDrawBuffer() {

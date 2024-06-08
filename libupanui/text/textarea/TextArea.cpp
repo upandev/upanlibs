@@ -28,7 +28,8 @@
 #include <VerticalScroller.h>
 
 namespace upanui {
-  TextArea::TextArea(int x, int y, int width, int height, int leftMargin) : RectangleCanvas(x, y, width, height),
+  TextArea::TextArea(int x, int y, int width, int height, int leftMargin, HorizontalPlacementType horizontalPlacementType)
+  : RectangleCanvas(x, y, width, height, horizontalPlacementType),
     _scrollY(0), _scrollHeight(0),
     _currentFontSize(Character::DEFAULT_FONT_SIZE), _currentFontType(usfn::PreloadedFonts::VGA16), _currentStyle(usfn::STYLE_REGULAR),
     _currentFGColor(DEFAULT_FG_COLOR), _currentBGColor(DEFAULT_BG_COLOR), _leftMargin(leftMargin),

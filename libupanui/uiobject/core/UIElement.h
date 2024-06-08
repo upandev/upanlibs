@@ -28,7 +28,7 @@
 namespace upanui {
   class UIElement : public UIObjectImpl {
   protected:
-    UIElement(int x, int y, int32_t width, int32_t height);
+    UIElement(int x, int y, int32_t width, int32_t height, HorizontalPlacementType horizontalPlacementType);
     ~UIElement();
 
     int drawX() const override;
@@ -42,5 +42,7 @@ namespace upanui {
 
     void notifyChange(const ChangeState changeState) override;
     bool skipRedraw() const;
+
+    bool resize(ResizeMode resizeMode, int dx, int dy) override;
   };
 }

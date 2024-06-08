@@ -35,7 +35,10 @@ namespace upanui {
     void insertCommandOutput(const upan::vector<Character>& characters);
 
   private:
-    Terminal(int x, int y, int width, int height, int leftMargin, const upan::string& prompt, TerminalCommandExecutor& terminalCommandExector);
+    Terminal(int x, int y, int width, int height, int leftMargin,
+             const upan::string& prompt,
+             TerminalCommandExecutor& terminalCommandExector,
+             HorizontalPlacementType horizontalPlacementType);
     ~Terminal() {}
 
     void initialize();

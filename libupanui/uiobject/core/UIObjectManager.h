@@ -86,7 +86,7 @@ namespace upanui {
     typedef upan::map<const UIObject*, UIObject*> ChildParentMap;
     ParentChildMap _parentChildMap;
     ChildParentMap _childParentMap;
-    UIObject& _rootCanvas;
+    UIRoot& _rootCanvas;
     upan::option<UIObject&> _focusedUIObject;
     upan::option<UIObject&> _mouseFocusedObject;
 

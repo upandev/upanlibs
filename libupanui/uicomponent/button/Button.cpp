@@ -24,8 +24,8 @@
 #include <MouseEventHandler.h>
 
 namespace upanui {
-  Button::Button(int x, int y, int width, int height)
-    : RectangleCanvas(x, y, width, height), _hover(false), _leftClickHold(false) {
+  Button::Button(int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType)
+    : RectangleCanvas(x, y, width, height, horizontalPlacementType), _hover(false), _leftClickHold(false) {
     UIObjectImpl::captureMouseEvents(true);
   }
 

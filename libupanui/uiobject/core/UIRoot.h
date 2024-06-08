@@ -46,6 +46,9 @@ namespace upanui {
 
     void notifyChange(const ChangeState changeState) override;
 
+    void updateViewport();
+    bool resize(ResizeMode resizeMode, int dx, int dy) override;
+
   private:
     Layout& layout() override {
       return _layout;
@@ -55,5 +58,6 @@ namespace upanui {
     RectangularLayout _layout;
 
     friend class GraphicsContext;
+    friend class UIObjectManager;
   };
 }

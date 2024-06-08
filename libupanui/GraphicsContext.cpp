@@ -37,7 +37,7 @@ namespace upanui {
     return interop::graphics_context::instance();
   }
 
-  GraphicsContext::GraphicsContext() : _frame(nullptr), _evenManager(nullptr) {
+  GraphicsContext::GraphicsContext() : _frame(nullptr), _evenManager(nullptr), _resizeMode(ResizeMode::NA) {
     FrameBufferInfo frameBufferInfo;
     init_gui_frame(&frameBufferInfo);
 
@@ -101,10 +101,37 @@ namespace upanui {
     return *_uiObjectManager;
   }
 
-  void GraphicsContext::setMouseCursorType(MouseCursorType type) {
-    if (_mouseCursorType != type) {
-      _mouseCursorType = type;
-      set_mouse_cursor_type(_mouseCursorType);
+  void GraphicsContext::setResizeMode(upanui::ResizeMode resizeMode) {
+    if (_resizeMode == resizeMode) {
+      return;
+    }
+
+    _resizeMode = resizeMode;
+
+    switch (resizeMode) {
+      case ResizeMode::LEFT:
+      case ResizeMode::RIGHT:
+        set_mouse_cursor_type(MouseCursorType::HRESIZER);
+        break;
+
+      case ResizeMode::TOP:
+      case ResizeMode::BOTTOM:
+        set_mouse_cursor_type(MouseCursorType::VRESIZER);
+        break;
+
+      case ResizeMode::LEFT_BOTTOM:
+      case ResizeMode::RIGHT_TOP:
+        set_mouse_cursor_type(MouseCursorType::UHVRESIZER);
+        break;
+
+      case ResizeMode::LEFT_TOP:
+      case ResizeMode::RIGHT_BOTTOM:
+        set_mouse_cursor_type(MouseCursorType::DHVRESIZER);
+        break;
+
+      case ResizeMode::NA:
+        set_mouse_cursor_type(MouseCursorType::NORMAL);
+        break;
     }
   }
 
