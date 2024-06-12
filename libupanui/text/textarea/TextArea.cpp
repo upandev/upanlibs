@@ -560,7 +560,7 @@ namespace upanui {
 
   void TextArea::ScrollerChanges::apply(VerticalScroller& verticalScroller) {
     if (_calibrate) {
-      verticalScroller.caliberateScrollbar();
+      verticalScroller.calibrateScrollbar();
     }
 
     if (_adjustScrollY) {

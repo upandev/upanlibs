@@ -55,15 +55,15 @@ namespace upanui {
     _scrollerCanvas->backgroundColor(0xd3d3d3);
 
     _scrollUpBt = &UIObjectFactory::createIconButton(*_scrollerCanvas, PngImageResource::UP, 0, 0,
-                                                     _scrollBarWidth, _scrollBarWidth, HorizontalPlacementType::ABSOLUTE, VerticalPlacementType::ABSOLUTE);
+                                                     _scrollBarWidth, _scrollBarWidth, HorizontalPlacementType::ABSOLUTE, VerticalPlacementType::TOP_FIXED);
     _scrollUpBt->backgroundColor(0xbebebe);
 
     _scrollDownBt = &UIObjectFactory::createIconButton(*_scrollerCanvas, PngImageResource::DOWN, 0, _scrollBarMaxY,
-                                                       _scrollBarWidth, _scrollBarWidth, HorizontalPlacementType::ABSOLUTE, VerticalPlacementType::ABSOLUTE);
+                                                       _scrollBarWidth, _scrollBarWidth, HorizontalPlacementType::ABSOLUTE, VerticalPlacementType::BOTTOM_FIXED);
     _scrollDownBt->backgroundColor(0xbebebe);
 
     _scrollBar = &UIObjectFactory::createRectangleCanvas(*_scrollerCanvas, 0, _scrollBarMinY,
-                                                         _scrollBarWidth, _scrollBarMaxHeight, HorizontalPlacementType::ABSOLUTE, VerticalPlacementType::ABSOLUTE);
+                                                         _scrollBarWidth, _scrollBarMaxHeight, HorizontalPlacementType::ABSOLUTE, VerticalPlacementType::TOP_FIXED);
     //_scrollBar->borderThickness(1);
     //_scrollBar->borderColor(0x000000);
     _scrollBar->backgroundColor(0xa9a9a9);
@@ -80,7 +80,24 @@ namespace upanui {
     _childCheck = true;
   }
 
-  void VerticalScroller::caliberateScrollbar() {
+  bool VerticalScroller::applyHeightChange(int newHeight) {
+    const int scrollBarMaxY = newHeight - _scrollBarWidth;
+    if (scrollBarMaxY < _scrollBarWidth) {
+      return false;
+    }
+    _scrollBarMaxY = scrollBarMaxY;
+
+    const int scrollBarMaxHeight = newHeight - _scrollBarWidth * 2;
+    if (scrollBarMaxHeight < _scrollBarWidth * 2) {
+      return false;
+    }
+    _scrollBarMaxHeight = scrollBarMaxHeight;
+
+    _scrollBar->height(_scrollBarMaxHeight);
+    return true;
+  }
+
+  void VerticalScroller::calibrateScrollbar() {
     const int minScrollBarHeight = _scrollBarWidth / 2;
     const int scrollBarMaxRunway = _scrollBarMaxHeight - minScrollBarHeight;
     const int scrollContentHeight = _scrollableChild.value().scrollHeight() >= height() ? _scrollableChild.value().scrollHeight() - height() : 0;
@@ -91,6 +108,9 @@ namespace upanui {
 //      scrollBarRequiredRunway = scrollContentHeight / _scrollMultiplier;
 //    }
     if (scrollBarRequiredRunway > scrollBarMaxRunway) {
+      if (_scrollBarMaxHeight == _scrollBar->height()) {
+        _scrollBar->height(minScrollBarHeight);
+      }
       _scrollMultiplier = scrollContentHeight / (_scrollBarMaxHeight - _scrollBar->height());
     } else {
       const int scrollBarHeight = _scrollBarMaxHeight - scrollBarRequiredRunway;
@@ -107,7 +127,7 @@ namespace upanui {
       }
       _scrollableChild = upan::option<UIObject &>(child);
       child.registerVerticalScroller(*this);
-      caliberateScrollbar();
+      calibrateScrollbar();
     }
     RectangleCanvas::add(child);
   }
@@ -139,7 +159,7 @@ namespace upanui {
       } else if (&sender == _scrollBar) {
         const int mouseViewY = event.viewY();
         if (mouseViewY >= int(_scrollUpBt->drawY() + _scrollBarWidth) && mouseViewY < _scrollDownBt->drawY()) {
-          newY = _scrollBar->y() - event.getData().deltaY();
+          newY = _scrollBar->y() + event.getData().deltaY();
         }
       } else if (&sender == _scrollerCanvas && e.leftButtonState() == MouseData::State::PRESSED) {
         newY = event.viewY() - _scrollerCanvas->drawY();

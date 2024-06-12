@@ -164,6 +164,7 @@ namespace upanui {
 
     int width(int) override;
     int height(int) override;
+    virtual bool applyHeightChange(int height) { return true; }
 
   private:
     int _x;

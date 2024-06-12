@@ -85,13 +85,17 @@ namespace upanui {
       height = RESIZER_ZONE_LIMIT;
     }
 
+    if (!applyHeightChange(height)) {
+      return 0;
+    }
+
     const int dy = _height - height;
     if (dy != 0) {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _height = height;
       notifyChange(ChangeState::Size);
       _verticalScroller.ifPresent([](VerticalScroller& verticalScroller) {
-        verticalScroller.caliberateScrollbar();
+        verticalScroller.calibrateScrollbar();
       });
     }
 

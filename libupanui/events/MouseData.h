@@ -95,7 +95,7 @@ namespace upanui {
     }
 
     MouseData transition(int deltaX, int deltaY, bool leftPressed, bool rightPressed, bool middlePressed, bool shiftPressed, bool ctrlPressed) const {
-      return {_x + deltaX, _y - deltaY, deltaX, deltaY,
+      return {_x + deltaX, _y + deltaY, deltaX, deltaY,
         transitionState(leftButtonState(), leftPressed),
         transitionState(rightButtonState(), rightPressed),
         transitionState(middleButtonState(), middlePressed), shiftPressed, ctrlPressed};

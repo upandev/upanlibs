@@ -29,7 +29,7 @@
 namespace upanui {
   class VerticalScroller : public RectangleCanvas {
   public:
-    void caliberateScrollbar();
+    void calibrateScrollbar();
     void updateScrollPosition(int newY);
 
   private:
@@ -41,6 +41,7 @@ namespace upanui {
     void add(UIObject& child) override;
     void handleMouseEvent(upanui::UIObject& sender, const upanui::MouseEvent& event);
     void setScrollPosition(int newY);
+    bool applyHeightChange(int height) override;
 
     class ScrollerMouseHandler : public MouseEventHandler {
     public:
