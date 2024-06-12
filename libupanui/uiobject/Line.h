@@ -41,7 +41,7 @@ namespace upanui {
 
   protected:
     virtual ~Line() {}
-    Line(int x1, int y1, int x2, int y2, int thickness, HorizontalPlacementType horizontalPlacementType);
+    Line(int x1, int y1, int x2, int y2, int thickness, HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
     void doDraw() override;
 
   private:

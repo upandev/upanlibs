@@ -47,41 +47,57 @@ namespace upanui {
 
   class UIObjectFactory {
   public:
-    static RectangleCanvas& createRectangleCanvas(UIObject& parent, int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType);
-    static RoundCanvas& createRoundCanvas(UIObject& parent, int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType);
+    static RectangleCanvas& createRectangleCanvas(UIObject& parent, int x, int y, int width, int height,
+                                                  HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
+    static RoundCanvas& createRoundCanvas(UIObject& parent, int x, int y, int width, int height,
+                                          HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
 
     static ImageCanvas& createImageCanvas(UIObject& parent, const Image& image, ImageComposeType composeType,
-                                          int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType);
+                                          int x, int y, int width, int height,
+                                          HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
     static ImageCanvas& createImageCanvas(UIObject& parent, const Image& image,
-                                          int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType);
-    ImageCanvas& createImageCanvas(UIObject& parent, const Image& image, int x, int y, HorizontalPlacementType horizontalPlacementType);
+                                          int x, int y, int width, int height,
+                                          HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
+    ImageCanvas& createImageCanvas(UIObject& parent, const Image& image, int x, int y,
+                                   HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
     static ImageCanvas& createImageCanvas(UIObject& parent, const ImageResource& imageResource, ImageComposeType composeType,
-                                          int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType);
+                                          int x, int y, int width, int height,
+                                          HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
     static ImageCanvas& createImageCanvas(UIObject& parent, const ImageResource& imageResource,
-                                          int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType);
-    static ImageCanvas& createImageCanvas(UIObject& parent, const ImageResource& imageResource, int x, int y, HorizontalPlacementType horizontalPlacementType);
+                                          int x, int y, int width, int height,
+                                          HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
+    static ImageCanvas& createImageCanvas(UIObject& parent, const ImageResource& imageResource, int x, int y,
+                                          HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
 
-    static Line& createLine(UIObject& parent, int x1, int y1, int x2, int y2, int thickness, HorizontalPlacementType horizontalPlacementType);
+    static Line& createLine(UIObject& parent, int x1, int y1, int x2, int y2, int thickness,
+                            HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
 
-    static Button& createButton(UIObject& parent, int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType);
+    static Button& createButton(UIObject& parent, int x, int y, int width, int height,
+                                HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
     static IconButton& createIconButton(UIObject& parent, const ImageResource& imageResource, ImageComposeType composeType,
-                                        int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType);
+                                        int x, int y, int width, int height,
+                                        HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
     static IconButton& createIconButton(UIObject& parent, const ImageResource& imageResource,
-                                        int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType);
+                                        int x, int y, int width, int height,
+                                        HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
 
     static Label& createLabel(UIObject& parent, int x, int y,
                               int width, int height,
                               const upan::string& str, uint32_t fgColor,
                               usfn::PreloadedFonts fontType,
-                              int fontFamily, int fontStyle, int fontSize, HorizontalPlacementType horizontalPlacementType);
+                              int fontFamily, int fontStyle, int fontSize,
+                              HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
 
     static VerticalScroller& createVerticalScroller(UIObject& parent, int x, int y,
                                                     int width, int height,
-                                                    int scrollBarWidth, HorizontalPlacementType horizontalPlacementType);
-    static TextArea& createTextArea(UIObject& parent, int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType);
+                                                    int scrollBarWidth,
+                                                    HorizontalPlacementType horizontalPlacementType,
+                                                    VerticalPlacementType verticalPlacementType);
+    static TextArea& createTextArea(UIObject& parent, int x, int y, int width, int height,
+                                    HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
     static Terminal& createTerminal(UIObject& parent, int x, int y, int width, int height,
                                     const upan::string& prompt,
                                     TerminalCommandExecutor& terminalCommandExecutor,
-                                    HorizontalPlacementType horizontalPlacementType);
+                                    HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
   };
 }

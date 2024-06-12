@@ -31,8 +31,8 @@ namespace upanui {
                const upan::string& str,
                uint32_t fgColor,
                usfn::PreloadedFonts fontType,
-               int fontFamily, int fontStyle, int fontSize, HorizontalPlacementType horizontalPlacementType)
-    : RectangleCanvas(x, y, width, height, horizontalPlacementType), _c(nullptr), _str(str),
+               int fontFamily, int fontStyle, int fontSize, HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType)
+    : RectangleCanvas(x, y, width, height, horizontalPlacementType, verticalPlacementType), _c(nullptr), _str(str),
       _fontType(-1), _fontFamily(-1),
       _fontStyle(fontStyle), _fontSize(fontSize), _updateText(false) {
     _textBuffer.ptr = nullptr;

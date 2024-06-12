@@ -25,8 +25,8 @@
 #include <GCoreFunctions.h>
 
 namespace upanui {
-  RectangleCanvas::RectangleCanvas(int x, int y, int32_t width, int32_t height, HorizontalPlacementType horizontalPlacementType)
-  : Canvas(x, y, width, height, horizontalPlacementType), _layout(*this) {
+  RectangleCanvas::RectangleCanvas(int x, int y, int32_t width, int32_t height, HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType)
+  : Canvas(x, y, width, height, horizontalPlacementType, verticalPlacementType), _layout(*this) {
   }
 
   UIObjectImpl::IntersectInfo RectangleCanvas::intersect(int x, int y) const {

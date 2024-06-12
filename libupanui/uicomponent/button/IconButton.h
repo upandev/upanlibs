@@ -30,7 +30,9 @@ namespace upanui {
   protected:
     virtual ~IconButton() {}
     IconButton(const ImageResource& imageResource, ImageComposeType composeType,
-               int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType);
+               int x, int y, int width, int height,
+               HorizontalPlacementType horizontalPlacementType,
+               VerticalPlacementType verticalPlacementType);
     void init();
 
   private:

@@ -24,8 +24,8 @@
 #include "GCoreFunctions.h"
 
 namespace upanui {
-  UILeafElement::UILeafElement(int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType)
-    : UIElement(x, y, width, height, horizontalPlacementType) {
+  UILeafElement::UILeafElement(int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType)
+    : UIElement(x, y, width, height, horizontalPlacementType, verticalPlacementType) {
   }
 
   UILeafElement::~UILeafElement() noexcept {

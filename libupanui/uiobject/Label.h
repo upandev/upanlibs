@@ -51,7 +51,9 @@ namespace upanui {
           usfn::PreloadedFonts fontType,
           int fontFamily,
           int fontStyle,
-          int fontSize, HorizontalPlacementType horizontalPlacementType);
+          int fontSize,
+          HorizontalPlacementType horizontalPlacementType,
+          VerticalPlacementType verticalPlacementType);
     void doDraw() override;
 
   private:

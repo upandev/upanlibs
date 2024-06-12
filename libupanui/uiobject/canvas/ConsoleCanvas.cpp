@@ -30,7 +30,7 @@ namespace upanui {
   ConsoleCanvas::ConsoleCanvas(int maxRows, int maxColumns)
     : UIElement(0, 0, GraphicsContext::Instance().frame().frameBuffer().width(),
                 GraphicsContext::Instance().frame().frameBuffer().height(),
-                HorizontalPlacementType::ABSOLUTE),
+                HorizontalPlacementType::ABSOLUTE, VerticalPlacementType::ABSOLUTE),
       _cursorPos(0),
       _charStyle(CharStyle::WHITE_ON_BLACK()),
       _consoleBuffer(*this, maxRows, maxColumns),

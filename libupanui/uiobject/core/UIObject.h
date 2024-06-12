@@ -59,7 +59,6 @@ namespace upanui {
     virtual void x(int) = 0;
     virtual void y(int) = 0;
     virtual void xy(int, int) = 0;
-    virtual void height(int) = 0;
     virtual void backgroundColor(const uint32_t color) = 0;
     virtual void backgroundColorAlpha(const uint8_t) = 0;
     virtual void borderColor(const uint32_t) = 0;
@@ -110,6 +109,7 @@ namespace upanui {
     virtual void setResizable(bool, bool) = 0;
     virtual void resize(ResizeMode resizeMode, int dx, int dy) = 0;
     virtual HorizontalPlacementType getHorizontalPlacementType() const = 0;
+    virtual VerticalPlacementType getVerticalPlacementType() const = 0;
 
   protected:
     virtual ~UIObject() {}
@@ -119,8 +119,11 @@ namespace upanui {
     virtual void onMouseFocus() = 0;
     virtual void onLoseMouseFocus() = 0;
 
-    virtual bool width(int) = 0;
+    virtual int width(int) = 0;
+    virtual int height(int) = 0;
 
     friend class UIObjectManager;
+    //need this to adjust height of scroll-bar
+    friend class VerticalScroller;
   };
 }

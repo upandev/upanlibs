@@ -45,7 +45,7 @@ namespace upanui {
 
   protected:
     virtual ~Button() {}
-    Button(int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType);
+    Button(int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
 
     uint32_t backgroundColorForDraw() const override;
 

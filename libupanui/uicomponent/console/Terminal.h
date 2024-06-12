@@ -38,7 +38,8 @@ namespace upanui {
     Terminal(int x, int y, int width, int height, int leftMargin,
              const upan::string& prompt,
              TerminalCommandExecutor& terminalCommandExector,
-             HorizontalPlacementType horizontalPlacementType);
+             HorizontalPlacementType horizontalPlacementType,
+             VerticalPlacementType verticalPlacementType);
     ~Terminal() {}
 
     void initialize();

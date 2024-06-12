@@ -30,7 +30,7 @@ namespace upanui {
 
   class RoundCanvas : public Canvas {
   public:
-    RoundCanvas(int x, int y, int32_t width, int32_t height, HorizontalPlacementType horizontalPlacementType);
+    RoundCanvas(int x, int y, int32_t width, int32_t height, HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
     virtual ~RoundCanvas() {}
 
     bool isRectangularShape() override { return false; }

@@ -43,7 +43,6 @@ namespace upanui {
     void x(const int) override {}
     void y(const int) override {}
     void xy(int, int) override {}
-    void height(int) override {}
     void backgroundColor(const uint32_t color) override {}
     void backgroundColorAlpha(const uint8_t) override {}
     void borderColor(const uint32_t) override {}
@@ -144,9 +143,11 @@ namespace upanui {
       throw upan::exception(XLOC,"unsupported setResizable() for UIProxyParent");
     }
 
-    bool width(int) override { return false; }
+    int width(int) override { return 0; }
+    int height(int) override { return 0; }
     void resize(ResizeMode, int, int) override {}
     HorizontalPlacementType getHorizontalPlacementType() const override { return HorizontalPlacementType::ABSOLUTE; }
+    VerticalPlacementType getVerticalPlacementType() const override { return VerticalPlacementType::ABSOLUTE; }
 
     friend class UIObjectManager;
   };

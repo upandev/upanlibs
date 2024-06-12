@@ -26,7 +26,7 @@
 
 namespace upanui {
   UIRoot::UIRoot(int x, int y, int width, int height)
-          : UIObjectImpl(x, y, width, height, HorizontalPlacementType::STRETCHED),
+          : UIObjectImpl(x, y, width, height, HorizontalPlacementType::STRETCHED, VerticalPlacementType::STRETCHED),
             _layout(*this) {
     gc().frame().updateViewport(x, y, width, height);
     UIObjectImpl::drawBuffer().initLocal(gc().frame().frameBuffer());
@@ -94,14 +94,31 @@ namespace upanui {
     ChangeNotificationLock cLock(*this);
     switch (resizeMode) {
       case ResizeMode::LEFT:
-        if (!width(width() - dx)) {
+        dx = width(width() - dx);
+        if (!dx) {
           return;
         }
         x(x() + dx);
         break;
 
       case ResizeMode::RIGHT:
-        if (!width(width() + dx)) {
+        dx = -width(width() + dx);
+        if (!dx) {
+          return;
+        }
+        break;
+
+      case ResizeMode::TOP:
+        dy = height(height() - dy);
+        if (!dy) {
+          return;
+        }
+        y(y() + dy);
+        break;
+
+      case ResizeMode::BOTTOM:
+        dy = -height(height() + dy);
+        if (!dy) {
           return;
         }
         break;

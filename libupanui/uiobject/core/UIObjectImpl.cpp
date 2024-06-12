@@ -29,13 +29,14 @@
 namespace upanui {
   UIObjectImpl::UIObjectImpl(int x, int y,
                              int32_t width, int32_t height,
-                             HorizontalPlacementType horizontalPlacementType)
+                             HorizontalPlacementType horizontalPlacementType,
+                             VerticalPlacementType verticalPlacementType)
     : _x(x), _y(y), _width(width), _height(height),
       _bgColor(0), _bgAlpha(GCoreFunctions::MAX_ALPHA), _brColor(0xFFFFFF),
       _brAlpha(GCoreFunctions::MAX_ALPHA), _borderThickness(0), _lockChangeNotification(false),
       _mouseEventHandler(upan::option<MouseEventHandler&>::empty()), _captureMouseEvents(false),
       _verticalScroller(upan::option<VerticalScroller&>::empty()), _changeState((int)ChangeState::Content),
-      _hResizable(false), _vResizable(false), _horizontalPlacementType(horizontalPlacementType),
+      _hResizable(false), _vResizable(false), _horizontalPlacementType(horizontalPlacementType), _verticalPlacementType(verticalPlacementType),
       _gc(GraphicsContext::Instance()) {
   }
 
@@ -64,23 +65,28 @@ namespace upanui {
     }
   }
 
-  bool UIObjectImpl::width(int32_t width) {
+  int UIObjectImpl::width(int32_t width) {
     if (width < RESIZER_ZONE_LIMIT) {
       width = RESIZER_ZONE_LIMIT;
     }
 
-    if (_width != width) {
+    const int dx = _width - width;
+    if (dx != 0) {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _width = width;
       notifyChange(ChangeState::Size);
-      return true;
-    } else {
-      return false;
     }
+
+    return dx;
   }
 
-  void UIObjectImpl::height(int32_t height) {
-    if (_height != height) {
+  int UIObjectImpl::height(int32_t height) {
+    if (height < RESIZER_ZONE_LIMIT) {
+      height = RESIZER_ZONE_LIMIT;
+    }
+
+    const int dy = _height - height;
+    if (dy != 0) {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _height = height;
       notifyChange(ChangeState::Size);
@@ -88,6 +94,8 @@ namespace upanui {
         verticalScroller.caliberateScrollbar();
       });
     }
+
+    return dy;
   }
 
   void UIObjectImpl::backgroundColor(const uint32_t color) {

@@ -39,7 +39,8 @@ namespace upanui {
 
   class UIObjectImpl : public UIObject {
   protected:
-    UIObjectImpl(int32_t x, int32_t y, int32_t width, int32_t height, HorizontalPlacementType horizontalPlacementType);
+    UIObjectImpl(int32_t x, int32_t y, int32_t width, int32_t height,
+                 HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
 
   public:
     const static int RESIZER_ZONE_LIMIT = 5;
@@ -58,7 +59,6 @@ namespace upanui {
     void x(int) override;
     void y(int) override;
     void xy(int x, int y) override;
-    void height(int) override;
     void backgroundColor(const uint32_t color) override;
     void backgroundColorAlpha(const uint8_t) override;
     void borderColor(const uint32_t) override;
@@ -112,6 +112,7 @@ namespace upanui {
     }
 
     HorizontalPlacementType getHorizontalPlacementType() const override { return _horizontalPlacementType; }
+    VerticalPlacementType getVerticalPlacementType() const override { return _verticalPlacementType; }
 
   protected:
     uint32_t backgroundColorWithAlpha() const {
@@ -161,7 +162,8 @@ namespace upanui {
       return _drawBuffer;
     }
 
-    bool width(int) override;
+    int width(int) override;
+    int height(int) override;
 
   private:
     int _x;
@@ -182,6 +184,7 @@ namespace upanui {
     bool _hResizable;
     bool _vResizable;
     HorizontalPlacementType _horizontalPlacementType;
+    VerticalPlacementType _verticalPlacementType;
 
     GraphicsContext& _gc;
   };

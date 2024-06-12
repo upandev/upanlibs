@@ -38,4 +38,8 @@ namespace upanui {
   enum class HorizontalPlacementType {
     ABSOLUTE, LEFT_FIXED, RIGHT_FIXED, STRETCHED, LEFT_STRETCHED, RIGHT_STRETCHED
   };
+
+  enum class VerticalPlacementType {
+    ABSOLUTE, TOP_FIXED, BOTTOM_FIXED, STRETCHED, TOP_STRETCHED, BOTTOM_STRETCHED
+  };
 }

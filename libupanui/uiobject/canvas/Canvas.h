@@ -30,7 +30,7 @@ namespace upanui {
   class Canvas : public UIElement {
   public:
   protected:
-    Canvas(int x, int y, int32_t width, int32_t height, HorizontalPlacementType horizontalPlacementType);
+    Canvas(int x, int y, int32_t width, int32_t height, HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
     virtual ~Canvas() {}
 
   protected:

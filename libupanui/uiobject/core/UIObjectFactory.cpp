@@ -34,102 +34,131 @@
 #include <Terminal.h>
 
 namespace upanui {
-  RectangleCanvas& UIObjectFactory::createRectangleCanvas(UIObject& parent, int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType) {
-    auto& canvas = *new RectangleCanvas(x, y, width, height, horizontalPlacementType);
+  RectangleCanvas& UIObjectFactory::createRectangleCanvas(UIObject& parent, int x, int y, int width, int height,
+                                                          HorizontalPlacementType horizontalPlacementType,
+                                                          VerticalPlacementType verticalPlacementType) {
+    auto& canvas = *new RectangleCanvas(x, y, width, height, horizontalPlacementType, verticalPlacementType);
     parent.add(canvas);
     return canvas;
   }
 
-  RoundCanvas& UIObjectFactory::createRoundCanvas(UIObject& parent, int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType) {
-    auto& canvas = *new RoundCanvas(x, y, width, height, horizontalPlacementType);
+  RoundCanvas& UIObjectFactory::createRoundCanvas(UIObject& parent, int x, int y, int width, int height,
+                                                  HorizontalPlacementType horizontalPlacementType,
+                                                  VerticalPlacementType verticalPlacementType) {
+    auto& canvas = *new RoundCanvas(x, y, width, height, horizontalPlacementType, verticalPlacementType);
     parent.add(canvas);
     return canvas;
   }
 
   ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const Image& image, ImageComposeType composeType,
-                                                  int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType) {
-    auto& canvas = *new ImageCanvas(image, composeType, x, y, width, height, horizontalPlacementType);
+                                                  int x, int y, int width, int height,
+                                                  HorizontalPlacementType horizontalPlacementType,
+                                                  VerticalPlacementType verticalPlacementType) {
+    auto& canvas = *new ImageCanvas(image, composeType, x, y, width, height, horizontalPlacementType, verticalPlacementType);
     parent.add(canvas);
     return canvas;
   }
 
-  ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const Image& image, int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType) {
-    return createImageCanvas(parent, image, ImageComposeType::FIT_IN, x, y, width, height, horizontalPlacementType);
+  ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const Image& image, int x, int y, int width, int height,
+                                                  HorizontalPlacementType horizontalPlacementType,
+                                                  VerticalPlacementType verticalPlacementType) {
+    return createImageCanvas(parent, image, ImageComposeType::FIT_IN, x, y, width, height, horizontalPlacementType, verticalPlacementType);
   }
 
-  ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const Image& image, int x, int y, HorizontalPlacementType horizontalPlacementType) {
-    return createImageCanvas(parent, image, ImageComposeType::FIT_IN, x, y, image.width(), image.height(), horizontalPlacementType);
+  ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const Image& image, int x, int y,
+                                                  HorizontalPlacementType horizontalPlacementType,
+                                                  VerticalPlacementType verticalPlacementType) {
+    return createImageCanvas(parent, image, ImageComposeType::FIT_IN, x, y, image.width(), image.height(),
+                             horizontalPlacementType, verticalPlacementType);
   }
 
   ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const ImageResource& imageResource, ImageComposeType composeType,
-                                                  int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType) {
-    auto& canvas = *new ImageCanvas(&imageResource.create(), composeType, x, y, width, height, horizontalPlacementType);
+                                                  int x, int y, int width, int height,
+                                                  HorizontalPlacementType horizontalPlacementType,
+                                                  VerticalPlacementType verticalPlacementType) {
+    auto& canvas = *new ImageCanvas(&imageResource.create(), composeType, x, y, width, height, horizontalPlacementType, verticalPlacementType);
     parent.add(canvas);
     return canvas;
   }
 
   ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const ImageResource& imageResource,
-                                                  int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType) {
-    return createImageCanvas(parent, imageResource, ImageComposeType::FIT_IN, x, y, width, height, horizontalPlacementType);
+                                                  int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType) {
+    return createImageCanvas(parent, imageResource, ImageComposeType::FIT_IN, x, y, width, height, horizontalPlacementType, verticalPlacementType);
   }
 
-  ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const ImageResource& imageResource, int x, int y, HorizontalPlacementType horizontalPlacementType) {
+  ImageCanvas& UIObjectFactory::createImageCanvas(UIObject& parent, const ImageResource& imageResource, int x, int y,
+                                                  HorizontalPlacementType horizontalPlacementType,
+                                                  VerticalPlacementType verticalPlacementType) {
     Image& image = imageResource.create();
-    auto& canvas = *new ImageCanvas(&image, ImageComposeType::FIT_IN, x, y, image.width(), image.height(), horizontalPlacementType);
+    auto& canvas = *new ImageCanvas(&image, ImageComposeType::FIT_IN, x, y, image.width(), image.height(), horizontalPlacementType, verticalPlacementType);
     parent.add(canvas);
     return canvas;
   }
 
-  Line& UIObjectFactory::createLine(UIObject& parent, int x1, int y1, int x2, int y2, int thickness, HorizontalPlacementType horizontalPlacementType) {
-    auto& line = *new Line(x1, y1, x2, y2, thickness, horizontalPlacementType);
+  Line& UIObjectFactory::createLine(UIObject& parent, int x1, int y1, int x2, int y2, int thickness,
+                                    HorizontalPlacementType horizontalPlacementType,
+                                    VerticalPlacementType verticalPlacementType) {
+    auto& line = *new Line(x1, y1, x2, y2, thickness, horizontalPlacementType, verticalPlacementType);
     parent.add(line);
     return line;
   }
 
-  Button& UIObjectFactory::createButton(UIObject& parent, int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType) {
-    auto& button = *new Button(x, y, width, height, horizontalPlacementType);
+  Button& UIObjectFactory::createButton(UIObject& parent, int x, int y, int width, int height,
+                                        HorizontalPlacementType horizontalPlacementType,
+                                        VerticalPlacementType verticalPlacementType) {
+    auto& button = *new Button(x, y, width, height, horizontalPlacementType, verticalPlacementType);
     parent.add(button);
     return button;
   }
 
   IconButton& UIObjectFactory::createIconButton(UIObject& parent, const ImageResource& imageResource, ImageComposeType composeType,
-                                                int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType) {
-    auto& button = *new IconButton(imageResource, composeType, x, y, width, height, horizontalPlacementType);
+                                                int x, int y, int width, int height,
+                                                HorizontalPlacementType horizontalPlacementType,
+                                                VerticalPlacementType verticalPlacementType) {
+    auto& button = *new IconButton(imageResource, composeType, x, y, width, height, horizontalPlacementType, verticalPlacementType);
     parent.add(button);
     button.init();
     return button;
   }
 
   IconButton& UIObjectFactory::createIconButton(UIObject& parent, const ImageResource& imageResource,
-                                                int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType) {
-    return createIconButton(parent, imageResource, ImageComposeType::FIT_IN, x, y, width, height, horizontalPlacementType);
+                                                int x, int y, int width, int height,
+                                                HorizontalPlacementType horizontalPlacementType,
+                                                VerticalPlacementType verticalPlacementType) {
+    return createIconButton(parent, imageResource, ImageComposeType::FIT_IN, x, y, width, height, horizontalPlacementType, verticalPlacementType);
   }
 
   Label& UIObjectFactory::createLabel(UIObject& parent, int x, int y,
                                       int width, int height,
                                       const upan::string& str, uint32_t fgColor,
                                       usfn::PreloadedFonts fontType,
-                                      int fontFamily, int fontStyle, int fontSize, HorizontalPlacementType horizontalPlacementType) {
-    auto& label = *new Label(x, y, width, height, str, fgColor, fontType, fontFamily, fontStyle, fontSize, horizontalPlacementType);
+                                      int fontFamily, int fontStyle, int fontSize,
+                                      HorizontalPlacementType horizontalPlacementType,
+                                      VerticalPlacementType verticalPlacementType) {
+    auto& label = *new Label(x, y, width, height, str, fgColor, fontType, fontFamily, fontStyle, fontSize, horizontalPlacementType, verticalPlacementType);
     parent.add(label);
     return label;
   }
 
   VerticalScroller& UIObjectFactory::createVerticalScroller(UIObject& parent, int x, int y,
                                                             int width, int height,
-                                                            int scrollBarWidth, HorizontalPlacementType horizontalPlacementType) {
-    auto& scroller = *new VerticalScroller(x, y, width, height, scrollBarWidth, horizontalPlacementType);
+                                                            int scrollBarWidth,
+                                                            HorizontalPlacementType horizontalPlacementType,
+                                                            VerticalPlacementType verticalPlacementType) {
+    auto& scroller = *new VerticalScroller(x, y, width, height, scrollBarWidth, horizontalPlacementType, verticalPlacementType);
     parent.add(scroller);
     scroller.init();
     return scroller;
   }
 
-  TextArea& UIObjectFactory::createTextArea(UIObject& parent, int x, int y, int width, int height, HorizontalPlacementType horizontalPlacementType) {
+  TextArea& UIObjectFactory::createTextArea(UIObject& parent, int x, int y, int width, int height,
+                                            HorizontalPlacementType horizontalPlacementType,
+                                            VerticalPlacementType verticalPlacementType) {
     int actualHeight = height;
     if (typeid(parent) == typeid(VerticalScroller)) {
       actualHeight = parent.height();
     }
-    auto& textArea = *new TextArea(x, y, width, actualHeight, TextArea::MIN_LEFT_MARGIN, horizontalPlacementType);
+    auto& textArea = *new TextArea(x, y, width, actualHeight, TextArea::MIN_LEFT_MARGIN, horizontalPlacementType, verticalPlacementType);
     parent.add(textArea);
     textArea.init();
     return textArea;
@@ -138,12 +167,14 @@ namespace upanui {
   Terminal& UIObjectFactory::createTerminal(UIObject& parent, int x, int y, int width, int height,
                                             const upan::string& prompt,
                                             TerminalCommandExecutor& terminalCommandExecutor,
-                                            HorizontalPlacementType horizontalPlacementType) {
+                                            HorizontalPlacementType horizontalPlacementType,
+                                            VerticalPlacementType verticalPlacementType) {
     int actualHeight = height;
     if (typeid(parent) == typeid(VerticalScroller)) {
       actualHeight = parent.height();
     }
-    auto& terminal = *new Terminal(x, y, width, actualHeight, TextArea::MIN_LEFT_MARGIN, prompt, terminalCommandExecutor, horizontalPlacementType);
+    auto& terminal = *new Terminal(x, y, width, actualHeight, TextArea::MIN_LEFT_MARGIN, prompt, terminalCommandExecutor,
+                                   horizontalPlacementType, verticalPlacementType);
     parent.add(terminal);
     terminal.initialize();
     return terminal;

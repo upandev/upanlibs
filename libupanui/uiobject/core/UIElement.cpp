@@ -24,8 +24,8 @@
 #include "GCoreFunctions.h"
 
 namespace upanui {
-  UIElement::UIElement(int x, int y, int32_t width, int32_t height, HorizontalPlacementType horizontalPlacementType)
-    : UIObjectImpl(x, y, width, height, horizontalPlacementType) {
+  UIElement::UIElement(int x, int y, int32_t width, int32_t height, HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType)
+    : UIObjectImpl(x, y, width, height, horizontalPlacementType, verticalPlacementType) {
   }
 
   UIElement::~UIElement() noexcept {
@@ -95,17 +95,18 @@ namespace upanui {
       case ResizeMode::LEFT:
         switch (getHorizontalPlacementType()) {
           case HorizontalPlacementType::LEFT_FIXED:
-          case HorizontalPlacementType::RIGHT_STRETCHED:
             return;
 
           case HorizontalPlacementType::ABSOLUTE:
           case HorizontalPlacementType::RIGHT_FIXED:
+          case HorizontalPlacementType::RIGHT_STRETCHED:
             x(x() - dx);
             return;
 
           case HorizontalPlacementType::LEFT_STRETCHED:
           case HorizontalPlacementType::STRETCHED:
-            if (!width(width() - dx)) {
+            dx = width(width() - dx);
+            if (!dx) {
               return;
             }
             break;
@@ -125,7 +126,29 @@ namespace upanui {
 
           case HorizontalPlacementType::RIGHT_STRETCHED:
           case HorizontalPlacementType::STRETCHED:
-            if (!width(width() + dx)) {
+            dx = -width(width() + dx);
+            if (!dx) {
+              return;
+            }
+            break;
+        }
+        break;
+
+      case ResizeMode::TOP:
+        switch (getVerticalPlacementType()) {
+          case VerticalPlacementType::TOP_FIXED:
+            return;
+
+          case VerticalPlacementType::ABSOLUTE:
+          case VerticalPlacementType::BOTTOM_FIXED:
+          case VerticalPlacementType::BOTTOM_STRETCHED:
+            y(y() - dy);
+            return;
+
+          case VerticalPlacementType::TOP_STRETCHED:
+          case VerticalPlacementType::STRETCHED:
+            dy = height(height() - dy);
+            if (!dy) {
               return;
             }
             break;

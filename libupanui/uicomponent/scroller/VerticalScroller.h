@@ -33,7 +33,8 @@ namespace upanui {
     void updateScrollPosition(int newY);
 
   private:
-    VerticalScroller(int x, int y, int width, int height, int scrollBarWidth, HorizontalPlacementType horizontalPlacementType);
+    VerticalScroller(int x, int y, int width, int height, int scrollBarWidth,
+                     HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
     virtual ~VerticalScroller();
 
     void init();
