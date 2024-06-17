@@ -90,44 +90,31 @@ namespace upanui {
     GraphicsContext::Instance().frame().updateViewport(x(), y(), width(), height());
   }
 
-  void UIRoot::resize(ResizeMode resizeMode, int dx, int dy) {
-    ChangeNotificationLock cLock(*this);
-    switch (resizeMode) {
-      case ResizeMode::LEFT:
-        dx = width(width() - dx);
-        if (!dx) {
-          return;
-        }
-        x(x() + dx);
-        break;
-
-      case ResizeMode::RIGHT:
-        dx = -width(width() + dx);
-        if (!dx) {
-          return;
-        }
-        break;
-
-      case ResizeMode::TOP:
-        dy = height(height() - dy);
-        if (!dy) {
-          return;
-        }
-        y(y() + dy);
-        break;
-
-      case ResizeMode::BOTTOM:
-        dy = -height(height() + dy);
-        if (!dy) {
-          return;
-        }
-        break;
+  bool UIRoot::resizeLeft(int& dx) {
+    dx = width(width() - dx);
+    if (!dx) {
+      return false;
     }
+    x(x() + dx);
+    return true;
+  }
 
-    for(auto child = children().rbegin(); child != children().rend(); ++child) {
-      child->resize(resizeMode, dx, dy);
+  bool UIRoot::resizeRight(int& dx) {
+    dx = -width(width() + dx);
+    return dx != 0;
+  }
+
+  bool UIRoot::resizeTop(int& dy) {
+    dy = height(height() - dy);
+    if (!dy) {
+      return false;
     }
+    y(y() + dy);
+    return true;
+  }
 
-    redraw();
+  bool UIRoot::resizeBottom(int& dy) {
+    dy = -height(height() + dy);
+    return dy != 0;
   }
 }

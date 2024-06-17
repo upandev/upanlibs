@@ -107,7 +107,7 @@ namespace upanui {
     virtual bool isHResizable() const = 0;
     virtual bool isVResizable() const = 0;
     virtual void setResizable(bool, bool) = 0;
-    virtual void resize(ResizeMode resizeMode, int dx, int dy) = 0;
+    virtual void resize(ResizeMode resizeMode, int dx, int dy, bool allowRedraw) = 0;
     virtual HorizontalPlacementType getHorizontalPlacementType() const = 0;
     virtual VerticalPlacementType getVerticalPlacementType() const = 0;
 

@@ -145,7 +145,7 @@ namespace upanui {
 
     int width(int) override { return 0; }
     int height(int) override { return 0; }
-    void resize(ResizeMode, int, int) override {}
+    void resize(ResizeMode, int, int, bool allowRedraw) override {}
     HorizontalPlacementType getHorizontalPlacementType() const override { return HorizontalPlacementType::ABSOLUTE; }
     VerticalPlacementType getVerticalPlacementType() const override { return VerticalPlacementType::ABSOLUTE; }
 

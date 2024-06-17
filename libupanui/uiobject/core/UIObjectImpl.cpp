@@ -306,4 +306,84 @@ namespace upanui {
   bool UIObjectImpl::isChangeState(ChangeState changeState, bool only) const {
     return (only || changeState == ChangeState::Clean) ? _changeState == (int)changeState : _changeState & (int)changeState;
   }
+
+  void UIObjectImpl::resize(upanui::ResizeMode resizeMode, int dx, int dy, bool allowRedraw) {
+    ChangeNotificationLock cLock(*this);
+    switch (resizeMode) {
+      case ResizeMode::NA:
+        return;
+
+      case ResizeMode::LEFT: {
+        if (dx != 0 && !resizeLeft(dx)) {
+          return;
+        }
+      }
+      break;
+
+      case ResizeMode::RIGHT: {
+        if (dx != 0 && !resizeRight(dx)) {
+          return;
+        }
+      }
+      break;
+
+      case ResizeMode::TOP: {
+        if (dy != 0 && !resizeTop(dy)) {
+          return;
+        }
+      }
+      break;
+
+      case ResizeMode::BOTTOM: {
+        if (dy != 0 && !resizeBottom(dy)) {
+          return;
+        }
+      }
+      break;
+
+      case ResizeMode::LEFT_TOP: {
+        const bool s1 = dx != 0 ? resizeLeft(dx) : false;
+        const bool s2 = dy != 0 ? resizeTop(dy) : false;
+        if (!s1 && !s2) {
+          return;
+        }
+      }
+      break;
+
+      case ResizeMode::LEFT_BOTTOM: {
+        const bool s1 = dx != 0 ? resizeLeft(dx) : false;
+        const bool s2 = dy != 0 ? resizeBottom(dy) : false;
+        if (!s1 && !s2) {
+          return;
+        }
+      }
+      break;
+
+      case ResizeMode::RIGHT_TOP: {
+        const bool s1 = dx != 0 ? resizeRight(dx) : false;
+        const bool s2 = dy != 0 ? resizeTop(dy) : false;
+        if (!s1 && !s2) {
+          return;
+        }
+      }
+      break;
+
+      case ResizeMode::RIGHT_BOTTOM: {
+        const bool s1 = dx != 0 ? resizeLeft(dx) : false;
+        const bool s2 = dy != 0 ? resizeTop(dy) : false;
+        if (!s1 && !s2) {
+          return;
+        }
+      }
+      break;
+    }
+
+    for(auto child = children().rbegin(); child != children().rend(); ++child) {
+      child->resize(resizeMode, dx, dy, false);
+    }
+
+    if (allowRedraw) {
+      redraw();
+    }
+  }
 }

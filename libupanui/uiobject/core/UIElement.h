@@ -43,6 +43,9 @@ namespace upanui {
     void notifyChange(const ChangeState changeState) override;
     bool skipRedraw() const;
 
-    void resize(ResizeMode resizeMode, int dx, int dy) override;
+    bool resizeLeft(int& dx) override;
+    bool resizeRight(int& dx) override;
+    bool resizeTop(int& dy) override;
+    bool resizeBottom(int& dy) override;
   };
 }

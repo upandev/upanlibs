@@ -198,7 +198,7 @@ namespace upanui {
         _mouseFocusedObject.value().onMouseFocus();
       }
       if (data.anyButtonHeld() && GraphicsContext::Instance().getResizeMode() != ResizeMode::NA) {
-        eventObject.value().resize(GraphicsContext::Instance().getResizeMode(), data.deltaX(), data.deltaY());
+        eventObject.value().resize(GraphicsContext::Instance().getResizeMode(), data.deltaX(), data.deltaY(), true);
       } else {
         const MouseEvent event(data, viewportX, viewportY);
         eventObject.value().onMouseEvent(event);
