@@ -47,10 +47,10 @@ namespace upanui {
     void notifyChange(const ChangeState changeState) override;
 
     void updateViewport();
-    bool resizeLeft(int& dx) override;
-    bool resizeRight(int& dx) override;
-    bool resizeTop(int& dy) override;
-    bool resizeBottom(int& dy) override;
+    int resizeLeft(int dx) override;
+    int resizeRight(int dx) override;
+    int resizeTop(int dy) override;
+    int resizeBottom(int dy) override;
 
   private:
     Layout& layout() override {

@@ -166,10 +166,10 @@ namespace upanui {
     int height(int) override;
     virtual bool applyHeightChange(int height) { return true; }
 
-    virtual bool resizeLeft(int& dx) = 0;
-    virtual bool resizeRight(int& dx) = 0;
-    virtual bool resizeTop(int& dy) = 0;
-    virtual bool resizeBottom(int& dy) = 0;
+    virtual int resizeLeft(int dx) = 0;
+    virtual int resizeRight(int dx) = 0;
+    virtual int resizeTop(int dy) = 0;
+    virtual int resizeBottom(int dy) = 0;
     void resize(ResizeMode resizeMode, int dx, int dy, bool allowRedraw) override;
 
   private:

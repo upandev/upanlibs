@@ -87,91 +87,95 @@ namespace upanui {
     }
   }
 
-  bool UIElement::resizeLeft(int& dx) {
-    switch (getHorizontalPlacementType()) {
-      case HorizontalPlacementType::LEFT_FIXED:
-        return false;
+  int UIElement::resizeLeft(int dx) {
+    if (dx != 0) {
+      switch (getHorizontalPlacementType()) {
+        case HorizontalPlacementType::LEFT_FIXED:
+          dx = 0;
+          break;
 
-      case HorizontalPlacementType::ABSOLUTE:
-      case HorizontalPlacementType::RIGHT_FIXED:
-      case HorizontalPlacementType::RIGHT_STRETCHED:
-        x(x() - dx);
-        return false;
+        case HorizontalPlacementType::ABSOLUTE:
+        case HorizontalPlacementType::RIGHT_FIXED:
+        case HorizontalPlacementType::RIGHT_STRETCHED:
+          x(x() - dx);
+          dx = 0;
+          break;
 
-      case HorizontalPlacementType::LEFT_STRETCHED:
-      case HorizontalPlacementType::STRETCHED:
-        dx = width(width() - dx);
-        if (!dx) {
-          return false;
-        }
-        return true;
+        case HorizontalPlacementType::LEFT_STRETCHED:
+        case HorizontalPlacementType::STRETCHED:
+          dx = width(width() - dx);
+          break;
+      }
     }
-    return false;
+    return dx;
   }
 
-  bool UIElement::resizeRight(int& dx) {
-    switch (getHorizontalPlacementType()) {
-      case HorizontalPlacementType::ABSOLUTE:
-      case HorizontalPlacementType::LEFT_FIXED:
-      case HorizontalPlacementType::LEFT_STRETCHED:
-        return false;
+  int UIElement::resizeRight(int dx) {
+    if (dx != 0) {
+      switch (getHorizontalPlacementType()) {
+        case HorizontalPlacementType::ABSOLUTE:
+        case HorizontalPlacementType::LEFT_FIXED:
+        case HorizontalPlacementType::LEFT_STRETCHED:
+          dx = 0;
+          break;
 
-      case HorizontalPlacementType::RIGHT_FIXED:
-        x(x() + dx);
-        return false;
+        case HorizontalPlacementType::RIGHT_FIXED:
+          x(x() + dx);
+          dx = 0;
+          break;
 
-      case HorizontalPlacementType::RIGHT_STRETCHED:
-      case HorizontalPlacementType::STRETCHED:
-        dx = -width(width() + dx);
-        if (!dx) {
-          return false;
-        }
-        return true;
+        case HorizontalPlacementType::RIGHT_STRETCHED:
+        case HorizontalPlacementType::STRETCHED:
+          dx = -width(width() + dx);
+          break;
+      }
     }
-    return false;
+    return dx;
   }
 
-  bool UIElement::resizeTop(int& dy) {
-    switch (getVerticalPlacementType()) {
-      case VerticalPlacementType::TOP_FIXED:
-        return false;
+  int UIElement::resizeTop(int dy) {
+    if (dy != 0) {
+      switch (getVerticalPlacementType()) {
+        case VerticalPlacementType::TOP_FIXED:
+          dy = 0;
+          break;
 
-      case VerticalPlacementType::ABSOLUTE:
-      case VerticalPlacementType::BOTTOM_FIXED:
-      case VerticalPlacementType::BOTTOM_STRETCHED:
-        y(y() - dy);
-        return false;
+        case VerticalPlacementType::ABSOLUTE:
+        case VerticalPlacementType::BOTTOM_FIXED:
+        case VerticalPlacementType::BOTTOM_STRETCHED:
+          y(y() - dy);
+          dy = 0;
+          break;
 
-      case VerticalPlacementType::TOP_STRETCHED:
-      case VerticalPlacementType::STRETCHED:
-        dy = height(height() - dy);
-        if (!dy) {
-          return false;
-        }
-        return true;
+        case VerticalPlacementType::TOP_STRETCHED:
+        case VerticalPlacementType::STRETCHED:
+          dy = height(height() - dy);
+          break;
+      }
     }
-    return false;
+    return dy;
   }
 
-  bool UIElement::resizeBottom(int& dy) {
-    switch (getVerticalPlacementType()) {
-      case VerticalPlacementType::ABSOLUTE:
-      case VerticalPlacementType::TOP_FIXED:
-      case VerticalPlacementType::TOP_STRETCHED:
-        return false;
+  int UIElement::resizeBottom(int dy) {
+    if (dy != 0) {
+      switch (getVerticalPlacementType()) {
+        case VerticalPlacementType::ABSOLUTE:
+        case VerticalPlacementType::TOP_FIXED:
+        case VerticalPlacementType::TOP_STRETCHED:
+          dy = 0;
+          break;
 
-      case VerticalPlacementType::BOTTOM_FIXED:
-        y(y() + dy);
-        return false;
+        case VerticalPlacementType::BOTTOM_FIXED:
+          y(y() + dy);
+          dy = 0;
+          break;
 
-      case VerticalPlacementType::BOTTOM_STRETCHED:
-      case VerticalPlacementType::STRETCHED:
-        dy = -height(height() + dy);
-        if (!dy) {
-          return false;
-        }
-        return true;
+        case VerticalPlacementType::BOTTOM_STRETCHED:
+        case VerticalPlacementType::STRETCHED:
+          dy = -height(height() + dy);
+          break;
+      }
     }
-    return false;
+    return dy;
   }
 }

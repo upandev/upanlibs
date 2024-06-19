@@ -314,64 +314,68 @@ namespace upanui {
         return;
 
       case ResizeMode::LEFT: {
-        if (dx != 0 && !resizeLeft(dx)) {
+        dx = resizeLeft(dx);
+        if (!dx) {
           return;
         }
       }
       break;
 
       case ResizeMode::RIGHT: {
-        if (dx != 0 && !resizeRight(dx)) {
+        dx = resizeRight(dx);
+        if (!dx) {
           return;
         }
       }
       break;
 
       case ResizeMode::TOP: {
-        if (dy != 0 && !resizeTop(dy)) {
+        dy = resizeTop(dy);
+        if (!dy) {
           return;
         }
       }
       break;
 
       case ResizeMode::BOTTOM: {
-        if (dy != 0 && !resizeBottom(dy)) {
+        dy = resizeBottom(dy);
+        if (!dy) {
           return;
         }
       }
       break;
 
       case ResizeMode::LEFT_TOP: {
-        const bool s1 = dx != 0 ? resizeLeft(dx) : false;
-        const bool s2 = dy != 0 ? resizeTop(dy) : false;
-        if (!s1 && !s2) {
+        dx = resizeLeft(dx);
+        dy = resizeTop(dy);
+        if (!dx && !dy) {
           return;
         }
       }
       break;
 
       case ResizeMode::LEFT_BOTTOM: {
-        const bool s1 = dx != 0 ? resizeLeft(dx) : false;
-        const bool s2 = dy != 0 ? resizeBottom(dy) : false;
-        if (!s1 && !s2) {
+        dx = resizeLeft(dx);
+        dy = resizeBottom(dy);
+        if (!dx && !dy) {
           return;
         }
       }
       break;
 
       case ResizeMode::RIGHT_TOP: {
-        const bool s1 = dx != 0 ? resizeRight(dx) : false;
-        const bool s2 = dy != 0 ? resizeTop(dy) : false;
-        if (!s1 && !s2) {
+        dx = resizeRight(dx);
+        dy = resizeTop(dy);
+        if (!dx && !dy) {
           return;
         }
       }
       break;
 
       case ResizeMode::RIGHT_BOTTOM: {
-        const bool s1 = dx != 0 ? resizeLeft(dx) : false;
-        const bool s2 = dy != 0 ? resizeTop(dy) : false;
-        if (!s1 && !s2) {
+        dx = resizeRight(dx);
+        dy = resizeBottom(dy);
+        if (!dx && !dy) {
           return;
         }
       }

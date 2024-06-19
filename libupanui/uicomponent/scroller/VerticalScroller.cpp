@@ -94,6 +94,7 @@ namespace upanui {
     _scrollBarMaxHeight = scrollBarMaxHeight;
 
     _scrollBar->height(_scrollBarMaxHeight);
+    _scrollBar->y(_scrollBarMinY);
     return true;
   }
 
