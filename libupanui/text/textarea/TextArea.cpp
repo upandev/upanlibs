@@ -35,7 +35,7 @@ namespace upanui {
     _scrollY(0), _scrollHeight(0),
     _currentFontSize(Character::DEFAULT_FONT_SIZE), _currentFontType(usfn::PreloadedFonts::VGA16), _currentStyle(usfn::STYLE_REGULAR),
     _currentFGColor(DEFAULT_FG_COLOR), _currentBGColor(DEFAULT_BG_COLOR), _leftMargin(leftMargin),
-    _maxLineCharWidth(width), _cursorBlinkThread(*this), _mouseHandler(nullptr), _lines(*this) {
+    _maxLineCharWidth(RectangleCanvas::width()), _cursorBlinkThread(*this), _mouseHandler(nullptr), _lines(*this) {
   }
 
   TextArea::~TextArea() {

@@ -38,6 +38,14 @@ namespace upanui {
       _verticalScroller(upan::option<VerticalScroller&>::empty()), _changeState((int)ChangeState::Content),
       _hResizable(false), _vResizable(false), _horizontalPlacementType(horizontalPlacementType), _verticalPlacementType(verticalPlacementType),
       _gc(GraphicsContext::Instance()) {
+
+    if (_width > gc().frame().frameBuffer().width()) {
+      _width = gc().frame().frameBuffer().width();
+    }
+
+    if (_height > gc().frame().frameBuffer().height()) {
+      _height = gc().frame().frameBuffer().height();
+    }
   }
 
   void UIObjectImpl::x(const int x) {
@@ -66,6 +74,10 @@ namespace upanui {
   }
 
   int UIObjectImpl::width(int32_t width) {
+    if (width > gc().frame().frameBuffer().width()) {
+      width = gc().frame().frameBuffer().width();
+    }
+
     if (width < RESIZER_ZONE_LIMIT) {
       width = RESIZER_ZONE_LIMIT;
     }
@@ -81,6 +93,10 @@ namespace upanui {
   }
 
   int UIObjectImpl::height(int32_t height) {
+    if (height > gc().frame().frameBuffer().height()) {
+      height = gc().frame().frameBuffer().height();
+    }
+
     if (height < RESIZER_ZONE_LIMIT) {
       height = RESIZER_ZONE_LIMIT;
     }
