@@ -114,8 +114,8 @@ namespace upanui {
     for(auto y = sy; y < ey; ++y) {
       auto yDestOffset = y * _width;
       auto ySrcOffset = y * srcWidth;
-      if (directSet) {
-        memcpy(&_buffer[sx + yDestOffset], &src[ySrcOffset], copyWidth * bytesPerPixel());
+      if (directSet && sx < ex) {
+        memcpy(&_buffer[sx + yDestOffset], &src[ySrcOffset], (ex - sx) * bytesPerPixel());
       } else {
         for (auto x = sx; x < ex; ++x) {
           GCoreFunctions::setPixel(_buffer[x + yDestOffset], src[(x - sx) + ySrcOffset], pixelCache, directSet);
@@ -139,11 +139,11 @@ namespace upanui {
   }
 
   void DrawBuffer::fill(int sx, int sy, int fillWidth, int fillHeight, uint32_t color) {
-    const int ex = upan::min(_vWidth, sx + fillWidth) - 1;
-    const int ey = upan::min(_vHeight, sy + fillHeight) - 1;
-    for(auto y = sy; y <= ey; ++y) {
+    const int ex = upan::min(_vWidth, sx + fillWidth);
+    const int ey = upan::min(_vHeight, sy + fillHeight);
+    for(auto y = sy; y < ey; ++y) {
       auto yOffset = y * _width;
-      for(auto x = sx; x <= ex; ++x) {
+      for(auto x = sx; x < ex; ++x) {
         _buffer[x + yOffset] = color;
       }
     }
