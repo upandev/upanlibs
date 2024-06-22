@@ -173,19 +173,12 @@ namespace upanui {
       height = minHeight();
     }
 
-    if (!applyHeightChange(height)) {
-      return 0;
-    }
-
     const int dy = _height - height;
     if (dy != 0) {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _height = height;
       if (isPrimary) _vHeight = height;
       notifyChange(ChangeState::Size);
-      _verticalScroller.ifPresent([](VerticalScroller& verticalScroller) {
-        verticalScroller.calibrateScrollbar();
-      });
     }
 
     return dy;
@@ -394,14 +387,6 @@ namespace upanui {
     x(x() + columns);
   }
 
-  void UIObjectImpl::registerVerticalScroller(VerticalScroller& verticalScroller) {
-    _verticalScroller = upan::option<VerticalScroller&>(verticalScroller);
-  }
-
-  void UIObjectImpl::removeVerticalScroller() {
-    _verticalScroller = upan::option<VerticalScroller&>::empty();
-  }
-
   void UIObjectImpl::setChangeState(const ChangeState changeState) {
     if (changeState == ChangeState::Clean) {
       _changeState = (int)changeState;
@@ -488,6 +473,8 @@ namespace upanui {
       }
       break;
     }
+
+    onResize();
 
     for(auto child = children().rbegin(); child != children().rend(); ++child) {
       child->resize(resizeMode, dx, dy, false);

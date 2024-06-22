@@ -100,9 +100,8 @@ namespace upanui {
     virtual int scrollHeight() const = 0;
     virtual void vscroll(int rows, int scrollableHeight) = 0;
     virtual void hscroll(int columns) = 0;
-    virtual void registerVerticalScroller(VerticalScroller& verticalScroller) = 0;
-    virtual void removeVerticalScroller() = 0;
     virtual upan::option<VerticalScroller&> getVerticalScroller() = 0;
+    virtual void setVerticalScroller(VerticalScroller*) = 0;
 
     virtual void notifyChange(const ChangeState changeState) = 0;
     virtual void setChangeState(const ChangeState changeState) = 0;

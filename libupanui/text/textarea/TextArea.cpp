@@ -56,6 +56,9 @@ namespace upanui {
     changeScrollHeight(curLine.lineHeight());
     _cursorBlinkThread.start();
 
+    minWidth(Character::DEFAULT_FONT_SIZE * 20);
+    minHeight((Character::DEFAULT_FONT_SIZE + TextLine::DEFAULT_LINE_SPACE) * 3);
+
     UIObjectImpl::captureMouseEvents(true);
     _mouseHandler.reset(new TextAreaMouseHandler(*this));
     registerMouseEventHandler(*_mouseHandler);
@@ -857,6 +860,10 @@ namespace upanui {
 
   bool TextArea::isNewLine(uint16_t ch) const {
     return ch == Keyboard_ENTER || ch == Keyboard_CTRL_J;
+  }
+
+  void TextArea::onResize() {
+    _textBuffer.init(width(), height(), backgroundColorWithAlpha());
   }
 
   void TextArea::SelectedArea::setRange(const UIPosition& pa, const UIPosition& pb) {

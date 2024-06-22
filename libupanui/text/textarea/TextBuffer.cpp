@@ -24,6 +24,9 @@
 
 namespace upanui {
   void TextBuffer::init(int width, int height, uint32_t bgColor) {
+    if (_width == width && _height == height) {
+      return;
+    }
     _width = width;
     _height = height;
     _bgColor = bgColor;
@@ -63,6 +66,9 @@ namespace upanui {
   }
 
   void TextBuffer::copy(upanui::DrawBuffer& drawBuffer) {
-    drawBuffer.copy(_drawBuffer.buffer() + MAX_FONT_SIZE * _drawBuffer.width(), _width, _height, true);
+    drawBuffer.copy(0, 0,
+                    _drawBuffer.buffer() + MAX_FONT_SIZE * _drawBuffer.width(),
+                    _drawBuffer.width(),
+                    _width, _height, true);
   }
 }

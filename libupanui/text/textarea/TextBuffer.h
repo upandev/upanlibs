@@ -39,7 +39,9 @@ namespace upanui {
   public:
     static const uint8_t MAX_FONT_SIZE = 128;
 
-    TextBuffer() : _width(0), _height(0), _bgColor(0) {}
+    TextBuffer() : _width(0), _height(0), _bgColor(0) {
+      _drawBuffer.reuseLocalBuffer(true);
+    }
 
     void init(int width, int height, uint32_t bgColor);
     void clear(int x, int  y, int width, int height);

@@ -123,9 +123,9 @@ namespace upanui {
     int scrollHeight() const override { return height(); }
     void vscroll(int rows, int scrollableHeight) override {}
     void hscroll(int columns) override {}
-    void registerVerticalScroller(VerticalScroller&) override {}
-    void removeVerticalScroller() override {}
+
     upan::option<VerticalScroller&> getVerticalScroller() override { return upan::option<VerticalScroller&>::empty(); }
+    void setVerticalScroller(VerticalScroller*) override {}
 
     void notifyChange(const ChangeState changeState) override {}
     void setChangeState(const ChangeState) override {}

@@ -181,6 +181,7 @@ namespace upanui {
 
     TextBuffer& textBuffer() { return _textBuffer; }
     usfn::Contexts& fontContexts() { return _fontContexts; }
+    void onResize() override;
 
   private:
     int _scrollY;

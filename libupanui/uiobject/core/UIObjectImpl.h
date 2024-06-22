@@ -99,9 +99,14 @@ namespace upanui {
     int scrollHeight() const override { return height(); }
     void vscroll(int rows, int scrollableHeight) override;
     void hscroll(int columns) override;
-    void registerVerticalScroller(VerticalScroller& verticalScroller) override;
-    void removeVerticalScroller() override;
-    upan::option<VerticalScroller&> getVerticalScroller() override { return _verticalScroller; }
+
+    upan::option<VerticalScroller&> getVerticalScroller() override {
+      return _verticalScroller;
+    }
+
+    void setVerticalScroller(VerticalScroller* verticalScroller) override {
+      _verticalScroller = upan::option<VerticalScroller&>(verticalScroller);
+    }
 
     void setChangeState(const ChangeState) override;
     bool isChangeState(const ChangeState, const bool only) const override;
@@ -169,7 +174,7 @@ namespace upanui {
     int resizeHeight(int, bool isPrimary) override;
     int minHeight(int) override;
 
-    virtual bool applyHeightChange(int height) { return true; }
+    virtual void onResize() {}
 
     virtual int resizeLeft(int dx, bool isPrimary) = 0;
     virtual int resizeRight(int dx, bool isPrimary) = 0;

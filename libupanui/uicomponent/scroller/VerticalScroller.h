@@ -41,7 +41,7 @@ namespace upanui {
     void add(UIObject& child) override;
     void handleMouseEvent(upanui::UIObject& sender, const upanui::MouseEvent& event);
     void setScrollPosition(int newY);
-    bool applyHeightChange(int height) override;
+    void onResize() override;
 
     class ScrollerMouseHandler : public MouseEventHandler {
     public:

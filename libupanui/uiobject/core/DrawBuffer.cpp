@@ -28,7 +28,7 @@
 #include "algorithm.h"
 
 namespace upanui {
-  DrawBuffer::DrawBuffer() : _type(BufferType::Null), _buffer(nullptr), _width(0), _height(0), _vWidth(0), _vHeight(0) {
+  DrawBuffer::DrawBuffer() : _type(BufferType::Null), _buffer(nullptr), _width(0), _height(0), _vWidth(0), _vHeight(0), _reuseLocalBuffer(false) {
   }
 
   DrawBuffer::~DrawBuffer() {
@@ -74,16 +74,23 @@ namespace upanui {
   }
 
   bool DrawBuffer::initLocal(int width, int height) {
-    const auto bufSize = width * height;
     if (_type == BufferType::Local && _width == width && _height == height) {
       return false;
     }
-    clear();
-    _width = _vWidth = width;
-    _height = _vHeight = height;
-    _buffer = new uint32_t[bufSize];
-    _type = BufferType::Local;
-    cleanBuffer();
+
+    if (_type == BufferType::Local && _reuseLocalBuffer && _width >= width && _height >= height) {
+      _vWidth = width;
+      _vHeight = height;
+      cleanBuffer();
+    } else {
+      const auto bufSize = width * height;
+      clear();
+      _width = _vWidth = width;
+      _height = _vHeight = height;
+      _buffer = new uint32_t[bufSize];
+      _type = BufferType::Local;
+      cleanBuffer();
+    }
     return true;
   }
 

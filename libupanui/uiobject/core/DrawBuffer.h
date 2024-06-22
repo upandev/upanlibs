@@ -55,6 +55,10 @@ namespace upanui {
     void fill(int sx, int sy, int fillWidth, int fillHeight, uint32_t color);
     void fill(uint32_t color);
 
+    void reuseLocalBuffer(bool v) {
+      _reuseLocalBuffer = v;
+    }
+
   private:
     enum BufferType { Null, Local, ForceLocal, Derived };
     BufferType _type;
@@ -63,5 +67,6 @@ namespace upanui {
     int _height;
     int _vWidth;
     int _vHeight;
+    bool _reuseLocalBuffer;
   };
 }

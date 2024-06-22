@@ -84,12 +84,12 @@ namespace upanui {
     _childCheck = true;
   }
 
-  bool VerticalScroller::applyHeightChange(int newHeight) {
-    _scrollBarMaxY = newHeight - _scrollBarWidth;
-    _scrollBarMaxHeight = newHeight - _scrollBarWidth * 2;
+  void VerticalScroller::onResize() {
+    _scrollBarMaxY = height() - _scrollBarWidth;
+    _scrollBarMaxHeight = height() - _scrollBarWidth * 2;
     _scrollBar->resizeHeight(_scrollBarMaxHeight, true);
     _scrollBar->y(_scrollBarMinY);
-    return true;
+    calibrateScrollbar();
   }
 
   void VerticalScroller::calibrateScrollbar() {
@@ -120,7 +120,7 @@ namespace upanui {
         throw upan::exception(XLOC, "Scroller can have only scrollable child");
       }
       _scrollableChild = upan::option<UIObject &>(child);
-      child.registerVerticalScroller(*this);
+      child.setVerticalScroller(this);
       calibrateScrollbar();
     }
     RectangleCanvas::add(child);
