@@ -240,8 +240,8 @@ namespace upanui {
 
     x(minX);
     y(minY);
-    width(maxX - minX + 1);
-    height(maxY - minY + 1);
+    resizeWidth(maxX - minX + 1, true);
+    resizeHeight(maxY - minY + 1, true);
   }
 
   void Line::Spec::calculate(const int x1, const int y1, const int x2, const int y2, int thickness) {

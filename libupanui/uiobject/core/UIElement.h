@@ -43,9 +43,9 @@ namespace upanui {
     void notifyChange(const ChangeState changeState) override;
     bool skipRedraw() const;
 
-    int resizeLeft(int dx) override;
-    int resizeRight(int dx) override;
-    int resizeTop(int dy) override;
-    int resizeBottom(int dy) override;
+    int resizeLeft(int dx, bool isPrimary) override;
+    int resizeRight(int dx, bool isPrimary) override;
+    int resizeTop(int dy, bool isPrimary) override;
+    int resizeBottom(int dy, bool isPrimary) override;
   };
 }

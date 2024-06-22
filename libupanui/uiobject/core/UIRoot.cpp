@@ -90,32 +90,32 @@ namespace upanui {
     GraphicsContext::Instance().frame().updateViewport(x(), y(), width(), height());
   }
 
-  int UIRoot::resizeLeft(int dx) {
+  int UIRoot::resizeLeft(int dx, bool isPrimary) {
     if (dx != 0) {
-      dx = width(width() - dx);
+      dx = resizeWidth(width() - dx, isPrimary);
       x(x() + dx);
     }
     return dx;
   }
 
-  int UIRoot::resizeRight(int dx) {
+  int UIRoot::resizeRight(int dx, bool isPrimary) {
     if (dx != 0) {
-      dx = -width(width() + dx);
+      dx = -resizeWidth(width() + dx, isPrimary);
     }
     return dx;
   }
 
-  int UIRoot::resizeTop(int dy) {
+  int UIRoot::resizeTop(int dy, bool isPrimary) {
     if (dy != 0) {
-      dy = height(height() - dy);
+      dy = resizeHeight(height() - dy, isPrimary);
       y(y() + dy);
     }
     return dy;
   }
 
-  int UIRoot::resizeBottom(int dy) {
+  int UIRoot::resizeBottom(int dy, bool isPrimary) {
     if (dy != 0) {
-      dy = -height(height() + dy);
+      dy = -resizeHeight(height() + dy, isPrimary);
     }
     return dy;
   }

@@ -45,10 +45,14 @@ namespace upanui {
     UIObject& operator=(const UIObject&) = delete;
 
   public:
+    const static int MIN_OBJECT_SIZE = 5;
+
     virtual int x() const = 0;
     virtual int y() const = 0;
     virtual int width() const = 0;
+    virtual int minWidth() const = 0;
     virtual int height() const = 0;
+    virtual int minHeight() const = 0;
     virtual uint32_t backgroundColor() const = 0;
     virtual uint32_t backgroundColorForDraw() const = 0;
     virtual uint8_t  backgroundColorAlpha() const = 0;
@@ -107,7 +111,7 @@ namespace upanui {
     virtual bool isHResizable() const = 0;
     virtual bool isVResizable() const = 0;
     virtual void setResizable(bool, bool) = 0;
-    virtual void resize(ResizeMode resizeMode, int dx, int dy, bool allowRedraw) = 0;
+    virtual void resize(ResizeMode resizeMode, int dx, int dy, bool isPrimary) = 0;
     virtual HorizontalPlacementType getHorizontalPlacementType() const = 0;
     virtual VerticalPlacementType getVerticalPlacementType() const = 0;
 
@@ -119,8 +123,10 @@ namespace upanui {
     virtual void onMouseFocus() = 0;
     virtual void onLoseMouseFocus() = 0;
 
-    virtual int width(int) = 0;
-    virtual int height(int) = 0;
+    virtual int resizeWidth(int, bool isPrimary) = 0;
+    virtual int minWidth(int) = 0;
+    virtual int resizeHeight(int, bool isPrimary) = 0;
+    virtual int minHeight(int) = 0;
 
     friend class UIObjectManager;
     //need this to adjust height of scroll-bar

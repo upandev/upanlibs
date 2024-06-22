@@ -77,30 +77,23 @@ namespace upanui {
     _scrollBar->registerMouseEventHandler(*_mouseHandler);
     _scrollerCanvas->registerMouseEventHandler(*_mouseHandler);
 
+    _scrollBar->minHeight(_scrollBarWidth / 2);
+    //up button + down button + max-scroll-bar-runway-area
+    minHeight(_scrollBarWidth * 4);
+
     _childCheck = true;
   }
 
   bool VerticalScroller::applyHeightChange(int newHeight) {
-    const int scrollBarMaxY = newHeight - _scrollBarWidth;
-    if (scrollBarMaxY < _scrollBarWidth) {
-      return false;
-    }
-    _scrollBarMaxY = scrollBarMaxY;
-
-    const int scrollBarMaxHeight = newHeight - _scrollBarWidth * 2;
-    if (scrollBarMaxHeight < _scrollBarWidth * 2) {
-      return false;
-    }
-    _scrollBarMaxHeight = scrollBarMaxHeight;
-
-    _scrollBar->height(_scrollBarMaxHeight);
+    _scrollBarMaxY = newHeight - _scrollBarWidth;
+    _scrollBarMaxHeight = newHeight - _scrollBarWidth * 2;
+    _scrollBar->resizeHeight(_scrollBarMaxHeight, true);
     _scrollBar->y(_scrollBarMinY);
     return true;
   }
 
   void VerticalScroller::calibrateScrollbar() {
-    const int minScrollBarHeight = _scrollBarWidth / 2;
-    const int scrollBarMaxRunway = _scrollBarMaxHeight - minScrollBarHeight;
+    const int scrollBarMaxRunway = _scrollBarMaxHeight - _scrollBar->minHeight();
     const int scrollContentHeight = _scrollableChild.value().scrollHeight() >= height() ? _scrollableChild.value().scrollHeight() - height() : 0;
     _scrollMultiplier = 8;
     const int scrollBarRequiredRunway = scrollContentHeight / _scrollMultiplier;
@@ -110,12 +103,12 @@ namespace upanui {
 //    }
     if (scrollBarRequiredRunway > scrollBarMaxRunway) {
       if (_scrollBarMaxHeight == _scrollBar->height()) {
-        _scrollBar->height(minScrollBarHeight);
+        _scrollBar->resizeHeight(_scrollBar->minHeight(), true);
       }
       _scrollMultiplier = scrollContentHeight / (_scrollBarMaxHeight - _scrollBar->height());
     } else {
       const int scrollBarHeight = _scrollBarMaxHeight - scrollBarRequiredRunway;
-      _scrollBar->height(scrollBarHeight);
+      _scrollBar->resizeHeight(scrollBarHeight, true);
     }
 
     updateScrollPosition(_scrollableChild.value().scrollY());

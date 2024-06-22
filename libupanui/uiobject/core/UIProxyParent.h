@@ -31,8 +31,12 @@ namespace upanui {
 
     int x() const override { return 0; };
     int y() const override { return 0; }
+
     int width() const override;
+    int minWidth() const override { return MIN_OBJECT_SIZE; }
     int height() const override;
+    int minHeight() const override { return MIN_OBJECT_SIZE; }
+
     uint32_t backgroundColor() const override { return 0; }
     uint32_t backgroundColorForDraw() const override { return 0; }
     uint8_t  backgroundColorAlpha() const override { return 0; }
@@ -143,9 +147,11 @@ namespace upanui {
       throw upan::exception(XLOC,"unsupported setResizable() for UIProxyParent");
     }
 
-    int width(int) override { return 0; }
-    int height(int) override { return 0; }
-    void resize(ResizeMode, int, int, bool allowRedraw) override {}
+    int resizeWidth(int, bool isPrimary) override { return 0; }
+    int resizeHeight(int, bool isPrimary) override { return 0; }
+    int minWidth(int) override { return 0; }
+    int minHeight(int) override { return 0; }
+    void resize(ResizeMode, int, int, bool isPrimary) override {}
     HorizontalPlacementType getHorizontalPlacementType() const override { return HorizontalPlacementType::ABSOLUTE; }
     VerticalPlacementType getVerticalPlacementType() const override { return VerticalPlacementType::ABSOLUTE; }
 

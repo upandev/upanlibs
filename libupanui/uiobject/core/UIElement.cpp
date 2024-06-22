@@ -87,7 +87,7 @@ namespace upanui {
     }
   }
 
-  int UIElement::resizeLeft(int dx) {
+  int UIElement::resizeLeft(int dx, bool isPrimary) {
     if (dx != 0) {
       switch (getHorizontalPlacementType()) {
         case HorizontalPlacementType::LEFT_FIXED:
@@ -103,14 +103,14 @@ namespace upanui {
 
         case HorizontalPlacementType::LEFT_STRETCHED:
         case HorizontalPlacementType::STRETCHED:
-          dx = width(width() - dx);
+          dx = resizeWidth(width() - dx, isPrimary);
           break;
       }
     }
     return dx;
   }
 
-  int UIElement::resizeRight(int dx) {
+  int UIElement::resizeRight(int dx, bool isPrimary) {
     if (dx != 0) {
       switch (getHorizontalPlacementType()) {
         case HorizontalPlacementType::ABSOLUTE:
@@ -126,14 +126,14 @@ namespace upanui {
 
         case HorizontalPlacementType::RIGHT_STRETCHED:
         case HorizontalPlacementType::STRETCHED:
-          dx = -width(width() + dx);
+          dx = -resizeWidth(width() + dx, isPrimary);
           break;
       }
     }
     return dx;
   }
 
-  int UIElement::resizeTop(int dy) {
+  int UIElement::resizeTop(int dy, bool isPrimary) {
     if (dy != 0) {
       switch (getVerticalPlacementType()) {
         case VerticalPlacementType::TOP_FIXED:
@@ -149,14 +149,14 @@ namespace upanui {
 
         case VerticalPlacementType::TOP_STRETCHED:
         case VerticalPlacementType::STRETCHED:
-          dy = height(height() - dy);
+          dy = resizeHeight(height() - dy, isPrimary);
           break;
       }
     }
     return dy;
   }
 
-  int UIElement::resizeBottom(int dy) {
+  int UIElement::resizeBottom(int dy, bool isPrimary) {
     if (dy != 0) {
       switch (getVerticalPlacementType()) {
         case VerticalPlacementType::ABSOLUTE:
@@ -172,7 +172,7 @@ namespace upanui {
 
         case VerticalPlacementType::BOTTOM_STRETCHED:
         case VerticalPlacementType::STRETCHED:
-          dy = -height(height() + dy);
+          dy = -resizeHeight(height() + dy, isPrimary);
           break;
       }
     }

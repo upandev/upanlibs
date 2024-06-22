@@ -43,9 +43,36 @@ namespace upanui {
       _width = gc().frame().frameBuffer().width();
     }
 
+    if (_width < MIN_OBJECT_SIZE) {
+      _width = MIN_OBJECT_SIZE;
+    }
+
     if (_height > gc().frame().frameBuffer().height()) {
       _height = gc().frame().frameBuffer().height();
     }
+
+    if (_height < MIN_OBJECT_SIZE) {
+      _height = MIN_OBJECT_SIZE;
+    }
+
+    if (_horizontalPlacementType == HorizontalPlacementType::ABSOLUTE
+    || _horizontalPlacementType == HorizontalPlacementType::RIGHT_FIXED
+    || _horizontalPlacementType == HorizontalPlacementType::LEFT_FIXED) {
+      _minWidth = _width;
+    } else {
+      _minWidth = MIN_OBJECT_SIZE;
+    }
+
+    if (_verticalPlacementType == VerticalPlacementType::ABSOLUTE
+    || _verticalPlacementType == VerticalPlacementType::TOP_FIXED
+    || _verticalPlacementType == VerticalPlacementType::BOTTOM_FIXED) {
+      _minHeight = _height;
+    } else {
+      _minHeight = MIN_OBJECT_SIZE;
+    }
+
+    _vWidth = _width;
+    _vHeight = _height;
   }
 
   void UIObjectImpl::x(const int x) {
@@ -73,32 +100,77 @@ namespace upanui {
     }
   }
 
-  int UIObjectImpl::width(int32_t width) {
+  int UIObjectImpl::resizeWidth(int width, bool isPrimary) {
     if (width > gc().frame().frameBuffer().width()) {
       width = gc().frame().frameBuffer().width();
     }
 
-    if (width < RESIZER_ZONE_LIMIT) {
-      width = RESIZER_ZONE_LIMIT;
+    if (!isPrimary) {
+      const int adx = width - _width;
+      _vWidth += adx;
+
+      if (adx >= 0) {
+        if (_vWidth < minWidth()) {
+          return 0;
+        } else {
+          width = _vWidth;
+        }
+      }
+    }
+
+    if (width < minWidth()) {
+      width = minWidth();
     }
 
     const int dx = _width - width;
     if (dx != 0) {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _width = width;
+      if (isPrimary) _vWidth = width;
       notifyChange(ChangeState::Size);
     }
 
     return dx;
   }
 
-  int UIObjectImpl::height(int32_t height) {
+  int UIObjectImpl::minWidth(int minWidth) {
+    if (minWidth > _width) {
+      minWidth = _width;
+    }
+
+    if (minWidth < MIN_OBJECT_SIZE) {
+      minWidth = MIN_OBJECT_SIZE;
+    }
+
+    const int dx = _minWidth - minWidth;
+    if (dx != 0) {
+      upan::mutex_guard g(_gc.uiObjectManager().drawLock());
+      _minWidth = minWidth;
+    }
+
+    return dx;
+  }
+
+  int UIObjectImpl::resizeHeight(int height, bool isPrimary) {
     if (height > gc().frame().frameBuffer().height()) {
       height = gc().frame().frameBuffer().height();
     }
 
-    if (height < RESIZER_ZONE_LIMIT) {
-      height = RESIZER_ZONE_LIMIT;
+    if (!isPrimary) {
+      const int ady = height - _height;
+      _vHeight += ady;
+
+      if (ady >= 0) {
+        if (_vHeight < minHeight()) {
+          return 0;
+        } else {
+          height = _vHeight;
+        }
+      }
+    }
+
+    if (height < minHeight()) {
+      height = minHeight();
     }
 
     if (!applyHeightChange(height)) {
@@ -109,10 +181,29 @@ namespace upanui {
     if (dy != 0) {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
       _height = height;
+      if (isPrimary) _vHeight = height;
       notifyChange(ChangeState::Size);
       _verticalScroller.ifPresent([](VerticalScroller& verticalScroller) {
         verticalScroller.calibrateScrollbar();
       });
+    }
+
+    return dy;
+  }
+
+  int UIObjectImpl::minHeight(int minHeight) {
+    if (minHeight > _height) {
+      minHeight = _height;
+    }
+
+    if (minHeight < MIN_OBJECT_SIZE) {
+      minHeight = MIN_OBJECT_SIZE;
+    }
+
+    const int dy = _minHeight - minHeight;
+    if (dy != 0) {
+      upan::mutex_guard g(_gc.uiObjectManager().drawLock());
+      _minHeight = minHeight;
     }
 
     return dy;
@@ -237,10 +328,10 @@ namespace upanui {
       return false;
     }
 
-    const bool lhresizer = intersectInfo._xLeftDelta >= 0 && intersectInfo._xLeftDelta < RESIZER_ZONE_LIMIT;
-    const bool rhresizer = intersectInfo._xRightDelta >= 0 && intersectInfo._xRightDelta < RESIZER_ZONE_LIMIT;
-    const bool tvresizer = intersectInfo._yTopDelta >= 0 && intersectInfo._yTopDelta < RESIZER_ZONE_LIMIT;
-    const bool bvresizer = intersectInfo._yBottomDelta >= 0 && intersectInfo._yBottomDelta < RESIZER_ZONE_LIMIT;
+    const bool lhresizer = intersectInfo._xLeftDelta >= 0 && intersectInfo._xLeftDelta < MIN_OBJECT_SIZE;
+    const bool rhresizer = intersectInfo._xRightDelta >= 0 && intersectInfo._xRightDelta < MIN_OBJECT_SIZE;
+    const bool tvresizer = intersectInfo._yTopDelta >= 0 && intersectInfo._yTopDelta < MIN_OBJECT_SIZE;
+    const bool bvresizer = intersectInfo._yBottomDelta >= 0 && intersectInfo._yBottomDelta < MIN_OBJECT_SIZE;
 
     if (((lhresizer && tvresizer) || (rhresizer && bvresizer)) && isHResizable() && isVResizable()) {
       gc().setResizeMode((lhresizer && tvresizer) ? ResizeMode::LEFT_TOP : ResizeMode::RIGHT_BOTTOM);
@@ -323,14 +414,14 @@ namespace upanui {
     return (only || changeState == ChangeState::Clean) ? _changeState == (int)changeState : _changeState & (int)changeState;
   }
 
-  void UIObjectImpl::resize(upanui::ResizeMode resizeMode, int dx, int dy, bool allowRedraw) {
+  void UIObjectImpl::resize(ResizeMode resizeMode, int dx, int dy, bool isPrimary) {
     ChangeNotificationLock cLock(*this);
     switch (resizeMode) {
       case ResizeMode::NA:
         return;
 
       case ResizeMode::LEFT: {
-        dx = resizeLeft(dx);
+        dx = resizeLeft(dx, isPrimary);
         if (!dx) {
           return;
         }
@@ -338,7 +429,7 @@ namespace upanui {
       break;
 
       case ResizeMode::RIGHT: {
-        dx = resizeRight(dx);
+        dx = resizeRight(dx, isPrimary);
         if (!dx) {
           return;
         }
@@ -346,7 +437,7 @@ namespace upanui {
       break;
 
       case ResizeMode::TOP: {
-        dy = resizeTop(dy);
+        dy = resizeTop(dy, isPrimary);
         if (!dy) {
           return;
         }
@@ -354,7 +445,7 @@ namespace upanui {
       break;
 
       case ResizeMode::BOTTOM: {
-        dy = resizeBottom(dy);
+        dy = resizeBottom(dy, isPrimary);
         if (!dy) {
           return;
         }
@@ -362,8 +453,8 @@ namespace upanui {
       break;
 
       case ResizeMode::LEFT_TOP: {
-        dx = resizeLeft(dx);
-        dy = resizeTop(dy);
+        dx = resizeLeft(dx, isPrimary);
+        dy = resizeTop(dy, isPrimary);
         if (!dx && !dy) {
           return;
         }
@@ -371,8 +462,8 @@ namespace upanui {
       break;
 
       case ResizeMode::LEFT_BOTTOM: {
-        dx = resizeLeft(dx);
-        dy = resizeBottom(dy);
+        dx = resizeLeft(dx, isPrimary);
+        dy = resizeBottom(dy, isPrimary);
         if (!dx && !dy) {
           return;
         }
@@ -380,8 +471,8 @@ namespace upanui {
       break;
 
       case ResizeMode::RIGHT_TOP: {
-        dx = resizeRight(dx);
-        dy = resizeTop(dy);
+        dx = resizeRight(dx, isPrimary);
+        dy = resizeTop(dy, isPrimary);
         if (!dx && !dy) {
           return;
         }
@@ -389,8 +480,8 @@ namespace upanui {
       break;
 
       case ResizeMode::RIGHT_BOTTOM: {
-        dx = resizeRight(dx);
-        dy = resizeBottom(dy);
+        dx = resizeRight(dx, isPrimary);
+        dy = resizeBottom(dy, isPrimary);
         if (!dx && !dy) {
           return;
         }
@@ -402,7 +493,7 @@ namespace upanui {
       child->resize(resizeMode, dx, dy, false);
     }
 
-    if (allowRedraw) {
+    if (isPrimary) {
       redraw();
     }
   }

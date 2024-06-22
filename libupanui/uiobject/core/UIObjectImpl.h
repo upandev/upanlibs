@@ -43,12 +43,14 @@ namespace upanui {
                  HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
 
   public:
-    const static int RESIZER_ZONE_LIMIT = 5;
-
     int x() const override { return _x; }
     int y() const override { return _y; }
+
     int width() const override { return _width; }
+    int minWidth() const override { return _minWidth; }
     int height() const override { return _height; }
+    int minHeight() const override { return _minHeight; }
+
     uint32_t backgroundColor() const override { return _bgColor; }
     uint32_t backgroundColorForDraw() const override { return _bgColor; }
     uint8_t  backgroundColorAlpha() const override { return _bgAlpha; }
@@ -162,21 +164,28 @@ namespace upanui {
       return _drawBuffer;
     }
 
-    int width(int) override;
-    int height(int) override;
+    int resizeWidth(int, bool isPrimary) override;
+    int minWidth(int) override;
+    int resizeHeight(int, bool isPrimary) override;
+    int minHeight(int) override;
+
     virtual bool applyHeightChange(int height) { return true; }
 
-    virtual int resizeLeft(int dx) = 0;
-    virtual int resizeRight(int dx) = 0;
-    virtual int resizeTop(int dy) = 0;
-    virtual int resizeBottom(int dy) = 0;
-    void resize(ResizeMode resizeMode, int dx, int dy, bool allowRedraw) override;
+    virtual int resizeLeft(int dx, bool isPrimary) = 0;
+    virtual int resizeRight(int dx, bool isPrimary) = 0;
+    virtual int resizeTop(int dy, bool isPrimary) = 0;
+    virtual int resizeBottom(int dy, bool isPrimary) = 0;
+    void resize(ResizeMode resizeMode, int dx, int dy, bool isPrimary) override;
 
   private:
     int _x;
     int _y;
     int _width;
+    int _minWidth;
+    int _vWidth;
     int _height;
+    int _minHeight;
+    int _vHeight;
     uint32_t _bgColor;
     uint8_t _bgAlpha;
     uint32_t _brColor;
