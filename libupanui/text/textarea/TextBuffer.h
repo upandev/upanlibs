@@ -43,8 +43,9 @@ namespace upanui {
       _drawBuffer.reuseLocalBuffer(true);
     }
 
-    void init(int width, int height, uint32_t bgColor);
+    bool init(int width, int height, uint32_t bgColor);
     void clear(int x, int  y, int width, int height);
+    void clear();
     void move(int dy, int sy, int len);
     void fill(int x, int y, int width, int height, uint32_t color);
     usfn::FrameBuffer initFrameBuffer(int dx, int dy, int chHeight, uint32_t fgColor, uint32_t bgColor);

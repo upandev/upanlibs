@@ -37,7 +37,7 @@ namespace upanui {
   private:
     Terminal(int x, int y, int width, int height, int leftMargin,
              const upan::string& prompt,
-             TerminalCommandExecutor& terminalCommandExector,
+             TerminalCommandExecutor& terminalCommandExecutor,
              HorizontalPlacementType horizontalPlacementType,
              VerticalPlacementType verticalPlacementType);
     ~Terminal() {}

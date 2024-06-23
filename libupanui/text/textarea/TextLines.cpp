@@ -31,6 +31,11 @@ namespace upanui {
     }
   }
 
+  void TextLines::clearCopy(upan::vector<TextLine*>& copyLines) {
+    copyLines = _lines;
+    _lines.clear();
+  }
+
   TextLine& TextLines::add(int index) {
     auto line = new TextLine(_textArea.currentFontSize(), _textArea);
     _lines.insert(index, line);
@@ -81,7 +86,7 @@ namespace upanui {
     return deletedLine;
   }
 
-  int TextLines::removech(const int y, const int characterPosY, const int scrollBaseY) {
+  int TextLines::removeLine(const int y, const int characterPosY, const int scrollBaseY) {
     const int baseY = getLineBaseY(y, scrollBaseY);
     auto& line = get(y);
     auto visibleBaseY = baseY - line.lineHeight() + 1;
@@ -126,14 +131,17 @@ namespace upanui {
 
       _lines.erase(y, y + 1);
       delete &line;
+      return deletedLineHeight;
     } else if (characterPosY < y) { //it's a no-op if deleting the line where character cursor is
       if (insideCanvas) {
         _textArea.textBuffer().clear(0, visibleBaseY, _textArea.width(), line.lineHeight());
       }
       _lines.erase(y, y + 1);
       delete &line;
+      return deletedLineHeight;
+    } else {
+      return 0;
     }
-    return deletedLineHeight;
   }
 
   int TextLines::getLineBaseY(int lineIndex, int scrollBaseY) {

@@ -27,10 +27,10 @@
 namespace upanui {
   Terminal::Terminal(int x, int y, int width, int height,
                      int leftMargin, const upan::string& prompt,
-                     TerminalCommandExecutor& terminalCommandExector,
+                     TerminalCommandExecutor& terminalCommandExecutor,
                      HorizontalPlacementType horizontalPlacementType,
                      VerticalPlacementType verticalPlacementType) : TextArea(x, y, width, height, leftMargin, horizontalPlacementType, verticalPlacementType),
-                     _terminalCommandExecutor(terminalCommandExector) {
+                     _terminalCommandExecutor(terminalCommandExecutor) {
     setPrompt(prompt);
   }
 

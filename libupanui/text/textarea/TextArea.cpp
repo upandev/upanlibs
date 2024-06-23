@@ -43,17 +43,10 @@ namespace upanui {
   }
 
   void TextArea::init() {
-    _maxLineCharWidth = width() - leftMargin() * 2;
+    _reset();
+
     backgroundColor(0xFFFFFF | GCoreFunctions::ALPHA_MASK);
-    auto& curLine = _lines.add(0);
-    _selectedArea.setPresent(false);
     _textBuffer.init(width(), height(), backgroundColorWithAlpha());
-    //cursor y is within the character pixel block.
-    //the character rendering should ensure that the character is drawn with certain bottom margin
-    //for the cursor to be visible at the last pixel row of the character block.
-    _cursorPos.set(_leftMargin, curLine.lineHeight() - 1);
-    _characterPos.set(0, 0);
-    changeScrollHeight(curLine.lineHeight());
     _cursorBlinkThread.start();
 
     minWidth(Character::DEFAULT_FONT_SIZE * 20);
@@ -62,6 +55,31 @@ namespace upanui {
     UIObjectImpl::captureMouseEvents(true);
     _mouseHandler.reset(new TextAreaMouseHandler(*this));
     registerMouseEventHandler(*_mouseHandler);
+  }
+
+  void TextArea::clear() {
+    _textBuffer.clear();
+    upan::vector<TextLine*> copyLines;
+    _lines.clearCopy(copyLines);
+    _reset();
+    //_renderLock = true;
+    //update
+    //_renderLock = false;
+  }
+
+  void TextArea::_reset() {
+    _renderLock = false;
+    _scrollY = 0;
+    _scrollHeight = 0;
+    _maxLineCharWidth = width() - leftMargin() * 2;
+    _selectedArea.setPresent(false);
+    auto& curLine = _lines.add(0);
+    //cursor y is within the character pixel block.
+    //the character rendering should ensure that the character is drawn with certain bottom margin
+    //for the cursor to be visible at the last pixel row of the character block.
+    _cursorPos.set(_leftMargin, curLine.lineHeight() - 1);
+    _characterPos.set(0, 0);
+    changeScrollHeight(curLine.lineHeight());
   }
 
   void TextArea::leftMargin(int lm) {
@@ -328,12 +346,12 @@ namespace upanui {
       }
 
       if (deletedLine > 0) {
-        changeScrollHeight(_lines.removech(deletedLine, _characterPos.y(), _scrollY));
+        changeScrollHeight(-_lines.removeLine(deletedLine, _characterPos.y(), _scrollY));
       }
     } else {
       if (_characterPos.x() == line.characters().size()) {
         if (_characterPos.x() == 0) {
-          changeScrollHeight(_lines.removech(_characterPos.y(), _characterPos.y(), _scrollY));
+          changeScrollHeight(-_lines.removeLine(_characterPos.y(), _characterPos.y(), _scrollY));
         }
       } else {
         line.remove(_characterPos.x(), _characterPos.x() + 1);
@@ -815,7 +833,7 @@ namespace upanui {
       const int deleteLineY = _selectedArea.p1().y() + 1;
       int lineCountToDelete = _selectedArea.p2().y() - deleteLineY;
       while(lineCountToDelete > 0) {
-        changeScrollHeight(_lines.removech(deleteLineY, _characterPos.y(), _scrollY));
+        changeScrollHeight(-_lines.removeLine(deleteLineY, _characterPos.y(), _scrollY));
         --lineCountToDelete;
       }
       auto& line1 = _lines.get(_selectedArea.p1().y());
@@ -863,7 +881,9 @@ namespace upanui {
   }
 
   void TextArea::onResize() {
-    _textBuffer.init(width(), height(), backgroundColorWithAlpha());
+    if (_textBuffer.init(width(), height(), backgroundColorWithAlpha())) {
+
+    }
   }
 
   void TextArea::SelectedArea::setRange(const UIPosition& pa, const UIPosition& pb) {

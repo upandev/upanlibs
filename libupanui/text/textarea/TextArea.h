@@ -50,6 +50,7 @@ namespace upanui {
     void selectAll();
     void copySelection();
     void paste();
+    void clear();
 
     uint8_t currentFontSize() const { return _currentFontSize; }
     usfn::PreloadedFonts currentFontType() const { return (usfn::PreloadedFonts) _currentFontType; }
@@ -73,6 +74,7 @@ namespace upanui {
     virtual ~TextArea();
 
     void init();
+    void _reset();
 
     virtual void enter();
     virtual void moveup();

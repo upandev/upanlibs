@@ -23,19 +23,24 @@
 #include "TextBuffer.h"
 
 namespace upanui {
-  void TextBuffer::init(int width, int height, uint32_t bgColor) {
+  bool TextBuffer::init(int width, int height, uint32_t bgColor) {
     if (_width == width && _height == height) {
-      return;
+      return false;
     }
     _width = width;
     _height = height;
     _bgColor = bgColor;
     _drawBuffer.initLocal(width, MAX_FONT_SIZE * 2 + height);
-    _drawBuffer.fill(bgColor);
+    clear();
+    return true;
   }
 
   void TextBuffer::clear(int x, int y, int width, int height) {
     _drawBuffer.fill(x, y + MAX_FONT_SIZE, width, height, _bgColor);
+  }
+
+  void TextBuffer::clear() {
+    _drawBuffer.fill(_bgColor);
   }
 
   void TextBuffer::move(int dy, int sy, int len) {
