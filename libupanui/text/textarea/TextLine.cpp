@@ -35,7 +35,7 @@ namespace upanui {
   }
 
   void TextLine::remove(int from, int last) {
-    if (from >= _characters.size()) {
+    if (from == last || from >= _characters.size()) {
       return;
     }
 

@@ -26,14 +26,71 @@
 
 namespace upanui {
   TextLines::~TextLines() {
+    clear();
+  }
+
+  void TextLines::clear() {
     for(auto i : _lines) {
       delete i;
     }
+    _lines.clear();
   }
 
-  void TextLines::clearCopy(upan::vector<TextLine*>& copyLines) {
-    copyLines = _lines;
-    _lines.clear();
+  void TextLines::realignOnWidthIncrease() {
+    for(int li = 0; li < _lines.size();) {
+      auto line = _lines[li];
+      if (line->wrapped()) {
+        int availableWidth = _textArea._maxLineCharWidth - line->width();
+        auto nextLine = _lines[li + 1];
+        int i;
+        for (i = 0; i < nextLine->size(); ++i) {
+          auto ch = nextLine->characters(i);
+          availableWidth -= ch.getChWidth();
+          if (availableWidth < 0) {
+            break;
+          }
+          line->insert(line->size(), ch);
+        }
+
+        nextLine->remove(0, i);
+
+        if (nextLine->size()) {
+          ++li;
+        } else {
+          _lines.erase(li + 1, li + 2);
+          if (!nextLine->wrapped()) {
+            line->wrapped(false);
+            ++li;
+          }
+          delete nextLine;
+        }
+      } else {
+        ++li;
+      }
+    }
+  }
+
+  void TextLines::realignOnWidthDecrease() {
+    Characters wrapCharacters;
+    for (int li = 0; li < _lines.size(); ++li) {
+      auto line = _lines[li];
+
+      for(int i = 0; i < wrapCharacters.size(); ++i) {
+        line->insert(i, wrapCharacters[i]);
+      }
+
+      wrapCharacters.clear();
+      while(line->width() > _textArea._maxLineCharWidth) {
+        auto ch = line->characters(line->size() - 1);
+        line->remove(line->size() - 1, line->size());
+        wrapCharacters.insert(0, ch);
+      }
+
+      if (!wrapCharacters.empty() && !line->wrapped()) {
+        line->wrapped(true);
+        add(li + 1);
+      }
+    }
   }
 
   TextLine& TextLines::add(int index) {

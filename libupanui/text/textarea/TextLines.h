@@ -41,7 +41,9 @@ namespace upanui {
     int size() const { return _lines.size(); }
     bool empty() const { return _lines.empty(); }
 
-    void clearCopy(upan::vector<TextLine*>& copyLines);
+    void clear();
+    void realignOnWidthIncrease();
+    void realignOnWidthDecrease();
     TextLine& add(int index);
     TextLine& get(int index) const;
     int wrapremovech(int x, int y, int maxLineChWidth);

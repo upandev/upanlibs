@@ -20,19 +20,29 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include "TextBuffer.h"
+#include <TextBuffer.h>
+#include <GraphicsContext.h>
 
 namespace upanui {
-  bool TextBuffer::init(int width, int height, uint32_t bgColor) {
-    if (_width == width && _height == height) {
-      return false;
-    }
+  TextBuffer::TextBuffer() : _width(0), _height(0), _bgColor(0) {
+    const int maxWidth = GraphicsContext::Instance().frame().frameBuffer().width();
+    const int maxHeight = GraphicsContext::Instance().frame().frameBuffer().height() + MAX_FONT_SIZE * 2;
+    _drawBuffer.initLocal(maxWidth, maxHeight);
+    _bgLine = new uint32_t[maxWidth];
+  }
+
+  TextBuffer::~TextBuffer() {
+    delete []_bgLine;
+  }
+
+  void TextBuffer::init(int width, int height, uint32_t bgColor) {
     _width = width;
     _height = height;
     _bgColor = bgColor;
-    _drawBuffer.initLocal(width, MAX_FONT_SIZE * 2 + height);
+    for(int i = 0; i < _drawBuffer.width(); ++i) {
+      _bgLine[i] = _bgColor;
+    }
     clear();
-    return true;
   }
 
   void TextBuffer::clear(int x, int y, int width, int height) {
@@ -40,7 +50,7 @@ namespace upanui {
   }
 
   void TextBuffer::clear() {
-    _drawBuffer.fill(_bgColor);
+    _drawBuffer.fill(0, _drawBuffer.height(), _bgLine, _drawBuffer.width() * _drawBuffer.bytesPerPixel());
   }
 
   void TextBuffer::move(int dy, int sy, int len) {

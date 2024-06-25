@@ -105,6 +105,7 @@ namespace upanui {
     int scrollY() const override { return _scrollY; }
     int updateScrollY(int sy);
     int scrollHeight() const override { return _scrollHeight; }
+    bool scrollToCoverEmptyArea();
     void changeScrollHeight(int delta);
     void vscroll(int rows, int scrollableHeight) override;
     void onKeyboardEvent(const KeyboardEvent& event) override;
@@ -157,11 +158,12 @@ namespace upanui {
 
     class ScrollerChanges {
     public:
-      ScrollerChanges() : _calibrate(false), _adjustScrollY(false), _scrollY(0) {}
+      ScrollerChanges(TextArea& textArea) : _textArea(textArea), _calibrate(false), _adjustScrollY(false), _scrollY(0) {}
       void capture(bool calibrate, bool adjustScrollY, int scrollY);
-      void apply(VerticalScroller&);
+      void apply();
 
     private:
+      TextArea& _textArea;
       bool _calibrate;
       bool _adjustScrollY;
       int _scrollY;
@@ -206,6 +208,7 @@ namespace upanui {
     usfn::Contexts _fontContexts;
     TextBuffer _textBuffer;
     TextLines _lines;
+    bool _dirtyOnResize;
 
     friend class TextLine;
     friend class TextLines;

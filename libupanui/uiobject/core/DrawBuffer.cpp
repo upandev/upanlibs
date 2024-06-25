@@ -28,7 +28,7 @@
 #include "algorithm.h"
 
 namespace upanui {
-  DrawBuffer::DrawBuffer() : _type(BufferType::Null), _buffer(nullptr), _width(0), _height(0), _vWidth(0), _vHeight(0), _reuseLocalBuffer(false) {
+  DrawBuffer::DrawBuffer() : _type(BufferType::Null), _buffer(nullptr), _width(0), _height(0), _vWidth(0), _vHeight(0) {
   }
 
   DrawBuffer::~DrawBuffer() {
@@ -74,23 +74,16 @@ namespace upanui {
   }
 
   bool DrawBuffer::initLocal(int width, int height) {
+    const auto bufSize = width * height;
     if (_type == BufferType::Local && _width == width && _height == height) {
       return false;
     }
-
-    if (_type == BufferType::Local && _reuseLocalBuffer && _width >= width && _height >= height) {
-      _vWidth = width;
-      _vHeight = height;
-      cleanBuffer();
-    } else {
-      const auto bufSize = width * height;
-      clear();
-      _width = _vWidth = width;
-      _height = _vHeight = height;
-      _buffer = new uint32_t[bufSize];
-      _type = BufferType::Local;
-      cleanBuffer();
-    }
+    clear();
+    _width = _vWidth = width;
+    _height = _vHeight = height;
+    _buffer = new uint32_t[bufSize];
+    _type = BufferType::Local;
+    cleanBuffer();
     return true;
   }
 
@@ -158,5 +151,13 @@ namespace upanui {
 
   void DrawBuffer::fill(uint32_t color) {
     fill(0, 0, _vWidth, _vHeight, color);
+  }
+
+  void DrawBuffer::fill(int sy, int fillHeight, const void* line, int len) {
+    const int ey = upan::min(_vHeight, sy + fillHeight);
+    for(auto y = sy; y < ey; ++y) {
+      auto yOffset = y * _width;
+      memcpy(&_buffer[yOffset], line, len);
+    }
   }
 }

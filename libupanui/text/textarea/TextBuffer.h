@@ -39,11 +39,10 @@ namespace upanui {
   public:
     static const uint8_t MAX_FONT_SIZE = 128;
 
-    TextBuffer() : _width(0), _height(0), _bgColor(0) {
-      _drawBuffer.reuseLocalBuffer(true);
-    }
+    TextBuffer();
+    ~TextBuffer();
 
-    bool init(int width, int height, uint32_t bgColor);
+    void init(int width, int height, uint32_t bgColor);
     void clear(int x, int  y, int width, int height);
     void clear();
     void move(int dy, int sy, int len);
@@ -51,10 +50,14 @@ namespace upanui {
     usfn::FrameBuffer initFrameBuffer(int dx, int dy, int chHeight, uint32_t fgColor, uint32_t bgColor);
     void copy(DrawBuffer& drawBuffer);
 
+    int width() const { return _width; }
+    int height() const { return _height; }
+
   private:
     int _width;
     int _height;
     uint32_t _bgColor;
     DrawBuffer _drawBuffer;
+    uint32_t* _bgLine;
   };
 }

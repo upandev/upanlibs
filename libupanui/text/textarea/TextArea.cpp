@@ -35,7 +35,8 @@ namespace upanui {
     _scrollY(0), _scrollHeight(0),
     _currentFontSize(Character::DEFAULT_FONT_SIZE), _currentFontType(usfn::PreloadedFonts::VGA16), _currentStyle(usfn::STYLE_REGULAR),
     _currentFGColor(DEFAULT_FG_COLOR), _currentBGColor(DEFAULT_BG_COLOR), _leftMargin(leftMargin),
-    _maxLineCharWidth(RectangleCanvas::width()), _cursorBlinkThread(*this), _mouseHandler(nullptr), _lines(*this) {
+    _maxLineCharWidth(RectangleCanvas::width()), _cursorBlinkThread(*this), _mouseHandler(nullptr),
+    _scrollerChanges(*this), _lines(*this), _dirtyOnResize(false) {
   }
 
   TextArea::~TextArea() {
@@ -59,16 +60,11 @@ namespace upanui {
 
   void TextArea::clear() {
     _textBuffer.clear();
-    upan::vector<TextLine*> copyLines;
-    _lines.clearCopy(copyLines);
+    _lines.clear();
     _reset();
-    //_renderLock = true;
-    //update
-    //_renderLock = false;
   }
 
   void TextArea::_reset() {
-    _renderLock = false;
     _scrollY = 0;
     _scrollHeight = 0;
     _maxLineCharWidth = width() - leftMargin() * 2;
@@ -307,7 +303,7 @@ namespace upanui {
     while (line.width() > _maxLineCharWidth) {
       auto ch = line.characters(line.size() - 1);
       line.remove(line.size() - 1, line.size());
-      wrapCharacters.push_back(ch);
+      wrapCharacters.insert(0, ch);
     }
 
     if (!wrapCharacters.empty()) {
@@ -579,20 +575,22 @@ namespace upanui {
     _scrollY = scrollY;
   }
 
-  void TextArea::ScrollerChanges::apply(VerticalScroller& verticalScroller) {
-    if (_calibrate) {
-      verticalScroller.calibrateScrollbar();
-    }
+  void TextArea::ScrollerChanges::apply() {
+    _textArea.getVerticalScroller().ifPresent([this](VerticalScroller& verticalScroller) {
+      if (_calibrate) {
+        verticalScroller.calibrateScrollbar();
+      }
 
-    if (_adjustScrollY) {
-      verticalScroller.updateScrollPosition(_scrollY);
-    }
+      if (_adjustScrollY) {
+        verticalScroller.updateScrollPosition(_scrollY);
+      }
+    });
     _calibrate = _adjustScrollY = false;
   }
 
   void TextArea::onKeyboardEvent(const KeyboardEvent& event) {
     processKeyboardEvent(event);
-    getVerticalScroller().ifPresent([this](VerticalScroller& verticalScroller) { _scrollerChanges.apply(verticalScroller); });
+    _scrollerChanges.apply();
   }
 
   void TextArea::processKeyboardEvent(const KeyboardEvent& event) {
@@ -699,6 +697,13 @@ namespace upanui {
 
   void TextArea::doDraw() {
     upan::mutex_guard g(_drawMutex);
+    if (_dirtyOnResize) {
+      scrollToY(_cursorPos.y(), _characterPos.y());
+      scrollToCoverEmptyArea();
+      _lines.renderLineTopDown(_scrollY, 0, height());
+      _scrollerChanges.apply();
+      _dirtyOnResize = false;
+    }
     _textBuffer.copy(drawBuffer());
   }
 
@@ -745,19 +750,24 @@ namespace upanui {
     return rows;
   }
 
+  bool TextArea::scrollToCoverEmptyArea() {
+    const int visibleScrollHeight = _scrollHeight - _scrollY;
+    if (visibleScrollHeight < height() && _scrollY != 0) {
+      const int rows = height() - visibleScrollHeight;
+      vscroll(rows, height());
+      return true;
+    }
+    return false;
+  }
+
   void TextArea::changeScrollHeight(int delta) {
     auto oldScrollHeight = _scrollHeight;
 
     const int newHeight = _scrollHeight + delta;
     _scrollHeight = newHeight < 0 ? 0 : newHeight;
-    bool adjustScrollY = false;
+
     if (_scrollHeight != oldScrollHeight) {
-      const int visibleScrollHeight = _scrollHeight - _scrollY;
-      if (visibleScrollHeight < height() && _scrollY != 0) {
-        const int rows = height() - visibleScrollHeight;
-        vscroll(rows, height());
-        adjustScrollY = true;
-      }
+      const bool adjustScrollY = scrollToCoverEmptyArea();
       _scrollerChanges.capture(true, adjustScrollY, _scrollY);
     }
   }
@@ -809,7 +819,7 @@ namespace upanui {
     const auto &e = event.getData();
     if (e.anyButtonPressed() || e.anyButtonHeld()) {
       moveCursor(e.isShiftPressed(), e.anyButtonHeld(), event.viewX() - drawX(), event.viewY() - drawY());
-      getVerticalScroller().ifPresent([this](VerticalScroller& verticalScroller) { _scrollerChanges.apply(verticalScroller); });
+      _scrollerChanges.apply();
     }
   }
 
@@ -881,8 +891,20 @@ namespace upanui {
   }
 
   void TextArea::onResize() {
-    if (_textBuffer.init(width(), height(), backgroundColorWithAlpha())) {
+    const bool hasWidthChanged = _textBuffer.width() != width();
+    const bool hasHeightChanged = _textBuffer.height() != height();
+    const bool hasWidthIncreased = width() > _textBuffer.width();
+    const bool hasWidthDecreased = width() < _textBuffer.width();
 
+    if (hasWidthChanged || hasHeightChanged) {
+      _textBuffer.init(width(), height(), backgroundColorWithAlpha());
+      _maxLineCharWidth = width() - leftMargin() * 2;
+      if (hasWidthIncreased) {
+        _lines.realignOnWidthIncrease();
+      } else if (hasWidthDecreased) {
+        _lines.realignOnWidthDecrease();
+      }
+      _dirtyOnResize = true;
     }
   }
 
