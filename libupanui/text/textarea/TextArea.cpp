@@ -698,8 +698,6 @@ namespace upanui {
   void TextArea::doDraw() {
     upan::mutex_guard g(_drawMutex);
     if (_dirtyOnResize) {
-      scrollToY(_cursorPos.y(), _characterPos.y());
-      scrollToCoverEmptyArea();
       _lines.renderLineTopDown(_scrollY, 0, height());
       _scrollerChanges.apply();
       _dirtyOnResize = false;
@@ -890,6 +888,38 @@ namespace upanui {
     return ch == Keyboard_ENTER || ch == Keyboard_CTRL_J;
   }
 
+  void TextArea::recalculateScrollYOnResize(int scrollYCharCount) {
+    _scrollY = 0;
+    for(int i = 0; i < _lines.size(); ++i) {
+      const int lineSize = _lines.get(i).size();
+      if (scrollYCharCount > lineSize) {
+        scrollYCharCount -= lineSize;
+        _scrollY += _lines.get(i).lineHeight();
+      } else {
+        break;
+      }
+    }
+
+    const int visibleScrollHeight = _scrollHeight - _scrollY;
+    if (visibleScrollHeight < height() && _scrollY != 0) {
+      updateScrollY(visibleScrollHeight - height());
+    }
+  }
+
+  void TextArea::recalculateCursorOnResize(int cursorCharCount) {
+    for(int i = 0; i < _lines.size(); ++i) {
+      const int lineSize = _lines.get(i).size();
+      if (cursorCharCount > lineSize) {
+        cursorCharCount -= lineSize;
+      } else {
+        _characterPos.set(cursorCharCount, i);
+        _cursorPos.set(_lines.getLineBaseX(_characterPos.x(), _characterPos.y(), _leftMargin),
+                       _lines.getLineBaseY(_characterPos.y(), _scrollY));
+        break;
+      }
+    }
+  }
+
   void TextArea::onResize() {
     const bool hasWidthChanged = _textBuffer.width() != width();
     const bool hasHeightChanged = _textBuffer.height() != height();
@@ -899,11 +929,23 @@ namespace upanui {
     if (hasWidthChanged || hasHeightChanged) {
       _textBuffer.init(width(), height(), backgroundColorWithAlpha());
       _maxLineCharWidth = width() - leftMargin() * 2;
+
+      int cursorCharCount = _lines.calculateCharCount(_characterPos.x(), _characterPos.y());
+      int scrollYCharCount = _lines.calculateCharCount(0, _lines.getLineInfo(_scrollY, 0)._lineIndex + 1);
+
       if (hasWidthIncreased) {
         _lines.realignOnWidthIncrease();
       } else if (hasWidthDecreased) {
         _lines.realignOnWidthDecrease();
       }
+
+      _scrollHeight = _lines.calculateHeight();
+
+      recalculateScrollYOnResize(scrollYCharCount);
+
+      recalculateCursorOnResize(cursorCharCount);
+
+      _scrollerChanges.capture(true, true, _scrollY);
       _dirtyOnResize = true;
     }
   }

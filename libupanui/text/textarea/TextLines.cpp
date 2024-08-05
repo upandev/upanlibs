@@ -287,4 +287,25 @@ namespace upanui {
       lineBaseY += line->lineHeight();
     }
   }
+
+  int TextLines::calculateCharCount(int x, int y) {
+    int charCount = 0;
+    for(int i = 0; i < _lines.size(); ++i) {
+      const int lineSize = _lines[i]->size();
+      if (i == y) {
+        charCount += (x > lineSize ? lineSize : x);
+        break;
+      }
+      charCount += _lines[i]->size();
+    }
+    return charCount;
+  }
+
+  int TextLines::calculateHeight() {
+    int height = 0;
+    for(const auto line : _lines) {
+      height += line->lineHeight();
+    }
+    return height;
+  }
 }

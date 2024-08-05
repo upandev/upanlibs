@@ -67,6 +67,8 @@ namespace upanui {
     void renderLineTopDown(int baseY, int rows, int height);
     void renderLineBottomUp(int baseY, int rows);
     void renderLineRange(const UIPosition& p1, const UIPosition& p2, int baseY);
+    int calculateCharCount(int x, int y);
+    int calculateHeight();
 
   private:
     upan::vector<TextLine*> _lines;

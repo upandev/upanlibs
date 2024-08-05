@@ -185,6 +185,9 @@ namespace upanui {
 
     TextBuffer& textBuffer() { return _textBuffer; }
     usfn::Contexts& fontContexts() { return _fontContexts; }
+
+    void recalculateScrollYOnResize(int scrollYCharCount);
+    void recalculateCursorOnResize(int cursorCharCount);
     void onResize() override;
 
   private:
