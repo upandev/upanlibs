@@ -166,14 +166,14 @@ namespace upanui {
 
   Terminal& UIObjectFactory::createTerminal(UIObject& parent, int x, int y, int width, int height,
                                             const upan::string& prompt,
-                                            TerminalCommandExecutor& terminalCommandExecutor,
+                                            Terminal::CommandExecutor& commandExecutor,
                                             HorizontalPlacementType horizontalPlacementType,
                                             VerticalPlacementType verticalPlacementType) {
     int actualHeight = height;
     if (typeid(parent) == typeid(VerticalScroller)) {
       actualHeight = parent.height();
     }
-    auto& terminal = *new Terminal(x, y, width, actualHeight, TextArea::MIN_LEFT_MARGIN, prompt, terminalCommandExecutor,
+    auto& terminal = *new Terminal(x, y, width, actualHeight, TextArea::MIN_LEFT_MARGIN, prompt, commandExecutor,
                                    horizontalPlacementType, verticalPlacementType);
     parent.add(terminal);
     terminal.initialize();

@@ -34,10 +34,20 @@ namespace upanui {
     void insertCommandOutput(const upan::string& str);
     void insertCommandOutput(const upan::vector<Character>& characters);
 
+    class CommandExecutor {
+    public:
+      CommandExecutor() {}
+      CommandExecutor(const CommandExecutor&) = delete;
+      CommandExecutor& operator=(const CommandExecutor&) = delete;
+
+      virtual void execute(const upan::string& cmdLine) = 0;
+      virtual void executeInBackground(const upan::string& cmdLine) = 0;
+    };
+
   private:
     Terminal(int x, int y, int width, int height, int leftMargin,
              const upan::string& prompt,
-             TerminalCommandExecutor& terminalCommandExecutor,
+             CommandExecutor& commandExecutor,
              HorizontalPlacementType horizontalPlacementType,
              VerticalPlacementType verticalPlacementType);
     ~Terminal() {}
@@ -62,7 +72,7 @@ namespace upanui {
     upan::string _prompt;
     UIPosition _mouseSelectionCharacterPos;
     UIPosition _mouseSelectionCursorPos;
-    TerminalCommandExecutor& _terminalCommandExecutor;
+    CommandExecutor& _commandExecutor;
     friend class UIObjectFactory;
   };
 }

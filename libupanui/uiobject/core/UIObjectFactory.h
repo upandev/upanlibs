@@ -26,6 +26,7 @@
 #include <usfntypes.h>
 #include <ImageResource.h>
 #include <UIEnums.h>
+#include <Terminal.h>
 
 namespace upanui {
   class UIObject;
@@ -41,9 +42,6 @@ namespace upanui {
 
   class VerticalScroller;
   class TextArea;
-
-  class Terminal;
-  class TerminalCommandExecutor;
 
   class UIObjectFactory {
   public:
@@ -97,7 +95,7 @@ namespace upanui {
                                     HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
     static Terminal& createTerminal(UIObject& parent, int x, int y, int width, int height,
                                     const upan::string& prompt,
-                                    TerminalCommandExecutor& terminalCommandExecutor,
+                                    Terminal::CommandExecutor& commandExecutor,
                                     HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
   };
 }

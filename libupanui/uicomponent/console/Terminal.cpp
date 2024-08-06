@@ -21,16 +21,15 @@
  */
 
 #include <Terminal.h>
-#include <TerminalCommandExecutor.h>
 #include <kb.h>
 
 namespace upanui {
   Terminal::Terminal(int x, int y, int width, int height,
                      int leftMargin, const upan::string& prompt,
-                     TerminalCommandExecutor& terminalCommandExecutor,
+                     CommandExecutor& commandExecutor,
                      HorizontalPlacementType horizontalPlacementType,
                      VerticalPlacementType verticalPlacementType) : TextArea(x, y, width, height, leftMargin, horizontalPlacementType, verticalPlacementType),
-                     _terminalCommandExecutor(terminalCommandExecutor) {
+                     _commandExecutor(commandExecutor) {
     setPrompt(prompt);
   }
 
@@ -65,7 +64,7 @@ namespace upanui {
     const upan::string& cmdLine = getCommandLine();
     moveend();
     TextArea::enter();
-    _terminalCommandExecutor.execute(cmdLine);
+    _commandExecutor.execute(cmdLine);
     TextArea::enter();
     insertCommand(_prompt);
   }
