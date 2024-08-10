@@ -113,7 +113,7 @@ namespace upanui {
     const int ey = upan::min(_vHeight, sy + copyHeight);
     for(auto y = sy; y < ey; ++y) {
       auto yDestOffset = y * _width;
-      auto ySrcOffset = y * srcWidth;
+      auto ySrcOffset = (y - sy) * srcWidth;
       if (directSet && sx < ex) {
         memcpy(&_buffer[sx + yDestOffset], &src[ySrcOffset], (ex - sx) * bytesPerPixel());
       } else {
