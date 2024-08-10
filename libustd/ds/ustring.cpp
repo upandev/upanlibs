@@ -88,6 +88,16 @@ string string::substr(int start) const {
   return substr(start, _len - start);
 }
 
+bool string::split(char c, string& p1, string& p2) const {
+  int pos = find(c);
+  if (pos < 0) {
+    return false;
+  }
+  p1 = substr(0, pos);
+  p2 = substr(pos+1);
+  return true;
+}
+
 void string::tokenize(const upan::string& delim, bool filterEmpty, list<string>& tokens) const {
   upan::string nextToken = *this;
   while(true) {

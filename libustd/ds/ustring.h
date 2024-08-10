@@ -152,6 +152,7 @@ public:
   int find(const upan::string& str) const;
   string substr(int start, int len) const;
   string substr(int start) const;
+  bool split(char c, string& p1, string& p2) const;
   void tokenize(const upan::string& delim, bool filterEmpty, list<string>& tokens) const;
 
 private:
