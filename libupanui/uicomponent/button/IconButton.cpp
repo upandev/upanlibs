@@ -22,7 +22,6 @@
 
 #include <IconButton.h>
 #include <UIObjectFactory.h>
-#include <Line.h>
 
 namespace upanui {
   IconButton::IconButton(const ImageResource& imageResource, const ImageComposeType composeType,

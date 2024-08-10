@@ -26,7 +26,7 @@
 #include <ImageCanvas.h>
 #include <Line.h>
 #include <IconButton.h>
-#include <Label.h>
+#include <IconLabel.h>
 #include <VerticalScroller.h>
 #include <Image.h>
 #include <TextArea.h>
@@ -128,14 +128,27 @@ namespace upanui {
     return createIconButton(parent, imageResource, ImageComposeType::FIT_IN, x, y, width, height, horizontalPlacementType, verticalPlacementType);
   }
 
+  IconLabel& UIObjectFactory::createIconLabel(UIObject& parent, const Image& image, const upan::string& label,
+                                                    int x, int y, int width, int height,
+                                                    HorizontalPlacementType horizontalPlacementType,
+                                                    VerticalPlacementType verticalPlacementType) {
+    auto& iconLabel = *new IconLabel(image, label, x, y, width, height, horizontalPlacementType, verticalPlacementType);
+    parent.add(iconLabel);
+    iconLabel.init();
+    return iconLabel;
+  }
+
   Label& UIObjectFactory::createLabel(UIObject& parent, int x, int y,
                                       int width, int height,
                                       const upan::string& str, uint32_t fgColor,
                                       usfn::PreloadedFonts fontType,
                                       int fontFamily, int fontStyle, int fontSize,
+                                      Label::HorizontalTextAlignment hTextAlignment, Label::VerticalTextAlignment vTextAlignment,
                                       HorizontalPlacementType horizontalPlacementType,
                                       VerticalPlacementType verticalPlacementType) {
-    auto& label = *new Label(x, y, width, height, str, fgColor, fontType, fontFamily, fontStyle, fontSize, horizontalPlacementType, verticalPlacementType);
+    auto& label = *new Label(x, y, width, height, str, fgColor, fontType, fontFamily, fontStyle, fontSize,
+                             hTextAlignment, vTextAlignment,
+                             horizontalPlacementType, verticalPlacementType);
     parent.add(label);
     return label;
   }

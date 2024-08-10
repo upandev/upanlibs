@@ -29,6 +29,9 @@
 namespace upanui {
   class Label : public RectangleCanvas {
   public:
+    enum HorizontalTextAlignment { LEFT, HCENTER, RIGHT };
+    enum VerticalTextAlignment { TOP, VCENTER, BOTTOM };
+
     void setText(const upan::string& str);
     void setFGColor(uint32_t fgColor);
     void setFont(usfn::PreloadedFonts fontType, int fontFamily);
@@ -44,14 +47,10 @@ namespace upanui {
 
   protected:
     virtual ~Label() {}
-    Label(int x, int y,
-          int width, int height,
-          const upan::string& str,
-          uint32_t fgColor,
-          usfn::PreloadedFonts fontType,
-          int fontFamily,
-          int fontStyle,
-          int fontSize,
+    Label(int x, int y, int width, int height,
+          const upan::string& str, uint32_t fgColor, usfn::PreloadedFonts fontType,
+          int fontFamily, int fontStyle, int fontSize,
+          HorizontalTextAlignment hTextAlignment, VerticalTextAlignment vTextAlignment,
           HorizontalPlacementType horizontalPlacementType,
           VerticalPlacementType verticalPlacementType);
     void doDraw() override;
@@ -59,6 +58,7 @@ namespace upanui {
   private:
     void markForUpdateText();
     void updateText();
+    void alignText();
 
     usfn::Context* _c;
     upan::string _str;
@@ -69,6 +69,10 @@ namespace upanui {
     usfn::FrameBuffer _textBuffer;
     upan::atomic::integral<bool> _updateText;
     upan::mutex _updateMutex;
+    HorizontalTextAlignment _hTextAlignment;
+    VerticalTextAlignment _vTextAlignment;
+    int _textX;
+    int _textY;
     friend class UIObjectFactory;
   };
 }

@@ -27,6 +27,7 @@
 #include <ImageResource.h>
 #include <UIEnums.h>
 #include <Terminal.h>
+#include <Label.h>
 
 namespace upanui {
   class UIObject;
@@ -35,10 +36,10 @@ namespace upanui {
   class ImageCanvas;
   class Image;
   class Line;
-  class Label;
 
   class Button;
   class IconButton;
+  class IconLabel;
 
   class VerticalScroller;
   class TextArea;
@@ -78,12 +79,16 @@ namespace upanui {
     static IconButton& createIconButton(UIObject& parent, const ImageResource& imageResource,
                                         int x, int y, int width, int height,
                                         HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
-
+    static IconLabel& createIconLabel(UIObject& parent, const Image& image, const upan::string& label,
+                                      int x, int y, int width, int height,
+                                      HorizontalPlacementType horizontalPlacementType,
+                                      VerticalPlacementType verticalPlacementType);
     static Label& createLabel(UIObject& parent, int x, int y,
                               int width, int height,
                               const upan::string& str, uint32_t fgColor,
                               usfn::PreloadedFonts fontType,
                               int fontFamily, int fontStyle, int fontSize,
+                              Label::HorizontalTextAlignment hTextAlignment, Label::VerticalTextAlignment vTextAlignment,
                               HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
 
     static VerticalScroller& createVerticalScroller(UIObject& parent, int x, int y,
