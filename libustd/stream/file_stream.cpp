@@ -156,8 +156,8 @@ namespace upan {
   upan::option<upan::string> file_stream::line_buffer::read_line() {
     for (int n = 0; n < _len; ++n) {
       if (_buf[n] == '\n') {
-        ++n;
         upan::string line(_buf, n);
+        ++n;
         _len -= n;
         memcpy(_buf, _buf + n, _len);
         return upan::option<upan::string>(line);
