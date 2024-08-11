@@ -27,12 +27,15 @@ namespace upanui {
   public:
     enum State { NORMAL, PRESSED, HOLD, RELEASED };
 
-    MouseData(int x, int y, int deltaX, int deltaY, State leftButtonState, State rightButtonState, State middleButtonState, bool shiftPressed, bool ctrlPressed)
+    MouseData(int x, int y, int deltaX, int deltaY,
+              State leftButtonState, State rightButtonState, State middleButtonState,
+              bool shiftPressed, bool ctrlPressed, bool doubleClick)
       : _x(x), _y(y), _deltaX(deltaX), _deltaY(deltaY),
-        _leftButtonState(leftButtonState), _rightButtonState(rightButtonState), _middleButtonState(middleButtonState), _shiftPressed(shiftPressed), _ctrlPressed(ctrlPressed) {
+        _leftButtonState(leftButtonState), _rightButtonState(rightButtonState), _middleButtonState(middleButtonState), _shiftPressed(shiftPressed), _ctrlPressed(ctrlPressed),
+        _doubleClick(doubleClick) {
     }
 
-    MouseData() : MouseData(0, 0, 0, 0, NORMAL, NORMAL, NORMAL, false, false) {
+    MouseData() : MouseData(0, 0, 0, 0, NORMAL, NORMAL, NORMAL, false, false, false) {
     }
 
     int x() const {
@@ -75,6 +78,10 @@ namespace upanui {
       return leftButtonState() == NORMAL || rightButtonState() == NORMAL || middleButtonState() == NORMAL;
     }
 
+    bool isDoubleClick() const {
+      return _doubleClick;
+    }
+
     bool anyButtonReleased() const {
       return leftButtonState() == RELEASED || rightButtonState() == RELEASED || middleButtonState() == RELEASED;
     }
@@ -94,11 +101,11 @@ namespace upanui {
       && _middleButtonState == r._middleButtonState;
     }
 
-    MouseData transition(int deltaX, int deltaY, bool leftPressed, bool rightPressed, bool middlePressed, bool shiftPressed, bool ctrlPressed) const {
+    MouseData transition(int deltaX, int deltaY, bool leftPressed, bool rightPressed, bool middlePressed, bool shiftPressed, bool ctrlPressed, bool doubleClick) const {
       return {_x + deltaX, _y + deltaY, deltaX, deltaY,
         transitionState(leftButtonState(), leftPressed),
         transitionState(rightButtonState(), rightPressed),
-        transitionState(middleButtonState(), middlePressed), shiftPressed, ctrlPressed};
+        transitionState(middleButtonState(), middlePressed), shiftPressed, ctrlPressed, doubleClick};
     }
 
   private:
@@ -123,5 +130,6 @@ namespace upanui {
     uint8_t _middleButtonState:2;
     uint8_t _shiftPressed:1;
     uint8_t _ctrlPressed:1;
+    uint8_t _doubleClick:1;
   } PACKED;
 }
