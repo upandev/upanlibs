@@ -146,6 +146,10 @@ namespace upanui {
       return { true, -1, -1, -1, -1 };
     }
 
+    virtual bool intersectWithAlpha(uint8_t alpha) const {
+      return alpha != 0;
+    }
+
     bool activateResizer(const IntersectInfo& intersectInfo);
 
     class ChangeNotificationLock {

@@ -48,12 +48,12 @@ namespace upanui {
       const auto brAplha = borderColorAlpha();
 
       if (x < ix1 || x > ix2 || y < iy1 || y > iy2) {
-        return { brAplha != 0, x - x1, x2 - x, y - y1, y2 - y };
+        return {intersectWithAlpha(brAplha), x - x1, x2 - x, y - y1, y2 - y };
       } else {
-        return { bgAlpha != 0, x - ix1, ix2 - x, y - iy1, iy2 - y };
+        return { intersectWithAlpha(bgAlpha), x - ix1, ix2 - x, y - iy1, iy2 - y };
       }
     } else {
-      return { bgAlpha != 0, x - x1, x2 - x, y - y1, y2 - y };
+      return { intersectWithAlpha(bgAlpha), x - x1, x2 - x, y - y1, y2 - y };
     }
   }
 

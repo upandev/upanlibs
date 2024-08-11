@@ -63,7 +63,7 @@ namespace upanui {
     const int y1 = drawY();
     const int y2 = drawY() + height();
 
-    return {bgAlpha != 0, x - x1, x2 - x, y - y1, y2 - y };
+    return { intersectWithAlpha(bgAlpha), x - x1, x2 - x, y - y1, y2 - y };
   }
 
   void UIRoot::notifyChange(const ChangeState changeState) {

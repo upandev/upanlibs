@@ -31,8 +31,7 @@ namespace upanui {
                        HorizontalPlacementType horizontalPlacementType,
                        VerticalPlacementType verticalPlacementType)
     : RectangleCanvas(x, y, width, height, horizontalPlacementType, verticalPlacementType),
-      _image(image), _label(label) {
-    UIObjectImpl::captureMouseEvents(true);
+      _image(image), _label(label), _uiLabel(nullptr), _selected(false) {
   }
 
   void IconLabel::init() {
@@ -67,7 +66,7 @@ namespace upanui {
                                          HorizontalPlacementType::ABSOLUTE, VerticalPlacementType::ABSOLUTE);
 
       const int fontSize = 16;
-      auto& uiLabel = UIObjectFactory::createLabel(*this,
+      _uiLabel = &UIObjectFactory::createLabel(*this,
                                    0, imageHeight,
                                    awidth, labelHeight,
                                    _label, 0xFFFFFF,
@@ -75,9 +74,18 @@ namespace upanui {
                                    upanui::usfn::FAMILY_MONOSPACE, upanui::usfn::STYLE_REGULAR, fontSize,
                                    Label::HorizontalTextAlignment::HCENTER, Label::VerticalTextAlignment::VCENTER,
                                    upanui::HorizontalPlacementType::ABSOLUTE, upanui::VerticalPlacementType::ABSOLUTE);
-      uiLabel.backgroundColorAlpha(0);
-      uiLabel.backgroundColor(0x0000FF);
+      _uiLabel->backgroundColorAlpha(0);
+      _uiLabel->backgroundColor(0x0000FF);
     }
     notifyChange(ChangeState::Content);
+  }
+
+  void IconLabel::select(bool selected) {
+    if (selected != _selected) {
+      borderColorAlpha(selected ? 0xFF : 0);
+      _uiLabel->backgroundColorAlpha(selected ? 0xFF : 0);
+      _selected = selected;
+      notifyChange(ChangeState::Content);
+    }
   }
 }

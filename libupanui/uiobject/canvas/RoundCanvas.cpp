@@ -45,9 +45,9 @@ namespace upanui {
     const auto bgAlpha = backgroundColorAlpha();
     const auto brAlpha = borderColorAlpha();
 
-    if (bgAlpha == 0 && brAlpha == 0) {
-      return {};
-    }
+//    if (bgAlpha == 0 && brAlpha == 0) {
+//      return {};
+//    }
 
     const auto outerRadius = (width() / 2) - 1;
     const auto innerRadius = outerRadius - borderThickness();
@@ -65,10 +65,10 @@ namespace upanui {
 
     if (d > innerRadius) {
       //TODO: IntersectInfo for Rounded Canvas
-      return { brAlpha != 0, -1, -1, -1, -1 };
+      return { intersectWithAlpha(brAlpha), -1, -1, -1, -1 };
     }
 
-    return { bgAlpha != 0, -1, -1, -1, -1 };
+    return { intersectWithAlpha(bgAlpha), -1, -1, -1, -1 };
   }
 
   void RoundCanvas::doDraw() {

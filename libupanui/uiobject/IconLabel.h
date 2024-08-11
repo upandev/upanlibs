@@ -26,6 +26,8 @@
 #include <RectangleCanvas.h>
 
 namespace upanui {
+  class Label;
+
   class IconLabel : public RectangleCanvas {
   protected:
     virtual ~IconLabel() {}
@@ -35,9 +37,21 @@ namespace upanui {
               VerticalPlacementType verticalPlacementType);
     void init();
 
+    bool intersectWithAlpha(uint8_t alpha) const override {
+      return true;
+    }
+
+  public:
+    void select(bool);
+    bool isSelected() {
+      return _selected;
+    }
+
   private:
     const Image& _image;
     const upan::string _label;
+    Label* _uiLabel;
+    bool _selected;
     friend class UIObjectFactory;
   };
 }
