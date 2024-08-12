@@ -21,7 +21,7 @@
  */
 
 #include <Terminal.h>
-#include <kb.h>
+
 
 namespace upanui {
   Terminal::Terminal(int x, int y, int width, int height,

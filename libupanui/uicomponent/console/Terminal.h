@@ -41,7 +41,6 @@ namespace upanui {
       CommandExecutor& operator=(const CommandExecutor&) = delete;
 
       virtual void execute(const upan::string& cmdLine) = 0;
-      virtual void executeInBackground(const upan::string& cmdLine) = 0;
     };
 
   private:

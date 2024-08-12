@@ -24,8 +24,8 @@
 #include <BmpEncoder.h>
 
 #define DECLARE_IMAGE(name, type) \
-extern unsigned _binary_icons_##type##_##name##_##type##_start; \
-extern unsigned _binary_icons_##type##_##name##_##type##_size;
+extern uint64_t _binary_icons_##type##_##name##_##type##_start; \
+extern uint64_t _binary_icons_##type##_##name##_##type##_size;
 
 #define IMAGE_PARAMS(name, type) \
 &_binary_icons_##type##_##name##_##type##_start, (size_t)&_binary_icons_##type##_##name##_##type##_size
