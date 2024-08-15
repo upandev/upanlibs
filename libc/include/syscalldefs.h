@@ -67,6 +67,7 @@ typedef enum
 		SYS_CALL_RMDIR,
 		SYS_CALL_GET_DIR_LIST,
 		SYS_CALL_FILE_OPEN,
+    SYS_CALL_FILE_OPEN_STREAM,
 		SYS_CALL_FILE_CREATE,
 		SYS_CALL_FILE_CLOSE,
 		SYS_CALL_FILE_READ,
@@ -149,7 +150,8 @@ int SysFS_CreateDirectory(const char* szDirPath, unsigned short usAttribute);
 int SysFS_DeleteDirectory(const char* szDirPath);
 int SysFS_GetDirContent(const char* szDirPath, struct stat_ex** dirList, int* size);
 int SysFS_CreateFile(const char* szDirPath, unsigned short usAttribute);
-int SysFS_FileOpen(const char* szFileName, byte bMode);
+int SysFS_FileOpen(const char* szFileName, uint32_t mode);
+int SysFS_FileOpenStream(uint32_t mode);
 int SysFS_FileClose(int fd);
 int SysFS_FileRead(int fd, void* buf, int len);
 int SysFS_FileWrite(int fd, const void* buf, int len);

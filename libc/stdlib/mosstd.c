@@ -130,8 +130,12 @@ int create(const char* file_path, unsigned short file_attr) {
   return SysFS_CreateFile(file_path, file_attr) ;
 }
 
-int open(const char* file_name, byte mode) {
+int open(const char* file_name, uint32_t mode) {
   return SysFS_FileOpen(file_name, mode) ;
+}
+
+int openstream(uint32_t mode) {
+  return SysFS_FileOpenStream(mode) ;
 }
 
 int close(int fd) {

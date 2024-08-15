@@ -46,8 +46,12 @@ int SysFS_CreateFile(const char* szDirPath, unsigned short usAttribute) {
   return _upanix_syscall(SYS_CALL_FILE_CREATE, (uint64_t)szDirPath, (uint64_t)usAttribute, 3, 4, 5);
 }
 
-int SysFS_FileOpen(const char* szFileName, byte bMode) {
-  return _upanix_syscall(SYS_CALL_FILE_OPEN, (uint64_t)szFileName, (uint64_t)bMode, 3, 4, 5);
+int SysFS_FileOpen(const char* szFileName, uint32_t mode) {
+  return _upanix_syscall(SYS_CALL_FILE_OPEN, (uint64_t)szFileName, (uint64_t)mode, 3, 4, 5);
+}
+
+int SysFS_FileOpenStream(uint32_t mode) {
+  return _upanix_syscall(SYS_CALL_FILE_OPEN_STREAM, (uint64_t)mode, 2, 3, 4, 5);
 }
 
 int SysFS_FileClose(int fd) {

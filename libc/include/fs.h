@@ -103,7 +103,8 @@ struct stat_ex {
 };
 
 int create(const char* file_path, unsigned short file_attr) ;
-int open(const char* file_name, byte mode) ;
+int open(const char* file_name, uint32_t mode) ;
+int openstream(uint32_t mode);
 int close(int fd) ;
 int unlink(const char* filePath);
 
