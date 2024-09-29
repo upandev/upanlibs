@@ -32,6 +32,10 @@ namespace upanui {
   }
 
   void UILeafElement::draw() {
+    if (!isVisible()) {
+      return;
+    }
+
     if (backgroundColorAlpha() != GCoreFunctions::MAX_ALPHA) {
       parent().draw();
     } else {
@@ -44,6 +48,10 @@ namespace upanui {
   }
 
   void UILeafElement::drawToTop() {
+    if (!isVisible()) {
+      return;
+    }
+
     if (drawBuffer().isLocal()) {
       parent().layout().draw(*this);
     }
@@ -61,6 +69,10 @@ namespace upanui {
     //5. Draw inside the buffer
     //6. if using parent buffer then end the draw
     //7. if using your own buffer then ask parent to copy the child buffer into it's buffer
+
+    if (!isVisible()) {
+      return;
+    }
 
     setupDrawBuffer();
 

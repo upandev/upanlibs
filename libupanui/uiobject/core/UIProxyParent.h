@@ -131,6 +131,9 @@ namespace upanui {
     void setChangeState(const ChangeState) override {}
     bool isChangeState(const ChangeState, const bool only) const override { return false; }
 
+    bool isVisible() const override { return false; }
+    void setVisible(bool) override {};
+
   protected:
     void onKeyboardEvent(const KeyboardEvent& event) override {
       throw upan::exception(XLOC, "unsupported onKeyboardEvent for UIProxyParent");

@@ -121,6 +121,9 @@ namespace upanui {
     HorizontalPlacementType getHorizontalPlacementType() const override { return _horizontalPlacementType; }
     VerticalPlacementType getVerticalPlacementType() const override { return _verticalPlacementType; }
 
+    bool isVisible() const override { return _visible; }
+    void setVisible(bool) override;
+
   protected:
     uint32_t backgroundColorWithAlpha() const {
       return (_bgColor & GCoreFunctions::NO_ALPHA_MASK) | (_bgAlpha << 24);
@@ -210,6 +213,7 @@ namespace upanui {
     bool _vResizable;
     HorizontalPlacementType _horizontalPlacementType;
     VerticalPlacementType _verticalPlacementType;
+    bool _visible;
 
     GraphicsContext& _gc;
   };

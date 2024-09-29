@@ -37,7 +37,7 @@ namespace upanui {
       _mouseEventHandler(upan::option<MouseEventHandler&>::empty()), _captureMouseEvents(false),
       _verticalScroller(upan::option<VerticalScroller&>::empty()), _changeState((int)ChangeState::Content),
       _hResizable(false), _vResizable(false), _horizontalPlacementType(horizontalPlacementType), _verticalPlacementType(verticalPlacementType),
-      _gc(GraphicsContext::Instance()) {
+      _visible(true), _gc(GraphicsContext::Instance()) {
 
     if (_width > gc().frame().frameBuffer().width()) {
       _width = gc().frame().frameBuffer().width();
@@ -280,6 +280,18 @@ namespace upanui {
     _gc.uiObjectManager().queueForRedraw(*this);
   }
 
+  void UIObjectImpl::setVisible(bool visible) {
+    if (visible != _visible) {
+      upan::mutex_guard g(_gc.uiObjectManager().drawLock());
+      _visible = visible;
+      if (_visible) {
+        notifyChange(ChangeState::Content);
+      } else {
+        notifyChange(ChangeState::Size);
+      }
+    }
+  }
+
   bool UIObjectImpl::hasAlphaLocal() {
     if (backgroundColorAlpha() != GCoreFunctions::MAX_ALPHA)
       return true;
@@ -305,6 +317,9 @@ namespace upanui {
   }
 
   bool UIObjectImpl::inside(const int x, const int y) const {
+    if (!isVisible()) {
+      return false;
+    }
     const int objX = drawX();
     const int objY = drawY();
     return x >= objX && x < (objX + _width) && y >= objY && y <= (objY + _height);

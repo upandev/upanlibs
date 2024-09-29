@@ -31,6 +31,10 @@ namespace upanui {
   }
 
   void Canvas::draw() {
+    if (!isVisible()) {
+      return;
+    }
+
     if (backgroundColorAlpha() != GCoreFunctions::MAX_ALPHA
     || (borderThickness() > 0 && borderColorAlpha() != GCoreFunctions::MAX_ALPHA)) {
       parent().draw();
@@ -44,6 +48,10 @@ namespace upanui {
   }
 
   void Canvas::drawToTop() {
+    if (!isVisible()) {
+      return;
+    }
+
     if (drawBuffer().isLocal()) {
       parent().layout().draw(*this);
     }
@@ -62,6 +70,10 @@ namespace upanui {
     //6. Draw all children
     //7. if using parent buffer then end the draw
     //8. if using your own buffer then ask parent to copy the child buffer into it's buffer
+
+    if (!isVisible()) {
+      return;
+    }
 
     const bool drawBufReset = setupDrawBuffer();
 

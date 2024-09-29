@@ -114,6 +114,9 @@ namespace upanui {
     virtual HorizontalPlacementType getHorizontalPlacementType() const = 0;
     virtual VerticalPlacementType getVerticalPlacementType() const = 0;
 
+    virtual bool isVisible() const = 0;
+    virtual void setVisible(bool) = 0;
+
   protected:
     virtual ~UIObject() {}
 
