@@ -22,12 +22,14 @@
 
 #include <UIRoot.h>
 #include <GraphicsContext.h>
-#include <GCoreFunctions.h>
+#include <UIObjectFactory.h>
+#include <Menu.h>
+#include <IconButton.h>
 
 namespace upanui {
   UIRoot::UIRoot(int x, int y, int width, int height)
           : UIObjectImpl(x, y, width, height, HorizontalPlacementType::STRETCHED, VerticalPlacementType::STRETCHED),
-            _layout(*this) {
+            _layout(*this), _menuInitialized(false), _menuBarHeight(0), _activeMenu(nullptr) {
     gc().frame().updateViewport(x, y, width, height);
     UIObjectImpl::drawBuffer().initLocal(gc().frame().frameBuffer());
   }
@@ -118,5 +120,79 @@ namespace upanui {
       dy = -resizeHeight(height() + dy, isPrimary);
     }
     return dy;
+  }
+
+  class AppDragMouseHandler : public upanui::MouseEventHandler {
+  public:
+    void onEvent(upanui::UIObject& uiObject, const upanui::MouseEvent& event) override {
+      const upanui::MouseData& data = event.getData();
+      if (data.leftButtonState() == upanui::MouseData::HOLD) {
+        uiObject.parent().xy(uiObject.parent().x() + data.deltaX(), uiObject.parent().y() + data.deltaY());
+      }
+    }
+  };
+
+  class CloseButtonMouseHandler : public upanui::MouseEventHandler {
+  public:
+    void onEvent(upanui::UIObject& uiObject, const upanui::MouseEvent& event) override {
+      const upanui::MouseData& data = event.getData();
+      if (data.leftButtonState() == upanui::MouseData::RELEASED) {
+        exit(0);
+      }
+    }
+  };
+
+  void UIRoot::initMenuBar() {
+    if (_menuInitialized) {
+      return;
+    }
+    _menuInitialized = true;
+
+    _menuBarHeight = 30;//Menu::MENU_LABEL_FONT_SIZE + Menu::MENU_LABEL_FONT_SIZE / 2;
+    const int appWidth = width();
+
+    auto& uiMenuBar = UIObjectFactory::createRectangleCanvas(*this, 0, 0, appWidth, _menuBarHeight, upanui::HorizontalPlacementType::STRETCHED, upanui::VerticalPlacementType::TOP_FIXED);
+    uiMenuBar.backgroundColor(0xA59E9D);
+
+    auto& fileMenu = upanui::UIObjectFactory::createMenu(*this, uiMenuBar, "File", 0, 0, _menuBarHeight);
+    auto& editMenu = upanui::UIObjectFactory::createMenu(*this, uiMenuBar, "Edit", fileMenu.width(), 0, _menuBarHeight);
+
+    auto& closeBt = upanui::UIObjectFactory::createIconButton(uiMenuBar, upanui::PngImageResource::CLOSE, appWidth - _menuBarHeight, 0, _menuBarHeight, _menuBarHeight, upanui::HorizontalPlacementType::RIGHT_FIXED, upanui::VerticalPlacementType::TOP_FIXED);
+
+    static AppDragMouseHandler appDragMouseHandler;
+    uiMenuBar.registerMouseEventHandler(appDragMouseHandler);
+
+    static CloseButtonMouseHandler closeButtonMouseHandler;
+    closeBt.registerMouseEventHandler(closeButtonMouseHandler);
+  }
+
+  void UIRoot::onMenuClick(upanui::Menu& menu) {
+    if (_activeMenu == &menu) {
+      _activeMenu->select(false);
+      _activeMenu = nullptr;
+    } else {
+      if (_activeMenu) {
+        _activeMenu->select(false);
+      }
+
+      _activeMenu = &menu;
+      _activeMenu->select(true);
+    }
+  }
+
+  void UIRoot::onMenuHover(upanui::Menu& menu) {
+    if (_activeMenu) {
+      if (_activeMenu != &menu) {
+        _activeMenu->select(false);
+        _activeMenu = &menu;
+        _activeMenu->select(true);
+      }
+    }
+  }
+
+  void UIRoot::drawActiveMenu() {
+    if (_activeMenu) {
+      _activeMenu->drawPanel();
+    }
   }
 }

@@ -26,7 +26,16 @@
 #include <RectangularLayout.h>
 
 namespace upanui {
+  class Menu;
+
   class UIRoot : public UIObjectImpl {
+  public:
+    void initMenuBar();
+    int menuBarHeight() const { return _menuBarHeight; }
+    void onMenuClick(Menu&);
+    void onMenuHover(Menu&);
+    void drawActiveMenu();
+
   private:
     UIRoot(int x, int y, int width, int height);
 
@@ -59,6 +68,9 @@ namespace upanui {
 
   private:
     RectangularLayout _layout;
+    bool _menuInitialized;
+    int _menuBarHeight;
+    Menu* _activeMenu;
 
     friend class GraphicsContext;
     friend class UIObjectManager;

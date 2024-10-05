@@ -137,6 +137,7 @@ namespace upanui {
       modifiedUIObjects[i]->draw();
     }
     if (count > 0) {
+      _rootCanvas.drawActiveMenu();
       if (_recalcHasAlpha) {
         GraphicsContext::Instance().frame().hasAlpha(_rootCanvas.hasAlpha());
         _recalcHasAlpha = false;

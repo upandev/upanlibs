@@ -31,6 +31,7 @@
 
 namespace upanui {
   class UIObject;
+  class UIRoot;
   class RectangleCanvas;
   class RoundCanvas;
   class ImageCanvas;
@@ -43,6 +44,8 @@ namespace upanui {
 
   class VerticalScroller;
   class TextArea;
+
+  class Menu;
 
   class UIObjectFactory {
   public:
@@ -102,5 +105,7 @@ namespace upanui {
                                     const upan::string& prompt,
                                     Terminal::CommandExecutor& commandExecutor,
                                     HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
+
+    static Menu& createMenu(UIRoot& uiRoot, UIObject& parent, const upan::string& title, int x, int y, int height);
   };
 }
