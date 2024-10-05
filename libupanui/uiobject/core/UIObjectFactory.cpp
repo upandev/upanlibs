@@ -32,6 +32,7 @@
 #include <TextArea.h>
 #include <typeinfo.h>
 #include <Terminal.h>
+#include <Menu.h>
 
 namespace upanui {
   RectangleCanvas& UIObjectFactory::createRectangleCanvas(UIObject& parent, int x, int y, int width, int height,
@@ -191,5 +192,12 @@ namespace upanui {
     parent.add(terminal);
     terminal.initialize();
     return terminal;
+  }
+
+  Menu& UIObjectFactory::createMenu(UIRoot& uiRoot, UIObject& parent, const upan::string& title, int x, int y, int height) {
+    auto& menu = *new Menu(uiRoot, title, x, y, height);
+    parent.add(menu);
+    menu.init();
+    return menu;
   }
 }
