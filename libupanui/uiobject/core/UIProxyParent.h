@@ -29,6 +29,12 @@ namespace upanui {
   private:
     UIProxyParent() {}
 
+    upan::string nameId() const override { return "UIProxyParent"; }
+    void nameId(const upan::string&) override {}
+
+    int zIndex() const override { return 0; }
+    void zIndex(int) override {}
+
     int x() const override { return 0; };
     int y() const override { return 0; }
 

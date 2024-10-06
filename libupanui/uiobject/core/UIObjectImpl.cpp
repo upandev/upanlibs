@@ -31,7 +31,7 @@ namespace upanui {
                              int32_t width, int32_t height,
                              HorizontalPlacementType horizontalPlacementType,
                              VerticalPlacementType verticalPlacementType)
-    : _x(x), _y(y), _width(width), _height(height),
+    : _zIndex(0), _x(x), _y(y), _width(width), _height(height),
       _bgColor(0), _bgAlpha(GCoreFunctions::MAX_ALPHA), _brColor(0xFFFFFF),
       _brAlpha(GCoreFunctions::MAX_ALPHA), _borderThickness(0), _lockChangeNotification(false),
       _mouseEventHandler(upan::option<MouseEventHandler&>::empty()), _captureMouseEvents(false),
@@ -359,7 +359,6 @@ namespace upanui {
     gc().setResizeMode(ResizeMode::NA);
 
     if (captureMouseEvents() && inside(x, y)) {
-
       const IntersectInfo intersectInfo = intersect(x, y);
       if (activateResizer(intersectInfo)) {
         return upan::option<UIObject &>(this);

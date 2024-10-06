@@ -46,11 +46,15 @@ namespace upanui {
   class TextArea;
 
   class Menu;
+  class MenuEntry;
 
   class UIObjectFactory {
   public:
     static RectangleCanvas& createRectangleCanvas(UIObject& parent, int x, int y, int width, int height,
                                                   HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
+    static RectangleCanvas& createRectangleCanvas(UIObject& parent, int zIndex, int x, int y, int width, int height,
+                                                  HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
+
     static RoundCanvas& createRoundCanvas(UIObject& parent, int x, int y, int width, int height,
                                           HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
 
@@ -107,5 +111,6 @@ namespace upanui {
                                     HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
 
     static Menu& createMenu(UIRoot& uiRoot, UIObject& parent, const upan::string& title, int x, int y, int height);
+    static MenuEntry& createMenuEntry(UIRoot& uiRoot, UIObject& parent, const upan::string& title, int x, int y, int width, int height);
   };
 }

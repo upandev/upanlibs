@@ -72,7 +72,9 @@ namespace upanui {
     if (i != _childParentMap.end()) {
       throw upan::exception(XLOC, "UIObject is already a child of another UIObject");
     }
-    _parentChildMap[&parent].push_back(&child);
+
+    const auto& comp = [](UIObject* nv, UIObject* ev) { return nv->zIndex() < ev->zIndex(); };
+    _parentChildMap[&parent].sorted_insert_comp(&child, comp);
     _childParentMap[&child] = &parent;
   }
 

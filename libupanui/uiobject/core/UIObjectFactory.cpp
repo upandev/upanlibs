@@ -33,12 +33,22 @@
 #include <typeinfo.h>
 #include <Terminal.h>
 #include <Menu.h>
+#include <MenuEntry.h>
 
 namespace upanui {
   RectangleCanvas& UIObjectFactory::createRectangleCanvas(UIObject& parent, int x, int y, int width, int height,
                                                           HorizontalPlacementType horizontalPlacementType,
                                                           VerticalPlacementType verticalPlacementType) {
     auto& canvas = *new RectangleCanvas(x, y, width, height, horizontalPlacementType, verticalPlacementType);
+    parent.add(canvas);
+    return canvas;
+  }
+
+  RectangleCanvas& UIObjectFactory::createRectangleCanvas(UIObject& parent, int zIndex, int x, int y, int width, int height,
+                                                          HorizontalPlacementType horizontalPlacementType,
+                                                          VerticalPlacementType verticalPlacementType) {
+    auto& canvas = *new RectangleCanvas(x, y, width, height, horizontalPlacementType, verticalPlacementType);
+    canvas.zIndex(zIndex);
     parent.add(canvas);
     return canvas;
   }
@@ -199,5 +209,12 @@ namespace upanui {
     parent.add(menu);
     menu.init();
     return menu;
+  }
+
+  MenuEntry& UIObjectFactory::createMenuEntry(UIRoot& uiRoot, UIObject& parent, const upan::string& title, int x, int y, int width, int height) {
+    auto& menuEntry = *new MenuEntry(uiRoot, title, x, y, width, height);
+    parent.add(menuEntry);
+    menuEntry.init();
+    return menuEntry;
   }
 }

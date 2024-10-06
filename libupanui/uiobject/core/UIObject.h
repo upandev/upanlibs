@@ -47,6 +47,12 @@ namespace upanui {
   public:
     const static int MIN_OBJECT_SIZE = 5;
 
+    virtual upan::string nameId() const = 0;
+    virtual void nameId(const upan::string&) = 0;
+
+    virtual int zIndex() const = 0;
+    virtual void zIndex(int) = 0;
+
     virtual int x() const = 0;
     virtual int y() const = 0;
     virtual int width() const = 0;

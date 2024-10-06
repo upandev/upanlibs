@@ -43,6 +43,12 @@ namespace upanui {
                  HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
 
   public:
+    upan::string nameId() const override { return _nameId; }
+    void nameId(const upan::string& id) override { _nameId = id; }
+
+    int zIndex() const override { return _zIndex; }
+    void zIndex(int z) override { _zIndex = z; }
+
     int x() const override { return _x; }
     int y() const override { return _y; }
 
@@ -190,6 +196,8 @@ namespace upanui {
     void resize(ResizeMode resizeMode, int dx, int dy, bool isPrimary) override;
 
   private:
+    upan::string _nameId;
+    int _zIndex;
     int _x;
     int _y;
     int _width;
