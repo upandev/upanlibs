@@ -60,6 +60,7 @@ class list
     iterator end() const;
     iterator insert(iterator pos, const T& v);
     iterator sorted_insert_asc(const T& v);
+    template <typename LAMBDA_COMP> iterator sorted_insert_comp(const T& v, LAMBDA_COMP&);
     iterator sorted_insert_desc(const T& v);
     reverse_iterator rbegin() const;
     reverse_iterator rend() const;
@@ -425,6 +426,17 @@ typename list<T>::iterator list<T>::sorted_insert_desc(const T& v)
   iterator i = begin();
   for(; i != end(); ++i)
     if(*i < v || !(v < *i))
+      break;
+  return insert(i, v);
+}
+
+template <typename T>
+template <typename LAMBDA_COMP>
+typename list<T>::iterator list<T>::sorted_insert_comp(const T& v, LAMBDA_COMP& comp)
+{
+  iterator i = begin();
+  for(; i != end(); ++i)
+    if(comp(v, *i))
       break;
   return insert(i, v);
 }
