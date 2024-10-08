@@ -211,8 +211,8 @@ namespace upanui {
     return menu;
   }
 
-  MenuEntry& UIObjectFactory::createMenuEntry(UIRoot& uiRoot, UIObject& parent, const upan::string& title, int x, int y, int width, int height) {
-    auto& menuEntry = *new MenuEntry(uiRoot, title, x, y, width, height);
+  MenuEntry& UIObjectFactory::createMenuEntry(UIRoot& uiRoot, UIObject& parent, int id, const upan::string& title, int x, int y, int width, int height) {
+    auto& menuEntry = *new MenuEntry(uiRoot, id, title, x, y, width, height);
     parent.add(menuEntry);
     menuEntry.init();
     return menuEntry;

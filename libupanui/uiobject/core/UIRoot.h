@@ -34,6 +34,8 @@ namespace upanui {
     int menuBarHeight() const { return _menuBarHeight; }
     void onMenuClick(Menu&);
     void onMenuHover(Menu&);
+    void onMenuEntryClick(int id);
+    void closeActiveMenu();
     void drawActiveMenu();
 
   private:
@@ -60,6 +62,7 @@ namespace upanui {
     int resizeRight(int dx, bool isPrimary) override;
     int resizeTop(int dy, bool isPrimary) override;
     int resizeBottom(int dy, bool isPrimary) override;
+    bool isVisible() const override;
 
   private:
     Layout& layout() override {

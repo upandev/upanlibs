@@ -122,6 +122,10 @@ namespace upanui {
     return dy;
   }
 
+  bool UIRoot::isVisible() const {
+    return getVisible();
+  }
+
   class AppDragMouseHandler : public upanui::MouseEventHandler {
   public:
     void onEvent(upanui::UIObject& uiObject, const upanui::MouseEvent& event) override {
@@ -168,13 +172,9 @@ namespace upanui {
 
   void UIRoot::onMenuClick(upanui::Menu& menu) {
     if (_activeMenu == &menu) {
-      _activeMenu->select(false);
-      _activeMenu = nullptr;
+      closeActiveMenu();
     } else {
-      if (_activeMenu) {
-        _activeMenu->select(false);
-      }
-
+      closeActiveMenu();
       _activeMenu = &menu;
       _activeMenu->select(true);
     }
@@ -183,10 +183,22 @@ namespace upanui {
   void UIRoot::onMenuHover(upanui::Menu& menu) {
     if (_activeMenu) {
       if (_activeMenu != &menu) {
-        _activeMenu->select(false);
+        closeActiveMenu();
         _activeMenu = &menu;
         _activeMenu->select(true);
       }
+    }
+  }
+
+  void UIRoot::onMenuEntryClick(int id) {
+    //call-back action for id
+    closeActiveMenu();
+  }
+
+  void UIRoot::closeActiveMenu() {
+    if (_activeMenu) {
+      _activeMenu->select(false);
+      _activeMenu = nullptr;
     }
   }
 

@@ -53,10 +53,11 @@ namespace upanui {
                                                        upanui::HorizontalPlacementType::ABSOLUTE, upanui::VerticalPlacementType::ABSOLUTE);
     _uiPanel->backgroundColor(0xD2D1C8);
     _uiPanel->captureMouseEvents(true);
+    _uiPanel->setVisible(false);
 
-    UIObjectFactory::createMenuEntry(_uiRoot, *_uiPanel, "New", 0, 0, _uiPanel->width(), 30);
-    UIObjectFactory::createMenuEntry(_uiRoot, *_uiPanel, "Open", 0, 30, _uiPanel->width(), 30);
-    UIObjectFactory::createMenuEntry(_uiRoot, *_uiPanel, "Exit", 0, 60, _uiPanel->width(), 30);
+    UIObjectFactory::createMenuEntry(_uiRoot, *_uiPanel, 1, "New", 0, 0, _uiPanel->width(), 30);
+    UIObjectFactory::createMenuEntry(_uiRoot, *_uiPanel, 2, "Open", 0, 30, _uiPanel->width(), 30);
+    UIObjectFactory::createMenuEntry(_uiRoot, *_uiPanel, 3, "Exit", 0, 60, _uiPanel->width(), 30);
   }
 
   void Menu::onKeyboardEvent(const KeyboardEvent& event) {

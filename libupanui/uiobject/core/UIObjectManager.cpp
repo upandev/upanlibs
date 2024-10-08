@@ -138,6 +138,7 @@ namespace upanui {
     for(int i = 0; i < count; ++i) {
       modifiedUIObjects[i]->draw();
     }
+
     if (count > 0) {
       _rootCanvas.drawActiveMenu();
       if (_recalcHasAlpha) {

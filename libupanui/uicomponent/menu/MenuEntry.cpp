@@ -27,9 +27,9 @@
 #include <UIRoot.h>
 
 namespace upanui {
-  MenuEntry::MenuEntry(UIRoot& uiRoot, const upan::string& title, int x, int y, int width, int height)
+  MenuEntry::MenuEntry(UIRoot& uiRoot, int id, const upan::string& title, int x, int y, int width, int height)
     : RectangleCanvas(x, y, width, height, HorizontalPlacementType::ABSOLUTE, VerticalPlacementType::ABSOLUTE),
-      _uiRoot(uiRoot), _title(title), _uiLabel(nullptr) {
+      _uiRoot(uiRoot), _id(id), _title(title), _uiLabel(nullptr) {
     UIObjectImpl::captureMouseEvents(true);
   }
 
@@ -48,6 +48,7 @@ namespace upanui {
 
   void MenuEntry::onMouseEvent(const MouseEvent& event) {
     if (event.getData().leftButtonState() == MouseData::State::PRESSED) {
+      _uiRoot.onMenuEntryClick(_id);
     }
     RectangleCanvas::onMouseEvent(event);
   }

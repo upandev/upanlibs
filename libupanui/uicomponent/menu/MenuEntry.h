@@ -31,7 +31,7 @@ namespace upanui {
   class MenuEntry : public RectangleCanvas {
   protected:
     virtual ~MenuEntry() {}
-    MenuEntry(UIRoot& uiRoot, const upan::string& title, int x, int y, int width, int height);
+    MenuEntry(UIRoot& uiRoot, int id, const upan::string& title, int x, int y, int width, int height);
     void init();
 
     void onMouseEvent(const MouseEvent& event) override;
@@ -40,6 +40,7 @@ namespace upanui {
 
   private:
     UIRoot& _uiRoot;
+    int _id;
     const upan::string _title;
     Label* _uiLabel;
 

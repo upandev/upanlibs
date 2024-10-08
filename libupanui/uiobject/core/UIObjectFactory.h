@@ -111,6 +111,6 @@ namespace upanui {
                                     HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
 
     static Menu& createMenu(UIRoot& uiRoot, UIObject& parent, const upan::string& title, int x, int y, int height);
-    static MenuEntry& createMenuEntry(UIRoot& uiRoot, UIObject& parent, const upan::string& title, int x, int y, int width, int height);
+    static MenuEntry& createMenuEntry(UIRoot& uiRoot, UIObject& parent, int id, const upan::string& title, int x, int y, int width, int height);
   };
 }

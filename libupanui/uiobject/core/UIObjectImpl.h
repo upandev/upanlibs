@@ -127,7 +127,8 @@ namespace upanui {
     HorizontalPlacementType getHorizontalPlacementType() const override { return _horizontalPlacementType; }
     VerticalPlacementType getVerticalPlacementType() const override { return _verticalPlacementType; }
 
-    bool isVisible() const override { return _visible; }
+    bool isVisible() const override;
+    bool getVisible() const override { return _visible; }
     void setVisible(bool) override;
 
   protected:

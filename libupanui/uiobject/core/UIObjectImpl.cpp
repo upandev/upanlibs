@@ -280,6 +280,10 @@ namespace upanui {
     _gc.uiObjectManager().queueForRedraw(*this);
   }
 
+  bool UIObjectImpl::isVisible() const {
+    return parent().isVisible() ? getVisible() : false;
+  }
+
   void UIObjectImpl::setVisible(bool visible) {
     if (visible != _visible) {
       upan::mutex_guard g(_gc.uiObjectManager().drawLock());
