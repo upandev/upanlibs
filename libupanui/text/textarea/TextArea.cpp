@@ -46,6 +46,8 @@ namespace upanui {
   void TextArea::init() {
     _reset();
 
+    UIObjectImpl::setKeyboardFocusable(true);
+
     backgroundColor(0xFFFFFF | GCoreFunctions::ALPHA_MASK);
     _textBuffer.init(width(), height(), backgroundColorWithAlpha());
     _cursorBlinkThread.start();

@@ -124,6 +124,9 @@ namespace upanui {
     virtual bool getVisible() const = 0;
     virtual void setVisible(bool) = 0;
 
+    virtual bool isKeyboardFocusable() const = 0;
+    virtual void setKeyboardFocusable(bool) = 0;
+
   protected:
     virtual ~UIObject() {}
 

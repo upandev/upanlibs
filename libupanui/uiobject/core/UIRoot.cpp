@@ -24,7 +24,9 @@
 #include <GraphicsContext.h>
 #include <UIObjectFactory.h>
 #include <Menu.h>
+#include <MenuEntry.h>
 #include <IconButton.h>
+#include <typeinfo.h>
 
 namespace upanui {
   UIRoot::UIRoot(int x, int y, int width, int height)
@@ -205,6 +207,18 @@ namespace upanui {
   void UIRoot::drawActiveMenu() {
     if (_activeMenu) {
       _activeMenu->drawPanel();
+    }
+  }
+
+  bool UIRoot::isModelActive() const {
+    return _activeMenu != nullptr;
+  }
+
+  void UIRoot::handleMouseEvent(const MouseEvent& e, const UIObject& eo) {
+    if (e.getData().anyButtonPressed()) {
+      if (typeid(eo) != typeid(Menu) && typeid(eo) != typeid(MenuEntry)) {
+        closeActiveMenu();
+      }
     }
   }
 }

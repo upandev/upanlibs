@@ -32,7 +32,8 @@ namespace upanui {
   }
 
   Menu::Menu(UIRoot& uiRoot, const upan::string& title, int x, int y, int height)
-    : RectangleCanvas(x, y, calcWidth(title), height, HorizontalPlacementType::ABSOLUTE, VerticalPlacementType::ABSOLUTE),
+    : RectangleCanvas(x, y, calcWidth(title), height,
+                      HorizontalPlacementType::LEFT_FIXED, VerticalPlacementType::TOP_FIXED),
       _uiRoot(uiRoot), _title(title), _uiLabel(nullptr) {
     UIObjectImpl::captureMouseEvents(true);
   }
@@ -50,7 +51,8 @@ namespace upanui {
     _uiLabel->backgroundColorAlpha(0);
 
     _uiPanel = &UIObjectFactory::createRectangleCanvas(_uiRoot, 1, x(), height(), 50, 100,
-                                                       upanui::HorizontalPlacementType::ABSOLUTE, upanui::VerticalPlacementType::ABSOLUTE);
+                                                       upanui::HorizontalPlacementType::LEFT_FIXED,
+                                                       upanui::VerticalPlacementType::TOP_FIXED);
     _uiPanel->backgroundColor(0xD2D1C8);
     _uiPanel->captureMouseEvents(true);
     _uiPanel->setVisible(false);

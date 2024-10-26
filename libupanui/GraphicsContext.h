@@ -53,7 +53,6 @@ namespace upanui {
     EventManager& initEventManager();
     EventManager& eventManager();
 
-    upan::option<UIObject&> setFocus(UIObject&);
     void setGuiBase(bool isGuiBase);
     ResizeMode getResizeMode() const { return _resizeMode; }
     void setResizeMode(ResizeMode resizeMode);

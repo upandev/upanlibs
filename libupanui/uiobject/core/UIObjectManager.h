@@ -62,16 +62,6 @@ namespace upanui {
       UIObjectManager& _uiObjectManager;
     };
 
-    upan::option<UIObject&> setFocus(UIObject& uiObject) {
-      auto prev = _focusedUIObject;
-      _focusedUIObject = upan::option<UIObject&>(uiObject);
-      return prev;
-    }
-
-    upan::option<UIObject&> focusedUIObject() {
-      return _focusedUIObject;
-    }
-
     void recalcHasAlpha() {
       _recalcHasAlpha = true;
     }
@@ -87,7 +77,7 @@ namespace upanui {
     ParentChildMap _parentChildMap;
     ChildParentMap _childParentMap;
     UIRoot& _rootCanvas;
-    upan::option<UIObject&> _focusedUIObject;
+    upan::option<UIObject&> _keyboardFocusedObject;
     upan::option<UIObject&> _mouseFocusedObject;
 
     upan::mutex _uiObjectTreeMutex;

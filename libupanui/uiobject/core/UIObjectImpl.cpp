@@ -37,7 +37,7 @@ namespace upanui {
       _mouseEventHandler(upan::option<MouseEventHandler&>::empty()), _captureMouseEvents(false),
       _verticalScroller(upan::option<VerticalScroller&>::empty()), _changeState((int)ChangeState::Content),
       _hResizable(false), _vResizable(false), _horizontalPlacementType(horizontalPlacementType), _verticalPlacementType(verticalPlacementType),
-      _visible(true), _gc(GraphicsContext::Instance()) {
+      _visible(true), _keyboardFocusable(false), _gc(GraphicsContext::Instance()) {
 
     if (_width > gc().frame().frameBuffer().width()) {
       _width = gc().frame().frameBuffer().width();

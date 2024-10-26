@@ -29,7 +29,7 @@
 namespace upanui {
   UIObjectManager::UIObjectManager(UIRoot& rootCanvas, const bool autoRefresh)
     : _rootCanvas(rootCanvas),
-      _focusedUIObject(rootCanvas),
+      _keyboardFocusedObject(rootCanvas),
       _mouseFocusedObject(upan::option<UIObject&>::empty()),
       _autoRefreshHandler(*this), _hasAlpha(false), _recalcHasAlpha(true) {
     _proxyParent.reset(new UIProxyParent());
@@ -95,9 +95,9 @@ namespace upanui {
     upan::mutex_guard g1(_uiObjectQueueMutex);
     _modifiedUIObjects.erase(&uiObject);
 
-    if (!_focusedUIObject.isEmpty()) {
-      if (&_focusedUIObject.value() == &uiObject) {
-        _focusedUIObject = upan::option<UIObject&>::empty();
+    if (!_keyboardFocusedObject.isEmpty()) {
+      if (&_keyboardFocusedObject.value() == &uiObject) {
+        _keyboardFocusedObject = upan::option<UIObject&>::empty();
       }
     }
 
@@ -162,9 +162,11 @@ namespace upanui {
   }
 
   void UIObjectManager::dispatch(const KeyboardEvent& event) {
-    _focusedUIObject.ifPresent([&event](UIObject& uiObject) {
-      uiObject.onKeyboardEvent(event);
-    });
+    if (!_rootCanvas.isModelActive()) {
+      _keyboardFocusedObject.ifPresent([&event](UIObject& uiObject) {
+        uiObject.onKeyboardEvent(event);
+      });
+    }
   }
 
   void UIObjectManager::dispatch(const MouseData& data) {
@@ -177,13 +179,13 @@ namespace upanui {
 
     if (!data.anyButtonHeld()) {
       _rootCanvas.uiObjectUnderCursor(viewportX, viewportY).ifPresent([&](UIObject& o) {
-        if (data.anyButtonPressed()) {
-          _focusedUIObject = upan::option<UIObject&>(o);
+        if (data.anyButtonPressed() && o.isKeyboardFocusable()) {
+          _keyboardFocusedObject = upan::option<UIObject&>(o);
         }
         eventObject = upan::option<UIObject&>(o);
       });
     } else {
-      eventObject = _focusedUIObject;
+      eventObject = _mouseFocusedObject;
     }
 
     if (eventObject.isEmpty()) {
@@ -191,7 +193,7 @@ namespace upanui {
         _mouseFocusedObject.value().onLoseMouseFocus();
         _mouseFocusedObject = upan::option<UIObject&>::empty();
       }
-      _focusedUIObject = upan::option<UIObject&>::empty();
+      //_keyboardFocusedObject = upan::option<UIObject&>::empty();
     } else {
       if (_mouseFocusedObject.isEmpty()) {
         _mouseFocusedObject = eventObject;
@@ -206,6 +208,7 @@ namespace upanui {
       } else {
         const MouseEvent event(data, viewportX, viewportY);
         eventObject.value().onMouseEvent(event);
+        _rootCanvas.handleMouseEvent(event, eventObject.value());
       }
     }
   }

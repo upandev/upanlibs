@@ -54,6 +54,7 @@ namespace upanui {
     }
     _cursorBlinkThread.start();
     _readerThread.start();
+    UIObjectImpl::setKeyboardFocusable(true);
   }
 
   TerminalConsole& TerminalConsole::Create(int maxRows, int maxColumns) {

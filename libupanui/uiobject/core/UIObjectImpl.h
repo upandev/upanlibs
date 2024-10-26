@@ -131,6 +131,9 @@ namespace upanui {
     bool getVisible() const override { return _visible; }
     void setVisible(bool) override;
 
+    bool isKeyboardFocusable() const override { return _keyboardFocusable; }
+    void setKeyboardFocusable(bool v) override { _keyboardFocusable = v; }
+
   protected:
     uint32_t backgroundColorWithAlpha() const {
       return (_bgColor & GCoreFunctions::NO_ALPHA_MASK) | (_bgAlpha << 24);
@@ -223,6 +226,7 @@ namespace upanui {
     HorizontalPlacementType _horizontalPlacementType;
     VerticalPlacementType _verticalPlacementType;
     bool _visible;
+    bool _keyboardFocusable;
 
     GraphicsContext& _gc;
   };

@@ -86,10 +86,6 @@ namespace upanui {
     return *_evenManager;
   }
 
-  upan::option<UIObject&> GraphicsContext::setFocus(UIObject& uiObject) {
-    return _uiObjectManager->setFocus(uiObject);
-  }
-
   void GraphicsContext::setGuiBase(bool isGuiBase) {
     set_gui_base(isGuiBase);
   }

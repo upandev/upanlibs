@@ -177,9 +177,9 @@ namespace upanui {
         child.vscroll(scrollRows, height());
       });
     } else {
-      _scrollableChild.ifPresent([this](UIObject &child) {
-        gc().setFocus(child);
-      });
+//      _scrollableChild.ifPresent([this](UIObject &child) {
+//        gc().setFocus(child);
+//      });
     }
   }
 }

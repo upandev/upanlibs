@@ -37,6 +37,8 @@ namespace upanui {
     void onMenuEntryClick(int id);
     void closeActiveMenu();
     void drawActiveMenu();
+    bool isModelActive() const;
+    void handleMouseEvent(const MouseEvent&, const UIObject&);
 
   private:
     UIRoot(int x, int y, int width, int height);
