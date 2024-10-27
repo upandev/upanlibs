@@ -28,6 +28,7 @@
 #include <UIEnums.h>
 #include <Terminal.h>
 #include <Label.h>
+#include <Menu.h>
 
 namespace upanui {
   class UIObject;
@@ -110,7 +111,9 @@ namespace upanui {
                                     Terminal::CommandExecutor& commandExecutor,
                                     HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
 
-    static Menu& createMenu(UIRoot& uiRoot, UIObject& parent, const upan::string& title, int x, int y, int height);
-    static MenuEntry& createMenuEntry(UIRoot& uiRoot, UIObject& parent, int id, const upan::string& title, int x, int y, int width, int height);
+    static Menu& createMenu(UIRoot& uiRoot, UIObject& parent, const upan::string& title, const upan::list<Menu::MenuEntryInfo>& menuEntryInfo,
+                            int x, int y, int height);
+    static MenuEntry& createMenuEntry(UIRoot& uiRoot, UIObject& parent, int id, const upan::string& name, Menu::ActionHandler& handler,
+                                      int x, int y, int width, int height);
   };
 }

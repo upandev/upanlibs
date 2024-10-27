@@ -24,17 +24,27 @@
 #include <stdlib.h>
 #include <UIObjectImpl.h>
 #include <RectangularLayout.h>
+#include <Menu.h>
 
 namespace upanui {
-  class Menu;
-
   class UIRoot : public UIObjectImpl {
   public:
-    void initMenuBar();
+    class MenuInfo {
+    public:
+      MenuInfo(const upan::string& title, const upan::list<Menu::MenuEntryInfo>& menuEntryInfo)
+      : _title(title), _menuEntryInfo(menuEntryInfo) {}
+
+      upan::string title() const { return _title; }
+      const upan::list<Menu::MenuEntryInfo>& menuEntryInfo() const { return _menuEntryInfo; }
+    private:
+      const upan::string _title;
+      const upan::list<Menu::MenuEntryInfo> _menuEntryInfo;
+    };
+
+    void initMenuBar(const upan::list<MenuInfo>& menuInfo);
     int menuBarHeight() const { return _menuBarHeight; }
     void onMenuClick(Menu&);
     void onMenuHover(Menu&);
-    void onMenuEntryClick(int id);
     void closeActiveMenu();
     void drawActiveMenu();
     bool isModelActive() const;

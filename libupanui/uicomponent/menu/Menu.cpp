@@ -38,7 +38,7 @@ namespace upanui {
     UIObjectImpl::captureMouseEvents(true);
   }
 
-  void Menu::init() {
+  void Menu::init(const upan::list<MenuEntryInfo>& menuEntryInfo) {
     backgroundColor(parent().backgroundColor());
     _uiLabel = &UIObjectFactory::createLabel(*this,
                                              0, 0,
@@ -50,16 +50,20 @@ namespace upanui {
                                              upanui::HorizontalPlacementType::ABSOLUTE, upanui::VerticalPlacementType::ABSOLUTE);
     _uiLabel->backgroundColorAlpha(0);
 
-    _uiPanel = &UIObjectFactory::createRectangleCanvas(_uiRoot, 1, x(), height(), 50, 100,
+    const int menuEntryHeight = 30;
+    _uiPanel = &UIObjectFactory::createRectangleCanvas(_uiRoot, 1, x(), height(), 100, menuEntryInfo.size() * menuEntryHeight,
                                                        upanui::HorizontalPlacementType::LEFT_FIXED,
                                                        upanui::VerticalPlacementType::TOP_FIXED);
     _uiPanel->backgroundColor(0xD2D1C8);
     _uiPanel->captureMouseEvents(true);
     _uiPanel->setVisible(false);
 
-    UIObjectFactory::createMenuEntry(_uiRoot, *_uiPanel, 1, "New", 0, 0, _uiPanel->width(), 30);
-    UIObjectFactory::createMenuEntry(_uiRoot, *_uiPanel, 2, "Open", 0, 30, _uiPanel->width(), 30);
-    UIObjectFactory::createMenuEntry(_uiRoot, *_uiPanel, 3, "Exit", 0, 60, _uiPanel->width(), 30);
+    int menuEntryY = 0;
+    for(auto& i : menuEntryInfo) {
+      UIObjectFactory::createMenuEntry(_uiRoot, *_uiPanel, i.id(), i.name(), i.handler(), 0, menuEntryY,
+                                       _uiPanel->width(), menuEntryHeight);
+      menuEntryY += menuEntryHeight;
+    }
   }
 
   void Menu::onKeyboardEvent(const KeyboardEvent& event) {

@@ -23,6 +23,7 @@
 #pragma once
 
 #include <RectangleCanvas.h>
+#include <map.h>
 
 namespace upanui {
   class UIRoot;
@@ -34,10 +35,32 @@ namespace upanui {
     void select(bool selected);
     void drawPanel();
 
+    class ActionHandler {
+    public:
+      virtual ~ActionHandler() {}
+      virtual void invoke(int id, const upan::string& name) = 0;
+    };
+
+    class MenuEntryInfo {
+    public:
+      MenuEntryInfo(int id, const upan::string& name, ActionHandler& handler) :
+        _id(id), _name(name), _handler(handler) {
+      }
+
+      int id() const { return _id; }
+      upan::string name() const { return _name; }
+      ActionHandler& handler() const { return _handler; }
+
+    private:
+      const int _id;
+      const upan::string _name;
+      ActionHandler& _handler;
+    };
+
   protected:
     virtual ~Menu() {}
     Menu(UIRoot& uiRoot, const upan::string& title, int x, int y, int height);
-    void init();
+    void init(const upan::list<MenuEntryInfo>& menuEntryInfo);
 
     void onKeyboardEvent(const KeyboardEvent& event) override;
     void onMouseEvent(const MouseEvent& event) override;

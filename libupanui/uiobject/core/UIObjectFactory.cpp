@@ -32,7 +32,6 @@
 #include <TextArea.h>
 #include <typeinfo.h>
 #include <Terminal.h>
-#include <Menu.h>
 #include <MenuEntry.h>
 
 namespace upanui {
@@ -204,15 +203,18 @@ namespace upanui {
     return terminal;
   }
 
-  Menu& UIObjectFactory::createMenu(UIRoot& uiRoot, UIObject& parent, const upan::string& title, int x, int y, int height) {
+  Menu& UIObjectFactory::createMenu(UIRoot& uiRoot, UIObject& parent, const upan::string& title, const upan::list<Menu::MenuEntryInfo>& menuEntryInfo,
+                                    int x, int y, int height) {
     auto& menu = *new Menu(uiRoot, title, x, y, height);
     parent.add(menu);
-    menu.init();
+    menu.init(menuEntryInfo);
     return menu;
   }
 
-  MenuEntry& UIObjectFactory::createMenuEntry(UIRoot& uiRoot, UIObject& parent, int id, const upan::string& title, int x, int y, int width, int height) {
-    auto& menuEntry = *new MenuEntry(uiRoot, id, title, x, y, width, height);
+  MenuEntry& UIObjectFactory::createMenuEntry(UIRoot& uiRoot, UIObject& parent,
+                                              int id, const upan::string& name, Menu::ActionHandler& handler,
+                                              int x, int y, int width, int height) {
+    auto& menuEntry = *new MenuEntry(uiRoot, id, name, handler, x, y, width, height);
     parent.add(menuEntry);
     menuEntry.init();
     return menuEntry;

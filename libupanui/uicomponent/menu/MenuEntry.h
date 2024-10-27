@@ -23,6 +23,7 @@
 #pragma once
 
 #include <RectangleCanvas.h>
+#include <Menu.h>
 
 namespace upanui {
   class UIRoot;
@@ -31,7 +32,7 @@ namespace upanui {
   class MenuEntry : public RectangleCanvas {
   protected:
     virtual ~MenuEntry() {}
-    MenuEntry(UIRoot& uiRoot, int id, const upan::string& title, int x, int y, int width, int height);
+    MenuEntry(UIRoot& uiRoot, int id, const upan::string& name, Menu::ActionHandler& handler, int x, int y, int width, int height);
     void init();
 
     void onMouseEvent(const MouseEvent& event) override;
@@ -41,7 +42,8 @@ namespace upanui {
   private:
     UIRoot& _uiRoot;
     int _id;
-    const upan::string _title;
+    const upan::string _name;
+    Menu::ActionHandler& _handler;
     Label* _uiLabel;
 
     friend class UIObjectFactory;

@@ -23,7 +23,6 @@
 #include <UIRoot.h>
 #include <GraphicsContext.h>
 #include <UIObjectFactory.h>
-#include <Menu.h>
 #include <MenuEntry.h>
 #include <IconButton.h>
 #include <typeinfo.h>
@@ -148,7 +147,7 @@ namespace upanui {
     }
   };
 
-  void UIRoot::initMenuBar() {
+  void UIRoot::initMenuBar(const upan::list<MenuInfo>& menuInfo) {
     if (_menuInitialized) {
       return;
     }
@@ -160,8 +159,11 @@ namespace upanui {
     auto& uiMenuBar = UIObjectFactory::createRectangleCanvas(*this, 0, 0, appWidth, _menuBarHeight, upanui::HorizontalPlacementType::STRETCHED, upanui::VerticalPlacementType::TOP_FIXED);
     uiMenuBar.backgroundColor(0xA59E9D);
 
-    auto& fileMenu = upanui::UIObjectFactory::createMenu(*this, uiMenuBar, "File", 0, 0, _menuBarHeight);
-    auto& editMenu = upanui::UIObjectFactory::createMenu(*this, uiMenuBar, "Edit", fileMenu.width(), 0, _menuBarHeight);
+    int menuX = 0;
+    for(auto& i : menuInfo) {
+      auto& menu = upanui::UIObjectFactory::createMenu(*this, uiMenuBar, i.title(), i.menuEntryInfo(), menuX, 0, _menuBarHeight);
+      menuX += menu.width();
+    }
 
     auto& closeBt = upanui::UIObjectFactory::createIconButton(uiMenuBar, upanui::PngImageResource::CLOSE, appWidth - _menuBarHeight, 0, _menuBarHeight, _menuBarHeight, upanui::HorizontalPlacementType::RIGHT_FIXED, upanui::VerticalPlacementType::TOP_FIXED);
 
@@ -190,11 +192,6 @@ namespace upanui {
         _activeMenu->select(true);
       }
     }
-  }
-
-  void UIRoot::onMenuEntryClick(int id) {
-    //call-back action for id
-    closeActiveMenu();
   }
 
   void UIRoot::closeActiveMenu() {
