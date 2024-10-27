@@ -19,11 +19,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef _UPAN_LIST_H_
-#define _UPAN_LIST_H_
+#pragma once
 
 #include <exception.h>
 #include <algorithm.h>
+#include <std_stuff.h>
 
 namespace upan {
 
@@ -41,6 +41,8 @@ class list
 
     list();
     list(const list<T>& rhs);
+    list(const std::initializer_list<T> l);
+
     ~list();
 
     void push_back(const T& value);
@@ -243,6 +245,13 @@ list<T>::list(const list<T>& rhs) : _size(0), _first(nullptr)
 {
   for(const auto& i : rhs)
     push_back(i);
+}
+
+template <typename T>
+list<T>::list(std::initializer_list<T> l) : _size(0), _first(nullptr) {
+  for(auto i : l) {
+    this->push_back(i);
+  }
 }
 
 template <typename T>
@@ -532,5 +541,3 @@ T& list<T>::operator[](int index) const
 }
 
 };
-
-#endif
