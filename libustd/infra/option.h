@@ -22,6 +22,7 @@
 #pragma once
 
 #include <exception.h>
+#include <utility.h>
 
 namespace upan {
 
@@ -35,6 +36,7 @@ protected:
 
 public:
   explicit option(const T& value) : _isEmpty(false), _value(value) {}
+  explicit option(const T&& value) : _isEmpty(false), _value(move(value)) {}
 
   static option<T> empty() {
     return option<T>();
