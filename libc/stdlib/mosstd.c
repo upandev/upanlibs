@@ -54,8 +54,7 @@ void sleepms(uint32_t milliseconds) {
 }
 
 int getpid() {
-  _thread_local_space* tls = (_thread_local_space*)(THREAD_LOCAL_SHARED_ADDRESS);
-  return tls->_pid;
+  return THREAD_LOCAL_META_DATA->_pid;
 }
 
 void yield() {

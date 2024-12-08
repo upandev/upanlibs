@@ -53,6 +53,7 @@ namespace upan {
 
       void set_error(const upan::error& e);
 
+      int pid() { return _pid; }
       bool has_error() const {
         return _error.isEmpty();
       }

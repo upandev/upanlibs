@@ -19,19 +19,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef _UPANIX_STD_H_
-#define _UPANIX_STD_H_
+#pragma once
 
 #include <stdint.h>
 #include <stdlib.h>
 
 #define pid_t int
 
-#define THREAD_LOCAL_SHARED_ADDRESS (512UL * 1024 * 1024 * 1024)
+#define GB * 1024UL * 1024 * 1024
+#define MB * 1024 * 1024
+#define KB * 1024
+
+#define THREAD_LOCAL_META_SPACE_ADDRESS ((513UL GB) - (4 KB))
 
 typedef struct {
   pid_t _pid;
-} PACKED _thread_local_space;
+} PACKED _thread_local_meta_space;
+
+#define THREAD_LOCAL_META_DATA ((_thread_local_meta_space*)(THREAD_LOCAL_META_SPACE_ADDRESS + sizeof(uintptr_t)))
 
 #if defined __cplusplus
 extern "C" {
@@ -102,6 +107,4 @@ extern void SysProcess_FreeProcListMem(PS* pProcList, unsigned uiListSize) ;
 
 #if defined __cplusplus
 }
-#endif
-
 #endif

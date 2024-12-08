@@ -27,18 +27,16 @@
 namespace upan {
     class thread_context {
     public:
-      static constexpr uint64_t SHARED_ADDRESS = THREAD_LOCAL_SHARED_ADDRESS;
-
       thread_context& instance() {
         static thread_context _instance;
         return _instance;
       }
 
-      int get_pid() const { return _tls->_pid; }
+      int get_pid() const { return _tlms->_pid; }
 
     private:
-      thread_context() : _tls((_thread_local_space*)SHARED_ADDRESS) {}
+      thread_context() : _tlms(THREAD_LOCAL_META_DATA) {}
 
-      _thread_local_space* _tls;
+      _thread_local_meta_space* _tlms;
     };
 }

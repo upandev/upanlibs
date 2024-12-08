@@ -39,6 +39,7 @@ class vector
     class vector_iterator;
     typedef vector_iterator iterator;
     typedef const vector_iterator const_iterator;
+    typedef T element_type;
 
     vector();
     explicit vector(const int reserve);
