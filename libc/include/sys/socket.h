@@ -21,6 +21,8 @@
  */
 #pragma once
 
+#include <stdlib.h>
+
 #if defined __cplusplus
 extern "C" {
 #endif
@@ -29,6 +31,29 @@ typedef enum {
   SOCK_STREAM = 1,
   SOCK_DGRAM = 2
 } SOCKET_TYPE;
+
+//SA_FAMILY_T
+#define AF_INET 2
+
+typedef uint16_t sa_family_t;
+typedef uint16_t in_port_t;
+typedef uint32_t socklen_t;
+
+struct in_addr {
+  uint32_t s_addr;
+};
+
+struct sockaddr {
+  sa_family_t sa_family;
+  uint8_t sa_data[14];
+};
+
+struct sockaddr_in {
+  sa_family_t sin_family;
+  in_port_t sin_port;
+  struct in_addr sin_addr;
+  uint8_t sin_zero[8];
+};
 
 #if defined __cplusplus
 }
