@@ -25,14 +25,11 @@
 #include <TextArea.h>
 
 namespace upanui {
-  class TerminalCommandExecutor;
-
   class Terminal : public TextArea {
   public:
     void setPrompt(const upan::string&);
     void insertCommand(const upan::string& str);
     void insertCommandOutput(const upan::string& str);
-    void insertCommandOutput(const upan::vector<Character>& characters);
 
     class CommandExecutor {
     public:
@@ -62,6 +59,7 @@ namespace upanui {
     void cutSelection() override;
     void moveCursor(bool shiftPressed, bool mouseHeld, int x, int y) override;
     void editSelection() override;
+    void insertCommandOutput(const upan::vector<Character>& characters);
 
   private:
     bool isPrimaryCommandLine();

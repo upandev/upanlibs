@@ -64,7 +64,9 @@ namespace upanui {
     const upan::string& cmdLine = getCommandLine();
     moveend();
     TextArea::enter();
+    drawMutex().unlock();
     _commandExecutor.execute(cmdLine);
+    drawMutex().lock();
     TextArea::enter();
     insertCommand(_prompt);
   }
@@ -147,6 +149,7 @@ namespace upanui {
   }
 
   void Terminal::insertCommandOutput(const upan::vector<Character>& characters) {
+    upan::mutex_guard g(drawMutex());
     for(const auto& c : characters) {
       if (isNewLine(c.getCh())) {
         TextArea::enter();
