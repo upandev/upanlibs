@@ -153,7 +153,25 @@ public:
   string substr(int start, int len) const;
   string substr(int start) const;
   bool split(char c, string& p1, string& p2) const;
-  void tokenize(const upan::string& delim, bool filterEmpty, list<string>& tokens) const;
+
+  template <typename Tokens>
+  void tokenize(const upan::string& delim, bool filterEmpty, Tokens& tokens) const {
+    upan::string nextToken = *this;
+    while(true) {
+      int pos = nextToken.find(delim);
+      if (pos < 0) {
+        if (!filterEmpty || nextToken.length() > 0) {
+          tokens.push_back(nextToken);
+        }
+        break;
+      }
+      const upan::string& firstToken = nextToken.substr(0, pos);
+      if (!filterEmpty || firstToken.length() > 0) {
+        tokens.push_back(firstToken);
+      }
+      nextToken = nextToken.substr(pos + delim.length());
+    }
+  }
 
 private:
   void init()

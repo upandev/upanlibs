@@ -20,29 +20,33 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include <stringalgo.h>
+#include <file_util.h>
+#include <stdlib.h>
+#include <vector.h>
+#include <fs.h>
 
 namespace upan {
-  upan::vector<upan::string> tokenize(const char *src, char chToken) {
-    int index;
-    int iStartIndex = 0;
-    upan::vector<upan::string> tokens;
+  namespace file_path {
+    upan::option<upan::string> resolve(const upan::string& fileName, const upan::string& pathEnvVar, const upan::string& defPath) {
+      char szPathEnvVal[MAX_ENV_VAL_LEN] = "";
+      getenv(pathEnvVar.c_str(), szPathEnvVal);
 
-    for (index = 0; src[index] != '\0'; index++) {
-      if (src[index] == chToken) {
-        if ((index - iStartIndex) > 0) {
-          upan::string token(src + iStartIndex, (index - iStartIndex));
-          tokens.push_back(token);
+      upan::string pathEnvVal(szPathEnvVal);
+      pathEnvVal += defPath;
+
+      upan::vector<upan::string> pathTokens;
+      pathTokens.push_back(".");
+      pathEnvVal.tokenize(":", true, pathTokens);
+
+      upan::option<upan::string> res = upan::option<upan::string>::empty();
+
+      for(const auto& path : pathTokens) {
+        const auto filePath = path + "/" + fileName;
+        if (!access(filePath.c_str(), O_RDONLY)) {
+          return upan::option<upan::string>(filePath);
         }
-        iStartIndex = index + 1;
       }
+      return upan::option<upan::string>::empty();
     }
-
-    if ((index - iStartIndex) > 0) {
-      upan::string token(src + iStartIndex, (index - iStartIndex));
-      tokens.push_back(token);
-    }
-    return tokens;
   }
 }
-

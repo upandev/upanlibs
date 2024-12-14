@@ -20,7 +20,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include "algo/stringalgo.h"
 #include "algo/algorithm.h"
 #include "mem/MemPool.h"
 #include "mem/newalloc.h"

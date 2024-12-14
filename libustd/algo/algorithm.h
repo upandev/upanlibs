@@ -19,8 +19,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef _ALGO_H_
-#define _ALGO_H_
+#pragma once
+
+#include <stdlib.h>
 
 namespace upan {
 
@@ -85,5 +86,3 @@ uint32_t hash32(const N1& n1, const N2& n2, const Ns&... ns) {
 }
 
 }
-
-#endif

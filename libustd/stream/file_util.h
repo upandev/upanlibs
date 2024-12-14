@@ -19,11 +19,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
+
 #pragma once
 
-#include <string.h>
-#include <vector.h>
+#include <option.h>
+#include <ustring.h>
 
 namespace upan {
-  upan::vector<upan::string> tokenize(const char* src, char chToken);
+  namespace file_path {
+    upan::option<upan::string> resolve(const upan::string& fileName, const upan::string& pathEnvVar, const upan::string& defPath);
+  }
 }
