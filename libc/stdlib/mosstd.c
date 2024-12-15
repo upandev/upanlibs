@@ -40,8 +40,11 @@ typedef struct  {
 
 static uint64_t* THREAD_CONTROL_BLOCK_DTV = (uint64_t*)((uint64_t)THREAD_LOCAL_META_DATA + sizeof(_thread_local_meta_space));
 
-//this is used implicitly by the linker to resolve TLS variable references
-UNUSED static uint64_t __tls_get_addr(tls_index* ti) {
+//This is used implicitly by the linker to resolve TLS variable references
+//It should not be declared as static to ensure this function appears in the dynamic symbol table of libc.so,
+//which then can be used by other shared libraries to resolve and relocate the usage of this function in their code
+//while accessing TLS variables
+UNUSED uint64_t __tls_get_addr(tls_index* ti) {
   return THREAD_CONTROL_BLOCK_DTV[ti->ti_module] + ti->ti_offset;
 }
 

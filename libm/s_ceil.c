@@ -32,6 +32,14 @@ static const double huge = 1.0e300;
 static double huge = 1.0e300;
 #endif
 
+extern __thread int _lib_data1_thread_local;
+extern __thread int _lib_global1_thread_local;
+
+void tls_xlib_test() {
+  _lib_data1_thread_local += 1;
+  _lib_global1_thread_local += 11;
+}
+
 #ifdef __STDC__
 	double ceil(double x)
 #else
