@@ -23,6 +23,32 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <syscalldefs.h>
+#include <stdio.h>
+
+__thread int _lib_data1_thread_local = 1000;
+__thread int _lib_global1_thread_local;
+
+void access_thread_local_test() {
+  _lib_data1_thread_local += getpid();
+  _lib_global1_thread_local += 10;
+}
+
+typedef struct  {
+  uint64_t ti_module;
+  uint64_t ti_offset;
+} PACKED tls_index;
+
+static uint64_t* THREAD_CONTROL_BLOCK_DTV = (uint64_t*)((uint64_t)THREAD_LOCAL_META_DATA + sizeof(_thread_local_meta_space));
+
+//this is used implicitly by the linker to resolve TLS variable references
+UNUSED static uint64_t __tls_get_addr(tls_index* ti) {
+  return THREAD_CONTROL_BLOCK_DTV[ti->ti_module] + ti->ti_offset;
+}
+
+//this is used inside crt start-up code - called at first before transferring control to main()
+UNUSED void _dll_init_relocate() {
+  SysProcess_DLLInitRelocate();
+}
 
 static void thread_entry_caller(thread_entry_func_p tmain, void* arg) {
   tmain(arg);

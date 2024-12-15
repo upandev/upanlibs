@@ -42,6 +42,8 @@ typedef struct {
 extern "C" {
 #endif
 
+void access_thread_local_test();
+
 typedef enum
 {
 	NEW,

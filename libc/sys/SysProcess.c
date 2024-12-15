@@ -143,3 +143,7 @@ int execvp(const char* szFileName, const char *const szArgList[])
 int SysProcess_IsKernel() {
   return 0;
 }
+
+void SysProcess_DLLInitRelocate() {
+  _upanix_syscall(SYS_CALL_DLL_INIT_RELOCATE, 1, 2, 3, 4, 5);
+}

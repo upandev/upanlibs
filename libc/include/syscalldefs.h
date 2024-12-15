@@ -89,7 +89,8 @@ typedef enum
 	SYS_CALL_MEM_END,
 
 	SYS_CALL_PROC_START = 600,
-		SYS_CALL_DLL_RELOCATE,
+    SYS_CALL_DLL_RELOCATE, //do not change this, and retain the value 601 as this is used by dynamic symbol relocation in DLL resolver system call
+    SYS_CALL_DLL_INIT_RELOCATE,
 		SYS_CALL_PROCESS_EXEC,
 		SYS_CALL_THREAD_EXEC,
 		SYS_CALL_PROCESS_WAIT_PID,
@@ -168,6 +169,7 @@ void SysFS_FileSelect(io_descriptor* waitIODescriptors, io_descriptor* readyIODe
 int SysMemory_AlignedAlloc(void** addr, uint32_t alignment, uint32_t uiSizeInBytes);
 int SysMemory_Free(void* uiAddress);
 int SysMemory_GetAllocSize(void* address, size_t* size);
+void SysProcess_DLLInitRelocate();
 int SysProcess_Exec(const char* szFileName, int iNoOfArgs, const char *const szArgList[]);
 int SysProcess_ThreadExec(uintptr_t threadCaller, uintptr_t entryAddress, void* arg);
 void SysProcess_WaitPID(int iProcessID);
