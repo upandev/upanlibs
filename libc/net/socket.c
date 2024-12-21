@@ -1,0 +1,111 @@
+/*
+ *	Upanix - An x86 based Operating System
+ *  Copyright (C) 2011 'Prajwala Prabhakar' 'srinivasa.prajwal@gmail.com'
+ *
+ *  I am making my contributions/submissions to this project solely in
+ *  my personal capacity and am not conveying any rights to any
+ *  intellectual property of any third parties.
+ *                                                                          
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *                                                                          
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *                                                                          
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/
+ */
+
+#include <net/socket.h>
+#include <endian.h>
+#include <stdio.h>
+#include <string.h>
+#include <syscalldefs.h>
+
+uint16_t htons(uint16_t x) {
+#if __BYTE_ORDER == __BIG_ENDIAN
+  return x;
+#elif __BYTE_ORDER == __LITTLE_ENDIAN
+  return __builtin_bswap16(x);
+#else
+# error "unknown __BYTE_ORDER for this machine"
+#endif
+}
+weak_alias(htons, ntohs)
+
+uint32_t htonl(uint32_t x) {
+#if __BYTE_ORDER == __BIG_ENDIAN
+  return x;
+#elif __BYTE_ORDER == __LITTLE_ENDIAN
+  return __builtin_bswap32(x);
+#else
+# error "unknown __BYTE_ORDER for this machine"
+#endif
+}
+weak_alias(htonl, ntohl)
+
+static __thread char _inet_conversion_buffer[INET_ADDRSTRLEN + 1];
+
+char* inet_ntoa(struct in_addr in) {
+  const uint8_t* addr = (uint8_t*) &in;
+  int n = snprintf(_inet_conversion_buffer, INET_ADDRSTRLEN + 1, "%u.%u.%u.%u", addr[0], addr[1], addr[2], addr[3]);
+  if (n >= INET_ADDRSTRLEN) {
+    return NULL;
+  }
+  return _inet_conversion_buffer;
+}
+
+in_addr_t inet_aton(const char* ip) {
+  if (!ip) {
+    return INADDR_NONE;
+  }
+
+  if (strlen(ip) >= INET_ADDRSTRLEN) {
+    return INADDR_NONE;
+  }
+
+  in_addr_t res = 0;
+
+  char c[4];
+  int ci = 0;
+  const char* p = ip;
+  int dot_count = 0;
+
+  while(*p != '\0') {
+    if (*p == '.') {
+      if (dot_count == 3) {
+        return INADDR_NONE;
+      }
+      ++dot_count;
+
+      c[ci] = '\0';
+      ci = 0;
+
+      res |= atoi(c) >> (dot_count * sizeof(uint8_t));
+    } else {
+      if (ci == 3) {
+        return INADDR_NONE;
+      }
+      if (!isdigit(*p)) {
+        return INADDR_NONE;
+      }
+      c[ci] = *p;
+      ++ci;
+    }
+    ++p;
+  }
+
+  if (dot_count != 3) {
+    return INADDR_NONE;
+  }
+
+  return res;
+}
+
+int socket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, IPPROTO_TYPE protocol) {
+  return SysNet_CreateSocket(sa_family, socket_type, protocol);
+}

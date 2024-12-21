@@ -31,7 +31,8 @@ extern "C" {
 # include <fs.h>
 # include <mosstd.h>
 # include <drive.h>
-#include "cdisplay.h"
+# include <cdisplay.h>
+# include <net/socket.h>
 
 uint64_t _upanix_syscall(uint64_t sysCallId, uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4, uint64_t p5);
 
@@ -127,6 +128,9 @@ typedef enum
 		SYS_CALL_UTIL_REBOOT,
 	SYS_CALL_UTIL_END,
 
+  SYS_CALL_NETWORK_START = 1300,
+    SYS_CALL_CREATE_SOCKET,
+  SYS_CALL_NETWORK_END,
 } SYS_CALL_NUMBERS ;
 
 /************************************************************************************/
@@ -193,6 +197,8 @@ uint32_t SysUtil_GetTimeSinceBoot();
 int SysProcess_IsProcessAlive(int iProcessID);
 int SysProcess_IsKernel();
 int SysProcess_IsChildAlive(int iProcessID);
+
+int SysNet_CreateSocket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, IPPROTO_TYPE protocol);
 
 #if defined __cplusplus
 }

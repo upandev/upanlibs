@@ -107,6 +107,13 @@ namespace upan {
       lambdaf(*_error);
       return true;
     }
+
+    upan::option<Good> toOption() {
+      if (isBad()) {
+        return upan::option<Good>::empty();
+      }
+      return upan::option<Good>(goodValue());
+    }
   };
 
   template <typename Good>
@@ -171,6 +178,13 @@ namespace upan {
         return false;
       lambdaf(*_error);
       return true;
+    }
+
+    upan::option<Good&> toOption() {
+      if (isBad()) {
+        return upan::option<Good&>::empty();
+      }
+      return upan::option<Good&>(goodValue());
     }
   };
 
