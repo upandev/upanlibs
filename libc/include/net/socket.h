@@ -46,6 +46,7 @@ typedef uint16_t sa_family_t;
 typedef uint16_t in_port_t;
 typedef uint32_t socklen_t;
 typedef uint32_t in_addr_t;
+typedef int sock_t;
 
 #define INADDR_ANY (in_addr_t)0
 #define INADDR_LOOPBACK (in_addr_t)0x7f000001
@@ -81,7 +82,8 @@ uint32_t ntohl(uint32_t x);
 char* inet_ntoa(struct in_addr in);
 in_addr_t inet_aton(const char* ip);
 
-int socket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, IPPROTO_TYPE protocol);
+sock_t socket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, IPPROTO_TYPE protocol);
+int bind(sock_t fd, struct sockaddr* client_addr, socklen_t len);
 
 #if defined __cplusplus
 }

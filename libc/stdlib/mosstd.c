@@ -167,7 +167,7 @@ int openstream(uint32_t mode) {
 }
 
 int close(int fd) {
-  return SysFS_FileClose(fd) ;
+  return SysIO_Close(fd) ;
 }
 
 int unlink(const char* filePath) {

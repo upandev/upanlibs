@@ -54,10 +54,6 @@ int SysFS_FileOpenStream(uint32_t mode) {
   return _upanix_syscall(SYS_CALL_FILE_OPEN_STREAM, (uint64_t)mode, 2, 3, 4, 5);
 }
 
-int SysFS_FileClose(int fd) {
-  return _upanix_syscall(SYS_CALL_FILE_CLOSE, (uint64_t)fd, 2, 3, 4, 5);
-}
-
 int SysFS_FileRead(int fd, void* buf, int len) {
   return _upanix_syscall(SYS_CALL_FILE_READ, (uint64_t)fd, (uint64_t)buf, (uint64_t)len, 4, 5);
 }

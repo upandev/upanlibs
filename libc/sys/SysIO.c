@@ -19,13 +19,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
+# include <syscalldefs.h>
 
-#include <syscalldefs.h>
-
-sock_t SysNet_CreateSocket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, IPPROTO_TYPE protocol) {
-  return (sock_t)_upanix_syscall(SYS_CALL_CREATE_SOCKET, (uint64_t)sa_family, (uint64_t)socket_type, (IPPROTO_TYPE)protocol, 4, 5);
-}
-
-int SysNet_Bind(sock_t fd, struct sockaddr* client_addr, socklen_t len) {
-  return _upanix_syscall(SYS_CALL_SOCKET_BIND, (uint64_t)fd, 2, 3, 4, 5);
+int SysIO_Close(int fd) {
+  return _upanix_syscall(SYS_CALL_IO_CLOSE, (uint64_t)fd, 2, 3, 4, 5);
 }

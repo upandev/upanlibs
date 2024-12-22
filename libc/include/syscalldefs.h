@@ -70,7 +70,6 @@ typedef enum
 		SYS_CALL_FILE_OPEN,
     SYS_CALL_FILE_OPEN_STREAM,
 		SYS_CALL_FILE_CREATE,
-		SYS_CALL_FILE_CLOSE,
 		SYS_CALL_FILE_READ,
 		SYS_CALL_FILE_WRITE,
 		SYS_CALL_FILE_SELECT,
@@ -82,6 +81,10 @@ typedef enum
 		SYS_CALL_FILE_ACCESS,
 		SYS_CALL_FILE_DUP2,
 	SYS_CALL_FILE_END,
+
+  SYS_CALL_IO_START = 300,
+    SYS_CALL_IO_CLOSE,
+  SYS_CALL_IO_END,
 
 	SYS_CALL_MEM_START = 400,
     SYS_CALL_ALIGNED_ALLOC,
@@ -130,6 +133,7 @@ typedef enum
 
   SYS_CALL_NETWORK_START = 1300,
     SYS_CALL_CREATE_SOCKET,
+    SYS_CALL_SOCKET_BIND,
   SYS_CALL_NETWORK_END,
 } SYS_CALL_NUMBERS ;
 
@@ -157,7 +161,6 @@ int SysFS_GetDirContent(const char* szDirPath, struct stat_ex** dirList, int* si
 int SysFS_CreateFile(const char* szDirPath, unsigned short usAttribute);
 int SysFS_FileOpen(const char* szFileName, uint32_t mode);
 int SysFS_FileOpenStream(uint32_t mode);
-int SysFS_FileClose(int fd);
 int SysFS_FileRead(int fd, void* buf, int len);
 int SysFS_FileWrite(int fd, const void* buf, int len);
 int SysFS_FileSeek(int fd, int offSet, int seekType);
@@ -169,6 +172,8 @@ int SysFS_Dup2(int oldFD, int newFD);
 int SysFS_CWD(char* uiReturnDirPathAddress, int len);
 int SysFS_FileAccess(const char* szFileName, int mode);
 void SysFS_FileSelect(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors);
+
+int SysIO_Close(int fd);
 
 int SysMemory_AlignedAlloc(void** addr, uint32_t alignment, uint32_t uiSizeInBytes);
 int SysMemory_Free(void* uiAddress);
@@ -198,7 +203,8 @@ int SysProcess_IsProcessAlive(int iProcessID);
 int SysProcess_IsKernel();
 int SysProcess_IsChildAlive(int iProcessID);
 
-int SysNet_CreateSocket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, IPPROTO_TYPE protocol);
+sock_t SysNet_CreateSocket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, IPPROTO_TYPE protocol);
+int SysNet_Bind(sock_t fd, struct sockaddr* client_addr, socklen_t len);
 
 #if defined __cplusplus
 }
