@@ -42,6 +42,37 @@ typedef enum {
   IPPROTO_UDP = 17,
 } IPPROTO_TYPE;
 
+typedef enum {
+  SO_BROADCAST,
+  IP_TTL,
+  TCP_NODELAY
+} SOCKET_OPTION;
+
+/* Bits in the FLAGS argument to `send', `recv', et al.  */
+typedef enum {
+  MSG_OOB = 0x01,	/* Process out-of-band data.  */
+  MSG_PEEK = 0x02,	/* Peek at incoming messages.  */
+  MSG_DONTROUTE = 0x04,	/* Don't use local routing.  */
+  MSG_CTRUNC = 0x08,	/* Control data lost before delivery.  */
+  MSG_PROXY = 0x10,	/* Supply or ask second address.  */
+  MSG_TRUNC = 0x20,
+  MSG_DONTWAIT = 0x40, /* Nonblocking IO.  */
+  MSG_EOR = 0x80, /* End of record.  */
+  MSG_WAITALL = 0x100, /* Wait for a full request.  */
+  MSG_FIN = 0x200,
+  MSG_SYN = 0x400,
+  MSG_CONFIRM = 0x800, /* Confirm path validity.  */
+  MSG_RST = 0x1000,
+  MSG_ERRQUEUE = 0x2000, /* Fetch message from error queue.  */
+  MSG_NOSIGNAL = 0x4000, /* Do not generate SIGPIPE.  */
+  MSG_MORE = 0x8000,  /* Sender will send more.  */
+  MSG_WAITFORONE = 0x10000, /* Wait for at least one packet to return.*/
+  MSG_BATCH = 0x40000, /* sendmmsg: more messages coming.  */
+  MSG_ZEROCOPY = 0x4000000, /* Use user data in kernel path.  */
+  MSG_FASTOPEN = 0x20000000, /* Send data in TCP SYN.  */
+  MSG_CMSG_CLOEXEC = 0x40000000	/* Set close_on_exit for file descriptor received through  SCM_RIGHTS */
+} SOCKET_SEND_RECV_FLAGS;
+
 typedef uint16_t sa_family_t;
 typedef uint16_t in_port_t;
 typedef uint32_t socklen_t;
@@ -56,6 +87,8 @@ typedef int sock_t;
 #define INPORT_ANY (in_port_t)0
 
 #define INET_ADDRSTRLEN 16
+
+#define SOL_SOCKET 1
 
 struct in_addr {
   in_addr_t s_addr;
@@ -84,6 +117,9 @@ in_addr_t inet_aton(const char* ip);
 
 sock_t socket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, IPPROTO_TYPE protocol);
 int bind(sock_t fd, struct sockaddr* client_addr, socklen_t len);
+int setsockopt(sock_t fd, int level, SOCKET_OPTION option, const void* optval, socklen_t len);
+ssize_t sendto(int fd, const void *buf, size_t n, int flags, const struct sockaddr* addr, socklen_t len);
+ssize_t recvfrom(int fd, void *buf, size_t n, int flags, struct sockaddr* addr, socklen_t* len);
 
 #if defined __cplusplus
 }

@@ -859,3 +859,14 @@ const char* get_proc_status_desc(int iStatus)
 
 void _initialize_standard_library() {
 }
+
+static __thread uint32_t _rand_seed = 1;
+
+void srand(uint32_t seed) {
+  _rand_seed = seed;
+}
+
+int rand() {
+  _rand_seed = _rand_seed * 1103515245U + 12345U;
+  return (int)(_rand_seed & 0x7fffffff);
+}

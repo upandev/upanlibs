@@ -132,8 +132,11 @@ typedef enum
 	SYS_CALL_UTIL_END,
 
   SYS_CALL_NETWORK_START = 1300,
-    SYS_CALL_CREATE_SOCKET,
+    SYS_CALL_SOCKET_CREATE,
     SYS_CALL_SOCKET_BIND,
+    SYS_CALL_SOCKET_SET_OPT,
+    SYS_CALL_SOCKET_SEND_TO,
+    SYS_CALL_SOCKET_RECV_FROM,
   SYS_CALL_NETWORK_END,
 } SYS_CALL_NUMBERS ;
 
@@ -205,6 +208,9 @@ int SysProcess_IsChildAlive(int iProcessID);
 
 sock_t SysNet_CreateSocket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, IPPROTO_TYPE protocol);
 int SysNet_Bind(sock_t fd, struct sockaddr* client_addr, socklen_t len);
+int SysNet_SetSockOpt(sock_t fd, int level, SOCKET_OPTION option, const void* optval, socklen_t len);
+int SysNet_SendTo(int fd, const void *buf, size_t n, int flags, const struct sockaddr* addr, socklen_t len);
+int SysNet_RecvFrom(int fd, void *buf, size_t n, int flags, struct sockaddr* addr, socklen_t* len);
 
 #if defined __cplusplus
 }

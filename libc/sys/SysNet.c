@@ -23,9 +23,23 @@
 #include <syscalldefs.h>
 
 sock_t SysNet_CreateSocket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, IPPROTO_TYPE protocol) {
-  return (sock_t)_upanix_syscall(SYS_CALL_CREATE_SOCKET, (uint64_t)sa_family, (uint64_t)socket_type, (IPPROTO_TYPE)protocol, 4, 5);
+  return (sock_t)_upanix_syscall(SYS_CALL_SOCKET_CREATE, (uint64_t)sa_family, (uint64_t)socket_type, (IPPROTO_TYPE)protocol, 4, 5);
 }
 
 int SysNet_Bind(sock_t fd, struct sockaddr* client_addr, socklen_t len) {
-  return _upanix_syscall(SYS_CALL_SOCKET_BIND, (uint64_t)fd, 2, 3, 4, 5);
+  return (int)_upanix_syscall(SYS_CALL_SOCKET_BIND, (uint64_t)fd, (uint64_t)client_addr, (uint64_t)len, 4, 5);
+}
+
+int SysNet_SetSockOpt(sock_t fd, int level, SOCKET_OPTION option, const void* optval, socklen_t len) {
+  return (int)_upanix_syscall(SYS_CALL_SOCKET_SET_OPT, (uint64_t)fd, (uint64_t)level, (uint64_t)option, (uint64_t)optval, (uint64_t)len);
+}
+
+int SysNet_SendTo(int fd, const void *buf, size_t n, int flags, const struct sockaddr* addr, socklen_t len) {
+  uint64_t ext_param[] = { (uint64_t)addr, (uint64_t)len };
+  return (int)_upanix_syscall(SYS_CALL_SOCKET_SEND_TO, (uint64_t)fd, (uint64_t)buf, (uint64_t)n, (uint64_t)flags, (uint64_t)&ext_param);
+}
+
+int SysNet_RecvFrom(int fd, void *buf, size_t n, int flags, struct sockaddr* addr, socklen_t* len) {
+  uint64_t ext_param[] = { (uint64_t)addr, (uint64_t)len };
+  return (int)_upanix_syscall(SYS_CALL_SOCKET_RECV_FROM, (uint64_t)fd, (uint64_t)buf, (uint64_t)n, (uint64_t)flags, (uint64_t)&ext_param);
 }

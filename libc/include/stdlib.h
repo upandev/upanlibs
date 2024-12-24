@@ -155,6 +155,9 @@ void format_dir_attr(unsigned short attr, char* fmAttr) ;
 
 const char* get_proc_status_desc(int iStatus) ;
 
+void srand(uint32_t seed);
+int rand();
+
 #if defined __cplusplus
 }
 #endif
