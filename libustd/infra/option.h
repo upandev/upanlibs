@@ -36,7 +36,7 @@ protected:
 
 public:
   explicit option(const T& value) : _isEmpty(false), _value(value) {}
-  explicit option(const T&& value) : _isEmpty(false), _value(move(value)) {}
+  explicit option(T&& value) : _isEmpty(false), _value(move(value)) {}
 
   static option<T> empty() {
     return option<T>();
