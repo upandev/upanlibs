@@ -80,7 +80,7 @@ namespace upanui {
 
     const auto pixelData = static_cast<const uint8_t*>((void*)((uintptr_t)imageData + _header._dataOffset));
     const uint32_t imageBufferSize = _infoHeader._width * _infoHeader._height;
-    upan::uniq_ptr<uint32_t> imageBuffer = new uint32_t[imageBufferSize];
+    upan::uniq_ptr<uint32_t> imageBuffer(new uint32_t[imageBufferSize]);
 
     int scanLinePadding = 0;
     switch(_infoHeader._bitsPerPixel) {

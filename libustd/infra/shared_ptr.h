@@ -26,66 +26,66 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <option.h>
+#include <atomicop.h>
 
 namespace upan {
 
   template<typename CONTAINER, typename PTR>
-  class _base_uniq_ptr {
-  protected:
+  class _base_shared_ptr {
+  private:
     void destroy() {
-      if (_owner && _ptr != nullptr) {
+      if (_refCount && _refCount->dec() == 1) {
         static_cast<CONTAINER*>(this)->deletePtr();
+
+        delete _refCount;
+        _refCount = nullptr;
       }
     }
 
-  public:
-    explicit _base_uniq_ptr(PTR *ptr) : _ptr (ptr), _owner(true) {}
-    _base_uniq_ptr() : _ptr(nullptr), _owner(true) {}
-    _base_uniq_ptr(_base_uniq_ptr&& r) noexcept : _ptr(r.get()), _owner(true) { r.disown(); }
-    _base_uniq_ptr& operator=(_base_uniq_ptr&& r) noexcept {
+  protected:
+    explicit _base_shared_ptr(PTR* ptr) : _ptr(ptr), _refCount(ptr ? new upan::atomic::integral<int>(1) : nullptr) {
+    }
+
+    _base_shared_ptr() : _ptr(nullptr), _refCount(nullptr) {
+    }
+
+    _base_shared_ptr(const _base_shared_ptr& r) : _ptr(r._ptr), _refCount(r._refCount) {
+      if (_refCount) _refCount->inc();
+    }
+
+    _base_shared_ptr& operator=(const _base_shared_ptr& r) {
       destroy();
-      _ptr = r.get();
-      _owner = true;
-      r.disown();
+      _ptr = r._ptr;
+      _refCount = r._refCount;
+      if (_refCount) _refCount->inc();
       return *this;
     }
 
-    _base_uniq_ptr(const _base_uniq_ptr&) = delete;
-    _base_uniq_ptr& operator=(const _base_uniq_ptr&) = delete;
-
-    ~_base_uniq_ptr() {
+    ~_base_shared_ptr() {
       destroy();
     }
 
-    void disown() { _owner = false; }
-
     PTR* get() { return _ptr; }
     const PTR* get() const { return _ptr; }
-
-
-    PTR* release() {
-      auto r = _ptr;
-      _ptr = nullptr;
-      return r;
-    }
 
     void reset(PTR* newPtr) {
       if (_ptr != newPtr) {
         destroy();
         _ptr = newPtr;
+        _refCount = _ptr ? new upan::atomic::integral<int>(1) : nullptr;
       }
     }
 
   protected:
     PTR* _ptr;
-    bool _owner;
+    upan::atomic::integral<int>* _refCount;
   };
 
   template<typename T>
-  class uniq_ptr : public _base_uniq_ptr<uniq_ptr<T>, T> {
+  class shared_ptr : public _base_shared_ptr<shared_ptr<T>, T> {
   private:
-    friend class _base_uniq_ptr<uniq_ptr<T>, T>;
-    using _base_uniq_ptr<uniq_ptr<T>, T>::_ptr;
+    friend class _base_shared_ptr<shared_ptr<T>, T>;
+    using _base_shared_ptr<shared_ptr<T>, T>::_ptr;
 
     void deletePtr() {
       delete _ptr;
@@ -93,34 +93,33 @@ namespace upan {
     }
 
   public:
-    explicit uniq_ptr(T* ptr) : _base_uniq_ptr<uniq_ptr<T>, T>(ptr) {}
-    uniq_ptr() {}
-    uniq_ptr(uniq_ptr &&r) noexcept = default;
-    uniq_ptr &operator=(uniq_ptr &&r) noexcept = default;
-    uniq_ptr(const uniq_ptr&) = delete;
-    uniq_ptr &operator=(const uniq_ptr&) = delete;
+    explicit shared_ptr(T* ptr) : _base_shared_ptr<shared_ptr<T>, T>(ptr) {}
+    shared_ptr() {}
+    shared_ptr(const shared_ptr&r) = default;
+    shared_ptr& operator=(const shared_ptr& r) = default;
+    shared_ptr(shared_ptr&& r) = delete;
+    shared_ptr &operator=(shared_ptr&& r) = delete;
 
     T* operator->() { return _ptr; }
     const T* operator->() const { return _ptr; }
 
     T& operator*() { return *_ptr; }
-    const T& operator*() const { return *_ptr; }
+    const T &operator*() const { return *_ptr; }
 
-    upan::option<T &> toOption() {
+    upan::option<T&> toOption() {
       if (_ptr) {
-        return upan::option<T &>(*_ptr);
+        return upan::option<T&>(*_ptr);
       } else {
-        return upan::option<T &>::empty();
+        return upan::option<T&>::empty();
       }
     }
   };
 
-
   template<typename T>
-  class uniq_ptr<T[]> : public _base_uniq_ptr<uniq_ptr<T[]>, T> {
+  class shared_ptr<T[]> : public _base_shared_ptr<shared_ptr<T[]>, T>{
   private:
-    friend class _base_uniq_ptr<uniq_ptr<T[]>, T>;
-    using _base_uniq_ptr<uniq_ptr<T[]>, T>::_ptr;
+    friend class _base_shared_ptr<shared_ptr<T[]>, T>;
+    using _base_shared_ptr<shared_ptr<T[]>, T>::_ptr;
 
     void deletePtr() {
       delete[] _ptr;
@@ -128,12 +127,12 @@ namespace upan {
     }
 
   public:
-    explicit uniq_ptr(T* ptr) : _base_uniq_ptr<uniq_ptr<T[]>, T>(ptr) {}
-    uniq_ptr() {}
-    uniq_ptr(uniq_ptr &&r) noexcept = default;
-    uniq_ptr &operator=(uniq_ptr &&r) noexcept = default;
-    uniq_ptr(const uniq_ptr&) = delete;
-    uniq_ptr &operator=(const uniq_ptr &) = delete;
+    explicit shared_ptr(T* ptr) : _base_shared_ptr<shared_ptr<T[]>, T>(ptr) {}
+    shared_ptr() {}
+    shared_ptr(const shared_ptr&r) = default;
+    shared_ptr& operator=(const shared_ptr& r) = default;
+    shared_ptr(shared_ptr&& r) = delete;
+    shared_ptr &operator=(shared_ptr&& r) = delete;
 
     T& operator[](int index) { return _ptr[index]; }
     const T& operator[](int index) const { return _ptr[index]; }
