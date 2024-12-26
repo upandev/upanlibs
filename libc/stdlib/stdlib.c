@@ -860,7 +860,7 @@ const char* get_proc_status_desc(int iStatus)
 void _initialize_standard_library() {
 }
 
-static __thread uint32_t _rand_seed = 1;
+__thread uint32_t _rand_seed = 1;
 
 void srand(uint32_t seed) {
   _rand_seed = seed;

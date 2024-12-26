@@ -412,6 +412,7 @@ extern int matherr (struct exception *__exc);
 #endif
 
 void tls_xlib_test();
+void test_initialized_globals();
 
 #if defined __cplusplus
 }

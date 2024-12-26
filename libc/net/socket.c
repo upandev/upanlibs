@@ -48,11 +48,13 @@ uint32_t htonl(uint32_t x) {
 }
 weak_alias(htonl, ntohl)
 
-static __thread char _inet_conversion_buffer[INET_ADDRSTRLEN + 1];
+const uint8_t INADDR_MAC_BROADCAST[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+
+__thread char _inet_conversion_buffer[INET_ADDRSTRLEN + 1];
 
 char* inet_ntoa(struct in_addr in) {
   const uint8_t* addr = (uint8_t*) &in;
-  int n = snprintf(_inet_conversion_buffer, INET_ADDRSTRLEN + 1, "%u.%u.%u.%u", addr[0], addr[1], addr[2], addr[3]);
+  int n = snprintf(_inet_conversion_buffer, INET_ADDRSTRLEN + 1, "%u.%u.%u.%u", addr[3], addr[2], addr[1], addr[0]);
   if (n >= INET_ADDRSTRLEN) {
     return NULL;
   }
@@ -85,7 +87,7 @@ in_addr_t inet_aton(const char* ip) {
       c[ci] = '\0';
       ci = 0;
 
-      res |= atoi(c) >> (dot_count * sizeof(uint8_t));
+      res |= (atoi(c) << ((4 - dot_count) * 8));
     } else {
       if (ci == 3) {
         return INADDR_NONE;
@@ -102,6 +104,9 @@ in_addr_t inet_aton(const char* ip) {
   if (dot_count != 3) {
     return INADDR_NONE;
   }
+
+  c[ci] = '\0';
+  res |= atoi(c);
 
   return res;
 }

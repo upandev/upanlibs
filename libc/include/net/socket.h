@@ -97,14 +97,17 @@ struct in_addr {
 struct sockaddr {
   sa_family_t sa_family;
   uint8_t sa_data[14];
-};
+} PACKED;
 
 struct sockaddr_in {
   sa_family_t sin_family;
   in_port_t sin_port;
   struct in_addr sin_addr;
   uint8_t sin_zero[8];
-};
+} PACKED;
+
+#define INADDR_MAC_LEN 6
+extern const uint8_t INADDR_MAC_BROADCAST[INADDR_MAC_LEN];
 
 uint16_t htons(uint16_t x);
 uint16_t ntohs(uint16_t x);
