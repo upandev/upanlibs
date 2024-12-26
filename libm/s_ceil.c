@@ -40,6 +40,19 @@ void tls_xlib_test() {
   _lib_global1_thread_local += 11;
 }
 
+#include <net/socket.h>
+#include <stdio.h>
+
+void test_initialized_globals() {
+  printf("\n ETHER BROADCAST MAC -> %02x:%02x:%02x:%02x:%02x:%02x",
+         INADDR_MAC_BROADCAST[0],
+         INADDR_MAC_BROADCAST[1],
+         INADDR_MAC_BROADCAST[2],
+         INADDR_MAC_BROADCAST[3],
+         INADDR_MAC_BROADCAST[4],
+         INADDR_MAC_BROADCAST[5]);
+}
+
 #ifdef __STDC__
 	double ceil(double x)
 #else
