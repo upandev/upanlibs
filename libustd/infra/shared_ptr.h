@@ -61,9 +61,26 @@ namespace upan {
       return *this;
     }
 
+    _base_shared_ptr(_base_shared_ptr&& r) : _ptr(r._ptr), _refCount(r._refCount) {
+      r._ptr = nullptr;
+      r._refCount = nullptr;
+    }
+
+    _base_shared_ptr& operator=(_base_shared_ptr&& r) {
+      destroy();
+      _ptr = r._ptr;
+      _refCount = r._refCount;
+      r._ptr = nullptr;
+      r._refCount = nullptr;
+      return *this;
+    }
+
     ~_base_shared_ptr() {
       destroy();
     }
+
+  public:
+    bool isEmpty() const { return _ptr == nullptr; }
 
     PTR* get() { return _ptr; }
     const PTR* get() const { return _ptr; }
@@ -93,12 +110,12 @@ namespace upan {
     }
 
   public:
-    explicit shared_ptr(T* ptr) : _base_shared_ptr<shared_ptr<T>, T>(ptr) {}
+    shared_ptr(T* ptr) : _base_shared_ptr<shared_ptr<T>, T>(ptr) {}
     shared_ptr() {}
     shared_ptr(const shared_ptr&r) = default;
     shared_ptr& operator=(const shared_ptr& r) = default;
-    shared_ptr(shared_ptr&& r) = delete;
-    shared_ptr &operator=(shared_ptr&& r) = delete;
+    shared_ptr(shared_ptr&& r) = default;
+    shared_ptr &operator=(shared_ptr&& r) = default;
 
     T* operator->() { return _ptr; }
     const T* operator->() const { return _ptr; }
@@ -131,8 +148,8 @@ namespace upan {
     shared_ptr() {}
     shared_ptr(const shared_ptr&r) = default;
     shared_ptr& operator=(const shared_ptr& r) = default;
-    shared_ptr(shared_ptr&& r) = delete;
-    shared_ptr &operator=(shared_ptr&& r) = delete;
+    shared_ptr(shared_ptr&& r) = default;
+    shared_ptr &operator=(shared_ptr&& r) = default;
 
     T& operator[](int index) { return _ptr[index]; }
     const T& operator[](int index) const { return _ptr[index]; }

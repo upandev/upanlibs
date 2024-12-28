@@ -38,7 +38,7 @@ namespace upan {
       }
     }
 
-  public:
+  protected:
     explicit _base_uniq_ptr(PTR *ptr) : _ptr (ptr), _owner(true) {}
     _base_uniq_ptr() : _ptr(nullptr), _owner(true) {}
     _base_uniq_ptr(_base_uniq_ptr&& r) noexcept : _ptr(r.get()), _owner(true) { r.disown(); }
@@ -57,7 +57,9 @@ namespace upan {
       destroy();
     }
 
+  public:
     void disown() { _owner = false; }
+    bool isEmpty() const { return _ptr == nullptr; }
 
     PTR* get() { return _ptr; }
     const PTR* get() const { return _ptr; }
@@ -128,8 +130,8 @@ namespace upan {
     }
 
   public:
-    explicit uniq_ptr(T* ptr) : _base_uniq_ptr<uniq_ptr<T[]>, T>(ptr) {}
-    uniq_ptr() {}
+    uniq_ptr(T* ptr) : _base_uniq_ptr<uniq_ptr<T[]>, T>(ptr) {}
+    uniq_ptr() = default;
     uniq_ptr(uniq_ptr &&r) noexcept = default;
     uniq_ptr &operator=(uniq_ptr &&r) noexcept = default;
     uniq_ptr(const uniq_ptr&) = delete;
