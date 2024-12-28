@@ -27,13 +27,10 @@ time_t time(time_t * t)
 	time_t result;
 	struct timeval tv;
 
-	if (gettimeofday(&tv) ) //, (struct timezone *) NULL)) 
-	{
+	if (gettimeofday(&tv))	{
 		result = (time_t) - 1;
-	}
-   	else
-   	{
-		result = (time_t) tv.tSec;
+	} else {
+		result = (time_t) tv.tv_sec;
 	}
 
 	if (t != NULL) 

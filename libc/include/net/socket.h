@@ -44,6 +44,7 @@ typedef enum {
 
 typedef enum {
   SO_BROADCAST,
+  SO_RCVTIMEO,
   IP_TTL,
   TCP_NODELAY
 } SOCKET_OPTION;

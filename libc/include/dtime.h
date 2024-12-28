@@ -28,8 +28,9 @@ extern "C" {
 
 #include <stdlib.h>
 
-typedef unsigned time_t ;
-typedef int clock_t ;
+typedef uint32_t time_t;
+typedef uint32_t suseconds_t;
+typedef int clock_t;
 
 typedef struct {
 	uint8_t _second ;
@@ -62,7 +63,8 @@ int localtime(struct tm* t, const time_t* time) ;
 
 struct timeval
 {
-	time_t tSec ;
+	time_t tv_sec; //seconds
+  time_t tv_usec; //microseconds
 //  unsigned uimSec ;
 } PACKED ;
 
