@@ -117,7 +117,7 @@ uint32_t htonl(uint32_t x);
 uint32_t ntohl(uint32_t x);
 
 char* inet_ntoa(struct in_addr in);
-in_addr_t inet_aton(const char* ip);
+int inet_aton(const char* ip, struct in_addr* inp);
 
 sock_t socket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, IPPROTO_TYPE protocol);
 int bind(sock_t fd, struct sockaddr* client_addr, socklen_t len);

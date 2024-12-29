@@ -54,23 +54,23 @@ __thread char _inet_conversion_buffer[INET_ADDRSTRLEN + 1];
 
 char* inet_ntoa(struct in_addr in) {
   const uint8_t* addr = (uint8_t*) &in;
-  int n = snprintf(_inet_conversion_buffer, INET_ADDRSTRLEN + 1, "%u.%u.%u.%u", addr[3], addr[2], addr[1], addr[0]);
+  int n = snprintf(_inet_conversion_buffer, INET_ADDRSTRLEN + 1, "%u.%u.%u.%u", addr[0], addr[1], addr[2], addr[3]);
   if (n >= INET_ADDRSTRLEN) {
     return NULL;
   }
   return _inet_conversion_buffer;
 }
 
-in_addr_t inet_aton(const char* ip) {
-  if (!ip) {
-    return INADDR_NONE;
+int inet_aton(const char* ip, struct in_addr* inp) {
+  if (!ip || !inp) {
+    return 0;
   }
 
   if (strlen(ip) >= INET_ADDRSTRLEN) {
-    return INADDR_NONE;
+    return 0;
   }
 
-  in_addr_t res = 0;
+  uint8_t res[4];
 
   char c[4];
   int ci = 0;
@@ -80,20 +80,24 @@ in_addr_t inet_aton(const char* ip) {
   while(*p != '\0') {
     if (*p == '.') {
       if (dot_count == 3) {
-        return INADDR_NONE;
+        return 0;
       }
       ++dot_count;
 
       c[ci] = '\0';
       ci = 0;
 
-      res |= (atoi(c) << ((4 - dot_count) * 8));
+      const uint32_t v = atoi(c);
+      if (v > 0xFF) {
+        return 0;
+      }
+      res[dot_count - 1] = v;
     } else {
       if (ci == 3) {
-        return INADDR_NONE;
+        return 0;
       }
       if (!isdigit(*p)) {
-        return INADDR_NONE;
+        return 0;
       }
       c[ci] = *p;
       ++ci;
@@ -102,13 +106,18 @@ in_addr_t inet_aton(const char* ip) {
   }
 
   if (dot_count != 3) {
-    return INADDR_NONE;
+    return 0;
   }
 
   c[ci] = '\0';
-  res |= atoi(c);
+  const uint32_t v = atoi(c);
+  if (v > 0xFF) {
+    return 0;
+  }
+  res[dot_count] = v;
+  inp->s_addr = *((in_addr_t*)(&res));
 
-  return res;
+  return 1;
 }
 
 sock_t socket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, IPPROTO_TYPE protocol) {
