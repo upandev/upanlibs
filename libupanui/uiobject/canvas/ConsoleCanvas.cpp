@@ -44,6 +44,7 @@ namespace upanui {
       _usfnContext->Select(upanui::usfn::FAMILY_MONOSPACE, NULL, upanui::usfn::STYLE_REGULAR, 16);
       _textWriter.setFontContext(_usfnContext.get());
       UIObjectImpl::setKeyboardFocusable(true);
+      UIObjectImpl::captureMouseEvents(true);
     } catch(upan::exception& e) {
       printf("\n Failed to load USFN font: %s", e.ErrorMsg().c_str());
     }

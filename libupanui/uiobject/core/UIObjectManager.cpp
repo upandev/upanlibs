@@ -170,7 +170,6 @@ namespace upanui {
   }
 
   void UIObjectManager::dispatch(const MouseData& data) {
-    //TODO: get focus to clicked object. Dispatch event to object under mouse x,y
     upan::mutex_guard g(_uiObjectTreeMutex);
 
     const int viewportX = data.x() - _rootCanvas.x();
