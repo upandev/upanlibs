@@ -32,12 +32,13 @@ namespace upan {
 
     upan::string line;
     while (rstream.read_line(line)) {
+      line = upan::string::trim(line);
       if (line[0] == '#') {
         _items.push_back(upan::make_pair(upan::string::EMPTY, line));
       } else {
         upan::string key, value;
         if (line.split('=', key, value)) {
-          _items.push_back(upan::make_pair(key, value));
+          _items.push_back(upan::make_pair(upan::string::trim(key), upan::string::trim(value)));
         }
       }
     }

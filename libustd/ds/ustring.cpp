@@ -100,4 +100,46 @@ bool string::split(char c, string& p1, string& p2) const {
   return true;
 }
 
-};
+upan::string upan::string::to_string(uint64_t uiNumber) {
+  char strNumber[128];
+  unsigned i = 0;
+
+  do {
+    strNumber[i++] = (uiNumber % 10) + 0x30;
+    uiNumber /= 10;
+    if(i == 128)
+      return "";
+  }
+  while(uiNumber) ;
+
+  strNumber[i] = '\0';
+  strreverse(strNumber);
+  return strNumber;
+}
+
+upan::string upan::string::trim(const upan::string& line) {
+  const char* l = line.c_str();
+
+  int s = 0;
+  for(int i = 0; i < line.length(); ++i) {
+    if (!isspace(l[i])) {
+      s = i;
+      break;
+    }
+  }
+
+  int e = line.length() - 1;
+  for(int i = line.length() - 1; i >= 0; --i) {
+    if (!isspace(l[i])) {
+      e = i;
+      break;
+    }
+  }
+
+  if (e < s) {
+    return EMPTY;
+  }
+
+  return { l + s, e - s + 1};
+}
+}

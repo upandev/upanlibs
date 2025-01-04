@@ -201,22 +201,8 @@ private:
   int   _capacity;
 
 public:
-  static upan::string to_string(uint64_t uiNumber) {
-    char strNumber[128];
-    unsigned i = 0;
-
-    do {
-      strNumber[i++] = (uiNumber % 10) + 0x30;
-      uiNumber /= 10;
-      if(i == 128)
-        return "";
-    }
-    while(uiNumber) ;
-
-    strNumber[i] = '\0';
-    strreverse(strNumber);
-    return strNumber;
-  }
+  static upan::string to_string(uint64_t uiNumber);
+  static upan::string trim(const upan::string& line);
 };
 
 };
