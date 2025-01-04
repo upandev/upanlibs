@@ -20,14 +20,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#pragma once
-
-#include <net/socket.h>
-#include <ustring.h>
+#include <unet.h>
 
 namespace upan {
   namespace net {
-    upan::string inet_ntostr(in_addr_t ip);
-    in_addr_t inet_strton(const upan::string& ip);
+    upan::string inet_ntostr(in_addr_t ip) {
+      return inet_ntoa({ip});
+    }
+
+    in_addr_t inet_strton(const upan::string& ip) {
+      struct in_addr addr {};
+      return inet_aton(ip.c_str(), &addr) ? addr.s_addr : INADDR_NONE;
+    }
   }
 }

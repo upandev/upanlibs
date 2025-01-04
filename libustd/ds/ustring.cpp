@@ -25,6 +25,8 @@
 
 namespace upan {
 
+const string string::EMPTY("");
+
 const char string::operator[](int index) const {
   if(index < 0 || index > length())
     throw exception(XLOC, "accessing string index (%d) out of range", index);

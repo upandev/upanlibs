@@ -31,6 +31,7 @@ template <typename T> class list;
 
 class string {
 public:
+  static const string EMPTY;
   string()
   {
     init();
