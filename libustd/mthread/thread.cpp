@@ -34,7 +34,7 @@ namespace upan {
 
   class _thread_termination_guard {
   public:
-    _thread_termination_guard(thread* t) : _t(t) {
+    explicit _thread_termination_guard(thread* t) : _t(t) {
     }
     ~_thread_termination_guard() {
       _t->_state.set(thread::stopped);

@@ -64,45 +64,56 @@ namespace upan {
 
 template <class T> class option;
 
-class error
-{
-  private:
-    error() {}
+class error {
+private:
+  error() {}
 
-  public:
-    error(const char * __restrict fmsg, ...)
-    {
-      va_list arg;
+  void init(const char* __restrict fmsg, va_list arg) {
+    const int BSIZE = 1024;
+    char buf[BSIZE];
+    vsnprintf(buf, BSIZE, fmsg, arg);
+    _msg = buf;
+  }
 
-      const int BSIZE = 1024;
-      char buf[BSIZE];
+public:
+  error(const char* __restrict fmsg, ...) : _val(-1) {
+    va_list arg;
+    va_start(arg, fmsg);
+    init(fmsg, arg);
+    va_end(arg);
+  }
 
-      va_start(arg, fmsg);
+  error(int64_t val, const char* __restrict fmsg, ...) : _val(val) {
+    va_list arg;
+    va_start(arg, fmsg);
+    init(fmsg, arg);
+    va_end(arg);
+  }
 
-      vsnprintf(buf, BSIZE, fmsg, arg);
-      _msg = buf;
+  error(const char* __restrict fmsg, va_list arg) : _val(-1) {
+    init(fmsg, arg);
+  }
 
-      va_end(arg);
-    }
+  error(int64_t val, const char* __restrict fmsg, va_list arg) : _val(val) {
+    init(fmsg, arg);
+  }
 
-    error(const char * __restrict fmsg, va_list arg)
-    {
-      const int BSIZE = 1024;
-      char buf[BSIZE];
-      vsnprintf(buf, BSIZE, fmsg, arg);
-      _msg = buf;
-    }
+  error(const upan::string& msg) : _val(-1), _msg(msg) {}
 
-    error(const upan::string& msg) : _msg(msg) {}
+  error(int64_t val, const upan::string& msg) : _val(val), _msg(msg) {}
 
-    const upan::string& Msg() const { return _msg; }
+  const upan::string& Msg() const { return _msg; }
+  uint64_t Val() const { return _val; }
 
-  private:
-    upan::string _msg;
+private:
+  int64_t _val;
+  upan::string _msg;
 
-    template<typename Good> friend class result;
-    friend class exception;
-    friend option<upan::error>;
+  template<typename Good> friend
+  class result;
+
+  friend class exception;
+  friend option<upan::error>;
 };
 
 class exception
