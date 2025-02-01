@@ -69,12 +69,12 @@ struct timeval
 } PACKED ;
 
 #define HRS_IN_DAY (86400)
-extern void SysUtil_GetDateTime(RTCDateTime* rtcDateTime) ;
-#define dtime(prtc) SysUtil_GetDateTime(prtc)
 
 int gettimeofday(struct timeval*) ;
 //time since boot
 uint32_t btime();
+void dtime(RTCDateTime*);
+char* dtime_str();
 
 // As per POSIX...
 #define CLOCKS_PER_SEC 1000000

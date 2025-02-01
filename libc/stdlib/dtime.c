@@ -21,6 +21,7 @@
  */
 # include <dtime.h>
 # include <syscalldefs.h>
+# include <stdio.h>
 
 time_t time(time_t * t)
 {
@@ -55,3 +56,22 @@ int gettimeofday(struct timeval* pTV)
 uint32_t btime() {
   return SysUtil_GetTimeSinceBoot();
 }
+
+void dtime(RTCDateTime* rtcDateTime) {
+  SysUtil_GetDateTime(rtcDateTime);
+}
+
+__thread char _dtime_str_buf[30];
+
+char* dtime_str() {
+  RTCDateTime rtcDateTime;
+  dtime(&rtcDateTime);
+
+  sprintf(_dtime_str_buf, "%02d/%02d/%d %02d:%02d:%02d", rtcDateTime._dayOfMonth, rtcDateTime._month,
+          rtcDateTime._century * 100 + rtcDateTime._year, rtcDateTime._hour, rtcDateTime._minute,
+          rtcDateTime._second);
+
+  return _dtime_str_buf;
+}
+
+
