@@ -31,6 +31,9 @@ namespace upan {
     open(fileName, mode);
   }
 
+  file_stream::file_stream(int fd) : _fd(fd) {
+  }
+
   file_stream::~file_stream() {
     close();
   }

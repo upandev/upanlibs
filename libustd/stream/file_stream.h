@@ -31,6 +31,7 @@ namespace upan {
   public:
     file_stream();
     file_stream(const upan::string& fileName, uint8_t mode);
+    file_stream(int fd);
     ~file_stream();
 
     bool is_good() const { return _fd >= 0; }
