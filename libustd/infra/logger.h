@@ -27,25 +27,32 @@
 
 namespace upan {
   class logger {
+  public:
+    enum level_t {
+      LOG_DEBUG,
+      LOG_INFO,
+      LOG_WARN,
+      LOG_ERROR,
+    };
   private:
     static logger* _instance;
 
-    logger(const upan::string& filePath);
+    explicit logger(const upan::string& filePath);
+    explicit logger(int fd);
     logger(const logger&) = delete;
     logger& operator=(const logger&) = delete;
 
   public:
     static void create(const upan::string& filePath);
+    static void create(int fd);
     static void close();
     static logger& instance();
-    static bool is_good() { return _instance != nullptr && _instance->_writer.is_good(); }
-    static void log(const char * __restrict fmsg, ...);
-    static void logarg(const char * __restrict fmsg, va_list);
+
+    void log(level_t level, const char * __restrict fmsg, ...);
+    void logarg(level_t level, const char * __restrict fmsg, va_list);
 
   private:
-    void _log(const upan::string& msg);
+    void _log(level_t level, const upan::string& msg);
     file_stream _writer;
   };
-
-
 }

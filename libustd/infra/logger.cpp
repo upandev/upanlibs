@@ -33,6 +33,13 @@ void logger::create(const upan::string& filePath) {
   _instance = new logger(filePath);
 }
 
+void logger::create(int fd) {
+  if (_instance) {
+    throw upan::exception(XLOC, "logger is already created");
+  }
+  _instance = new logger(fd);
+}
+
 void logger::close() {
   delete _instance;
   _instance = nullptr;
@@ -48,27 +55,45 @@ logger& logger::instance() {
 logger::logger(const upan::string& filePath) : _writer(filePath, O_RDWR | O_APPEND) {
 }
 
-void logger::log(const char * __restrict fmsg, ...) {
+logger::logger(int fd) : _writer(fd) {
+}
+
+void logger::log(level_t level, const char * __restrict fmsg, ...) {
   va_list arg;
   va_start(arg, fmsg);
-  logarg(fmsg, arg);
+  logarg(level, fmsg, arg);
   va_end(arg);
 }
 
-void logger::logarg(const char * __restrict fmsg, va_list arg) {
+void logger::logarg(level_t level, const char * __restrict fmsg, va_list arg) {
   const int BSIZE = 1024;
   char buf[BSIZE];
   vsnprintf(buf, BSIZE, fmsg, arg);
-
-  if (logger::is_good()) {
-    logger::instance()._log(buf);
-  } else {
-    printf(buf);
-  }
+  _log(level, buf);
 }
 
-void logger::_log(const upan::string& msg) {
-  _writer.write(msg.c_str(), msg.length());
+void logger::_log(level_t level, const upan::string& msg) {
+  upan::string logline("\n");
+  logline += dtime_str();
+  switch (level) {
+    case LOG_DEBUG:
+      logline += " [DEBUG] ";
+      break;
+
+    case LOG_INFO:
+      logline += " [INFO] ";
+      break;
+
+    case LOG_WARN:
+      logline += " [WARN] ";
+      break;
+
+    case LOG_ERROR:
+      logline += " [ERROR] ";
+      break;
+  }
+  logline += msg;
+  _writer.write(logline.c_str(), logline.length());
 }
 
 }
