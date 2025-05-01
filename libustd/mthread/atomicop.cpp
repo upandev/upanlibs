@@ -45,6 +45,12 @@ namespace upan {
       return val;
     }
 
+    uint32_t op::bit_and(volatile uint32_t& var, uint32_t mask) {
+      return __atomic_fetch_and(&var, mask, __ATOMIC_SEQ_CST);
+    }
 
+    uint32_t op::bit_or(volatile uint32_t& var, uint32_t mask) {
+      return __atomic_fetch_or(&var, mask, __ATOMIC_SEQ_CST);
+    }
   }
 }

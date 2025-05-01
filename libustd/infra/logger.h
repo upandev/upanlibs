@@ -29,10 +29,10 @@ namespace upan {
   class logger {
   public:
     enum level_t {
-      LOG_DEBUG,
-      LOG_INFO,
-      LOG_WARN,
-      LOG_ERROR,
+      LOG_DEBUG = 1,
+      LOG_INFO = 2,
+      LOG_WARN = 4,
+      LOG_ERROR = 8,
     };
   private:
     static logger* _instance;
