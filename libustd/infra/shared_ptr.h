@@ -54,10 +54,12 @@ namespace upan {
     }
 
     _base_shared_ptr& operator=(const _base_shared_ptr& r) {
-      destroy();
-      _ptr = r._ptr;
-      _refCount = r._refCount;
-      if (_refCount) _refCount->inc();
+      if (this != &r) {
+        destroy();
+        _ptr = r._ptr;
+        _refCount = r._refCount;
+        if (_refCount) _refCount->inc();
+      }
       return *this;
     }
 
