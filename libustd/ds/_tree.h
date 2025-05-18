@@ -84,7 +84,13 @@ class _tree
     const_iterator begin() const { return cbegin(); }
     const_iterator end() const { return cend(); }
 
-    template <typename LAMBDA>
+    iterator lower_bound(key_type& key) { return iterator(lower_bound_node(key)); }
+    const_iterator lower_bound(key_type& key) const { return const_iterator(lower_bound_node(key)); }
+
+    iterator upper_bound(key_type& key) { return iterator(upper_bound_node(key)); }
+    const_iterator upper_bound(key_type& key) const { return const_iterator(upper_bound_node(key)); }
+
+  template <typename LAMBDA>
     void foreach(const LAMBDA& lambda) const {
       for(auto i = begin(); i != end(); ++i) {
         lambda(*i);
@@ -467,7 +473,35 @@ class _tree
       return cur;
     }
 
-  private:
+    node* lower_bound_node(key_type& key) {
+      node* cur = _root;
+      node* result = nullptr;
+      while(cur) {
+        if (!(get_key(cur->element()) < key)) {
+          result = cur;
+          cur = cur->left();
+        } else {
+          cur = cur->right();
+        }
+      }
+      return result;
+    }
+
+    node* upper_bound_node(key_type& key) {
+      node* cur = _root;
+      node* result = nullptr;
+      while(cur) {
+        if (key < get_key(cur->element())) {
+          result = cur;
+          cur = cur->left();
+        } else {
+          cur = cur->right();
+        }
+      }
+      return result;
+    }
+
+private:
     node* _root;
     int   _size;
 };
