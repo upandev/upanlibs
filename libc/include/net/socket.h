@@ -22,6 +22,8 @@
 #pragma once
 
 #include <stdlib.h>
+#include <net/ip.h>
+#include <net/if_ether.h>
 
 #if defined __cplusplus
 extern "C" {
@@ -36,18 +38,6 @@ typedef enum {
 typedef enum {
   AF_INET = 2
 } SA_FAMILY_TYPE;
-
-typedef enum {
-  IPPROTO_IP = 0,
-  IPPROTO_ICMP = 1,
-  IPPROTO_TCP = 6,
-  IPPROTO_UDP = 17,
-} IPPROTO_TYPE;
-
-typedef enum {
-  ETH_P_IP = 0x0800,
-  ETH_P_ARP = 0x0806,
-} ETH_PROTO_TYPE;
 
 typedef enum {
   SO_BROADCAST,
@@ -84,7 +74,6 @@ typedef enum {
 typedef uint16_t sa_family_t;
 typedef uint16_t in_port_t;
 typedef uint32_t socklen_t;
-typedef uint32_t in_addr_t;
 typedef int sock_t;
 
 #define INADDR_ANY (in_addr_t)0
@@ -94,13 +83,7 @@ typedef int sock_t;
 
 #define INPORT_ANY (in_port_t)0
 
-#define INET_ADDRSTRLEN 16
-
 #define SOL_SOCKET 1
-
-struct in_addr {
-  in_addr_t s_addr;
-};
 
 struct sockaddr {
   sa_family_t sa_family;
@@ -114,63 +97,13 @@ struct sockaddr_in {
   uint8_t sin_zero[8];
 } PACKED;
 
-struct ip {
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-  unsigned int ip_hl:4;       // header length
-  unsigned int ip_v:4;        // version
-#else
-  unsigned int ip_v:4;
-  unsigned int ip_hl:4;
-#endif
-  uint8_t  ip_tos;            // type of service
-  uint16_t ip_len;            // total length
-  uint16_t ip_id;             // identification
-  uint16_t ip_off;            // fragment offset field
-  uint8_t  ip_ttl;            // time to live
-  uint8_t  ip_p;              // protocol
-  uint16_t ip_sum;            // checksum
-  struct in_addr ip_src; // source address
-  struct in_addr ip_dst; // dest address
-} PACKED;
-
-struct icmp {
-  uint8_t  icmp_type;
-  uint8_t  icmp_code; //subtype
-  uint16_t icmp_cksum;
-  union {
-    struct {
-      uint16_t icmp_id;
-      uint16_t icmp_seq;
-    };             // for echo request/reply
-    uint32_t icmp_gateway;
-    struct {
-      uint16_t __unused;
-      uint16_t mtu;
-    };
-  };//header-union
-
-  union {
-    uint32_t icmp_timestamp[3];
-    uint8_t icmp_data[1];
-    struct ip ip_header; // for errors (includes offending IP header)
-    uint32_t unused;
-  };//data-union
-} PACKED;
-
-#define ICMP_ECHOREPLY 0
-#define ICMP_ECHO 8
-
-#define INADDR_MAC_LEN 6
-extern const uint8_t INADDR_MAC_BROADCAST[INADDR_MAC_LEN];
+extern const uint8_t INADDR_MAC_BROADCAST[ETH_ALEN];
 
 uint16_t htons(uint16_t x);
 uint16_t ntohs(uint16_t x);
 
 uint32_t htonl(uint32_t x);
 uint32_t ntohl(uint32_t x);
-
-char* inet_ntoa(struct in_addr in);
-int inet_aton(const char* ip, struct in_addr* inp);
 
 sock_t socket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, int protocol);
 int bind(sock_t fd, struct sockaddr* client_addr, socklen_t len);
