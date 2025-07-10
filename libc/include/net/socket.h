@@ -29,7 +29,8 @@ extern "C" {
 
 typedef enum {
   SOCK_STREAM = 1,
-  SOCK_DGRAM = 2
+  SOCK_DGRAM = 2,
+  SOCK_RAW = 3
 } SOCKET_TYPE;
 
 typedef enum {
@@ -38,6 +39,7 @@ typedef enum {
 
 typedef enum {
   IPPROTO_IP = 0,
+  IPPROTO_ICMP = 1,
   IPPROTO_TCP = 6,
   IPPROTO_UDP = 17,
 } IPPROTO_TYPE;
@@ -106,6 +108,52 @@ struct sockaddr_in {
   struct in_addr sin_addr;
   uint8_t sin_zero[8];
 } PACKED;
+
+struct ip {
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+  unsigned int ip_hl:4;       // header length
+  unsigned int ip_v:4;        // version
+#else
+  unsigned int ip_v:4;
+    unsigned int ip_hl:4;
+#endif
+  uint8_t  ip_tos;            // type of service
+  uint16_t ip_len;            // total length
+  uint16_t ip_id;             // identification
+  uint16_t ip_off;            // fragment offset field
+  uint8_t  ip_ttl;            // time to live
+  uint8_t  ip_p;              // protocol
+  uint16_t ip_sum;            // checksum
+  struct in_addr ip_src; // source address
+  struct in_addr ip_dst; // dest address
+};
+
+struct icmp {
+  uint8_t  icmp_type;
+  uint8_t  icmp_code; //subtype
+  uint16_t icmp_cksum;
+  union {
+    struct {
+      uint16_t icmp_id;
+      uint16_t icmp_seq;
+    };             // for echo request/reply
+    uint32_t icmp_gateway;
+    struct {
+      uint16_t __unused;
+      uint16_t mtu;
+    };
+  };//header-union
+
+  union {
+    uint32_t icmp_timestamp[3];
+    uint8_t icmp_data[1];
+    struct ip ip_header; // for errors (includes offending IP header)
+    uint32_t unused;
+  };//data-union
+};
+
+#define ICMP_ECHOREPLY 0
+#define ICMP_ECHO 8
 
 #define INADDR_MAC_LEN 6
 extern const uint8_t INADDR_MAC_BROADCAST[INADDR_MAC_LEN];
