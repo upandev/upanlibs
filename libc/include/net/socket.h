@@ -115,7 +115,7 @@ struct ip {
   unsigned int ip_v:4;        // version
 #else
   unsigned int ip_v:4;
-    unsigned int ip_hl:4;
+  unsigned int ip_hl:4;
 #endif
   uint8_t  ip_tos;            // type of service
   uint16_t ip_len;            // total length
@@ -126,7 +126,7 @@ struct ip {
   uint16_t ip_sum;            // checksum
   struct in_addr ip_src; // source address
   struct in_addr ip_dst; // dest address
-};
+} PACKED;
 
 struct icmp {
   uint8_t  icmp_type;
@@ -150,7 +150,7 @@ struct icmp {
     struct ip ip_header; // for errors (includes offending IP header)
     uint32_t unused;
   };//data-union
-};
+} PACKED;
 
 #define ICMP_ECHOREPLY 0
 #define ICMP_ECHO 8
