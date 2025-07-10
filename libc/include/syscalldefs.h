@@ -84,6 +84,7 @@ typedef enum
 
   SYS_CALL_IO_START = 300,
     SYS_CALL_IO_CLOSE,
+    SYS_CALL_IO_CTL,
   SYS_CALL_IO_END,
 
 	SYS_CALL_MEM_START = 400,
@@ -177,6 +178,7 @@ int SysFS_FileAccess(const char* szFileName, int mode);
 void SysFS_FileSelect(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors);
 
 int SysIO_Close(int fd);
+int SysIO_Ctl(int fd, uint64_t cmd, uint64_t arg);
 
 int SysMemory_AlignedAlloc(void** addr, uint32_t alignment, uint32_t uiSizeInBytes);
 int SysMemory_Free(void* uiAddress);
@@ -206,7 +208,7 @@ int SysProcess_IsProcessAlive(int iProcessID);
 int SysProcess_IsKernel();
 int SysProcess_IsChildAlive(int iProcessID);
 
-sock_t SysNet_CreateSocket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, IPPROTO_TYPE protocol);
+sock_t SysNet_CreateSocket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, int protocol);
 int SysNet_Bind(sock_t fd, struct sockaddr* client_addr, socklen_t len);
 int SysNet_SetSockOpt(sock_t fd, int level, SOCKET_OPTION option, const void* optval, socklen_t len);
 int SysNet_SendTo(int fd, const void *buf, size_t n, int flags, const struct sockaddr* addr, socklen_t len);

@@ -120,7 +120,7 @@ int inet_aton(const char* ip, struct in_addr* inp) {
   return 1;
 }
 
-sock_t socket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, IPPROTO_TYPE protocol) {
+sock_t socket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, int protocol) {
   return SysNet_CreateSocket(sa_family, socket_type, protocol);
 }
 

@@ -22,8 +22,8 @@
 
 #include <syscalldefs.h>
 
-sock_t SysNet_CreateSocket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, IPPROTO_TYPE protocol) {
-  return (sock_t)_upanix_syscall(SYS_CALL_SOCKET_CREATE, (uint64_t)sa_family, (uint64_t)socket_type, (IPPROTO_TYPE)protocol, 4, 5);
+sock_t SysNet_CreateSocket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, int protocol) {
+  return (sock_t)_upanix_syscall(SYS_CALL_SOCKET_CREATE, (uint64_t)sa_family, (uint64_t)socket_type, (uint64_t)protocol, 4, 5);
 }
 
 int SysNet_Bind(sock_t fd, struct sockaddr* client_addr, socklen_t len) {

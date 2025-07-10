@@ -94,14 +94,14 @@ include_directories(${PROJECT_SOURCE_DIR}/libupanui/interop/includes)
 add_custom_target(resources COMMAND make WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/libupanui/resources/)
 
 #LIBC
-execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.S' | grep -v CMakeFile | grep -v './libc/sys/'" OUTPUT_VARIABLE LIBC_ASM_SRC)
-execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.[cS]' | grep -v CMakeFile | grep -v './libc/sys/'" OUTPUT_VARIABLE LIBC_SRC)
-execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.c' | grep -v CMakeFile | grep './libc/sys/'" OUTPUT_VARIABLE LIBC_SYS_SRC)
+execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.S' | grep -v CMakeFile | grep -v './libc/syscall/'" OUTPUT_VARIABLE LIBC_ASM_SRC)
+execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.[cS]' | grep -v CMakeFile | grep -v './libc/syscall/'" OUTPUT_VARIABLE LIBC_SRC)
+execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.c' | grep -v CMakeFile | grep './libc/syscall/'" OUTPUT_VARIABLE LIBC_SYSCALL_SRC)
 string(REPLACE "\n" ";" LIBC_SRC ${LIBC_SRC})
 string(REPLACE "\n" ";" LIBC_ASM_SRC ${LIBC_ASM_SRC})
-string(REPLACE "\n" ";" LIBC_SYS_SRC ${LIBC_SYS_SRC})
+string(REPLACE "\n" ";" LIBC_SYSCALL_SRC ${LIBC_SYSCALL_SRC})
 set_source_files_properties(${LIBC_ASM_SRC} PROPERTIES LANGUAGE C)
-add_library(c SHARED ${LIBC_SRC} ${LIBC_ASM_SRC} ${LIBC_SYS_SRC})
+add_library(c SHARED ${LIBC_SRC} ${LIBC_ASM_SRC} ${LIBC_SYSCALL_SRC})
 target_compile_options(c PRIVATE -O0 ${SO_COMPILE_FLAGS})
 
 #LIBC static for kernel - so don't include sys-call code

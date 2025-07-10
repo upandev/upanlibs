@@ -24,3 +24,7 @@
 int SysIO_Close(int fd) {
   return _upanix_syscall(SYS_CALL_IO_CLOSE, (uint64_t)fd, 2, 3, 4, 5);
 }
+
+int SysIO_Ctl(int fd, uint64_t cmd, uint64_t arg) {
+  return _upanix_syscall(SYS_CALL_IO_CTL, (uint64_t)fd, cmd, arg, 4 ,5);
+}
