@@ -36,7 +36,8 @@ typedef enum {
 } SOCKET_TYPE;
 
 typedef enum {
-  AF_INET = 2
+  AF_INET = 2,
+  AF_PACKET = 17,
 } SA_FAMILY_TYPE;
 
 typedef enum {
@@ -95,6 +96,16 @@ struct sockaddr_in {
   in_port_t sin_port;
   struct in_addr sin_addr;
   uint8_t sin_zero[8];
+} PACKED;
+
+struct sockaddr_ll {
+  uint16_t sll_family;   // Always AF_PACKET
+  uint16_t sll_protocol; // Ethernet protocol in network byte order (e.g., htons(ETH_P_ARP))
+  int      sll_ifindex;  // Interface index (e.g., from ioctl SIOCGIFINDEX)
+  uint16_t sll_hatype;   // ARP hardware type (e.g., ARPHRD_ETHER)
+  uint8_t  sll_pkttype;  // Packet type (e.g., PACKET_HOST)
+  uint8_t  sll_halen;    // Length of address (MAC length = 6)
+  uint8_t  sll_addr[8];  // Physical address (MAC address, 6 bytes + padding)
 } PACKED;
 
 extern const uint8_t INADDR_MAC_BROADCAST[ETH_ALEN];

@@ -29,6 +29,11 @@
 extern "C" {
 #endif
 
+#define ARPHRD_ETHER 1
+
+#define ARPOP_REQUEST 1
+#define ARPOP_REPLY 2
+
 struct arphdr {
   uint16_t ar_hrd;      // Hardware type (e.g., ARPHRD_ETHER)
   uint16_t ar_pro;      // Protocol type (e.g., ETH_P_IP)
