@@ -148,10 +148,18 @@ bool bitset<SIZE>::all() const {
 
 template <int SIZE>
 int bitset<SIZE>::allocate(int start, int end) {
-  for (int i = 0; i < BIT_ARRAY_SIZE; ++i) {
+  const auto start_array_index = start / BITS_PER_ELEMENT;
+  const auto start_bit_pos = start % BITS_PER_ELEMENT;
+
+  const auto end_array_index = end / BITS_PER_ELEMENT;
+  const auto end_bit_pos = end % BITS_PER_ELEMENT;
+
+  for (int i = start_array_index; i < BIT_ARRAY_SIZE && i <= end_array_index; ++i) {
     const auto v = _bit_array[i];
     if (v != UINT64_MAX) {
-      for (int j = 0; j < BITS_PER_ELEMENT; ++j) {
+      const auto j_start = i == start_array_index ? start_bit_pos : 0;
+      const auto j_end = i == end_array_index ? end_bit_pos : BITS_PER_ELEMENT - 1;
+      for (int j = j_start; j <= j_end; ++j) {
         if (((v >> j) & 1) == 0) {
           _bit_array[i] |= (1 << j);
           return i * BITS_PER_ELEMENT + j;
