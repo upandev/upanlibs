@@ -93,3 +93,8 @@ int inet_aton(const char* ip, struct in_addr* inp) {
 
   return 1;
 }
+
+bool is_ip_address(const char* ip) {
+  struct in_addr addr;
+  return inet_aton(ip, &addr) == 1;
+}

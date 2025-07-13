@@ -22,12 +22,14 @@
 #pragma once
 
 #include <stdlib.h>
+#include <stdbool.h>
 
 #if defined __cplusplus
 extern "C" {
 #endif
 
 #define INET_ADDRSTRLEN 16
+#define IPV4_ADDR_LEN 4
 
 typedef enum {
   IPPROTO_IP = 0,
@@ -63,6 +65,7 @@ struct ip {
 
 char* inet_ntoa(struct in_addr in);
 int inet_aton(const char* ip, struct in_addr* inp);
+bool is_ip_address(const char* ip);
 
 #if defined __cplusplus
 }
