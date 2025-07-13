@@ -43,3 +43,15 @@ int SysNet_RecvFrom(int fd, void *buf, size_t n, int flags, struct sockaddr* add
   uint64_t ext_param[] = { (uint64_t)addr, (uint64_t)len };
   return (int)_upanix_syscall(SYS_CALL_SOCKET_RECV_FROM, (uint64_t)fd, (uint64_t)buf, (uint64_t)n, (uint64_t)flags, (uint64_t)&ext_param);
 }
+
+int SysNet_GetHostByName(const char* name, struct hostent** hostinfo) {
+  return (int)_upanix_syscall(SYS_CALL_GET_HOST_BY_NAME, (uint64_t)name, (uint64_t)hostinfo, 3, 4, 5);
+}
+
+int SysNet_GetHostByAddr(const void* addr, socklen_t len, int type, struct hostent** hostinfo) {
+  return (int)_upanix_syscall(SYS_CALL_GET_HOST_BY_ADDR, (uint64_t)addr, (uint64_t)len, (uint64_t)type, (uint64_t)hostinfo, 5);
+}
+
+void SysNet_FreeHostInfo(struct hostent* hostinfo) {
+  _upanix_syscall(SYS_CALL_FREE_HOST_INFO, (uint64_t)hostinfo, 2, 3, 4, 5);
+}

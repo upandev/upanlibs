@@ -33,6 +33,7 @@ extern "C" {
 # include <drive.h>
 # include <cdisplay.h>
 # include <net/socket.h>
+# include <net/netdb.h>
 
 uint64_t _upanix_syscall(uint64_t sysCallId, uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4, uint64_t p5);
 
@@ -138,6 +139,9 @@ typedef enum
     SYS_CALL_SOCKET_SET_OPT,
     SYS_CALL_SOCKET_SEND_TO,
     SYS_CALL_SOCKET_RECV_FROM,
+    SYS_CALL_GET_HOST_BY_NAME,
+    SYS_CALL_GET_HOST_BY_ADDR,
+    SYS_CALL_FREE_HOST_INFO,
   SYS_CALL_NETWORK_END,
 } SYS_CALL_NUMBERS ;
 
@@ -213,6 +217,9 @@ int SysNet_Bind(sock_t fd, struct sockaddr* client_addr, socklen_t len);
 int SysNet_SetSockOpt(sock_t fd, int level, SOCKET_OPTION option, const void* optval, socklen_t len);
 int SysNet_SendTo(int fd, const void *buf, size_t n, int flags, const struct sockaddr* addr, socklen_t len);
 int SysNet_RecvFrom(int fd, void *buf, size_t n, int flags, struct sockaddr* addr, socklen_t* len);
+int SysNet_GetHostByName(const char* name, struct hostent** hostinfo);
+int SysNet_GetHostByAddr(const void* addr, socklen_t len, int type, struct hostent** hostinfo);
+void SysNet_FreeHostInfo(struct hostent* hostinfo);
 
 #if defined __cplusplus
 }
