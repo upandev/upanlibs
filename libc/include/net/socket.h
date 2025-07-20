@@ -78,7 +78,7 @@ typedef uint32_t socklen_t;
 typedef int sock_t;
 
 #define INADDR_ANY (in_addr_t)0
-#define INADDR_LOOPBACK (in_addr_t)0x7f000001
+#define INADDR_LOOPBACK (in_addr_t)0x0100007f
 #define INADDR_BROADCAST (in_addr_t)0xffffffff
 #define INADDR_NONE (in_addr_t)0xffffffff
 

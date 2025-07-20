@@ -52,13 +52,25 @@ logger& logger::instance() {
   return *_instance;
 }
 
-logger::logger(const upan::string& filePath) : _writer(filePath, O_RDWR | O_APPEND) {
+static uint32_t constexpr DEFAULT_LOG_LEVEL = upan::logger::LOG_INFO | upan::logger::LOG_WARN | upan::logger::LOG_ERROR;
+
+logger::logger(const upan::string& filePath) : _writer(filePath, O_RDWR | O_APPEND), _logLevel(DEFAULT_LOG_LEVEL) {
 }
 
-logger::logger(int fd) : _writer(fd) {
+logger::logger(int fd) : _writer(fd), _logLevel(DEFAULT_LOG_LEVEL) {
+}
+
+void logger::enable(uint32_t levels) {
+  _logLevel.bit_or(levels);
+}
+
+void logger::disable(uint32_t levels) {
+  _logLevel.bit_and(~levels);
 }
 
 void logger::log(level_t level, const char * __restrict fmsg, ...) {
+  if (!(_logLevel.get() & level)) { return; }
+
   va_list arg;
   va_start(arg, fmsg);
   logarg(level, fmsg, arg);
@@ -66,6 +78,8 @@ void logger::log(level_t level, const char * __restrict fmsg, ...) {
 }
 
 void logger::logarg(level_t level, const char * __restrict fmsg, va_list arg) {
+  if (!(_logLevel.get() & level)) { return; }
+
   const int BSIZE = 1024;
   char buf[BSIZE];
   vsnprintf(buf, BSIZE, fmsg, arg);
@@ -76,6 +90,10 @@ void logger::_log(level_t level, const upan::string& msg) {
   upan::string logline("\n");
   logline += dtime_str();
   switch (level) {
+    case LOG_TRACE:
+      logline += " [TRACE] ";
+      break;
+
     case LOG_DEBUG:
       logline += " [DEBUG] ";
       break;
@@ -90,6 +108,10 @@ void logger::_log(level_t level, const upan::string& msg) {
 
     case LOG_ERROR:
       logline += " [ERROR] ";
+      break;
+
+    default:
+      logline += " [UNKNOWN] ";
       break;
   }
   logline += msg;

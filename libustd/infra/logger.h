@@ -23,36 +23,43 @@
 #pragma once
 
 #include <ustring.h>
+#include <atomicop.h>
 #include <file_stream.h>
 
 namespace upan {
   class logger {
   public:
     enum level_t {
-      LOG_DEBUG = 1,
-      LOG_INFO = 2,
-      LOG_WARN = 4,
-      LOG_ERROR = 8,
+      LOG_TRACE = 1,
+      LOG_DEBUG = 2,
+      LOG_INFO = 4,
+      LOG_WARN = 8,
+      LOG_ERROR = 16,
     };
+
   private:
     static logger* _instance;
 
     explicit logger(const upan::string& filePath);
     explicit logger(int fd);
+
+  public:
     logger(const logger&) = delete;
     logger& operator=(const logger&) = delete;
 
-  public:
     static void create(const upan::string& filePath);
     static void create(int fd);
     static void close();
     static logger& instance();
 
+    void enable(uint32_t levels);
+    void disable(uint32_t levels);
     void log(level_t level, const char * __restrict fmsg, ...);
     void logarg(level_t level, const char * __restrict fmsg, va_list);
 
   private:
     void _log(level_t level, const upan::string& msg);
     file_stream _writer;
+    upan::atomic::integral<uint32_t> _logLevel;
   };
 }
