@@ -68,6 +68,29 @@ void logger::disable(uint32_t levels) {
   _logLevel.bit_and(~levels);
 }
 
+static uint32_t strtolevel(const upan::string& level) {
+  if (level == "trace") {
+    return upan::logger::LOG_TRACE;
+  } else if (level == "debug") {
+    return upan::logger::LOG_DEBUG;
+  } else if (level == "info") {
+    return upan::logger::LOG_INFO;
+  } else if (level == "warn") {
+    return upan::logger::LOG_WARN;
+  } else if (level == "error") {
+    return upan::logger::LOG_ERROR;
+  }
+  throw upan::exception(XLOC, "invalid log level %s", level.c_str());
+}
+
+void logger::enable(const upan::string& level) {
+  _logLevel.bit_or(strtolevel(level));
+}
+
+void logger::disable(const upan::string& level) {
+  _logLevel.bit_and(~strtolevel(level));
+}
+
 void logger::log(level_t level, const char * __restrict fmsg, ...) {
   if (!(_logLevel.get() & level)) { return; }
 

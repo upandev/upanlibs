@@ -54,6 +54,9 @@ namespace upan {
 
     void enable(uint32_t levels);
     void disable(uint32_t levels);
+    void enable(const upan::string& level);
+    void disable(const upan::string& level);
+
     void log(level_t level, const char * __restrict fmsg, ...);
     void logarg(level_t level, const char * __restrict fmsg, va_list);
 

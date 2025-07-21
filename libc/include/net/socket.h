@@ -120,7 +120,10 @@ sock_t socket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, int protocol);
 int bind(sock_t fd, struct sockaddr* client_addr, socklen_t len);
 int setsockopt(sock_t fd, int level, SOCKET_OPTION option, const void* optval, socklen_t len);
 ssize_t sendto(int fd, const void *buf, size_t n, int flags, const struct sockaddr* addr, socklen_t len);
+ssize_t send(int fd, const void *buf, size_t n, int flags);
 ssize_t recvfrom(int fd, void *buf, size_t n, int flags, struct sockaddr* addr, socklen_t* len);
+ssize_t recv(int fd, void *buf, size_t n, int flags);
+int connect(int fd, const struct sockaddr *addr, socklen_t len);
 
 #if defined __cplusplus
 }

@@ -69,6 +69,18 @@ ssize_t sendto(int fd, const void *buf, size_t n, int flags, const struct sockad
   return SysNet_SendTo(fd, buf, n, flags, addr, len);
 }
 
+ssize_t send(int fd, const void *buf, size_t n, int flags) {
+  return sendto(fd, buf, n, flags, NULL, 0);
+}
+
 ssize_t recvfrom(int fd, void *buf, size_t n, int flags, struct sockaddr* addr, socklen_t* len) {
   return SysNet_RecvFrom(fd, buf, n, flags, addr, len);
+}
+
+ssize_t recv(int fd, void *buf, size_t n, int flags) {
+  return recvfrom(fd, buf, n, flags, NULL, NULL);
+}
+
+int connect(int fd, const struct sockaddr *addr, socklen_t len) {
+  return SysNet_Connect(fd, addr, len);
 }
