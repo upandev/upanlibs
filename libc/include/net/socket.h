@@ -43,6 +43,7 @@ typedef enum {
 typedef enum {
   SO_BROADCAST,
   SO_RCVTIMEO,
+  SO_SNDTIMEO,
   IP_TTL,
   TCP_NODELAY
 } SOCKET_OPTION;
@@ -124,6 +125,7 @@ ssize_t send(int fd, const void *buf, size_t n, int flags);
 ssize_t recvfrom(int fd, void *buf, size_t n, int flags, struct sockaddr* addr, socklen_t* len);
 ssize_t recv(int fd, void *buf, size_t n, int flags);
 int connect(int fd, const struct sockaddr *addr, socklen_t len);
+int listen(int fd, int backlog);
 
 #if defined __cplusplus
 }

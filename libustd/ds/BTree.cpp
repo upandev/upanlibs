@@ -20,7 +20,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 #include <BTree.h>
-#include <stdio.h>
 
 //class BTree definition
 BTree::BTree(int iMaxElements) :
@@ -42,7 +41,7 @@ BTree::BTree(int iMaxElements) :
 	  iChunkSize = iMaxElements;
 	}
 
-	m_pElementMemPool = &MemPool<BTreeElement>::CreateMemPool(iMaxElements, iChunkSize) ;
+	m_pElementMemPool = &MemPool<BTreeElement>::createMemPool(iMaxElements, iChunkSize) ;
 }
 
 BTree::~BTree()
@@ -87,16 +86,20 @@ void BTree::DestroyElement(BTreeElement* pElement)
 {
 	DestroyKey(pElement->GetKeyPtr()) ;
 	DestroyValue(pElement->GetValue()) ;
-	m_pElementMemPool->Release(pElement) ;
+  m_pElementMemPool->release(*pElement) ;
 }
 
 BTreeElement* BTree::CreateElement(BTreeKey* pKey, BTreeValue* pValue)
 {
-	BTreeElement* pElement = m_pElementMemPool->Create() ;
-	pElement->SetKey(pKey) ;
-	pElement->SetValue(pValue) ;
+	auto element = m_pElementMemPool->allocate() ;
+  if (element.isEmpty()) {
+    throw upan::exception(XLOC, "BTree::CreateElement: Failed to allocate memory for BTreeElement");
+  }
+  auto& pElement = element.value();
+	pElement.SetKey(pKey) ;
+	pElement.SetValue(pValue) ;
 
-	return pElement ;
+	return &pElement ;
 }
 
 bool BTree::SetValue(const BTreeKey& rKey, BTreeValue* pValue)

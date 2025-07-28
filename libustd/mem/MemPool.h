@@ -19,128 +19,88 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef _MCPP_MEM_POOL_H_
-#define _MCPP_MEM_POOL_H_
+#pragma once
 
-#include <stddef.h>
-#include <stdio.h>
 #include <newalloc.h>
 #include <malloc.h>
-#include <Stack.h>
 #include <exception.h>
+#include <vector.h>
+#include <set.h>
+#include <option.h>
 
 template <typename T>
-class MemPool
-{
+class MemPool {
 	private:
-		const unsigned MAX_ELEMENTS ;
-		const unsigned CHUNK_SIZE ;
-		const unsigned MAX_CHUNKS ;
+		const uint32_t MAX_ELEMENTS;
+		const uint32_t CHUNK_SIZE;
+		const uint32_t MAX_CHUNKS;
 		
-		Stack<T*> m_mStackMemPool ;
-
-		unsigned m_uiNoOfChunks ;
-
-		uint8_t** m_pAllocAddressArray ;
+		upan::vector<uintptr_t> _freePool;
+    upan::set<uintptr_t> _allocatedPool;
+		uint32_t _allocatedChunkCount;
+    upan::vector<uintptr_t> _allocatedChunks;
 
 	private:
-		MemPool(unsigned uiSize, unsigned uiChunkSize) : MAX_ELEMENTS(uiSize), CHUNK_SIZE(uiChunkSize), MAX_CHUNKS(MAX_ELEMENTS/CHUNK_SIZE), m_mStackMemPool(uiSize)
-		{
-			m_uiNoOfChunks = 0 ;
-			m_pAllocAddressArray = new uint8_t*[ MAX_CHUNKS ] ;
+		MemPool(uint32_t maxElements, uint32_t chunkSize) : MAX_ELEMENTS(maxElements), CHUNK_SIZE(chunkSize), MAX_CHUNKS(MAX_ELEMENTS / CHUNK_SIZE), _freePool(maxElements) {
+      _allocatedChunkCount = 0 ;
 		}
 
-		bool AllocateChunk()
-		{
-			if(m_uiNoOfChunks == MAX_CHUNKS)
-				return false ;
+    bool allocateChunk() {
+			if(_allocatedChunkCount == MAX_CHUNKS) {
+        return false;
+      }
 
-			int iTotalSize = CHUNK_SIZE * sizeof(T) ;
-			uint8_t* uiAddress = (uint8_t*) malloc(iTotalSize);
+			auto address = (uintptr_t)malloc(CHUNK_SIZE * sizeof(T));
+      _allocatedChunks.push_back(address);
 
-			for(unsigned i = 0; i < CHUNK_SIZE; i++)
-			{
-				T* pVal = reinterpret_cast<T*>(uiAddress + i * sizeof(T)) ;
-
-				if(!m_mStackMemPool.Push(pVal))
-				{
-					printf("\n MemPool AllocateChunk Failed!!\n") ;
-					free((void*)uiAddress);
-					return false ;
-				}
+			for(uint32_t i = 0; i < CHUNK_SIZE; i++) {
+				_freePool.push_back(address + i * sizeof(T));
 			}
 
-			m_pAllocAddressArray[ m_uiNoOfChunks ] = uiAddress ;
-			m_uiNoOfChunks++ ;
+			_allocatedChunkCount++;
 			return true;
-		}
-
-		bool IsMemFromPool(T* pAddress)
-		{
-      uint8_t* uiAddress = (uint8_t*)pAddress ;
-			for(unsigned i = 0; i < m_uiNoOfChunks; i++)
-			{
-        uint8_t* uiStart = m_pAllocAddressArray[ i ] ;
-        uint8_t* uiEnd = uiStart + CHUNK_SIZE * sizeof(T) ;
-				if(uiAddress >= uiStart && uiAddress < uiEnd)
-				{
-					if(((uiAddress - uiStart) % sizeof(T)) == 0)
-						return true ;
-				}
-			}
-
-			return false ;
 		}
 
 	public:
 		// Factory
-		static MemPool<T>& CreateMemPool(unsigned uiSize, unsigned uiChunkSize)
-		{
-			if((uiSize % uiChunkSize) != 0)
-        throw upan::exception(XLOC, "\n MemPool Creation Failure. MemPool Size: %u is not a multiple of Chunk Size: %u", uiSize, uiChunkSize);
-			return *new MemPool<T>(uiSize, uiChunkSize) ;
+		static MemPool<T>& createMemPool(uint32_t size, uint32_t chunkSize) {
+			if((size % chunkSize) != 0)
+        throw upan::exception(XLOC, "MemPool creation failed. MemPool size: %u is not a multiple of chunk size: %u", size, chunkSize);
+			return *new MemPool<T>(size, chunkSize) ;
 		}
 
-		~MemPool()
-		{
-			for(unsigned i = 0; i < m_uiNoOfChunks; i++)
-				free((void*)m_pAllocAddressArray[ i ]) ;
-			delete[] m_pAllocAddressArray ;
+		~MemPool() {
+			for(auto address : _allocatedChunks) {
+        free((void*) address);
+      }
 		}
 
-		T* Create()
-		{
-			T* buf;
-			//allocate from pool
-			if(m_mStackMemPool.Pop(buf))
-				return new (buf)T();
+		upan::option<T&> allocate() {
+      //if pool is empty then populate pool
+      if (_freePool.empty()) {
+        allocateChunk();
+      }
 
-			//if pool is empty then populate pool
-			AllocateChunk();
+      if (_freePool.empty()) {
+        return upan::option<T&>::empty();
+      }
 
-			//allocate from pool
-			if(m_mStackMemPool.Pop(buf))
-				return new (buf)T();
+      auto allocatedAddress = _freePool[_freePool.size() - 1];
+      T* object = new((void*)allocatedAddress)T();
 
-			//if pool AllocateChunk failed then allocate directly from heap
-			return new T();
+      _freePool.pop_back();
+      _allocatedPool.insert(allocatedAddress);
+
+      return upan::option<T&>(*object);
 		}
 
-		bool Release(T* pAddress)
-		{
-			if(IsMemFromPool(pAddress))
-			{
-				if(m_mStackMemPool.IsFull())
-				{
-					printf("\n MemPool is Full! which can happen only if the Pool Memory is double deallocated") ;
-					return false ;
-				}
-				m_mStackMemPool.Push(pAddress) ;
-				return true ;
-			}
-			delete pAddress ;
-			return true ;
-		}
-} ;
+		void release(T& object) {
+      auto address = (uintptr_t)&object;
 
-#endif
+      if (!_allocatedPool.erase(address)) {
+        throw upan::exception(XLOC, "MemPool release failed. address: 0x%llx is not allocated", address);
+      }
+
+      _freePool.push_back(address);
+		}
+};

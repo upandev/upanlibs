@@ -84,3 +84,7 @@ ssize_t recv(int fd, void *buf, size_t n, int flags) {
 int connect(int fd, const struct sockaddr *addr, socklen_t len) {
   return SysNet_Connect(fd, addr, len);
 }
+
+int listen(int fd, int backlog) {
+  return SysNet_Listen(fd, backlog);
+}

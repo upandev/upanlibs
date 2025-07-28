@@ -48,6 +48,10 @@ int SysNet_Connect(int fd, const struct sockaddr *addr, socklen_t len) {
   return (int)_upanix_syscall(SYS_CALL_SOCKET_CONNECT, (uint64_t)fd, (uint64_t)addr, (uint64_t)len, 4, 5);
 }
 
+int SysNet_Listen(int fd, int backlog) {
+  return (int)_upanix_syscall(SYS_CALL_SOCKET_LISTEN, (uint64_t)fd, (uint64_t)backlog, 3, 4, 5);
+}
+
 int SysNet_GetHostByName(const char* name, struct hostent** hostinfo) {
   return (int)_upanix_syscall(SYS_CALL_GET_HOST_BY_NAME, (uint64_t)name, (uint64_t)hostinfo, 3, 4, 5);
 }
