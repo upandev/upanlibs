@@ -43,15 +43,14 @@ class queue
     void clear();
     int read(T out[], int n);
     int write(const T in[], int n);
-    uint32_t size() const {
-      return _size;
-    }
+    uint32_t size() const { return _size; }
+    uint32_t availableSize() const { return _size - _count.get(); }
 
   private:
     uint32_t _readEnd;
     uint32_t _writeEnd;
     uint32_t _size;
-    atomic::integral<uint32_t> _count;
+    mutable atomic::integral<uint32_t> _count;
     T*       _buffer;
 };
 
@@ -129,7 +128,7 @@ int queue<T>::write(const T in[], int n) {
     return 0;
   }
 
-  auto remaining = _size - _count.get();
+  auto remaining = availableSize();
 
   if (n > remaining) {
     n = remaining;

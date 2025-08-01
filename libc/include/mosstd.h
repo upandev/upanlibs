@@ -96,7 +96,7 @@ int getpid();
 void yield();
 void waitpid(int pid);
 void waitonlock(uint64_t lockAddress, int oldVal, int newVal);
-void waitqueue(int id, void* mutex);
+int waitqueue(int id, void* mutex, const struct timeval* timeout);
 void waitdequeue(int id, bool all);
 
 extern void SysProcess_Exit(int iExitStatus) ;

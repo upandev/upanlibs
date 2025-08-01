@@ -28,7 +28,7 @@ namespace upan {
 
     const auto pid = getpid();
 
-    _cv.wait(_m, [&] {
+    _cv.waitc(_m, [&] {
       return _active_writer == NO_ACTIVE_WRITER || _active_writer == pid;
     });
 
@@ -62,7 +62,7 @@ namespace upan {
 
     const auto pid = getpid();
 
-    _cv.wait(_m, [&] {
+    _cv.waitc(_m, [&] {
       return _active_writer == pid || (_active_writer == NO_ACTIVE_WRITER && _readers.empty());
     });
 

@@ -35,9 +35,10 @@ namespace upan {
     ~condition_variable() = default;
 
     void wait(mutex &m);
+    void wait(mutex &m, const struct timeval* timeout);
 
     template<typename LAMBDA>
-    void wait(mutex &m, const LAMBDA &condition) {
+    void waitc(mutex &m, const LAMBDA &condition) {
       while (!condition()) {
         wait(m);
       }

@@ -20,6 +20,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 #include <condition_variable.h>
+#include "exception.h"
 
 namespace upan {
   atomic::integral<int> condition_variable::_global_cv_id_seq(0);
@@ -28,8 +29,17 @@ namespace upan {
   }
 
   void condition_variable::wait(mutex& m) {
-    waitqueue(_id, &m);
+    waitqueue(_id, &m, nullptr);
     m.lock();
+  }
+
+  void condition_variable::wait(mutex& m, const struct timeval* timeout) {
+    if(!waitqueue(_id, &m, timeout)) {
+      m.lock();
+    } else {
+      throw upan::exception(XLOC, "conditional variable wait timeout");
+    }
+
   }
 
   void condition_variable::notify_one() {

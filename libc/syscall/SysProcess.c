@@ -41,8 +41,8 @@ void SysProcess_WaitOnLock(uint64_t lockAddress, int oldVal, int newVal) {
   _upanix_syscall(SYS_CALL_PROCESS_WAIT_ON_LOCK, lockAddress, oldVal, newVal, 4, 5);
 }
 
-void SysProcess_WaitQueue(int id, void* mutex) {
-  _upanix_syscall(SYS_CALL_PROCESS_WAIT_QUEUE, id, (uint64_t)mutex, 3, 4, 5);
+int SysProcess_WaitQueue(int id, void* mutex, const struct timeval* timeout) {
+  return _upanix_syscall(SYS_CALL_PROCESS_WAIT_QUEUE, id, (uint64_t)mutex, (uint64_t)timeout, 4, 5);
 }
 
 void SysProcess_WaitDequeue(int id, bool all) {

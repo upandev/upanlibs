@@ -194,7 +194,7 @@ int SysProcess_Exec(const char* szFileName, int iNoOfArgs, const char *const szA
 int SysProcess_ThreadExec(uintptr_t threadCaller, uintptr_t entryAddress, void* arg);
 void SysProcess_WaitPID(int iProcessID);
 void SysProcess_WaitOnLock(uint64_t lockAddress, int newVal, int curVal);
-void SysProcess_WaitQueue(int id, void* mutex);
+int SysProcess_WaitQueue(int id, void* mutex, const struct timeval* timeout);
 void SysProcess_WaitDequeue(int id, bool all);
 void SysProcess_Exit(int iExitStatus);
 void SysProcess_Yield();
