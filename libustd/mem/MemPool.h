@@ -101,6 +101,7 @@ class MemPool {
         throw upan::exception(XLOC, "MemPool release failed. address: 0x%llx is not allocated", address);
       }
 
+      object.~T();
       _freePool.push_back(address);
 		}
 };
