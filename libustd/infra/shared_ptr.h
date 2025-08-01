@@ -119,6 +119,10 @@ namespace upan {
     shared_ptr(shared_ptr&& r) = default;
     shared_ptr &operator=(shared_ptr&& r) = default;
 
+    bool operator<(const shared_ptr& r) const {
+      return _ptr < r._ptr;
+    }
+
     T* operator->() { return _ptr; }
     const T* operator->() const { return _ptr; }
 
