@@ -88,3 +88,7 @@ int connect(int fd, const struct sockaddr *addr, socklen_t len) {
 int listen(int fd, int backlog) {
   return SysNet_Listen(fd, backlog);
 }
+
+int accept(int fd, struct sockaddr* addr, socklen_t* len) {
+  return SysNet_Accept(fd, addr, len);
+}

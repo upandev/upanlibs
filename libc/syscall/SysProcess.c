@@ -26,11 +26,11 @@
 # include <stdio.h>
 
 int SysProcess_Exec(const char* szFileName, int iNoOfArgs, const char *const szArgList[]) {
-  return _upanix_syscall(SYS_CALL_PROCESS_EXEC, (uint64_t)szFileName, (uint64_t)iNoOfArgs, (uint64_t)szArgList, 4, 5);
+  return (int)_upanix_syscall(SYS_CALL_PROCESS_EXEC, (uint64_t)szFileName, (uint64_t)iNoOfArgs, (uint64_t)szArgList, 4, 5);
 }
 
 int SysProcess_ThreadExec(uintptr_t threadCaller, uintptr_t entryAddress, void* arg) {
-  return _upanix_syscall(SYS_CALL_THREAD_EXEC, (uint64_t)threadCaller, (uint64_t)entryAddress, (uint64_t)arg, 4, 5);
+  return (int)_upanix_syscall(SYS_CALL_THREAD_EXEC, (uint64_t)threadCaller, (uint64_t)entryAddress, (uint64_t)arg, 4, 5);
 }
 
 void SysProcess_WaitPID(int iProcessID) {
@@ -42,7 +42,7 @@ void SysProcess_WaitOnLock(uint64_t lockAddress, int oldVal, int newVal) {
 }
 
 int SysProcess_WaitQueue(int id, void* mutex, const struct timeval* timeout) {
-  return _upanix_syscall(SYS_CALL_PROCESS_WAIT_QUEUE, id, (uint64_t)mutex, (uint64_t)timeout, 4, 5);
+  return (int)_upanix_syscall(SYS_CALL_PROCESS_WAIT_QUEUE, id, (uint64_t)mutex, (uint64_t)timeout, 4, 5);
 }
 
 void SysProcess_WaitDequeue(int id, bool all) {
@@ -50,11 +50,11 @@ void SysProcess_WaitDequeue(int id, bool all) {
 }
 
 int SysProcess_IsChildAlive(int iProcessID) {
-  return _upanix_syscall(SYS_CALL_PROCESS_CHILD_ALIVE, (uint64_t)iProcessID, 2, 3, 4, 5);
+  return (int)_upanix_syscall(SYS_CALL_PROCESS_CHILD_ALIVE, (uint64_t)iProcessID, 2, 3, 4, 5);
 }
 
 int SysProcess_IsProcessAlive(int iProcessID) {
-  return _upanix_syscall(SYS_CALL_PROCESS_ALIVE, (uint64_t)iProcessID, 2, 3, 4, 5);
+  return (int)_upanix_syscall(SYS_CALL_PROCESS_ALIVE, (uint64_t)iProcessID, 2, 3, 4, 5);
 }
 
 void SysProcess_Exit(int iExitStatus) {
@@ -74,15 +74,19 @@ int SysProcess_GetEnv(const char* szVar, char* retVal) {
 }
 
 int SysProcess_SetEnv(const char* szVar, const char* szVal) {
-  return _upanix_syscall(SYS_CALL_PROCESS_SET_ENV, (uint64_t)szVar, (uint64_t)szVal, 3, 4, 5);
+  return (int)_upanix_syscall(SYS_CALL_PROCESS_SET_ENV, (uint64_t)szVar, (uint64_t)szVal, 3, 4, 5);
 }
 
 int SysProcess_GetProcList(PS** pProcList, unsigned* uiListSize) {
-  return _upanix_syscall(SYS_CALL_PROCESS_GET_PS_LIST, (uint64_t)pProcList, (uint64_t)uiListSize, 3, 4, 5);
+  return (int)_upanix_syscall(SYS_CALL_PROCESS_GET_PS_LIST, (uint64_t)pProcList, (uint64_t)uiListSize, 3, 4, 5);
 }
 
 void SysProcess_FreeProcListMem(PS* pProcList, unsigned uiListSize) {
   _upanix_syscall(SYS_CALL_PROCESS_FREE_PS_LIST, (uint64_t)pProcList, (uint64_t)uiListSize, 3, 4, 5);
+}
+
+int SysProcess_Kill(int pid, int signal) {
+  return (int)_upanix_syscall(SYS_CALL_PROCESS_KILL, (uint64_t)pid, (uint64_t)signal, 3, 4, 5);
 }
 
 int exec(const char* szFileName, ...)

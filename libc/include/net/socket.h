@@ -126,6 +126,7 @@ ssize_t recvfrom(int fd, void *buf, size_t n, int flags, struct sockaddr* addr, 
 ssize_t recv(int fd, void *buf, size_t n, int flags);
 int connect(int fd, const struct sockaddr *addr, socklen_t len);
 int listen(int fd, int backlog);
+int accept(int fd, struct sockaddr* addr, socklen_t* len);
 
 #if defined __cplusplus
 }

@@ -112,6 +112,7 @@ typedef enum
 		SYS_CALL_PROCESS_FREE_PS_LIST,
 		SYS_CALL_PROCESS_CHILD_ALIVE,
 		SYS_CALL_PROCESS_ALIVE,
+    SYS_CALL_PROCESS_KILL,
 	SYS_CALL_PROC_END,
 
 	SYS_CALL_KB_START = 800,
@@ -141,6 +142,7 @@ typedef enum
     SYS_CALL_SOCKET_RECV_FROM,
     SYS_CALL_SOCKET_CONNECT,
     SYS_CALL_SOCKET_LISTEN,
+    SYS_CALL_SOCKET_ACCEPT,
     SYS_CALL_GET_HOST_BY_NAME,
     SYS_CALL_GET_HOST_BY_ADDR,
     SYS_CALL_FREE_HOST_INFO,
@@ -203,6 +205,7 @@ int SysProcess_GetEnv(const char* szVar, char* retVal);
 int SysProcess_SetEnv(const char* szVar, const char* szVal);
 int SysProcess_GetProcList(PS** pProcList, unsigned* uiListSize);
 void SysProcess_FreeProcListMem(PS* pProcList, unsigned uiListSize);
+int SysProcess_Kill(int pid, int signal);
 
 void SysUtil_GetDateTime(RTCDateTime* rtcDateTime);
 void SysUtil_Reboot();
@@ -221,6 +224,7 @@ int SysNet_SendTo(int fd, const void *buf, size_t n, int flags, const struct soc
 int SysNet_RecvFrom(int fd, void *buf, size_t n, int flags, struct sockaddr* addr, socklen_t* len);
 int SysNet_Connect(int fd, const struct sockaddr *addr, socklen_t len);
 int SysNet_Listen(int fd, int backlog);
+int SysNet_Accept(int fd, struct sockaddr* addr, socklen_t* len);
 int SysNet_GetHostByName(const char* name, struct hostent** hostinfo);
 int SysNet_GetHostByAddr(const void* addr, socklen_t len, int type, struct hostent** hostinfo);
 void SysNet_FreeHostInfo(struct hostent* hostinfo);
