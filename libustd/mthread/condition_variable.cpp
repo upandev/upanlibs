@@ -29,17 +29,19 @@ namespace upan {
   }
 
   void condition_variable::wait(mutex& m) {
-    waitqueue(_id, &m, nullptr);
-    m.lock();
+    if (!waitqueue(_id, &m, nullptr)) {
+      m.lock();
+    } else {
+      throw upan::exception(XLOC, "cv wait interrupted");
+    }
   }
 
   void condition_variable::wait(mutex& m, const struct timeval* timeout) {
     if(!waitqueue(_id, &m, timeout)) {
       m.lock();
     } else {
-      throw upan::exception(XLOC, "conditional variable wait timeout");
+      throw upan::exception(XLOC, "cv wait timeout/interrupted");
     }
-
   }
 
   void condition_variable::notify_one() {
