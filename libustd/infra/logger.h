@@ -64,5 +64,8 @@ namespace upan {
     void _log(level_t level, const upan::string& msg);
     file_stream _writer;
     upan::atomic::integral<uint32_t> _logLevel;
+    level_t _prevLogLevel;
+    upan::string _prevLogMsg;
+    int _logRepeatCount;
   };
 }

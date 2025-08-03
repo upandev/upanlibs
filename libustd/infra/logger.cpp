@@ -54,10 +54,12 @@ logger& logger::instance() {
 
 static uint32_t constexpr DEFAULT_LOG_LEVEL = upan::logger::LOG_INFO | upan::logger::LOG_WARN | upan::logger::LOG_ERROR;
 
-logger::logger(const upan::string& filePath) : _writer(filePath, O_RDWR | O_APPEND), _logLevel(DEFAULT_LOG_LEVEL) {
+logger::logger(const upan::string& filePath) :
+  _writer(filePath, O_RDWR | O_APPEND), _logLevel(DEFAULT_LOG_LEVEL),
+  _prevLogLevel(LOG_TRACE), _logRepeatCount(0) {
 }
 
-logger::logger(int fd) : _writer(fd), _logLevel(DEFAULT_LOG_LEVEL) {
+logger::logger(int fd) : _writer(fd), _logLevel(DEFAULT_LOG_LEVEL), _logRepeatCount(0) {
 }
 
 void logger::enable(uint32_t levels) {
@@ -110,8 +112,31 @@ void logger::logarg(level_t level, const char * __restrict fmsg, va_list arg) {
 }
 
 void logger::_log(level_t level, const upan::string& msg) {
+  static upan::string REPEATED_PREFIX(" [REPEATED ");
+  static upan::string REPEATED_SUFFIX(" TIMES]");
+
   upan::string logline("\n");
   logline += dtime_str();
+
+  if (_prevLogLevel == level && _prevLogMsg == msg) {
+    _logRepeatCount++;
+    if (_logRepeatCount % 100 == 0) {
+      const upan::string countStr(upan::string::to_string(_logRepeatCount));
+      logline += REPEATED_PREFIX + countStr + REPEATED_SUFFIX;
+      _writer.write(logline.c_str(), logline.length());
+      return;
+    }
+  } else {
+    if (_logRepeatCount > 0) {
+      const upan::string countStr(upan::string::to_string(_logRepeatCount));
+      const upan::string repeatLogLine = logline + REPEATED_PREFIX + countStr + REPEATED_SUFFIX;
+      _logRepeatCount = 0;
+      _writer.write(repeatLogLine.c_str(), repeatLogLine.length());
+    }
+    _prevLogMsg = msg;
+    _prevLogLevel = level;
+  }
+
   switch (level) {
     case LOG_TRACE:
       logline += " [TRACE] ";
