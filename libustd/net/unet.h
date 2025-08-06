@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <net/socket.h>
+#include <sys/socket.h>
 #include <ustring.h>
 
 namespace upan {

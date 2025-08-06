@@ -34,6 +34,10 @@ int SysNet_SetSockOpt(sock_t fd, int level, SOCKET_OPTION option, const void* op
   return (int)_upanix_syscall(SYS_CALL_SOCKET_SET_OPT, (uint64_t)fd, (uint64_t)level, (uint64_t)option, (uint64_t)optval, (uint64_t)len);
 }
 
+int SysNet_GetSockOpt(sock_t fd, int level, SOCKET_OPTION option, void* optval, socklen_t* len) {
+  return (int)_upanix_syscall(SYS_CALL_SOCKET_GET_OPT, (uint64_t)fd, (uint64_t)level, (uint64_t)option, (uint64_t)optval, (uint64_t)len);
+}
+
 int SysNet_SendTo(int fd, const void *buf, size_t n, int flags, const struct sockaddr* addr, socklen_t len) {
   uint64_t ext_param[] = { (uint64_t)addr, (uint64_t)len };
   return (int)_upanix_syscall(SYS_CALL_SOCKET_SEND_TO, (uint64_t)fd, (uint64_t)buf, (uint64_t)n, (uint64_t)flags, (uint64_t)&ext_param);

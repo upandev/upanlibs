@@ -22,7 +22,7 @@
 #pragma once
 
 #include <stdlib.h>
-#include <net/socket.h>
+#include <sys/socket.h>
 
 #if defined __cplusplus
 extern "C" {

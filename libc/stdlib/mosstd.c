@@ -99,7 +99,7 @@ void waitonlock(uint64_t lockAddress, int oldVal, int newVal) {
 }
 
 int waitqueue(int id, void* mutex, const struct timeval* timeout) {
-  SysProcess_WaitQueue(id, mutex, timeout);
+  return SysProcess_WaitQueue(id, mutex, timeout);
 }
 
 void waitdequeue(int id, bool all) {

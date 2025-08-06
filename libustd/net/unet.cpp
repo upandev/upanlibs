@@ -21,6 +21,7 @@
  */
 
 #include <unet.h>
+#include <arpa/inet.h>
 
 namespace upan {
   namespace net {

@@ -23,7 +23,7 @@
 
 #include <stdlib.h>
 #include <net/if_ether.h>
-#include <net/ip.h>
+#include <netinet/ip.h>
 
 #if defined __cplusplus
 extern "C" {

@@ -20,7 +20,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include <net/netdb.h>
+#include <netdb.h>
 #include <syscalldefs.h>
 
 struct hostent *gethostbyname(const char *name) {

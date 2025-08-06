@@ -22,7 +22,8 @@
 #pragma once
 
 #include <stdlib.h>
-#include <net/ip.h>
+#include <netinet/ip.h>
+#include <netinet/in.h>
 #include <net/if_ether.h>
 
 #if defined __cplusplus
@@ -36,14 +37,13 @@ typedef enum {
 } SOCKET_TYPE;
 
 typedef enum {
-  AF_INET = 2,
-  AF_PACKET = 17,
-} SA_FAMILY_TYPE;
-
-typedef enum {
   SO_BROADCAST,
   SO_RCVTIMEO,
   SO_SNDTIMEO,
+  SO_ERROR,
+  SO_KEEPALIVE,
+  SO_REUSEADDR,
+  SO_TYPE,
   IP_TTL,
   TCP_NODELAY
 } SOCKET_OPTION;
@@ -92,13 +92,6 @@ struct sockaddr {
   uint8_t sa_data[14];
 } PACKED;
 
-struct sockaddr_in {
-  sa_family_t sin_family;
-  in_port_t sin_port;
-  struct in_addr sin_addr;
-  uint8_t sin_zero[8];
-} PACKED;
-
 struct sockaddr_ll {
   uint16_t sll_family;   // Always AF_PACKET
   uint16_t sll_protocol; // Ethernet protocol in network byte order (e.g., htons(ETH_P_ARP))
@@ -111,15 +104,10 @@ struct sockaddr_ll {
 
 extern const uint8_t INADDR_MAC_BROADCAST[ETH_ALEN];
 
-uint16_t htons(uint16_t x);
-uint16_t ntohs(uint16_t x);
-
-uint32_t htonl(uint32_t x);
-uint32_t ntohl(uint32_t x);
-
 sock_t socket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, int protocol);
 int bind(sock_t fd, struct sockaddr* client_addr, socklen_t len);
 int setsockopt(sock_t fd, int level, SOCKET_OPTION option, const void* optval, socklen_t len);
+int getsockopt(sock_t sockfd, int level, SOCKET_OPTION option, void *optval, socklen_t *optlen);
 ssize_t sendto(int fd, const void *buf, size_t n, int flags, const struct sockaddr* addr, socklen_t len);
 ssize_t send(int fd, const void *buf, size_t n, int flags);
 ssize_t recvfrom(int fd, void *buf, size_t n, int flags, struct sockaddr* addr, socklen_t* len);

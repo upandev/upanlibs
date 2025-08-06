@@ -23,6 +23,7 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <netinet/in.h>
 
 #if defined __cplusplus
 extern "C" {
@@ -37,12 +38,6 @@ typedef enum {
   IPPROTO_TCP = 6,
   IPPROTO_UDP = 17,
 } IPPROTO_TYPE;
-
-typedef uint32_t in_addr_t;
-
-struct in_addr {
-  in_addr_t s_addr;
-};
 
 struct ip {
 #if __BYTE_ORDER == __LITTLE_ENDIAN
@@ -62,10 +57,6 @@ struct ip {
   struct in_addr ip_src; // source address
   struct in_addr ip_dst; // dest address
 } PACKED;
-
-char* inet_ntoa(struct in_addr in);
-int inet_aton(const char* ip, struct in_addr* inp);
-bool is_ip_address(const char* ip);
 
 #if defined __cplusplus
 }

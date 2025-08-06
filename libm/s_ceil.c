@@ -40,7 +40,7 @@ void tls_xlib_test() {
   _lib_global1_thread_local += 11;
 }
 
-#include <net/socket.h>
+#include <sys/socket.h>
 #include <stdio.h>
 
 void test_initialized_globals() {

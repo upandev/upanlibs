@@ -20,7 +20,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include <net/ip.h>
+#include <netinet/ip.h>
 #include <stdio.h>
 #include <string.h>
 

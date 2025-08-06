@@ -22,7 +22,7 @@
 #pragma once
 
 #include <stdlib.h>
-#include <net/ip.h>
+#include <netinet/ip.h>
 
 #if defined __cplusplus
 extern "C" {

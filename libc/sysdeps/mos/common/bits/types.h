@@ -93,10 +93,6 @@ typedef int __timer_t;
 /* Used in `struct shmid_ds'.  */
 //typedef __kernel_ipc_pid_t __ipc_pid_t;
 
-/* Number of descriptors that can fit in an `fd_set'.  */
-#define __FD_SETSIZE	1024
-
-
 /* Used in XTI.  */
 typedef long int __t_scalar_t;
 typedef unsigned long int __t_uscalar_t;

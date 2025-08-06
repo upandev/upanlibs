@@ -29,6 +29,11 @@ typedef long int ptrdiff_t;
 #define offsetof(st, m) __builtin_offsetof(st, m)
 #if !defined __cplusplus
 typedef int wchar_t ;
+typedef int __wchar_t ;
+#endif
+
+#ifndef NULL
+#define NULL 0x0
 #endif
 
 #endif
