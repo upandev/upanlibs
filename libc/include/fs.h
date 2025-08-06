@@ -75,7 +75,9 @@ typedef enum
 	O_CREAT = 16,
 	O_EXCL = 32,
 	O_TRUNC = 64,
-  O_NONBLOCK = 128
+  O_NONBLOCK = 128,
+  O_RD_NONBLOCK = 256,
+  O_WR_NONBLOCK = 512,
 } FileModes ;
 
 /* This is same as FileSystem_FileStat in Upanix Source and must be maintained in consistent with that */
