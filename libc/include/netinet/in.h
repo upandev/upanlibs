@@ -30,8 +30,9 @@ extern "C" {
 #endif
 
 typedef enum {
-  AF_LOCAL = 1,
   AF_UNSPEC = 0,
+  AF_UNIX = 1,
+  AF_LOCAL = 1,
   AF_INET = 2,
   AF_INET6 = 10,
   AF_PACKET = 17,

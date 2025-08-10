@@ -47,6 +47,7 @@ namespace upan {
   }
 
   bool file_stream::open(const upan::string& fileName, uint8_t mode) {
+    close();
     return (_fd = ::open(fileName.c_str(), mode)) >= 0;
   }
 

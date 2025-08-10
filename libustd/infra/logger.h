@@ -25,47 +25,46 @@
 #include <ustring.h>
 #include <atomicop.h>
 #include <file_stream.h>
+#include <mutex.h>
+#include "syslog.h"
 
 namespace upan {
   class logger {
   public:
-    enum level_t {
-      LOG_TRACE = 1,
-      LOG_DEBUG = 2,
-      LOG_INFO = 4,
-      LOG_WARN = 8,
-      LOG_ERROR = 16,
-    };
 
-  private:
-    static logger* _instance;
-
+    logger(const upan::string& ident, int option, LOG_CATEGORY facility);
+    logger(const upan::string& filePath, const upan::string& ident, int option, LOG_CATEGORY facility);
     explicit logger(const upan::string& filePath);
-    explicit logger(int fd);
+    explicit logger();
 
-  public:
     logger(const logger&) = delete;
     logger& operator=(const logger&) = delete;
 
-    static void create(const upan::string& filePath);
-    static void create(int fd);
-    static void close();
-    static logger& instance();
+    void openFile(const upan::string& filePath);
+    void closeFile();
+    void log(LOG_PRIORITY priority, const char * __restrict fmsg, ...);
+    void log(LOG_PRIORITY priority, const char * __restrict fmsg, va_list arg);
+    void log(const upan::string& msg);
 
-    void enable(uint32_t levels);
-    void disable(uint32_t levels);
-    void enable(const upan::string& level);
-    void disable(const upan::string& level);
-
-    void log(level_t level, const char * __restrict fmsg, ...);
-    void logarg(level_t level, const char * __restrict fmsg, va_list);
+    void enable(LOG_PRIORITY priority);
+    void disable(LOG_PRIORITY priority);
+    void setMaskUpto(LOG_PRIORITY priority);
+    void setMask(uint32_t logmask);
+    void enable(const upan::string& priority);
+    void disable(const upan::string& priority);
 
   private:
-    void _log(level_t level, const upan::string& msg);
+    void _logarg(LOG_PRIORITY priority, const char * __restrict fmsg, va_list);
+    void _log(const upan::string& msg);
+
     file_stream _writer;
-    upan::atomic::integral<uint32_t> _logLevel;
-    level_t _prevLogLevel;
+    char _messageBuffer[MAX_LOG_MESSAGE_SIZE];
+    upan::atomic::integral<uint32_t> _mask;
     upan::string _prevLogMsg;
     int _logRepeatCount;
+    upan::string _ident;
+    int _option;
+    LOG_CATEGORY _facility;
+    upan::mutex _logMutex;
   };
 }

@@ -36,6 +36,7 @@ namespace upan {
 
     bool is_good() const { return _fd >= 0; }
     bool open(const upan::string& fileName, uint8_t mode);
+    void close();
     int read(uint8_t* buf, int n) const;
     bool read_line(upan::string& line);
     int write(const char* buf, int len);
@@ -44,7 +45,7 @@ namespace upan {
     bool seek_end(int offset);
 
   private:
-    void close();
+
 
     class line_buffer {
     public:

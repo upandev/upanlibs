@@ -21,104 +21,95 @@
  */
 
 #include <logger.h>
-#include <stdarg.h>
+#include <syslog.h>
+
+static constexpr int DEFAULT_LOG_MASK = LOG_UPTO(LOG_PRIORITY::LOG_EMERG);
 
 namespace upan {
-logger* logger::_instance = nullptr;
-
-void logger::create(const upan::string& filePath) {
-  if (_instance) {
-    throw upan::exception(XLOC, "logger is already created");
-  }
-  _instance = new logger(filePath);
+logger::logger(const upan::string& ident, int option, LOG_CATEGORY facility) :
+        _mask(DEFAULT_LOG_MASK), _logRepeatCount(0),
+        _ident(ident), _option(option), _facility(facility) {
+  disable(LOG_PRIORITY::LOG_DEBUG);
 }
 
-void logger::create(int fd) {
-  if (_instance) {
-    throw upan::exception(XLOC, "logger is already created");
-  }
-  _instance = new logger(fd);
+logger::logger(const upan::string& filePath, const upan::string& ident, int option, LOG_CATEGORY facility) :
+        logger(ident, option, facility) {
+  _writer.open(filePath, O_RDWR | O_APPEND);
 }
 
-void logger::close() {
-  delete _instance;
-  _instance = nullptr;
+logger::logger(const upan::string& filePath) : logger(filePath, "", LOG_PID | LOG_CONS, LOG_USER) {
 }
 
-logger& logger::instance() {
-  if (!_instance) {
-    throw upan::exception(XLOC, "logger is not created yet");
-  }
-  return *_instance;
+logger::logger() : logger("", LOG_PID | LOG_CONS, LOG_USER) {
 }
 
-static uint32_t constexpr DEFAULT_LOG_LEVEL = upan::logger::LOG_INFO | upan::logger::LOG_WARN | upan::logger::LOG_ERROR;
-
-logger::logger(const upan::string& filePath) :
-  _writer(filePath, O_RDWR | O_APPEND), _logLevel(DEFAULT_LOG_LEVEL),
-  _prevLogLevel(LOG_TRACE), _logRepeatCount(0) {
+void logger::openFile(const upan::string& filePath) {
+  _writer.open(filePath, O_RDWR | O_APPEND);
 }
 
-logger::logger(int fd) : _writer(fd), _logLevel(DEFAULT_LOG_LEVEL), _logRepeatCount(0) {
+void logger::closeFile() {
+  _writer.close();
 }
 
-void logger::enable(uint32_t levels) {
-  _logLevel.bit_or(levels);
+void logger::enable(LOG_PRIORITY priority) {
+  _mask.bit_or(1 << priority);
 }
 
-void logger::disable(uint32_t levels) {
-  _logLevel.bit_and(~levels);
+void logger::disable(LOG_PRIORITY priority) {
+  _mask.bit_and(~(1 << priority));
 }
 
-static uint32_t strtolevel(const upan::string& level) {
-  if (level == "trace") {
-    return upan::logger::LOG_TRACE;
-  } else if (level == "debug") {
-    return upan::logger::LOG_DEBUG;
-  } else if (level == "info") {
-    return upan::logger::LOG_INFO;
-  } else if (level == "warn") {
-    return upan::logger::LOG_WARN;
-  } else if (level == "error") {
-    return upan::logger::LOG_ERROR;
-  }
-  throw upan::exception(XLOC, "invalid log level %s", level.c_str());
+void logger::setMaskUpto(LOG_PRIORITY priority) {
+  _mask.set(LOG_UPTO(priority));
 }
 
-void logger::enable(const upan::string& level) {
-  _logLevel.bit_or(strtolevel(level));
+void logger::setMask(uint32_t mask) {
+  _mask.set(mask);
 }
 
-void logger::disable(const upan::string& level) {
-  _logLevel.bit_and(~strtolevel(level));
+void logger::enable(const upan::string& priority) {
+  enable((LOG_PRIORITY)str_to_log_priority(priority.c_str()));
 }
 
-void logger::log(level_t level, const char * __restrict fmsg, ...) {
-  if (!(_logLevel.get() & level)) { return; }
+void logger::disable(const upan::string& priority) {
+  disable((LOG_PRIORITY)str_to_log_priority(priority.c_str()));
+}
+
+void logger::log(LOG_PRIORITY priority, const char * __restrict fmsg, ...) {
+  upan::mutex_guard g(_logMutex);
+  if (!(_mask.get() & (1 << priority))) { return; }
 
   va_list arg;
   va_start(arg, fmsg);
-  logarg(level, fmsg, arg);
+  _logarg(priority, fmsg, arg);
   va_end(arg);
 }
 
-void logger::logarg(level_t level, const char * __restrict fmsg, va_list arg) {
-  if (!(_logLevel.get() & level)) { return; }
+void logger::log(LOG_PRIORITY priority, const char * __restrict fmsg, va_list arg) {
+  upan::mutex_guard g(_logMutex);
+  if (!(_mask.get() & priority)) { return; }
 
-  const int BSIZE = 1024;
-  char buf[BSIZE];
-  vsnprintf(buf, BSIZE, fmsg, arg);
-  _log(level, buf);
+  _logarg(priority, fmsg, arg);
 }
 
-void logger::_log(level_t level, const upan::string& msg) {
-  static upan::string REPEATED_PREFIX(" [REPEATED ");
-  static upan::string REPEATED_SUFFIX(" TIMES]");
+void logger::log(const upan::string& msg) {
+  upan::mutex_guard g(_logMutex);
+  _log(msg);
+}
 
+void logger::_logarg(LOG_PRIORITY priority, const char * __restrict fmsg, va_list arg) {
+  construct_log_msg(_messageBuffer, MAX_LOG_MESSAGE_SIZE, priority, _ident.c_str(), _option, _facility, fmsg, arg);
+  _log(_messageBuffer);
+}
+
+void logger::_log(const upan::string& msg) {
   upan::string logline("\n");
   logline += dtime_str();
 
-  if (_prevLogLevel == level && _prevLogMsg == msg) {
+  static upan::string REPEATED_PREFIX("[REPEATED ");
+  static upan::string REPEATED_SUFFIX(" TIMES]");
+
+  if (_prevLogMsg == msg) {
     _logRepeatCount++;
     if (_logRepeatCount % 100 == 0) {
       const upan::string countStr(upan::string::to_string(_logRepeatCount));
@@ -134,36 +125,14 @@ void logger::_log(level_t level, const upan::string& msg) {
       _writer.write(repeatLogLine.c_str(), repeatLogLine.length());
     }
     _prevLogMsg = msg;
-    _prevLogLevel = level;
   }
 
-  switch (level) {
-    case LOG_TRACE:
-      logline += " [TRACE] ";
-      break;
-
-    case LOG_DEBUG:
-      logline += " [DEBUG] ";
-      break;
-
-    case LOG_INFO:
-      logline += " [INFO] ";
-      break;
-
-    case LOG_WARN:
-      logline += " [WARN] ";
-      break;
-
-    case LOG_ERROR:
-      logline += " [ERROR] ";
-      break;
-
-    default:
-      logline += " [UNKNOWN] ";
-      break;
-  }
   logline += msg;
-  _writer.write(logline.c_str(), logline.length());
+  if (_writer.is_good()) {
+    _writer.write(logline.c_str(), logline.length());
+  } else if (_option & LOG_CONS) {
+    printf("%s", logline.c_str());
+  }
 }
 
 }

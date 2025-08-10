@@ -97,15 +97,14 @@ include_directories(${PROJECT_SOURCE_DIR}/libupanssl/providers/implementations/i
 add_custom_target(resources COMMAND make WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/libupanui/resources/)
 
 #LIBC
-execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.S' | grep -v CMakeFile | grep -v './libc/syscall/'" OUTPUT_VARIABLE LIBC_ASM_SRC)
-execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.[cS]' | grep -v CMakeFile | grep -v './libc/syscall/'" OUTPUT_VARIABLE LIBC_SRC)
-execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.c' | grep -v CMakeFile | grep './libc/syscall/'" OUTPUT_VARIABLE LIBC_SYSCALL_SRC)
+execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.S' | grep -v CMakeFile | grep -v './libc/interopc/'" OUTPUT_VARIABLE LIBC_ASM_SRC)
+execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.[cS]' | grep -v CMakeFile | grep -v './libc/interopc/'" OUTPUT_VARIABLE LIBC_SRC)
+execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.c' | grep -v CMakeFile | grep './libc/interopc/'" OUTPUT_VARIABLE LIBC_INTEROPC_SRC)
 string(REPLACE "\n" ";" LIBC_SRC ${LIBC_SRC})
 string(REPLACE "\n" ";" LIBC_ASM_SRC ${LIBC_ASM_SRC})
-string(REPLACE "\n" ";" LIBC_SYSCALL_SRC ${LIBC_SYSCALL_SRC})
+string(REPLACE "\n" ";" LIBC_INTEROPC_SRC ${LIBC_INTEROPC_SRC})
 set_source_files_properties(${LIBC_ASM_SRC} PROPERTIES LANGUAGE C)
-add_library(c SHARED ${LIBC_SRC} ${LIBC_ASM_SRC} ${LIBC_SYSCALL_SRC}
-		libc/include/arpa/inet.h)
+add_library(c SHARED ${LIBC_SRC} ${LIBC_ASM_SRC} ${LIBC_INTEROPC_SRC})
 target_compile_options(c PRIVATE -O0 ${SO_COMPILE_FLAGS})
 
 #LIBC static for kernel - so don't include sys-call code
