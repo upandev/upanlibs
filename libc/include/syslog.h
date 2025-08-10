@@ -53,6 +53,7 @@ typedef enum {
 typedef enum {
   LOG_KERN,     // Kernel messages
   LOG_USER,     // Default if no facility is specified
+  LOG_DAEMON,
   LOG_SYSLOG,   // Messages from syslogd itself
 } LOG_CATEGORY;
 
