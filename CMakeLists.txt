@@ -41,9 +41,24 @@ set(CMAKE_CXX_FLAGS " -O0 -Wall -ffreestanding -nodefaultlibs -nostdlib -nostart
 set(COMMON_COMPILE_FLAGS " -O0 -Wall -std=c11 -nostdlib -nodefaultlibs -ffreestanding -nostartfiles -D__GCC__")
 set(CMAKE_C_FLAGS ${COMMON_COMPILE_FLAGS})
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_COMPILE_FLAGS}")
-set(CMAKE_SHARED_LINKER_FLAGS "${COMMON_COMPILE_FLAGS} ${SO_LD_FLAGS}")
+set(CMAKE_SHARED_LINKER_FLAGS "-T${PROJECT_SOURCE_DIR}/upanso.ld ${COMMON_COMPILE_FLAGS} ${SO_LD_FLAGS}")
+
+add_custom_target(crt
+		COMMAND make WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/crt
+		BYPRODUCTS ${PROJECT_SOURCE_DIR}/crt/crt0.o ${PROJECT_SOURCE_DIR}/crt/crti.o ${PROJECT_SOURCE_DIR}/crt/crtn.o)
+
+execute_process(COMMAND bash -c "${CMAKE_C_COMPILER} -print-file-name=crtbeginS.o" OUTPUT_VARIABLE CRTBEGIN_SHARED_OBJ)
+string(REPLACE "\n" "" CRTBEGIN_SHARED_OBJ ${CRTBEGIN_SHARED_OBJ})
+execute_process(COMMAND bash -c "${CMAKE_C_COMPILER} -print-file-name=crtendS.o" OUTPUT_VARIABLE CRTEND_SHARED_OBJ)
+string(REPLACE "\n" "" CRTEND_SHARED_OBJ ${CRTEND_SHARED_OBJ})
+
+set(CRTINIT_OBJ "${PROJECT_SOURCE_DIR}/crt/crti.o ${CRTBEGIN_SHARED_OBJ}")
+set(CRTFINI_OBJ "${CRTEND_SHARED_OBJ} ${PROJECT_SOURCE_DIR}/crt/crtn.o")
+
+set(CMAKE_C_CREATE_SHARED_LIBRARY "<CMAKE_C_COMPILER> ${CMAKE_C_FLAGS} ${CMAKE_SHARED_LINKER_FLAGS} ${CRTINIT_OBJ} <OBJECTS> -o <TARGET> <LINK_LIBRARIES> ${CRTFINI_OBJ}")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 include_directories(${PROJECT_SOURCE_DIR}/libc/include)
 include_directories(${PROJECT_SOURCE_DIR}/libc/stdio)
@@ -100,13 +115,16 @@ add_custom_target(resources COMMAND make WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.S' | grep -v CMakeFile | grep -v './libc/interopc/'" OUTPUT_VARIABLE LIBC_ASM_SRC)
 execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.[cS]' | grep -v CMakeFile | grep -v './libc/interopc/'" OUTPUT_VARIABLE LIBC_SRC)
 execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.c' | grep -v CMakeFile | grep './libc/interopc/'" OUTPUT_VARIABLE LIBC_INTEROPC_SRC)
+execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libc -name '*.cpp' | grep -v CMakeFile | grep -v './libc/interopc/'" OUTPUT_VARIABLE LIBCPP_SRC)
 string(REPLACE "\n" ";" LIBC_SRC ${LIBC_SRC})
+string(REPLACE "\n" ";" LIBCPP_SRC ${LIBCPP_SRC})
 string(REPLACE "\n" ";" LIBC_ASM_SRC ${LIBC_ASM_SRC})
 string(REPLACE "\n" ";" LIBC_INTEROPC_SRC ${LIBC_INTEROPC_SRC})
 set_source_files_properties(${LIBC_ASM_SRC} PROPERTIES LANGUAGE C)
-add_library(c SHARED ${LIBC_SRC} ${LIBC_ASM_SRC} ${LIBC_INTEROPC_SRC})
+add_library(c SHARED ${LIBC_SRC} ${LIBCPP_SRC} ${LIBC_ASM_SRC} ${LIBC_INTEROPC_SRC})
+add_dependencies(c crt)
 target_compile_options(c PRIVATE -O0 ${SO_COMPILE_FLAGS})
-
+set_target_properties(c PROPERTIES LINKER_LANGUAGE C)
 #LIBC static for kernel - so don't include sys-call code
 add_library(upanc STATIC ${LIBC_SRC} ${LIBC_ASM_SRC})
 set_target_properties(upanc PROPERTIES OUTPUT_NAME c)

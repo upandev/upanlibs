@@ -34,6 +34,7 @@ extern "C" {
 # include <cdisplay.h>
 # include <sys/socket.h>
 # include <netdb.h>
+# include <mosstd.h>
 
 uint64_t _upanix_syscall(uint64_t sysCallId, uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4, uint64_t p5);
 
@@ -96,7 +97,7 @@ typedef enum
 
 	SYS_CALL_PROC_START = 600,
     SYS_CALL_DLL_RELOCATE, //do not change this, and retain the value 601 as this is used by dynamic symbol relocation in DLL resolver system call
-    SYS_CALL_DLL_INIT_RELOCATE,
+    SYS_CALL_PROCESS_INIT_RELOCATE,
 		SYS_CALL_PROCESS_EXEC,
 		SYS_CALL_THREAD_EXEC,
 		SYS_CALL_PROCESS_WAIT_PID,
@@ -192,7 +193,7 @@ int SysIO_Ctl(int fd, uint64_t cmd, uint64_t arg);
 int SysMemory_AlignedAlloc(void** addr, uint32_t alignment, uint32_t uiSizeInBytes);
 int SysMemory_Free(void* uiAddress);
 int SysMemory_GetAllocSize(void* address, size_t* size);
-void SysProcess_DLLInitRelocate();
+process_init_fini_t* SysProcess_InitRelocate();
 int SysProcess_Exec(const char* szFileName, int iNoOfArgs, const char *const szArgList[]);
 int SysProcess_ThreadExec(uintptr_t threadCaller, uintptr_t entryAddress, void* arg);
 void SysProcess_WaitPID(int iProcessID);

@@ -24,6 +24,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
 #define pid_t int
 
@@ -85,6 +86,12 @@ typedef struct
 } PS ;
 
 typedef void (*thread_entry_func_p)(void*);
+
+typedef struct {
+  void (*_init)();
+  void (*_fini)();
+  bool _end;
+} process_init_fini_t;
 
 int exec(const char* szFileName, ...) ;
 int execv(const char* szFileName, int iNoOfArgs, const char *const szArgList[]) ;

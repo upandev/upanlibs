@@ -24,6 +24,9 @@
 #include <stdlib.h>
 #include <syscalldefs.h>
 #include <stdio.h>
+#include <mosstd.h>
+
+static process_init_fini_t* _process_init_fini_list = NULL;
 
 __thread int _lib_data1_thread_local = 1000;
 __thread int _lib_global1_thread_local;
@@ -49,8 +52,44 @@ UNUSED uint64_t __tls_get_addr(tls_index* ti) {
 }
 
 //this is used inside crt start-up code - called at first before transferring control to main()
-UNUSED void _dll_init_relocate() {
-  SysProcess_DLLInitRelocate();
+UNUSED void _process_init_relocate() {
+  _process_init_fini_list = SysProcess_InitRelocate();
+  process_init_fini_t* i = _process_init_fini_list;
+
+  //the last entry is main executable
+  while (!i->_end) {
+    if (i->_init) {
+      i->_init();
+    }
+    i++;
+  }
+}
+
+extern void __cxa_finalize(void*);
+
+extern void _stdio_term();
+void exit(int rv) {
+  /* If we are using stdio, try to shut it down.  At the very least,
+   * this will attempt to commit all buffered writes.  It may also
+   * unbuffer all writable files, or close them outright.
+   * Check the stdio routines for details. */
+  //if (_stdio_term)
+  _stdio_term();
+
+  if (!iskernel()) {
+    __cxa_finalize(NULL);
+
+    //the last entry is for the main executable
+    process_init_fini_t* i = _process_init_fini_list;
+    while (!i->_end) {
+      if (i->_fini) {
+        i->_fini();
+      }
+      i++;
+    }
+  }
+
+  _exit(rv);
 }
 
 static void thread_entry_caller(thread_entry_func_p tmain, void* arg) {

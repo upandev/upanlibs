@@ -770,19 +770,6 @@ __XL_ALIAS(wcstoull)
 #endif
 /**********************************************************************/
 
-/* MOSS */
-void exit(int rv)
-{
-    /* If we are using stdio, try to shut it down.  At the very least,
-	 * this will attempt to commit all buffered writes.  It may also
-	 * unbuffer all writable files, or close them outright.
-	 * Check the stdio routines for details. */
-//	if (_stdio_term) 
-	    _stdio_term();
-
-	_exit(rv);
-}
-
 int getenv(const char* var, char* retVal)
 {
   return SysProcess_GetEnv(var, retVal);
