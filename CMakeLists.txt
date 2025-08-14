@@ -126,7 +126,7 @@ add_dependencies(c crt)
 target_compile_options(c PRIVATE -O0 ${SO_COMPILE_FLAGS})
 set_target_properties(c PROPERTIES LINKER_LANGUAGE C)
 #LIBC static for kernel - so don't include sys-call code
-add_library(upanc STATIC ${LIBC_SRC} ${LIBC_ASM_SRC})
+add_library(upanc STATIC ${LIBC_SRC} ${LIBCPP_SRC} ${LIBC_ASM_SRC})
 set_target_properties(upanc PROPERTIES OUTPUT_NAME c)
 
 #LIBM

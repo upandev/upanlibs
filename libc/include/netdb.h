@@ -37,9 +37,22 @@ struct hostent {
   // (use h_addr_list[0] for the first address)
 };
 
+struct servent {
+  char  *s_name;      /* Official service name */
+  char **s_aliases;   /* Alias list (NULL-terminated array of strings) */
+  int    s_port;      /* Port number (in network byte order) */
+  char  *s_proto;     /* Protocol name, e.g., "tcp" or "udp" */
+};
+
 struct hostent* gethostbyname(const char* name);
 struct hostent* gethostbyaddr(const void *addr, socklen_t len, int type);
 void freehostinfo(struct hostent* hostinfo);
+
+struct servent* getservbyname(const char *name, const char *proto);
+struct servent* getservbyport(int port, const char *proto);
+struct servent* getservent();
+void setservent(int stayopen);
+void endservent();
 
 #if defined __cplusplus
 }
