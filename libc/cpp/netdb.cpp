@@ -25,7 +25,7 @@
 #include <syslog.h>
 #include <vector.h>
 #include <mutex.h>
-#include <fs.h>
+#include <sys/stat.h>
 
 #define SERVICES_FILE_PATH "/etc/services"
 

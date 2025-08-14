@@ -22,9 +22,9 @@
 #ifndef _FS_H_
 #define _FS_H_
 
-# include <dtime.h>
-# include <stdlib.h>
-#include "mosstd.h"
+#include <stdlib.h>
+#include <mosstd.h>
+#include <sys/stat.h>
 
 #define ATTR_DIR_DEFAULT	0x01ED  //0000 0001 1110 1101 => 0000(Rsv) 000(Dir) 111(u:rwx) 101(g:r-x) 101(o:r-x)
 #define ATTR_FILE_DEFAULT	0x03A4  //0000(Rsv) 001(File) 110(u:rw-) 100(g:r--) 100(o:r--)
@@ -80,29 +80,6 @@ typedef enum
   O_WR_NONBLOCK = 512,
 } FileModes ;
 
-/* This is same as FileSystem_FileStat in Upanix Source and must be maintained in consistent with that */
-struct stat {
-  int 	    st_dev;     /* ID of device containing file */
-  int     	st_ino;     /* inode number */
-  uint16_t 	st_mode;    /* protection */
-  int   		st_nlink;   /* number of hard links */
-  int     	st_uid;     /* user ID of owner */
-  int     	st_gid;     /* group ID of owner */
-  int     	st_rdev;    /* device ID (if special file) */
-  uint32_t  st_size;    /* total size, in bytes */
-  uint32_t  st_blksize; /* blocksize for filesystem I/O */
-  uint32_t  st_blocks;  /* number of blocks allocated */
-
-  struct timeval st_atime;   /* time of last access */
-  struct timeval st_mtime;   /* time of last modification */
-  struct timeval st_ctime;   /* time of last status change */
-};
-
-struct stat_ex {
-  char _name[33];
-  struct stat _stat;
-};
-
 int create(const char* file_path, unsigned short file_attr) ;
 int open(const char* file_name, uint32_t mode) ;
 int openstream(uint32_t mode);
@@ -117,8 +94,6 @@ int write(int fd, const void* buf, int len) ;
 void select(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors);
 int lseek(int fd, int offset, int seekType) ;
 unsigned tell(int fd) ;
-int stat(const char* szFileName, struct stat* pFileStat) ;
-int fstat(int iFD, struct stat* pFileStat) ;
 int getomode(int fd) ;
 int access(const char* szFileName, int mode) ;
 int dup2(int oldFD, int newFD) ;
