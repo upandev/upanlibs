@@ -25,8 +25,11 @@
 #include <syscalldefs.h>
 #include <stdio.h>
 #include <mosstd.h>
+#include <string.h>
 
 static process_init_fini_t* _process_init_fini_list = NULL;
+
+extern void load_environ(const char** environ);
 
 __thread int _lib_data1_thread_local = 1000;
 __thread int _lib_global1_thread_local;
@@ -52,7 +55,7 @@ UNUSED uint64_t __tls_get_addr(tls_index* ti) {
 }
 
 //this is used inside crt start-up code - called at first before transferring control to main()
-UNUSED void _process_init_relocate() {
+UNUSED void _process_init_relocate(int argc, char** argv) {
   _process_init_fini_list = SysProcess_InitRelocate();
   process_init_fini_t* i = _process_init_fini_list;
 
@@ -63,6 +66,13 @@ UNUSED void _process_init_relocate() {
     }
     i++;
   }
+
+  uint32_t argvSize = sizeof(uintptr_t) * argc;
+  int e;
+  for(e = 0; e < argc; ++e) {
+    argvSize += strlen(argv[e]) + 1;
+  }
+  load_environ((const char**)((uintptr_t)argv + argvSize));
 }
 
 extern void __cxa_finalize(void*);
@@ -146,7 +156,12 @@ void waitdequeue(int id, bool all) {
 }
 
 int chdrive(const char* szDriveName) {
-  return SysDrive_ChangeDrive(szDriveName);
+  char* retPwd;
+  int r = SysDrive_ChangeDrive(szDriveName, &retPwd);
+  if (!r) {
+    setenv("PWD", retPwd, 1);
+  }
+  return r;
 }
 
 int get_drive_list(DriveStat** pDriveList, int* iListSize) {
@@ -242,5 +257,11 @@ int getcwd(char* buf, size_t size) {
 }
 
 int chdir(const char* dirPath) {
-  return SysFS_ChangeDirectory(dirPath);
+  char* pwd;
+  int r = SysFS_ChangeDirectory(dirPath, &pwd);
+  if (!r) {
+    setenv("PWD", pwd, 1);
+    free(pwd);
+  }
+  return r;
 }

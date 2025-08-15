@@ -22,8 +22,8 @@
 # include <syscalldefs.h>
 # include <fs.h>
 
-int SysFS_ChangeDirectory(const char* szDirPath) {
-  return _upanix_syscall(SYS_CALL_CHANGE_DIR, (uint64_t)szDirPath, 2, 3, 4, 5);
+int SysFS_ChangeDirectory(const char* szDirPath, char** retPwd) {
+  return _upanix_syscall(SYS_CALL_CHANGE_DIR, (uint64_t)szDirPath, (uint64_t)retPwd, 3, 4, 5);
 }
 
 int SysFS_CWD(char* uiReturnDirPathAddress, int len) {

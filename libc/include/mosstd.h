@@ -93,9 +93,10 @@ typedef struct {
   bool _end;
 } process_init_fini_t;
 
-int exec(const char* szFileName, ...) ;
-int execv(const char* szFileName, int iNoOfArgs, const char *const szArgList[]) ;
-int execvp(const char* szFileName, const char *const szArgList[]) ;
+int execl(const char* szFileName, const char* arg, ...);
+int execle(const char* szFileName, const char* arg, ...);
+int execv(const char* szFileName, const char* const argv[]);
+int execve(const char* szFileName, const char* const argv[], const char* const envp[]) ;
 int exect(thread_entry_func_p entryPoint, void* arg);
 int childalive(int pid) ;
 int isprocessalive(int pid);

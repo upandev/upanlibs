@@ -22,8 +22,8 @@
 # include <syscalldefs.h>
 # include <drive.h>
 
-int SysDrive_ChangeDrive(const char* szDriveName) {
-  return _upanix_syscall(SYS_CALL_CHANGE_DRIVE, (uint64_t)szDriveName, 2, 3, 4, 5);
+int SysDrive_ChangeDrive(const char* szDriveName, char** retPwd) {
+  return _upanix_syscall(SYS_CALL_CHANGE_DRIVE, (uint64_t)szDriveName, (uintptr_t)retPwd, 3, 4, 5);
 }
 
 int SysDrive_ShowDrives(DriveStat** pDriveList, int* iListSize) {

@@ -140,16 +140,16 @@ void *bsearch(const void *key, const void *base, size_t /* nmemb */ high,
 			  size_t size, int (*compar)(const void *, const void *)) ;
 /* Algos End */
 
-#define MAX_ENV_KEY_LEN 64
-#define MAX_ENV_VAL_LEN 2048
-#define MAX_ENV_KEYS 1024
 #define LD_LIBRARY_PATH_ENV "LD_LIBRARY_PATH"
 #define PATH_ENV			"PATH"
 #define I_DIVIDE_AND_CEIL(N, D) ((N) / (D) + (((N) % (D)) ? 1 : 0))
 
-int getenv(const char* var, char* retVal) ;
-int setenv(const char* var, const char* val) ;
-int putenv(char* env) ;
+const char* getenv(const char* var);
+int setenv(const char* key, const char* val, int overwrite);
+int putenv(const char* env);
+int unsetenv(const char* key);
+int clearenv();
+const char** getenviron();
 
 void format_dir_attr(unsigned short attr, char* fmAttr) ;
 

@@ -25,8 +25,8 @@
 # include <stdlib.h>
 # include <stdio.h>
 
-int SysProcess_Exec(const char* szFileName, int iNoOfArgs, const char *const szArgList[]) {
-  return (int)_upanix_syscall(SYS_CALL_PROCESS_EXEC, (uint64_t)szFileName, (uint64_t)iNoOfArgs, (uint64_t)szArgList, 4, 5);
+int SysProcess_Exec(const char* szFileName, const char *const argv[], const char *const envp[]) {
+  return (int)_upanix_syscall(SYS_CALL_PROCESS_EXEC, (uint64_t)szFileName, (uint64_t)argv, (uint64_t)envp, 4, 5);
 }
 
 int SysProcess_ThreadExec(uintptr_t threadCaller, uintptr_t entryAddress, void* arg) {
@@ -69,14 +69,6 @@ void SysProcess_Sleep(unsigned milisec) {
   _upanix_syscall(SYS_CALL_PROCESS_SLEEP, (uint64_t)milisec, 2, 3, 4, 5);
 }
 
-int SysProcess_GetEnv(const char* szVar, char* retVal) {
-  return _upanix_syscall(SYS_CALL_PROCESS_GET_ENV, (uint64_t)szVar, (uint64_t)retVal, 3, 4, 5);
-}
-
-int SysProcess_SetEnv(const char* szVar, const char* szVal) {
-  return (int)_upanix_syscall(SYS_CALL_PROCESS_SET_ENV, (uint64_t)szVar, (uint64_t)szVal, 3, 4, 5);
-}
-
 int SysProcess_GetProcList(PS** pProcList, unsigned* uiListSize) {
   return (int)_upanix_syscall(SYS_CALL_PROCESS_GET_PS_LIST, (uint64_t)pProcList, (uint64_t)uiListSize, 3, 4, 5);
 }
@@ -89,59 +81,66 @@ int SysProcess_Kill(int pid, int signal) {
   return (int)_upanix_syscall(SYS_CALL_PROCESS_KILL, (uint64_t)pid, (uint64_t)signal, 3, 4, 5);
 }
 
-int exec(const char* szFileName, ...)
-{
-  int iProcessID ;
-  int argc ;
-	char** argv = NULL ;
+int exec(const char* szFileName, bool hasEnv, const char* arg, va_list argl) {
+  const int MAX_ARGS = 128;
+  char* argv[MAX_ARGS];
+  int argc = 0;
+  const char** envp = NULL;
 
-	int i ;
-	uintptr_t* ref = (uintptr_t*)&szFileName + 1 ;
-	for(argc = 0; *(ref + argc); argc++) ;
+  while (true) {
+    if (argc == (MAX_ARGS - 1)) {
+      argv[argc] = NULL;
+      break;
+    }
 
-	if(argc)
-	{
-		argv = (char**)malloc(sizeof(char**) * argc) ;
-		if(!argv)
-			return -1 ;
+    const char* p = va_arg(argl, const char*);
+    if (p) {
+      argv[argc] = (char*) malloc(strlen(p));
+      strcpy(argv[argc], p);
+    } else {
+      argv[argc] = NULL;
+      if (hasEnv) {
+        envp = va_arg(argl, const char**);
+      }
+      break;
+    }
 
-		for(i = 0; i < argc; i++)
-		{
-			argv[i] = (char*)malloc(strlen((char*)(*(ref + i))) + 1) ;
-			strcpy(argv[i], (const char*)(*(ref + i))) ;
-		}
-	}
+    ++argc;
+  }
 
-	iProcessID = SysProcess_Exec(szFileName, argc, (const char**const)argv) ;
+  int pid = execve(szFileName, (const char*const*)argv, envp);
 
-	for(i = 0; i < argc; i++)
-		free((void*)argv[i]) ;
-	free(argv) ;
+  for(int i = 0; i < argc; ++i) {
+    free(argv[i]);
+  }
 
-	return iProcessID ;
+  return pid;
 }
 
-int execv(const char* szFileName, int iNoOfArgs, const char *const szArgList[])
-{
-	return SysProcess_Exec(szFileName, iNoOfArgs, szArgList) ;
+int execl(const char* szFileName, const char* arg, ...) {
+  va_list argl;
+  int pid;
+  va_start(argl, arg);
+  pid = exec(szFileName, false, arg, argl);
+  va_end(argl);
+  return pid;
 }
 
-int execvp(const char* szFileName, const char *const szArgList[])
-{
-	__volatile__ int argc ;
-	__volatile__ const int max_args = 256 ;
+int execle(const char* szFileName, const char* arg, ...) {
+  va_list argl;
+  int pid;
+  va_start(argl, arg);
+  pid = exec(szFileName, true, arg, argl);
+  va_end(argl);
+  return pid;
+}
 
+int execv(const char* szFileName, const char* const argv[]) {
+  return execve(szFileName, argv, NULL);
+}
 
-	for(argc = 0; szArgList[ argc ] != NULL; argc++)
-	{
-		if(argc > max_args)
-		{
-			printf("\n Number of arguments to execvp exceeded max args of %d", max_args) ;
-			return -1 ;
-		}
-	}
-
-	return SysProcess_Exec(szFileName, argc, szArgList) ;
+int execve(const char* szFileName, const char* const argv[], const char* const envp[]) {
+  return SysProcess_Exec(szFileName, argv, envp) ;
 }
 
 int SysProcess_IsKernel() {

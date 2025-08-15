@@ -770,26 +770,6 @@ __XL_ALIAS(wcstoull)
 #endif
 /**********************************************************************/
 
-int getenv(const char* var, char* retVal)
-{
-  return SysProcess_GetEnv(var, retVal);
-}
-
-int setenv(const char* var, const char* val)
-{
-	return SysProcess_SetEnv(var, val) ;
-}
-
-int putenv (char *string)
-{
-  char *name_end = strchr (string, '=');
-  if (name_end != NULL) {
-    *name_end = '\0' ;
-    return setenv(string, name_end + 1) ;
-  }
-  return -1;
-}
-
 /* MOSE */
 
 void set_rwx(char* rwx, unsigned short perm)

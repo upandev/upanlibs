@@ -107,8 +107,6 @@ typedef enum
 		SYS_CALL_PROCESS_EXIT,
     SYS_CALL_PROCESS_YIELD,
 		SYS_CALL_PROCESS_SLEEP,
-		SYS_CALL_PROCESS_GET_ENV,
-		SYS_CALL_PROCESS_SET_ENV,
 		SYS_CALL_PROCESS_GET_PS_LIST,
 		SYS_CALL_PROCESS_FREE_PS_LIST,
 		SYS_CALL_PROCESS_CHILD_ALIVE,
@@ -161,14 +159,14 @@ int SysDisplay_GetCursor();
 void SysDisplay_RawCharacter(__volatile__ const char ch, __volatile__ unsigned uiAttr, __volatile__ bool bUpdateCursorOnScreen);
 void SysDisplay_RawCharacterArea(const MChar* src, uint32_t rows, uint32_t cols, int curPos);
 
-int SysDrive_ChangeDrive(const char* szDriveName);
+int SysDrive_ChangeDrive(const char* szDriveName, char** retPwd);
 int SysDrive_ShowDrives(DriveStat** pDriveList, int* iListSize);
 int SysDrive_Mount(const char* szDriveName);
 int SysDrive_UnMount(const char* szDriveName);
 int SysDrive_Format(const char* szDriveName);
 int SysDrive_GetCurrentDriveStat(DriveStat* pDriveStat);
 
-int SysFS_ChangeDirectory(const char* szDirPath);
+int SysFS_ChangeDirectory(const char* szDirPath, char** retPwd);
 int SysFS_CreateDirectory(const char* szDirPath, unsigned short usAttribute);
 int SysFS_DeleteDirectory(const char* szDirPath);
 int SysFS_GetDirContent(const char* szDirPath, struct stat_ex** dirList, int* size);
@@ -194,7 +192,7 @@ int SysMemory_AlignedAlloc(void** addr, uint32_t alignment, uint32_t uiSizeInByt
 int SysMemory_Free(void* uiAddress);
 int SysMemory_GetAllocSize(void* address, size_t* size);
 process_init_fini_t* SysProcess_InitRelocate();
-int SysProcess_Exec(const char* szFileName, int iNoOfArgs, const char *const szArgList[]);
+int SysProcess_Exec(const char* szFileName, const char *const argv[], const char *const envp[]);
 int SysProcess_ThreadExec(uintptr_t threadCaller, uintptr_t entryAddress, void* arg);
 void SysProcess_WaitPID(int iProcessID);
 void SysProcess_WaitOnLock(uint64_t lockAddress, int newVal, int curVal);
@@ -203,8 +201,6 @@ void SysProcess_WaitDequeue(int id, bool all);
 void SysProcess_Exit(int iExitStatus);
 void SysProcess_Yield();
 void SysProcess_Sleep(unsigned milisec);
-int SysProcess_GetEnv(const char* szVar, char* retVal);
-int SysProcess_SetEnv(const char* szVar, const char* szVal);
 int SysProcess_GetProcList(PS** pProcList, unsigned* uiListSize);
 void SysProcess_FreeProcListMem(PS* pProcList, unsigned uiListSize);
 int SysProcess_Kill(int pid, int signal);

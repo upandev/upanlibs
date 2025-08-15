@@ -29,6 +29,7 @@
 #endif
 #include <exception.h>
 #include <algorithm.h>
+#include <std_stuff.h>
 
 namespace upan {
 
@@ -45,6 +46,7 @@ class vector
     explicit vector(const int reserve);
     vector(const vector<T>& rhs);
     vector(vector<T>&& rhs);
+    vector(std::initializer_list<T> l);
     ~vector();
 
     vector& operator=(const vector& rhs);
@@ -207,6 +209,14 @@ vector<T>::vector(vector<T> &&rhs) : _size(rhs._size), _capacity(rhs._capacity),
   rhs._size = 0;
   rhs._capacity = 0;
   rhs._buffer = nullptr;
+}
+
+//TODO: not working - needs to be fixed
+template <typename T>
+vector<T>::vector(std::initializer_list<T> l) : _size(l.size()), _capacity(0), _buffer(nullptr) {
+  for(const auto& e : l) {
+    this->push_back(e);
+  }
 }
 
 template <typename T>

@@ -28,10 +28,7 @@
 namespace upan {
   namespace file_path {
     upan::option<upan::string> resolve(const upan::string& fileName, const upan::string& pathEnvVar, const upan::string& defPath) {
-      char szPathEnvVal[MAX_ENV_VAL_LEN] = "";
-      getenv(pathEnvVar.c_str(), szPathEnvVal);
-
-      upan::string pathEnvVal(szPathEnvVal);
+      upan::string pathEnvVal(getenv(pathEnvVar.c_str()));
       pathEnvVal += defPath;
 
       upan::vector<upan::string> pathTokens;
