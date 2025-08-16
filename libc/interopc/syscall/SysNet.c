@@ -60,6 +60,10 @@ int SysNet_Accept(int fd, struct sockaddr* addr, socklen_t* len) {
   return (int)_upanix_syscall(SYS_CALL_SOCKET_ACCEPT, (uint64_t)fd, (uint64_t)addr, (uint64_t)len, 4, 5);
 }
 
+int SysNet_Shutdown(int fd, SOCKET_SHUTDOWN_TYPE type) {
+  return (int)_upanix_syscall(SYS_CALL_SOCKET_SHUTDOWN, (uint64_t)fd, (uint64_t)type, 3, 4, 5);
+}
+
 int SysNet_GetHostByName(const char* name, struct hostent** hostinfo) {
   return (int)_upanix_syscall(SYS_CALL_GET_HOST_BY_NAME, (uint64_t)name, (uint64_t)hostinfo, 3, 4, 5);
 }

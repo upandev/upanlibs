@@ -96,3 +96,7 @@ int listen(int fd, int backlog) {
 int accept(int fd, struct sockaddr* addr, socklen_t* len) {
   return SysNet_Accept(fd, addr, len);
 }
+
+int shutdown(int fd, SOCKET_SHUTDOWN_TYPE type) {
+  return SysNet_Shutdown(fd, type);
+}

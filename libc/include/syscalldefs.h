@@ -143,6 +143,7 @@ typedef enum
     SYS_CALL_SOCKET_CONNECT,
     SYS_CALL_SOCKET_LISTEN,
     SYS_CALL_SOCKET_ACCEPT,
+    SYS_CALL_SOCKET_SHUTDOWN,
     SYS_CALL_GET_HOST_BY_NAME,
     SYS_CALL_GET_HOST_BY_ADDR,
     SYS_CALL_FREE_HOST_INFO,
@@ -224,6 +225,7 @@ int SysNet_RecvFrom(int fd, void *buf, size_t n, int flags, struct sockaddr* add
 int SysNet_Connect(int fd, const struct sockaddr *addr, socklen_t len);
 int SysNet_Listen(int fd, int backlog);
 int SysNet_Accept(int fd, struct sockaddr* addr, socklen_t* len);
+int SysNet_Shutdown(int fd, SOCKET_SHUTDOWN_TYPE type);
 int SysNet_GetHostByName(const char* name, struct hostent** hostinfo);
 int SysNet_GetHostByAddr(const void* addr, socklen_t len, int type, struct hostent** hostinfo);
 void SysNet_FreeHostInfo(struct hostent* hostinfo);

@@ -48,6 +48,13 @@ typedef enum {
   TCP_NODELAY
 } SOCKET_OPTION;
 
+typedef enum {
+  SHUT_RD = 0,
+  SHUT_WR = 1,
+  SHUT_RDWR = 2,
+  SHUT_NA = 999
+} SOCKET_SHUTDOWN_TYPE;
+
 /* Bits in the FLAGS argument to `send', `recv', et al.  */
 typedef enum {
   MSG_OOB = 0x01,	/* Process out-of-band data.  */
@@ -115,6 +122,7 @@ ssize_t recv(int fd, void *buf, size_t n, int flags);
 int connect(int fd, const struct sockaddr *addr, socklen_t len);
 int listen(int fd, int backlog);
 int accept(int fd, struct sockaddr* addr, socklen_t* len);
+int shutdown(int fd, SOCKET_SHUTDOWN_TYPE type);
 
 #if defined __cplusplus
 }
