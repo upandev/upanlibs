@@ -123,12 +123,12 @@ int iskernel() {
   return SysProcess_IsKernel();
 }
 
-void sleep(uint32_t seconds) {
-  SysProcess_Sleep(seconds * 1000);
+int sleep(uint32_t seconds) {
+  return SysProcess_Sleep(seconds * 1000);
 }
 
-void sleepms(uint32_t milliseconds) {
-  SysProcess_Sleep(milliseconds);
+int sleepms(uint32_t milliseconds) {
+  return SysProcess_Sleep(milliseconds);
 }
 
 int getpid() {
