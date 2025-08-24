@@ -31,7 +31,11 @@ namespace upan {
     __asm__ __volatile__ ("xchgl %0, %1" : "=r" ( b ) : "m"( a ), "0" (b) : "memory" );
   }
 
-  template <typename T> T align(const T& n, int v) {
-    return ((n + (v - 1)) / v) * v;
+  template <typename T> T align_up(const T& n, int v) {
+    return (n + (v - 1)) & ~(v - 1);
+  }
+
+  template <typename T> T align_down(const T& n, int v) {
+    return n & ~(v - 1);
   }
 }
