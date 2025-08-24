@@ -813,7 +813,8 @@ void format_dir_attr(unsigned short attr, char* fmAttr)
 }
 
 static const char PROC_STATUS_DESC[TOTAL_PROC_STATUS + 1][30] = {
-    "New", "Run", "Sleep", "Wait(int)", "Wait(int+timeout)", "Wait(child)",  "Wait(lock)", "Wait(queue)", "Wait(resource)", "Wait(service)", "Wait(event)", "Wait(io)", "Terminated", "Released"
+    "New", "Run", "Sleep", "Wait(int)", "Wait(int+timeout)", "Wait(child)",  "Wait(lock)", "Wait(queue)",
+    "Wait(service)", "Wait(event)", "Wait(io)", "Stopped", "Terminated", "Released", "SignalExit"
 } ;
 
 const char* get_proc_status_desc(int iStatus)

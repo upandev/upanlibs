@@ -22,7 +22,69 @@
 
 #include <signal.h>
 #include <syscalldefs.h>
+#include <string.h>
 
-int kill(int pid, int signal) {
-  return SysProcess_Kill(pid, signal);
+int sigemptyset(sigset_t *set) {
+  if (!set) {
+    return -1;
+  }
+  memset(set, 0, sizeof(*set));
+  return 0;
 }
+
+int sigfillset(sigset_t *set) {
+  if (!set) {
+    return -1;
+  }
+  memset(set, 0xFF, sizeof(*set));
+  return 0;
+}
+
+int sigaddset(sigset_t *set, int signo) {
+  if (!set || signo <= 0 || signo >= _NSIG) {
+    return -1;
+  }
+
+  unsigned int bit = signo - 1;
+  set->__val[bit / _NSIG_BITS_PER_WORD] |= 1UL << (bit % _NSIG_BITS_PER_WORD);
+  return 0;
+}
+
+int sigdelset(sigset_t *set, int signo) {
+  if (!set || signo <= 0 || signo >= _NSIG) {
+    return -1;
+  }
+
+  unsigned int bit = signo - 1;
+  set->__val[bit / _NSIG_BITS_PER_WORD] &= ~(1UL << (bit % _NSIG_BITS_PER_WORD));
+  return 0;
+}
+
+int sigismember(const sigset_t *set, int signo) {
+  if (!set || signo <= 0 || signo >= _NSIG) {
+    return -1;
+  }
+
+  unsigned int bit = signo - 1;
+  return !!(set->__val[bit / _NSIG_BITS_PER_WORD] & (1UL << (bit % _NSIG_BITS_PER_WORD)));
+}
+
+int kill(pid_t pid, SIGNAL signo) {
+  return SysProcess_SendSignal(pid, signo, NULL);
+}
+
+int sigqueue(pid_t pid, SIGNAL signo, const union sigval value) {
+  return SysProcess_SendSignal(pid, signo, &value);
+}
+
+void signal_restorer() {
+  SysProcess_SignalReturn();
+}
+
+int sigaction(int signo, const struct sigaction *act, struct sigaction *oldact) {
+  if (act) {
+    ((struct sigaction*)act)->sa_restorer = &signal_restorer;
+  }
+  return SysProcess_SetSignalAction(signo, act, oldact);
+}
+

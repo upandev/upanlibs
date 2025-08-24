@@ -26,7 +26,8 @@
 #include <time.h>
 #include <stdbool.h>
 
-#define pid_t int
+typedef int pid_t;
+typedef int uid_t;
 
 #define GB * 1024UL * 1024 * 1024
 #define MB * 1024 * 1024
@@ -56,12 +57,13 @@ typedef enum
 	WAIT_CHILD,
   WAIT_LOCK,
   WAIT_QUEUE,
-	WAIT_RESOURCE,
 	WAIT_KERNEL_SERVICE,
   WAIT_EVENT,
   WAIT_IO_DESCRIPTORS,
+  STOPPED,
 	TERMINATED,
 	RELEASED,
+  SIGNAL_RETURN,
   TOTAL_PROC_STATUS
 } PROCESS_STATUS ;
 

@@ -35,6 +35,7 @@ extern "C" {
 # include <sys/socket.h>
 # include <netdb.h>
 # include <mosstd.h>
+#include "signal.h"
 
 uint64_t _upanix_syscall(uint64_t sysCallId, uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4, uint64_t p5);
 
@@ -111,7 +112,9 @@ typedef enum
 		SYS_CALL_PROCESS_FREE_PS_LIST,
 		SYS_CALL_PROCESS_CHILD_ALIVE,
 		SYS_CALL_PROCESS_ALIVE,
-    SYS_CALL_PROCESS_KILL,
+    SYS_CALL_PROCESS_SIGNAL,
+    SYS_CALL_PROCESS_SET_SIGNAL_ACTION,
+    SYS_CALL_PROCESS_SET_SIGNAL_RETURN,
 	SYS_CALL_PROC_END,
 
 	SYS_CALL_KB_START = 800,
@@ -201,10 +204,12 @@ int SysProcess_WaitQueue(int id, void* mutex, const struct timeval* timeout);
 void SysProcess_WaitDequeue(int id, bool all);
 void SysProcess_Exit(int iExitStatus);
 void SysProcess_Yield();
-void SysProcess_Sleep(unsigned milisec);
+int SysProcess_Sleep(unsigned milisec);
 int SysProcess_GetProcList(PS** pProcList, unsigned* uiListSize);
 void SysProcess_FreeProcListMem(PS* pProcList, unsigned uiListSize);
-int SysProcess_Kill(int pid, int signal);
+int SysProcess_SendSignal(pid_t pid, SIGNAL signo, const union sigval* value);
+int SysProcess_SetSignalAction(int signo, const struct sigaction *act, struct sigaction *oldact);
+void SysProcess_SignalReturn();
 
 void SysUtil_GetDateTime(RTCDateTime* rtcDateTime);
 void SysUtil_Reboot();

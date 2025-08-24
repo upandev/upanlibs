@@ -22,15 +22,107 @@
 #ifndef _SIGNAL_H_
 #define _SIGNAL_H_
 
+#include <dtime.h>
+#include <mosstd.h>
+
 #if defined __cplusplus
 extern "C" {
 #endif
 
-#define SIGINT 2
-#define SIGTERM 15
-#define SIGKILL 9
+typedef enum {
+  SIGINT = 2,
+  SIGQUIT = 3,
+  SIGKILL = 9,
+  SIGSEGV = 11,
+  SIGALRM = 14,
+  SIGTERM = 15,
+  SIGCHLD = 17,
+  SIGCONT = 18,
+  SIGSTOP = 19,
+  SIGTSTP = 20,
+} SIGNAL;
 
-int kill(int pid, int signal);
+typedef enum {
+  SA_NOCLDSTOP = 1u,        /* Don't send SIGCHLD when children stop */
+  SA_NOCLDWAIT = 2u,        /* Don't leave zombies */
+  SA_SIGINFO = 4u,        /* Use sa_sigaction instead of sa_handler */
+  SA_ONSTACK = 0x08000000u, /* Deliver on alternate signal stack */
+  SA_RESTART = 0x10000000u, /* Restart some interrupted syscalls */
+  SA_NODEFER = 0x40000000u, /* Don’t automatically block signal */
+  SA_RESETHAND = 0x80000000u, /* Reset handler to default on entry */
+} SA_FLAG;
+
+#define _NSIG 256
+#define _NSIG_BITS_PER_WORD 64 //8 * sizeof(uint64_t)
+#define _NSIG_WORDS (_NSIG / _NSIG_BITS_PER_WORD) // 4
+
+typedef struct {
+  uint64_t __val[_NSIG_WORDS];
+} __sigset_t;
+
+typedef __sigset_t sigset_t;
+
+union sigval {
+  int   sival_int;   // integer value
+  void *sival_ptr;   // pointer value
+};
+
+typedef struct siginfo {
+  int      si_signo;   /* Signal number */
+  int      si_errno;   /* If nonzero, errno associated */
+  int      si_code;    /* Signal code (cause) */
+  union sigval si_value;
+
+  union {
+    //Padding to fixed size - for now, kernel, libc share same definition.
+    //and we need to recompile all apps and libraries if we add more entries in the union in future
+    //int _pad[...];
+
+    /* kill() / tgkill() */
+    struct {
+      pid_t si_pid;  /* Sending process PID */
+      uid_t si_uid;  /* Real user ID of sender */
+    } _kill;
+
+    /* Signals like SIGSEGV, SIGILL, SIGBUS */
+    struct {
+      void *si_addr;    /* Faulting address */
+    } _sigfault;
+
+    /* SIGCHLD */
+    struct {
+      pid_t si_pid;     /* Child PID */
+      uid_t si_uid;     /* Child UID */
+      int   si_status;  /* Exit value or signal */
+      time_t si_utime;
+      time_t si_stime;
+    } _sigchld;
+
+    /* SIGPOLL / SIGIO */
+    struct {
+      int64_t si_band;
+      int  si_fd;
+    } _sigpoll;
+  } _sifields;
+} siginfo_t;
+
+struct sigaction {
+  void     (*sa_handler)(int);            /* pointer to a handler function */
+  void     (*sa_sigaction)(int, siginfo_t *, void *); /* alternative handler */
+  sigset_t sa_mask;                       /* signals to block during handler */
+  int      sa_flags;                      /* flags to modify behavior */
+  void     (*sa_restorer)();
+};
+
+int sigemptyset(sigset_t *set);
+int sigfillset(sigset_t *set);
+int sigaddset(sigset_t *set, int signo);
+int sigdelset(sigset_t *set, int signo);
+int sigismember(const sigset_t *set, int signo);
+
+int kill(pid_t pid, SIGNAL signo);
+int sigqueue(pid_t pid, SIGNAL signo, union sigval value);
+int sigaction(int signo, const struct sigaction *act, struct sigaction *oldact);
 
 #if defined __cplusplus
 }

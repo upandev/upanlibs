@@ -65,8 +65,8 @@ void SysProcess_Yield() {
   _upanix_syscall(SYS_CALL_PROCESS_YIELD, 1, 2, 3, 4, 5);
 }
 
-void SysProcess_Sleep(unsigned milisec) {
-  _upanix_syscall(SYS_CALL_PROCESS_SLEEP, (uint64_t)milisec, 2, 3, 4, 5);
+int SysProcess_Sleep(unsigned milisec) {
+  return (int)_upanix_syscall(SYS_CALL_PROCESS_SLEEP, (uint64_t)milisec, 2, 3, 4, 5);
 }
 
 int SysProcess_GetProcList(PS** pProcList, unsigned* uiListSize) {
@@ -77,8 +77,16 @@ void SysProcess_FreeProcListMem(PS* pProcList, unsigned uiListSize) {
   _upanix_syscall(SYS_CALL_PROCESS_FREE_PS_LIST, (uint64_t)pProcList, (uint64_t)uiListSize, 3, 4, 5);
 }
 
-int SysProcess_Kill(int pid, int signal) {
-  return (int)_upanix_syscall(SYS_CALL_PROCESS_KILL, (uint64_t)pid, (uint64_t)signal, 3, 4, 5);
+int SysProcess_SendSignal(pid_t pid, SIGNAL signo, const union sigval* value) {
+  return (int)_upanix_syscall(SYS_CALL_PROCESS_SIGNAL, (uint64_t)pid, (uint64_t)signo, 3, 4, 5);
+}
+
+void SysProcess_SignalReturn() {
+  _upanix_syscall(SYS_CALL_PROCESS_SET_SIGNAL_RETURN, 1, 2, 3, 4, 5);
+}
+
+int SysProcess_SetSignalAction(int signo, const struct sigaction *act, struct sigaction *oldact) {
+  return (int)_upanix_syscall(SYS_CALL_PROCESS_SET_SIGNAL_ACTION, (uint64_t)signo, (uint64_t)act, (uint64_t)oldact, 4, 5);
 }
 
 int exec(const char* szFileName, bool hasEnv, const char* arg, va_list argl) {
