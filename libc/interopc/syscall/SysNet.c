@@ -26,7 +26,7 @@ sock_t SysNet_CreateSocket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, in
   return (sock_t)_upanix_syscall(SYS_CALL_SOCKET_CREATE, (uint64_t)sa_family, (uint64_t)socket_type, (uint64_t)protocol, 4, 5);
 }
 
-int SysNet_Bind(sock_t fd, struct sockaddr* client_addr, socklen_t len) {
+int SysNet_Bind(sock_t fd, const struct sockaddr* client_addr, socklen_t len) {
   return (int)_upanix_syscall(SYS_CALL_SOCKET_BIND, (uint64_t)fd, (uint64_t)client_addr, (uint64_t)len, 4, 5);
 }
 

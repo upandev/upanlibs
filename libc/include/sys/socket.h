@@ -112,7 +112,7 @@ struct sockaddr_ll {
 extern const uint8_t INADDR_MAC_BROADCAST[ETH_ALEN];
 
 sock_t socket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, int protocol);
-int bind(sock_t fd, struct sockaddr* client_addr, socklen_t len);
+int bind(sock_t fd, const struct sockaddr* client_addr, socklen_t len);
 int setsockopt(sock_t fd, int level, SOCKET_OPTION option, const void* optval, socklen_t len);
 int getsockopt(sock_t sockfd, int level, SOCKET_OPTION option, void *optval, socklen_t *optlen);
 ssize_t sendto(int fd, const void *buf, size_t n, int flags, const struct sockaddr* addr, socklen_t len);

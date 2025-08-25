@@ -77,6 +77,10 @@ void SysProcess_FreeProcListMem(PS* pProcList, unsigned uiListSize) {
   _upanix_syscall(SYS_CALL_PROCESS_FREE_PS_LIST, (uint64_t)pProcList, (uint64_t)uiListSize, 3, 4, 5);
 }
 
+int SysProcess_MaskSignal(SIG_MASKING_TYPE how, const sigset_t *set, sigset_t *oldset) {
+  return (int)_upanix_syscall(SYS_CALL_PROCESS_MASK_SIGNAL, (uint64_t)how, (uint64_t)set, (uint64_t)oldset, 4, 5);
+}
+
 int SysProcess_SendSignal(pid_t pid, SIGNAL signo, const union sigval* value) {
   return (int)_upanix_syscall(SYS_CALL_PROCESS_SIGNAL, (uint64_t)pid, (uint64_t)signo, 3, 4, 5);
 }

@@ -69,6 +69,10 @@ int sigismember(const sigset_t *set, int signo) {
   return !!(set->__val[bit / _NSIG_BITS_PER_WORD] & (1UL << (bit % _NSIG_BITS_PER_WORD)));
 }
 
+int sigprocmask(int how, const sigset_t *set, sigset_t *oldset) {
+  return SysProcess_MaskSignal(how, set, oldset);
+}
+
 int kill(pid_t pid, SIGNAL signo) {
   return SysProcess_SendSignal(pid, signo, NULL);
 }
@@ -88,3 +92,16 @@ int sigaction(int signo, const struct sigaction *act, struct sigaction *oldact) 
   return SysProcess_SetSignalAction(signo, act, oldact);
 }
 
+bool isignoreaction(const struct sigaction *act) {
+  if (!act) return true;
+  if (act->sa_flags & SA_SIGINFO && (uintptr_t)act->sa_sigaction == SIG_IGN) return true;
+  if (!(act->sa_flags & SA_SIGINFO) && (uintptr_t)act->sa_handler == SIG_IGN) return true;
+  return false;
+}
+
+bool isdefaultaction(const struct sigaction *act) {
+  if (!act) return true;
+  if (act->sa_flags & SA_SIGINFO && (uintptr_t)act->sa_sigaction == SIG_DFL) return true;
+  if (!(act->sa_flags & SA_SIGINFO) && (uintptr_t)act->sa_handler == SIG_DFL) return true;
+  return false;
+}

@@ -54,7 +54,7 @@ sock_t socket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, int protocol) {
   return SysNet_CreateSocket(sa_family, socket_type, protocol);
 }
 
-int bind(sock_t fd, struct sockaddr* client_addr, socklen_t len) {
+int bind(sock_t fd, const struct sockaddr* client_addr, socklen_t len) {
   if (!client_addr) {
     return -1;
   }

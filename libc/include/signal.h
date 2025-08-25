@@ -32,6 +32,11 @@ extern "C" {
 typedef enum {
   SIGINT = 2,
   SIGQUIT = 3,
+  SIGILL = 4, /* Illegal instruction */
+  SIGTRAP = 5, /* Trace/breakpoint trap */
+  SIGABRT = 6, /* Abort (not asked, but near FPE) */
+  SIGBUS = 7, /* Bus error (bad memory access) */
+  SIGFPE = 8, /* Floating point exception */
   SIGKILL = 9,
   SIGSEGV = 11,
   SIGALRM = 14,
@@ -51,6 +56,15 @@ typedef enum {
   SA_NODEFER = 0x40000000u, /* Don’t automatically block signal */
   SA_RESETHAND = 0x80000000u, /* Reset handler to default on entry */
 } SA_FLAG;
+
+typedef enum {
+  SIG_BLOCK = 0, /* Block signals: mask |= set  */
+  SIG_UNBLOCK = 1,  /* Unblock signals: mask &= ~set */
+  SIG_SETMASK = 2,  /* Set mask: mask = set */
+} SIG_MASKING_TYPE;
+
+#define SIG_DFL 0
+#define SIG_IGN 1
 
 #define _NSIG 256
 #define _NSIG_BITS_PER_WORD 64 //8 * sizeof(uint64_t)
@@ -106,9 +120,12 @@ typedef struct siginfo {
   } _sifields;
 } siginfo_t;
 
+typedef void (*sa_handler_t)(int);
+typedef void (*sa_sigaction_t)(int, siginfo_t *, void *);
+
 struct sigaction {
-  void     (*sa_handler)(int);            /* pointer to a handler function */
-  void     (*sa_sigaction)(int, siginfo_t *, void *); /* alternative handler */
+  sa_handler_t sa_handler;
+  sa_sigaction_t sa_sigaction;
   sigset_t sa_mask;                       /* signals to block during handler */
   int      sa_flags;                      /* flags to modify behavior */
   void     (*sa_restorer)();
@@ -119,10 +136,13 @@ int sigfillset(sigset_t *set);
 int sigaddset(sigset_t *set, int signo);
 int sigdelset(sigset_t *set, int signo);
 int sigismember(const sigset_t *set, int signo);
+int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 
 int kill(pid_t pid, SIGNAL signo);
 int sigqueue(pid_t pid, SIGNAL signo, union sigval value);
 int sigaction(int signo, const struct sigaction *act, struct sigaction *oldact);
+bool isignoreaction(const struct sigaction *act);
+bool isdefaultaction(const struct sigaction *act);
 
 #if defined __cplusplus
 }

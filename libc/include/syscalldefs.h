@@ -112,6 +112,7 @@ typedef enum
 		SYS_CALL_PROCESS_FREE_PS_LIST,
 		SYS_CALL_PROCESS_CHILD_ALIVE,
 		SYS_CALL_PROCESS_ALIVE,
+    SYS_CALL_PROCESS_MASK_SIGNAL,
     SYS_CALL_PROCESS_SIGNAL,
     SYS_CALL_PROCESS_SET_SIGNAL_ACTION,
     SYS_CALL_PROCESS_SET_SIGNAL_RETURN,
@@ -207,6 +208,7 @@ void SysProcess_Yield();
 int SysProcess_Sleep(unsigned milisec);
 int SysProcess_GetProcList(PS** pProcList, unsigned* uiListSize);
 void SysProcess_FreeProcListMem(PS* pProcList, unsigned uiListSize);
+int SysProcess_MaskSignal(SIG_MASKING_TYPE how, const sigset_t *set, sigset_t *oldset);
 int SysProcess_SendSignal(pid_t pid, SIGNAL signo, const union sigval* value);
 int SysProcess_SetSignalAction(int signo, const struct sigaction *act, struct sigaction *oldact);
 void SysProcess_SignalReturn();
@@ -222,7 +224,7 @@ int SysProcess_IsKernel();
 int SysProcess_IsChildAlive(int iProcessID);
 
 sock_t SysNet_CreateSocket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, int protocol);
-int SysNet_Bind(sock_t fd, struct sockaddr* client_addr, socklen_t len);
+int SysNet_Bind(sock_t fd, const struct sockaddr* client_addr, socklen_t len);
 int SysNet_SetSockOpt(sock_t fd, int level, SOCKET_OPTION option, const void* optval, socklen_t len);
 int SysNet_GetSockOpt(sock_t fd, int level, SOCKET_OPTION option, void* optval, socklen_t* len);
 int SysNet_SendTo(int fd, const void *buf, size_t n, int flags, const struct sockaddr* addr, socklen_t len);
