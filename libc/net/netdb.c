@@ -23,6 +23,9 @@
 #include <netdb.h>
 #include <syscalldefs.h>
 
+//TODO: make it thread local
+int h_errno;
+
 struct hostent *gethostbyname(const char *name) {
   struct hostent *hostinfo;
   if (SysNet_GetHostByName(name, &hostinfo) < 0) {

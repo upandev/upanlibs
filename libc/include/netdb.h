@@ -28,6 +28,8 @@
 extern "C" {
 #endif
 
+extern int h_errno;
+
 struct hostent {
   char  *h_name;        // Official name of the host
   char **h_aliases;     // Null-terminated array of alternate names

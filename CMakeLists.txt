@@ -106,9 +106,6 @@ include_directories(${PROJECT_SOURCE_DIR}/libupanui/image/bmp)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/image/png)
 include_directories(${PROJECT_SOURCE_DIR}/libupanui/interop/includes)
 
-include_directories(${PROJECT_SOURCE_DIR}/libupanssl/include)
-include_directories(${PROJECT_SOURCE_DIR}/libupanssl/providers/implementations/include)
-
 add_custom_target(resources COMMAND make WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/libupanui/resources/)
 
 #LIBC
@@ -177,20 +174,6 @@ add_library(upanui_interop STATIC ${RESOURCE_OBJS} ${LIB_UPANUI_CPP_SRC})
 
 add_dependencies(upanui resources)
 add_dependencies(upanui_interop resources)
-
-#LIBUPANSSL
-execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libupanssl/crypto -name '*.c' | grep -v CMakeFile" OUTPUT_VARIABLE LIBUPANSSL_CRYPTO_SRC)
-execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libupanssl/crypto -name '*.S' | grep -v CMakeFile | grep x86_64" OUTPUT_VARIABLE LIBUPANSSL_CRYPTO_ASM_SRC)
-execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libupanssl/providers -name '*.c' | grep -v CMakeFile" OUTPUT_VARIABLE LIBUPANSSL_PROVIDERS_SRC)
-execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libupanssl/ssl -name '*.c' | grep -v CMakeFile" OUTPUT_VARIABLE LIBUPANSSL_SSL_SRC)
-string(REPLACE "\n" ";" LIBUPANSSL_CRYPTO_SRC ${LIBUPANSSL_CRYPTO_SRC})
-string(REPLACE "\n" ";" LIBUPANSSL_CRYPTO_ASM_SRC ${LIBUPANSSL_CRYPTO_ASM_SRC})
-string(REPLACE "\n" ";" LIBUPANSSL_PROVIDERS_SRC ${LIBUPANSSL_PROVIDERS_SRC})
-string(REPLACE "\n" ";" LIBUPANSSL_SSL_SRC ${LIBUPANSSL_SSL_SRC})
-set_source_files_properties(${LIBUPANSSL_CRYPTO_ASM_SRC} PROPERTIES LANGUAGE C)
-#add_library(crypto STATIC ${LIBUPANSSL_CRYPTO_SRC} ${LIBUPANSSL_CRYPTO_ASM_SRC} ${LIBUPANSSL_PROVIDERS_SRC})
-#add_library(ssl STATIC ${LIBUPANSSL_SSL_SRC})
-#target_link_libraries(ssl PRIVATE crypto)
 
 link_directories(${OUTPUT_DIR})
 
