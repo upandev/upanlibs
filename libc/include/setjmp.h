@@ -22,9 +22,22 @@
 #ifndef _SET_JMP_H_
 #define _SET_JMP_H_
 
+#include <signal.h>
+
 #if defined __cplusplus
 extern "C" {
 #endif
+
+typedef struct {
+  unsigned long __jmpbuf[8];
+  int           __mask_was_saved;
+  sigset_t      __saved_mask;
+} __sig_jmp_buf;
+
+typedef __sig_jmp_buf sigjmp_buf[1];
+
+int sigsetjmp(sigjmp_buf env, int savesigmask);
+void siglongjmp(sigjmp_buf env, int val);
 
 #if defined __cplusplus
 }
