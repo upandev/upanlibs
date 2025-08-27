@@ -85,8 +85,8 @@ int SysProcess_SendSignal(pid_t pid, SIGNAL signo, const union sigval* value) {
   return (int)_upanix_syscall(SYS_CALL_PROCESS_SIGNAL, (uint64_t)pid, (uint64_t)signo, 3, 4, 5);
 }
 
-void SysProcess_SignalReturn() {
-  _upanix_syscall(SYS_CALL_PROCESS_SET_SIGNAL_RETURN, 1, 2, 3, 4, 5);
+void SysProcess_SignalReturn(void* signalContext) {
+  _upanix_syscall(SYS_CALL_PROCESS_SET_SIGNAL_RETURN, (uint64_t)signalContext, 2, 3, 4, 5);
 }
 
 int SysProcess_SetSignalAction(int signo, const struct sigaction *act, struct sigaction *oldact) {

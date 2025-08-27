@@ -211,7 +211,7 @@ void SysProcess_FreeProcListMem(PS* pProcList, unsigned uiListSize);
 int SysProcess_MaskSignal(SIG_MASKING_TYPE how, const sigset_t *set, sigset_t *oldset);
 int SysProcess_SendSignal(pid_t pid, SIGNAL signo, const union sigval* value);
 int SysProcess_SetSignalAction(int signo, const struct sigaction *act, struct sigaction *oldact);
-void SysProcess_SignalReturn();
+void SysProcess_SignalReturn(void* signalContext);
 
 void SysUtil_GetDateTime(RTCDateTime* rtcDateTime);
 void SysUtil_Reboot();

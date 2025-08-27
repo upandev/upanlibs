@@ -81,8 +81,10 @@ int sigqueue(pid_t pid, SIGNAL signo, const union sigval value) {
   return SysProcess_SendSignal(pid, signo, &value);
 }
 
-void signal_restorer() {
-  SysProcess_SignalReturn();
+__attribute__((naked)) void signal_restorer() {
+  __asm__ __volatile__(
+          "movq %rsp, %rdi;"
+          "call SysProcess_SignalReturn;");
 }
 
 int sigaction(int signo, const struct sigaction *act, struct sigaction *oldact) {
