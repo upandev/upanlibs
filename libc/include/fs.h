@@ -26,12 +26,13 @@
 #include <mosstd.h>
 #include <sys/stat.h>
 
-#define ATTR_DIR_DEFAULT	0x01ED  //0000 0001 1110 1101 => 0000(Rsv) 000(Dir) 111(u:rwx) 101(g:r-x) 101(o:r-x)
-#define ATTR_FILE_DEFAULT	0x03A4  //0000(Rsv) 001(File) 110(u:rw-) 100(g:r--) 100(o:r--)
-//#define ATTR_FILE_DEFAULT	0x02A4  //0000(Rsv) 001(File) 110(u:rw-) 100(g:r--) 100(o:r--)
-#define ATTR_DELETED_DIR	0x1000
-#define ATTR_TYPE_DIRECTORY	0x2000
-#define ATTR_TYPE_FILE		0x4000
+#define S_IFREG		0x8000
+#define S_IFDIR		0x4000
+#define S_IFSOCK  0xC000
+
+#define ATTR_DIR_DEFAULT	(0755 | S_IFDIR)  //0000 0001 1110 1101 => 0000(Rsv) 000(Dir) 111(u:rwx) 101(g:r-x) 101(o:r-x)
+#define ATTR_FILE_DEFAULT	(0644 | S_IFREG) //0000(Rsv) 001(File) 110(u:rw-) 100(g:r--) 100(o:r--)
+#define ATTR_DELETED_DIR	0x0000
 
 #define ATTR_READ	0x4
 #define ATTR_WRITE	0x2
@@ -45,7 +46,7 @@
 #define G_GROUP(perm)		((perm >> 3) & 0x7)
 #define G_OTHERS(perm)		(perm & 0x7)
 
-#define FILE_PERM_MASK	0x1FF
+#define FILE_PERM_MASK	0xFFF
 #define FILE_TYPE_MASK	0xF000
 
 #define HAS_READ_PERM(perm)		((perm & 0x7) & ATTR_READ)
@@ -55,8 +56,9 @@
 #define FILE_PERM(attr)	(attr & FILE_PERM_MASK)
 #define FILE_TYPE(attr) (attr & FILE_TYPE_MASK)
 
-#define S_ISDIR(attr) (FILE_TYPE(attr) == ATTR_TYPE_DIRECTORY)
-#define S_ISFILE(attr) (FILE_TYPE(attr) == ATTR_TYPE_FILE)
+#define S_ISDIR(attr) (FILE_TYPE(attr) == S_IFDIR)
+#define S_ISFILE(attr) (FILE_TYPE(attr) == S_IFREG)
+#define S_ISSOCK(attr) (FILE_TYPE(attr) == S_IFSOCK)
 
 #define	SEEK_SET 0
 #define	SEEK_CUR 1

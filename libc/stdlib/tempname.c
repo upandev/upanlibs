@@ -236,7 +236,7 @@ int __gen_tempname (char *tmpl, int kind)
 	    case __GT_DIR:
 /* MOSS		fd = mkdir (tmpl, S_IRUSR | S_IWUSR | S_IXUSR);
  * MOSE */
-		fd = mkdir (tmpl, ATTR_DIR_DEFAULT | ATTR_TYPE_DIRECTORY) ;
+		fd = mkdir (tmpl, ATTR_DIR_DEFAULT) ;
 		break;
 	    default:
 		fd = -1;

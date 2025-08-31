@@ -28,6 +28,7 @@
 extern "C" {
 #endif
 
+#define _POSIX_VERSION 199309L
 #if defined __cplusplus
 }
 #endif

@@ -75,6 +75,7 @@ typedef struct {
 } __sigset_t;
 
 typedef __sigset_t sigset_t;
+typedef int sig_atomic_t;
 
 union sigval {
   int   sival_int;   // integer value
