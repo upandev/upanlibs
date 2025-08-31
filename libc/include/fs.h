@@ -32,7 +32,7 @@
 
 #define ATTR_DIR_DEFAULT	(0755 | S_IFDIR)  //0000 0001 1110 1101 => 0000(Rsv) 000(Dir) 111(u:rwx) 101(g:r-x) 101(o:r-x)
 #define ATTR_FILE_DEFAULT	(0644 | S_IFREG) //0000(Rsv) 001(File) 110(u:rw-) 100(g:r--) 100(o:r--)
-#define ATTR_DELETED_DIR	0x0000
+#define ATTR_DELETED_DIR	0x1000
 
 #define ATTR_READ	0x4
 #define ATTR_WRITE	0x2
