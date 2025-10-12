@@ -56,6 +56,7 @@ namespace upan {
   private:
     void _logarg(LOG_PRIORITY priority, const char * __restrict fmsg, va_list);
     void _log(const upan::string& msg);
+    void _write(const upan::string& logline);
 
     file_stream _writer;
     char _messageBuffer[MAX_LOG_MESSAGE_SIZE];

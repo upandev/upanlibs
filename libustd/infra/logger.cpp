@@ -114,20 +114,24 @@ void logger::_log(const upan::string& msg) {
     if (_logRepeatCount % 100 == 0) {
       const upan::string countStr(upan::string::to_string(_logRepeatCount));
       logline += REPEATED_PREFIX + countStr + REPEATED_SUFFIX;
-      _writer.write(logline.c_str(), logline.length());
-      return;
+      _write(logline);
     }
+    return;
   } else {
     if (_logRepeatCount > 0) {
       const upan::string countStr(upan::string::to_string(_logRepeatCount));
       const upan::string repeatLogLine = logline + REPEATED_PREFIX + countStr + REPEATED_SUFFIX;
       _logRepeatCount = 0;
-      _writer.write(repeatLogLine.c_str(), repeatLogLine.length());
+      _write(repeatLogLine);
     }
     _prevLogMsg = msg;
   }
 
   logline += msg;
+  _write(logline);
+}
+
+void logger::_write(const upan::string& logline) {
   if (_writer.is_good()) {
     _writer.write(logline.c_str(), logline.length());
   } else if (_option & LOG_CONS) {
