@@ -60,6 +60,7 @@ typedef enum
 	WAIT_KERNEL_SERVICE,
   WAIT_EVENT,
   WAIT_IO_DESCRIPTORS,
+  WAIT_TERMINAL_IO,
   STOPPED,
 	TERMINATED,
 	RELEASED,
@@ -78,8 +79,7 @@ typedef struct {
   IO_OP_TYPES _ioType;
 } io_descriptor;
 
-typedef struct
-{
+typedef struct {
 	int pid ;
 	char* pname ;
 	PROCESS_STATUS status ;
