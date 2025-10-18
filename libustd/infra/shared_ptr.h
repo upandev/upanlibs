@@ -96,6 +96,10 @@ namespace upan {
     }
 
   protected:
+    _base_shared_ptr(PTR* ptr, upan::atomic::integral<int>* refCount) : _ptr(ptr), _refCount(refCount) {
+      if (_refCount) _refCount->inc();
+    }
+
     PTR* _ptr;
     upan::atomic::integral<int>* _refCount;
   };
@@ -114,10 +118,13 @@ namespace upan {
   public:
     shared_ptr(T* ptr) : _base_shared_ptr<shared_ptr<T>, T>(ptr) {}
     shared_ptr() {}
-    shared_ptr(const shared_ptr&r) = default;
+    shared_ptr(const shared_ptr& r) = default;
     shared_ptr& operator=(const shared_ptr& r) = default;
     shared_ptr(shared_ptr&& r) = default;
-    shared_ptr &operator=(shared_ptr&& r) = default;
+    shared_ptr& operator=(shared_ptr&& r) = default;
+
+    //casting constructor
+    shared_ptr(T* ptr, upan::atomic::integral<int>* refCount) : _base_shared_ptr<shared_ptr<T>, T>(ptr, refCount) {}
 
     bool operator<(const shared_ptr& r) const {
       return _ptr < r._ptr;
@@ -134,6 +141,16 @@ namespace upan {
         return upan::option<T&>(*_ptr);
       } else {
         return upan::option<T&>::empty();
+      }
+    }
+
+    template<typename D>
+    shared_ptr<D> cast() {
+      auto ptr = dynamic_cast<D*>(_base_shared_ptr<shared_ptr<T>, T>::_ptr);
+      if (ptr) {
+        return shared_ptr<D>(ptr, _base_shared_ptr<shared_ptr<T>, T>::_refCount);
+      } else {
+        return {};
       }
     }
   };
