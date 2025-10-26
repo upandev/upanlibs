@@ -26,6 +26,8 @@
 extern "C" {
 #endif
 
+int posix_openpt(int flag);
+
 #if defined __cplusplus
 }
 #endif

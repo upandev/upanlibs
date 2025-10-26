@@ -29,6 +29,7 @@
 extern "C" {
 #endif
 
+#define PATH_MAX 1024
 /* Maximum length of any multibyte character in any locale.
    We define this value here since the gcc header does not define
    the correct value.  */

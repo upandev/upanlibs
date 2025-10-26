@@ -93,6 +93,10 @@ int SysProcess_SetSignalAction(int signo, const struct sigaction *act, struct si
   return (int)_upanix_syscall(SYS_CALL_PROCESS_SET_SIGNAL_ACTION, (uint64_t)signo, (uint64_t)act, (uint64_t)oldact, 4, 5);
 }
 
+int SysProcess_SetSID() {
+  return (int)_upanix_syscall(SYS_CALL_PROCESS_SET_SID, 1, 2, 3, 4, 5);
+}
+
 int exec(const char* szFileName, bool hasEnv, const char* arg, va_list argl) {
   const int MAX_ARGS = 128;
   char* argv[MAX_ARGS];

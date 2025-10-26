@@ -158,6 +158,9 @@ const char* get_proc_status_desc(int iStatus) ;
 void srand(uint32_t seed);
 int rand();
 
+int ptsname_r(int fd, char* name, int len);
+char *ptsname(int fd);
+
 #if defined __cplusplus
 }
 #endif

@@ -28,6 +28,7 @@
 
 #define S_IFREG		0x8000
 #define S_IFDIR		0x4000
+#define S_IFCHR   0x2000
 #define S_IFSOCK  0xC000
 
 #define ATTR_DIR_DEFAULT	(0755 | S_IFDIR)  //0000 0001 1110 1101 => 0000(Rsv) 000(Dir) 111(u:rwx) 101(g:r-x) 101(o:r-x)
@@ -59,7 +60,7 @@
 #define S_ISDIR(attr) (FILE_TYPE(attr) == S_IFDIR)
 #define S_ISFILE(attr) (FILE_TYPE(attr) == S_IFREG)
 #define S_ISSOCK(attr) (FILE_TYPE(attr) == S_IFSOCK)
-
+#define S_ISCHR(attr) (FILE_TYPE(attr) == S_IFCHR)
 #define	SEEK_SET 0
 #define	SEEK_CUR 1
 #define	SEEK_END 2
@@ -78,8 +79,9 @@ typedef enum
 	O_EXCL = 32,
 	O_TRUNC = 64,
   O_NONBLOCK = 128,
-  O_RD_NONBLOCK = 256,
-  O_WR_NONBLOCK = 512,
+  O_NOCTTY = 256,
+  O_RD_NONBLOCK = 512,
+  O_WR_NONBLOCK = 1024,
 } FileModes ;
 
 int create(const char* file_path, unsigned short file_attr) ;

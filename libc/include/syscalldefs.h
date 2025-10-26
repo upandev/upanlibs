@@ -35,7 +35,7 @@ extern "C" {
 # include <sys/socket.h>
 # include <netdb.h>
 # include <mosstd.h>
-#include "signal.h"
+# include <signal.h>
 
 uint64_t _upanix_syscall(uint64_t sysCallId, uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4, uint64_t p5);
 
@@ -88,6 +88,8 @@ typedef enum
   SYS_CALL_IO_START = 300,
     SYS_CALL_IO_CLOSE,
     SYS_CALL_IO_CTL,
+    SYS_CALL_IO_OPENPT,
+    SYS_CALL_IO_PTS_NAME,
   SYS_CALL_IO_END,
 
 	SYS_CALL_MEM_START = 400,
@@ -116,6 +118,7 @@ typedef enum
     SYS_CALL_PROCESS_SIGNAL,
     SYS_CALL_PROCESS_SET_SIGNAL_ACTION,
     SYS_CALL_PROCESS_SET_SIGNAL_RETURN,
+    SYS_CALL_PROCESS_SET_SID,
 	SYS_CALL_PROC_END,
 
 	SYS_CALL_KB_START = 800,
@@ -192,6 +195,8 @@ void SysFS_FileSelect(io_descriptor* waitIODescriptors, io_descriptor* readyIODe
 
 int SysIO_Close(int fd);
 int SysIO_Ctl(int fd, uint64_t cmd, uint64_t arg);
+int SysIO_OpenPT(int flags);
+int SysIO_GetPTSName(int fd, char* name, int len);
 
 int SysMemory_AlignedAlloc(void** addr, uint32_t alignment, uint32_t uiSizeInBytes);
 int SysMemory_Free(void* uiAddress);
@@ -212,6 +217,7 @@ int SysProcess_MaskSignal(SIG_MASKING_TYPE how, const sigset_t *set, sigset_t *o
 int SysProcess_SendSignal(pid_t pid, SIGNAL signo, const union sigval* value);
 int SysProcess_SetSignalAction(int signo, const struct sigaction *act, struct sigaction *oldact);
 void SysProcess_SignalReturn(void* signalContext);
+int SysProcess_SetSID();
 
 void SysUtil_GetDateTime(RTCDateTime* rtcDateTime);
 void SysUtil_Reboot();

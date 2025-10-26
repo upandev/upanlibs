@@ -265,3 +265,7 @@ int chdir(const char* dirPath) {
   }
   return r;
 }
+
+int setsid() {
+  return SysProcess_SetSID();
+}

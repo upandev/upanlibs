@@ -32,6 +32,7 @@ typedef enum {
   SIOCGIFADDR = 0x8915,
   SIOCGIFHWADDR = 0x8927,
   SIOCGIFINDEX = 0x8933,
+  TIOCSCTTY = 0x540E,
 } IOCTL_CMD;
 
 int ioctl(int fd, uint64_t cmd, uint64_t arg);

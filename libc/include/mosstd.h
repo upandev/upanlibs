@@ -107,6 +107,7 @@ int iskernel();
 int getpid();
 void yield();
 void waitpid(int pid);
+int setsid();
 void waitonlock(uint64_t lockAddress, int oldVal, int newVal);
 int waitqueue(int id, void* mutex, const struct timeval* timeout);
 void waitdequeue(int id, bool all);

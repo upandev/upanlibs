@@ -1,5 +1,5 @@
 /*
- *  Mother Operating System - An x86 based Operating System
+ *	Upanix - An x86 based Operating System
  *  Copyright (C) 2011 'Prajwala Prabhakar' 'srinivasa.prajwal@gmail.com'
  *
  *  I am making my contributions/submissions to this project solely in
@@ -19,20 +19,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-# include <syscalldefs.h>
 
-int SysIO_Close(int fd) {
-  return _upanix_syscall(SYS_CALL_IO_CLOSE, (uint64_t)fd, 2, 3, 4, 5);
-}
+#include <fcntl.h>
+#include <syscalldefs.h>
 
-int SysIO_Ctl(int fd, uint64_t cmd, uint64_t arg) {
-  return _upanix_syscall(SYS_CALL_IO_CTL, (uint64_t)fd, cmd, arg, 4 ,5);
-}
-
-int SysIO_OpenPT(int flag) {
-  return _upanix_syscall(SYS_CALL_IO_OPENPT, (uint64_t)flag, 2, 3, 4 ,5);
-}
-
-int SysIO_GetPTSName(int fd, char* name, int len) {
-  return _upanix_syscall(SYS_CALL_IO_PTS_NAME, (uint64_t)fd, (uint64_t)name, (uint64_t)len, 4 ,5);
+int posix_openpt(int flags) {
+  return SysIO_OpenPT(flags);
 }

@@ -839,3 +839,17 @@ int rand() {
   _rand_seed = _rand_seed * 1103515245U + 12345U;
   return (int)(_rand_seed & 0x7fffffff);
 }
+
+__thread char __pts_name_buffer[PATH_MAX];
+
+int ptsname_r(int fd, char* name, int len) {
+  return SysIO_GetPTSName(fd, name, len);
+}
+
+char* ptsname(int fd) {
+  if (ptsname_r(fd, __pts_name_buffer, PATH_MAX) < 0) {
+    return NULL;
+  } else {
+    return __pts_name_buffer;
+  }
+}
