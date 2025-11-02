@@ -64,13 +64,13 @@ namespace upan {
         _state.set(running);
         break;
       case running:
-        throw exception(XLOC, "timer is already running");
+        throw exception(XLOC, "thread is already running");
       case stopping:
-        throw exception(XLOC, "timer has stopping - can't run again");
+        throw exception(XLOC, "thread has stopping - can't run again");
       case stopped:
-        throw exception(XLOC, "timer has stopped - can't run again");
+        throw exception(XLOC, "thread has stopped - can't run again");
       default:
-        throw exception(XLOC, "timer is in unknown state: %d", _state);
+        throw exception(XLOC, "thread is in unknown state: %d", _state);
     }
   }
 
@@ -83,11 +83,11 @@ namespace upan {
       case paused:
         break;
       case not_running:
-        throw exception(XLOC, "timer is not running - can't pause");
+        throw exception(XLOC, "thread is not running - can't pause");
       case stopped:
-        throw exception(XLOC, "timer has stopped - can't pause");
+        throw exception(XLOC, "thread has stopped - can't pause");
       default:
-        throw exception(XLOC, "timer is in unknown state: %d", _state);
+        throw exception(XLOC, "thread is in unknown state: %d", _state);
     }
   }
 
