@@ -33,9 +33,17 @@ namespace upanui {
   }
 
   void EventManager::startEventLoop() {
+    startEventLoop(false);
+  }
+
+  void EventManager::startTerminalEventLoop() {
+    startEventLoop(true);
+  }
+
+  void EventManager::startEventLoop(bool readFromTerminal) {
     init_gui_event_stream(_eventStreamFDs);
 
-    io_descriptor waitFDs[3];
+    io_descriptor waitFDs[4];
     waitFDs[0]._fd = _eventStreamFDs[0];
     waitFDs[0]._ioType = IO_OP_TYPES::IO_Read;
 
@@ -43,8 +51,13 @@ namespace upanui {
     waitFDs[1]._ioType = IO_OP_TYPES::IO_Read;
 
     waitFDs[2]._fd = -1;
+    waitFDs[3]._fd = -1;
+    if (readFromTerminal) {
+      waitFDs[2]._fd = STDIN_FD;
+      waitFDs[2]._ioType = IO_OP_TYPES::IO_Read;
+    }
 
-    io_descriptor readyFDs[3];
+    io_descriptor readyFDs[4];
     readyFDs[0]._fd = -1;
 
     try {
@@ -56,6 +69,8 @@ namespace upanui {
             handleKeyboardEvent(_eventStreamFDs[0]);
           } else if (readyFDs[i]._fd == _eventStreamFDs[1]) { //Mouse
             handleMouseEvent(_eventStreamFDs[1]);
+          } else if(readyFDs[i]._fd == STDIN_FD) {
+            handleTerminalInput(STDIN_FD);
           }
         }
       }
@@ -113,6 +128,19 @@ namespace upanui {
       }
 
       GraphicsContext::Instance().uiObjectManager().dispatch(data);
+    }
+  }
+
+  void EventManager::handleTerminalInput(int fd) {
+  	const int MAX_BUFFER_SIZE = 1024;
+    uint8_t buffer[MAX_BUFFER_SIZE];
+    int n = read(fd, buffer, MAX_BUFFER_SIZE);
+    if (n > 0) {
+      for (int i = 0; i < n; ++i) {
+        KeyboardData data(buffer[i], false, false, false);
+        KeyboardEvent keyboardEvent(data);
+        GraphicsContext::Instance().uiObjectManager().dispatch(keyboardEvent);
+      }
     }
   }
 }

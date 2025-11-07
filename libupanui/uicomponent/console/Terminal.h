@@ -28,12 +28,10 @@ namespace upanui {
   class Terminal : public TextArea {
   public:
     void setPrompt(const upan::string&);
-    void insertCommand(const upan::string& str);
-    void insertCommandOutput(const upan::string& str);
 
     class CommandExecutor {
     public:
-      CommandExecutor() {}
+      CommandExecutor() = default;
       CommandExecutor(const CommandExecutor&) = delete;
       CommandExecutor& operator=(const CommandExecutor&) = delete;
 
@@ -46,11 +44,11 @@ namespace upanui {
              CommandExecutor& commandExecutor,
              HorizontalPlacementType horizontalPlacementType,
              VerticalPlacementType verticalPlacementType);
-    ~Terminal() {}
+    ~Terminal() override;
 
     void initialize();
 
-    void enter() override;
+    void onKeyboardEvent(const KeyboardEvent& event) override;
     void moveup() override;
     void moveleft() override;
     void movehome() override;
@@ -59,17 +57,31 @@ namespace upanui {
     void cutSelection() override;
     void moveCursor(bool shiftPressed, bool mouseHeld, int x, int y) override;
     void editSelection() override;
-    void insertCommandOutput(const upan::vector<Character>& characters);
+    void displayCommandLine();
+
+    class TerminalOutputHandler : public upan::thread {
+    public:
+      explicit TerminalOutputHandler(Terminal& terminal);
+
+    private:
+      void run() override;
+      Terminal& _terminal;
+    };
 
   private:
     bool isPrimaryCommandLine();
     upan::string getCommandLine();
+    int terminalMasterFD() const { return _terminalMasterFD; }
 
   private:
+    int _terminalMasterFD;
+    int _terminalSlaveFD;
     upan::string _prompt;
     UIPosition _mouseSelectionCharacterPos;
     UIPosition _mouseSelectionCursorPos;
     CommandExecutor& _commandExecutor;
+    TerminalOutputHandler _terminalOutputHandler;
+
     friend class UIObjectFactory;
   };
 }

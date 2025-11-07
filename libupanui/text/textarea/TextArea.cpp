@@ -591,16 +591,19 @@ namespace upanui {
   }
 
   void TextArea::onKeyboardEvent(const KeyboardEvent& event) {
-    processKeyboardEvent(event);
+    handleInput(event.getData().getRch(), event.getData().isShiftPressed());
+  }
+
+  void TextArea::handleInput(uint8_t ch, bool isShiftPressed) {
+    doHandleInput(ch, isShiftPressed);
     _scrollerChanges.apply();
   }
 
-  void TextArea::processKeyboardEvent(const KeyboardEvent& event) {
+  void TextArea::doHandleInput(uint8_t ch, bool isShiftPressed) {
     upan::mutex_guard g(_drawMutex);
     validateCursorPos();
 
     const UIPosition prevCharPos = _characterPos;
-    auto ch = event.getData().getRch();
 
     if (isSelectKey(ch) || isTextModifyKey(ch)) {
       scrollToY(_cursorPos.y(), _characterPos.y());
@@ -693,7 +696,7 @@ namespace upanui {
         break;
     }
 
-    updateSelectedArea(event.getData().isShiftPressed(), isSelectKey(ch), prevCharPos, _characterPos);
+    updateSelectedArea(isShiftPressed, isSelectKey(ch), prevCharPos, _characterPos);
     notifyChange(ChangeState::Content);
   }
 

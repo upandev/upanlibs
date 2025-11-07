@@ -21,7 +21,9 @@
  */
 
 #include <Terminal.h>
-
+#include <fcntl.h>
+#include <fs.h>
+#include <KeyboardEvent.h>
 
 namespace upanui {
   Terminal::Terminal(int x, int y, int width, int height,
@@ -29,13 +31,24 @@ namespace upanui {
                      CommandExecutor& commandExecutor,
                      HorizontalPlacementType horizontalPlacementType,
                      VerticalPlacementType verticalPlacementType) : TextArea(x, y, width, height, leftMargin, horizontalPlacementType, verticalPlacementType),
-                     _commandExecutor(commandExecutor) {
+                     _terminalMasterFD(-1), _terminalSlaveFD(-1), _commandExecutor(commandExecutor), _terminalOutputHandler(*this) {
     setPrompt(prompt);
+  }
+
+  Terminal::~Terminal() {
   }
 
   void Terminal::initialize() {
     TextArea::init();
-    insertCommand(_prompt);
+
+    _terminalMasterFD = posix_openpt(O_RDWR);
+    _terminalSlaveFD = open(ptsname(_terminalMasterFD), O_RDWR);
+    dup2(_terminalSlaveFD, STDIN_FD);
+    dup2(_terminalSlaveFD, STDOUT_FD);
+    dup2(_terminalSlaveFD, STDERR_FD);
+
+    displayCommandLine();
+    _terminalOutputHandler.start();
   }
 
   void Terminal::setPrompt(const upan::string& prompt) {
@@ -51,24 +64,31 @@ namespace upanui {
     return !lines().get(lineIndex - 1).wrapped();
   }
 
+  void Terminal::displayCommandLine() {
+    printf("%s", _prompt.c_str());
+  }
+
+  void Terminal::onKeyboardEvent(const KeyboardEvent& event) {
+    const auto ch = event.getData().getRch();
+    if (isNewLine(ch)) {
+      const upan::string& cmdLine = getCommandLine();
+      putc('\n', stdout);
+      _commandExecutor.execute(cmdLine);
+      putc('\n', stdout);
+      displayCommandLine();
+    } else {
+      putc(ch, stdout);
+    }
+  }
+
   upan::string Terminal::getCommandLine() {
     movehome();
     upan::string cmdLine;
     for(int i = characterPos().y(); i < lines().size(); ++i) {
       cmdLine += lines().get(i).toString(i == characterPos().y() ? _prompt.length() : 0);
     }
-    return cmdLine;
-  }
-
-  void Terminal::enter() {
-    const upan::string& cmdLine = getCommandLine();
     moveend();
-    TextArea::enter();
-    drawMutex().unlock();
-    _commandExecutor.execute(cmdLine);
-    drawMutex().lock();
-    TextArea::enter();
-    insertCommand(_prompt);
+    return cmdLine;
   }
 
   void Terminal::moveup() {
@@ -134,28 +154,36 @@ namespace upanui {
     unselectArea();
   }
 
-  void Terminal::insertCommand(const upan::string& str) {
-    for (int i = 0; i < str.length(); ++i) {
-      insert(str[i]);
-    }
-  }
+  Terminal::TerminalOutputHandler::TerminalOutputHandler(upanui::Terminal& terminal) : _terminal(terminal) {}
 
-  void Terminal::insertCommandOutput(const upan::string& str) {
-    upan::vector<Character> characters;
-    for (int i = 0; i < str.length(); ++i) {
-      characters.push_back(createCharacter(str[i]));
-    }
-    insertCommandOutput(characters);
-  }
+  void Terminal::TerminalOutputHandler::run() {
+    io_descriptor waitFDs[2];
+    waitFDs[0]._fd = _terminal.terminalMasterFD();
+    waitFDs[0]._ioType = IO_OP_TYPES::IO_Read;
 
-  void Terminal::insertCommandOutput(const upan::vector<Character>& characters) {
-    upan::mutex_guard g(drawMutex());
-    for(const auto& c : characters) {
-      if (isNewLine(c.getCh())) {
-        TextArea::enter();
-      } else {
-        doInsert(c);
+    waitFDs[1]._fd = -1;
+
+    io_descriptor readyFDs[2];
+    readyFDs[0]._fd = -1;
+
+    const int MAX_BUFFER_SIZE = 1024;
+    char buffer[MAX_BUFFER_SIZE];
+
+    try {
+      while (true) {
+        select(waitFDs, readyFDs);
+
+        for(int i = 0; readyFDs[i]._fd >= 0; ++i) {
+          if (readyFDs[i]._fd == _terminal.terminalMasterFD()) {
+            int n = read(readyFDs[i]._fd, buffer, MAX_BUFFER_SIZE);
+            for (int j = 0; j < n; ++j) {
+              _terminal.handleInput(buffer[j], false);
+            }
+          }
+        }
       }
+    } catch(upan::exception& e) {
+      e.Print();
     }
   }
 }

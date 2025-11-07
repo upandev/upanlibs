@@ -85,6 +85,8 @@ namespace upanui {
     virtual void cutSelection();
     virtual void moveCursor(bool shiftPressed, bool mouseHeld, int x, int y);
     virtual void editSelection();
+    void handleInput(uint8_t ch, bool isShiftPressed);
+
 
     UIPosition& characterPos() { return _characterPos; }
     upan::mutex& drawMutex() { return _drawMutex; }
@@ -111,6 +113,7 @@ namespace upanui {
     void onKeyboardEvent(const KeyboardEvent& event) override;
     void inlinemovehome();
     void inlinemoveend();
+    void doHandleInput(uint8_t ch, bool isShiftPressed);
 
   private:
 
@@ -170,7 +173,6 @@ namespace upanui {
     };
 
   private:
-    void processKeyboardEvent(const KeyboardEvent& event);
     void insert(const Character& ch);
     void validateCursorPos() const;
     void updateCursorPosition(int charPosX, int charPosY, int cursorPosX, int cursorPosY);
