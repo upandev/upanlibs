@@ -36,6 +36,7 @@ extern "C" {
 # include <netdb.h>
 # include <mosstd.h>
 # include <signal.h>
+# include <termios.h>
 
 uint64_t _upanix_syscall(uint64_t sysCallId, uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4, uint64_t p5);
 
@@ -90,6 +91,8 @@ typedef enum
     SYS_CALL_IO_CTL,
     SYS_CALL_IO_OPENPT,
     SYS_CALL_IO_PTS_NAME,
+    SYS_CALL_IO_TC_GET_ATTR,
+    SYS_CALL_IO_TC_SET_ATTR,
   SYS_CALL_IO_END,
 
 	SYS_CALL_MEM_START = 400,
@@ -242,6 +245,8 @@ int SysNet_Shutdown(int fd, SOCKET_SHUTDOWN_TYPE type);
 int SysNet_GetHostByName(const char* name, struct hostent** hostinfo);
 int SysNet_GetHostByAddr(const void* addr, socklen_t len, int type, struct hostent** hostinfo);
 void SysNet_FreeHostInfo(struct hostent* hostinfo);
+int SysIO_TCGetAttr(int fd, struct termios *termios_p);
+int SysIO_TCSetAttr(int fd, termios_actions action, const struct termios *termios_p);
 
 #if defined __cplusplus
 }

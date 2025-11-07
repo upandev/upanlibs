@@ -19,7 +19,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-# include <syscalldefs.h>
+
+#include <syscalldefs.h>
 
 int SysIO_Close(int fd) {
   return _upanix_syscall(SYS_CALL_IO_CLOSE, (uint64_t)fd, 2, 3, 4, 5);
@@ -35,4 +36,12 @@ int SysIO_OpenPT(int flag) {
 
 int SysIO_GetPTSName(int fd, char* name, int len) {
   return _upanix_syscall(SYS_CALL_IO_PTS_NAME, (uint64_t)fd, (uint64_t)name, (uint64_t)len, 4 ,5);
+}
+
+int SysIO_TCGetAttr(int fd, struct termios *termios_p) {
+  return _upanix_syscall(SYS_CALL_IO_TC_GET_ATTR, (uint64_t)fd, (uint64_t)termios_p, 3, 4 ,5);
+}
+
+int SysIO_TCSetAttr(int fd, termios_actions action, const struct termios *termios_p) {
+  return _upanix_syscall(SYS_CALL_IO_TC_SET_ATTR, (uint64_t)fd, (uint64_t)action, (uint64_t)termios_p, 4 ,5);
 }
