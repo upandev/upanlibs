@@ -125,6 +125,12 @@ public:
     return *this;
   }
 
+  string& operator+=(const char r) {
+    const char buf[2] = { r, '\0' };
+    expandAndCopy(buf, 1);
+    return *this;
+  }
+
   bool operator<(const string& r) const
   {
     return strcmp(c_str(), r.c_str()) < 0;
@@ -148,12 +154,25 @@ public:
   int length() const { return _len; }
   bool empty() const { return _len == 0; }
 
+  void clear() {
+    _len = 0;
+    _buffer[0] = '\0';
+  }
+
+  char back() const {
+    if (_len == 0) {
+      return '\0';
+    }
+    return _buffer[_len - 1];
+  }
+
   const char operator[](int index) const;
   int find(char c) const;
   int find(const upan::string& str) const;
   string substr(int start, int len) const;
   string substr(int start) const;
   bool split(char c, string& p1, string& p2) const;
+  void pop_back();
 
   template <typename Tokens>
   void tokenize(const upan::string& delim, bool filterEmpty, Tokens& tokens) const {

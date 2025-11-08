@@ -100,6 +100,13 @@ bool string::split(char c, string& p1, string& p2) const {
   return true;
 }
 
+void string::pop_back() {
+  if (_len > 0) {
+    --_len;
+    _buffer[_len] = '\0';
+  }
+}
+
 upan::string upan::string::to_string(uint64_t uiNumber) {
   char strNumber[128];
   unsigned i = 0;
