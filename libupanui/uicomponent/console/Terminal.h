@@ -70,7 +70,6 @@ namespace upanui {
 
   private:
     bool isPrimaryCommandLine();
-    upan::string getCommandLine();
     int terminalMasterFD() const { return _terminalMasterFD; }
 
   private:
@@ -81,6 +80,7 @@ namespace upanui {
     UIPosition _mouseSelectionCursorPos;
     CommandExecutor& _commandExecutor;
     TerminalOutputHandler _terminalOutputHandler;
+    upan::string _commandLine;
 
     friend class UIObjectFactory;
   };

@@ -65,30 +65,24 @@ namespace upanui {
   }
 
   void Terminal::displayCommandLine() {
-    printf("%s", _prompt.c_str());
+    printf("\n%s", _prompt.c_str());
   }
 
   void Terminal::onKeyboardEvent(const KeyboardEvent& event) {
     const auto ch = event.getData().getRch();
-    if (isNewLine(ch)) {
-      const upan::string& cmdLine = getCommandLine();
-      putc('\n', stdout);
-      _commandExecutor.execute(cmdLine);
-      putc('\n', stdout);
+    if (ch == Keyboard_BACKSPACE) {
+      if (!_commandLine.empty()) {
+        _commandLine.pop_back();
+        putchar(Keyboard_BACKSPACE);
+      }
+    } else if (isNewLine(ch)) {
+      //const upan::string& cmdLine = getCommandLine();
+      _commandExecutor.execute(_commandLine);
+      _commandLine.clear();
       displayCommandLine();
-    } else {
-      putc(ch, stdout);
+    } else if (isInsertableKey(ch)) {
+      _commandLine += ch;
     }
-  }
-
-  upan::string Terminal::getCommandLine() {
-    movehome();
-    upan::string cmdLine;
-    for(int i = characterPos().y(); i < lines().size(); ++i) {
-      cmdLine += lines().get(i).toString(i == characterPos().y() ? _prompt.length() : 0);
-    }
-    moveend();
-    return cmdLine;
   }
 
   void Terminal::moveup() {

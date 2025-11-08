@@ -95,6 +95,7 @@ namespace upanui {
     void updateSelectedArea(bool isSelectionOn, bool isSelectKey, const UIPosition& prevCharPos, const UIPosition& newCharPos);
     void unselectArea();
     bool isNewLine(uint16_t ch) const;
+    bool isInsertableKey(uint16_t ch) const;
     Character createCharacter(uint16_t ch) const;
     void doInsert(const Character& ch);
     TextLines& lines() { return _lines; }
@@ -183,7 +184,6 @@ namespace upanui {
 
     bool isSelectKey(uint8_t) const;
     bool isTextModifyKey(uint8_t ch) const;
-    bool isInsertableKey(uint16_t ch) const;
 
     TextBuffer& textBuffer() { return _textBuffer; }
     usfn::Contexts& fontContexts() { return _fontContexts; }
