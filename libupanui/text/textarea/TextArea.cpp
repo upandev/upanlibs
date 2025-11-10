@@ -275,12 +275,14 @@ namespace upanui {
     }
 
     auto cursorY = _cursorPos.y();
+    auto charX = _characterPos.x();
     for(int i = _characterPos.y(); i < _lines.size(); ++i) {
       auto& l = _lines.get(i);
-      l.render(0, i, cursorY);
+      l.render(charX, i, cursorY);
       if (!l.wrapped()) { break; }
       if (cursorY >= height()) { break; }
       cursorY += l.lineHeight();
+      charX = 0;
     }
 
     if (line.size() == _characterPos.x()) {
