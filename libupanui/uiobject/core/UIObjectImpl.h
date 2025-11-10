@@ -133,6 +133,7 @@ namespace upanui {
 
     bool isKeyboardFocusable() const override { return _keyboardFocusable; }
     void setKeyboardFocusable(bool v) override { _keyboardFocusable = v; }
+    void setFocus() override;
 
   protected:
     uint32_t backgroundColorWithAlpha() const {

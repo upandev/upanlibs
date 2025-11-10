@@ -55,6 +55,7 @@ namespace upan {
     static void create();
     static metrics& instance();
 
+    stats& get(const string &name, int id);
     stats& get(const string& name);
     void remove(const string& name);
 

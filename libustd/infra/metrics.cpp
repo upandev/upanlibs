@@ -41,7 +41,12 @@ namespace upan {
     return *_instance;
   }
 
-  metrics::stats &metrics::get(const string &name) {
+  metrics::stats& metrics::get(const string &name, int id) {
+    mutex_guard g(_mutexStats);
+    return _stats[name][id];
+  }
+
+  metrics::stats& metrics::get(const string &name) {
     mutex_guard g(_mutexStats);
     return _stats[name][getpid()];
   }

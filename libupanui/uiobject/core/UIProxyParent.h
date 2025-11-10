@@ -145,6 +145,9 @@ namespace upanui {
     void setKeyboardFocusable(bool) override {
       throw upan::exception(XLOC, "setKeyboardFocusable is unsupported for UIProxyParent");
     }
+    void setFocus() override {
+      throw upan::exception(XLOC, "setFocus is unsupported for UIProxyParent");
+    }
 
   protected:
     void onKeyboardEvent(const KeyboardEvent& event) override {

@@ -296,6 +296,10 @@ namespace upanui {
     }
   }
 
+  void UIObjectImpl::setFocus() {
+    _gc.uiObjectManager().setKeyboardFocus(*this);
+  }
+
   bool UIObjectImpl::hasAlphaLocal() {
     if (backgroundColorAlpha() != GCoreFunctions::MAX_ALPHA)
       return true;

@@ -76,7 +76,6 @@ namespace upanui {
         putchar(Keyboard_BACKSPACE);
       }
     } else if (isNewLine(ch)) {
-      //const upan::string& cmdLine = getCommandLine();
       _commandExecutor.execute(_commandLine);
       _commandLine.clear();
       displayCommandLine();

@@ -62,6 +62,8 @@ namespace upanui {
       UIObjectManager& _uiObjectManager;
     };
 
+    void setKeyboardFocus(UIObject& uiObject);
+    void setMouseFocus(UIObject& uiObject);
     void recalcHasAlpha() {
       _recalcHasAlpha = true;
     }

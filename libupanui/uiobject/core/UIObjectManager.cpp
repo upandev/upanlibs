@@ -124,22 +124,21 @@ namespace upanui {
   void UIObjectManager::draw() {
     upan::mutex_guard g(_uiObjectTreeMutex);
 
-    UIObject* modifiedUIObjects[MAX_OBJECTS_UPDATE_QUEUE];
-    int count = 0;
+    upan::set<UIObject*> modifiedUIObjects;
 
     {
       upan::mutex_guard g1(_uiObjectQueueMutex);
       for(auto it = _modifiedUIObjects.begin(); it != _modifiedUIObjects.end(); ++it) {
-        modifiedUIObjects[count++] = *it;
+        modifiedUIObjects.insert(*it);
       }
       _modifiedUIObjects.clear();
     }
 
-    for(int i = 0; i < count; ++i) {
-      modifiedUIObjects[i]->draw();
+    for (auto uiObject : modifiedUIObjects) {
+      uiObject->draw();
     }
 
-    if (count > 0) {
+    if (!modifiedUIObjects.empty()) {
       _rootCanvas.drawActiveMenu();
       if (_recalcHasAlpha) {
         GraphicsContext::Instance().frame().hasAlpha(_rootCanvas.hasAlpha());
@@ -210,5 +209,15 @@ namespace upanui {
         _rootCanvas.handleMouseEvent(event, eventObject.value());
       }
     }
+  }
+
+  void UIObjectManager::setKeyboardFocus(UIObject& uiObject) {
+    upan::mutex_guard g(_uiObjectTreeMutex);
+    _keyboardFocusedObject = upan::option<UIObject&>(uiObject);
+  }
+
+  void UIObjectManager::setMouseFocus(UIObject& uiObject) {
+    upan::mutex_guard g(_uiObjectTreeMutex);
+    _mouseFocusedObject = upan::option<UIObject&>(uiObject);
   }
 }
