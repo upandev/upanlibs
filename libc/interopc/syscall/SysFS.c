@@ -38,8 +38,16 @@ int SysFS_DeleteDirectory(const char* szDirPath) {
   return _upanix_syscall(SYS_CALL_RMDIR, (uint64_t)szDirPath, 2, 3, 4, 5);
 }
 
-int SysFS_GetDirContent(const char* szDirPath, struct stat_ex** dirList, int* size) {
-  return _upanix_syscall(SYS_CALL_GET_DIR_LIST, (uint64_t)szDirPath, (uint64_t)dirList, (uint64_t)size, 4, 5);
+DIR* SysFS_OpenDir(const char* szDirPath) {
+  return (DIR*)_upanix_syscall(SYS_CALL_FILE_OPEN_DIR, (uint64_t)szDirPath, 2, 3, 4, 5);
+}
+
+struct dirent* SysFS_ReadDir(DIR* dirp) {
+  return (struct dirent*)_upanix_syscall(SYS_CALL_FILE_READ_DIR, (uint64_t)dirp, 2, 3, 4, 5);
+}
+
+int SysFS_CloseDir(DIR* dirp) {
+  return _upanix_syscall(SYS_CALL_FILE_CLOSE_DIR, (uint64_t)dirp, 2, 3, 4, 5);
 }
 
 int SysFS_CreateFile(const char* szDirPath, unsigned short usAttribute) {

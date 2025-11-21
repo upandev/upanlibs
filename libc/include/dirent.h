@@ -19,27 +19,39 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef _DIR_ENT_H_
-#define _DIR_ENT_H_
+#pragma once
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdint.h>
 
 #if defined __cplusplus
 extern "C" {
 #endif
 
+struct dirent {
+  ino_t    d_ino;      /* inode number */
+  char     d_name[33];   /* filename (null-terminated) */
+  struct stat d_stat;
+//  off_t    d_off;      /* offset to the next dirent */
+//  uint16_t d_reclen;   /* length of this record */
+//  uint8_t  d_type;     /* type of file */
+};
+
 struct __dirstream {
   int fd;                 /* File descriptor for the directory */
-  char *data;              /* Directory block */
-  size_t allocation;       /* Space allocated for the block */
-  size_t size;             /* Amount of data in the block */
-  size_t offset;           /* Current offset into the block */
-  off_t filepos;           /* Current position in the directory stream */
+  struct stat d_stat;
+  size_t size;             /* number of entries in the block */
+  size_t index;           /* Current offset into the block */
+  struct dirent *data;     /* Directory block */
 };
 
 typedef struct __dirstream DIR;
 
+DIR *opendir(const char *name);
+struct dirent *readdir(DIR *dirp);
+int closedir(DIR *dirp);
+
 #if defined __cplusplus
 }
-#endif
-
 #endif

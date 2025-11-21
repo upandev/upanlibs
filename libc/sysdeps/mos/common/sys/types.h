@@ -25,7 +25,7 @@
 
 
 /*** Required in GCC compilation **/
-typedef int ino_t;
+typedef unsigned long ino_t;
 typedef int dev_t;
 typedef long off_t;
 /********************************/

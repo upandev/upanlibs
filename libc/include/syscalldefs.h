@@ -37,6 +37,7 @@ extern "C" {
 # include <mosstd.h>
 # include <signal.h>
 # include <termios.h>
+# include <dirent.h>
 
 uint64_t _upanix_syscall(uint64_t sysCallId, uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4, uint64_t p5);
 
@@ -70,7 +71,9 @@ typedef enum
 		SYS_CALL_CWD,
 		SYS_CALL_MKDIR,
 		SYS_CALL_RMDIR,
-		SYS_CALL_GET_DIR_LIST,
+    SYS_CALL_FILE_OPEN_DIR,
+    SYS_CALL_FILE_READ_DIR,
+    SYS_CALL_FILE_CLOSE_DIR,
 		SYS_CALL_FILE_OPEN,
     SYS_CALL_FILE_OPEN_STREAM,
 		SYS_CALL_FILE_CREATE,
@@ -180,7 +183,9 @@ int SysDrive_GetCurrentDriveStat(DriveStat* pDriveStat);
 int SysFS_ChangeDirectory(const char* szDirPath, char** retPwd);
 int SysFS_CreateDirectory(const char* szDirPath, unsigned short usAttribute);
 int SysFS_DeleteDirectory(const char* szDirPath);
-int SysFS_GetDirContent(const char* szDirPath, struct stat_ex** dirList, int* size);
+DIR* SysFS_OpenDir(const char* szDirPath);
+struct dirent* SysFS_ReadDir(DIR* dirp);
+int SysFS_CloseDir(DIR* dirp);
 int SysFS_CreateFile(const char* szDirPath, unsigned short usAttribute);
 int SysFS_FileOpen(const char* szFileName, uint32_t mode);
 int SysFS_FileOpenStream(uint32_t mode);

@@ -232,10 +232,6 @@ int mkdir(const char* dirPath, uint16_t attr) {
   return SysFS_CreateDirectory(dirPath, attr);
 }
 
-int get_dir_content(const char* dirPath, struct stat_ex** dirList, int* size) {
-  return SysFS_GetDirContent(dirPath, dirList, size);
-}
-
 int stat(const char* szFileName, struct stat* pFileStat) {
   return SysFS_FileStat(szFileName, pFileStat) ;
 }

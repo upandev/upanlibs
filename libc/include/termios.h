@@ -30,17 +30,26 @@ typedef unsigned char cc_t ;
 extern "C" {
 #endif
 
-typedef enum
-{
-	ECHO,
-	ECHONL,
+typedef enum {
+  ECHO = 0x8,
+  ECHONL = 0x10,
+  ISIG = 0x80,
+  ICANON = 0x100,
+} termios_lflags;
 
-	ICRNL,
-	INLCR,
-	IGNCR,
+typedef enum {
+	ICRNL = 0x100,
+	INLCR = 0x40,
+	IGNCR = 0x80,
+} termios_iflags;
 
-	ONLCR
-} termios_consts ;
+typedef enum {
+  ONLCR = 0x2,
+} termios_oflags;
+
+typedef enum {
+  CS8 = 0x300,
+} termios_cflags;
 
 typedef enum {
   TCSANOW,

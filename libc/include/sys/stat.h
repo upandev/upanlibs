@@ -46,11 +46,6 @@ struct stat {
   struct timeval st_ctime;   /* time of last status change */
 };
 
-struct stat_ex {
-  char _name[33];
-  struct stat _stat;
-};
-
 int stat(const char* szFileName, struct stat* pFileStat) ;
 int fstat(int iFD, struct stat* pFileStat) ;
 
