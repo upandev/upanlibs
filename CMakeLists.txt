@@ -35,7 +35,7 @@ if(ENABLE_CXX_RT)
 endif()
 
 set(SO_COMPILE_FLAGS -shared -fPIC)
-set(SO_LD_FLAGS " -Wl,-shared -Wl,-fPIC")
+set(SO_LD_FLAGS " -Wl,-shared -Wl,-fPIC -Wl,-z,max-page-size=0x1000 -Wl,-z,common-page-size=0x1000")
 
 set(CMAKE_CXX_FLAGS " -O0 -Wall -ffreestanding -nodefaultlibs -nostdlib -nostartfiles -nostdinc -std=c++11 -nostdinc++ -fno-threadsafe-statics -fpermissive ${EXCEPTION_SUP}")
 set(COMMON_COMPILE_FLAGS " -O0 -Wall -std=c11 -nostdlib -nodefaultlibs -ffreestanding -nostartfiles -D__GCC__")
@@ -65,6 +65,8 @@ include_directories(${PROJECT_SOURCE_DIR}/libc/stdio)
 include_directories(${PROJECT_SOURCE_DIR}/libc/sysdeps)
 include_directories(${PROJECT_SOURCE_DIR}/libc/sysdeps/mos/common)
 include_directories(${PROJECT_SOURCE_DIR}/libc/sysdeps/mos/common/bits)
+
+include_directories(${PROJECT_SOURCE_DIR}/libupthread/include)
 
 include_directories(${PROJECT_SOURCE_DIR}/libm/include)
 include_directories(${PROJECT_SOURCE_DIR}/libm/include/bits)
@@ -123,8 +125,20 @@ add_dependencies(c crt)
 target_compile_options(c PRIVATE -O0 ${SO_COMPILE_FLAGS})
 set_target_properties(c PROPERTIES LINKER_LANGUAGE C)
 #LIBC static for kernel - so don't include sys-call code
-add_library(upanc STATIC ${LIBC_SRC} ${LIBCPP_SRC} ${LIBC_ASM_SRC})
-set_target_properties(upanc PROPERTIES OUTPUT_NAME c)
+add_library(c_static STATIC ${LIBC_SRC} ${LIBCPP_SRC} ${LIBC_ASM_SRC})
+set_target_properties(c_static PROPERTIES OUTPUT_NAME c)
+
+#LIBUPTHREAD
+execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libupthread -name '*.c' | grep -v CMakeFile" OUTPUT_VARIABLE LIBUPTHREAD_SRC)
+execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libupthread -name '*.cpp' | grep -v CMakeFile" OUTPUT_VARIABLE LIBUPTHREAD_CPP_SRC)
+string(REPLACE "\n" ";" LIBUPTHREAD_SRC ${LIBUPTHREAD_SRC})
+string(REPLACE "\n" ";" LIBUPTHREAD_CPP_SRC ${LIBUPTHREAD_CPP_SRC})
+add_library(upthread SHARED ${LIBUPTHREAD_SRC} ${LIBUPTHREAD_CPP_SRC})
+target_compile_options(upthread PRIVATE -O0 ${SO_COMPILE_FLAGS})
+set_target_properties(upthread PROPERTIES LINKER_LANGUAGE C)
+#LIBUPTHREAD static - so don't include sys-call code
+add_library(upthread_static STATIC ${LIBUPTHREAD_SRC} ${LIBUPTHREAD_CPP_SRC})
+set_target_properties(upthread_static PROPERTIES OUTPUT_NAME upthread)
 
 #LIBM
 execute_process(COMMAND bash -c "cd ${PROJECT_SOURCE_DIR}; find ./libm -name '*.c' | grep -v CMakeFile" OUTPUT_VARIABLE LIBM_SRC)

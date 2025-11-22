@@ -1,9 +1,30 @@
+/*
+ *	Upanix - An x86 based Operating System
+ *  Copyright (C) 2011 'Prajwala Prabhakar' 'srinivasa.prajwal@gmail.com'
+ *
+ *  I am making my contributions/submissions to this project solely in
+ *  my personal capacity and am not conveying any rights to any
+ *  intellectual property of any third parties.
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/
+ */
+
 #ifndef _PTHREAD_H_
 #define _PTHREAD_H_
 
 #define PTHREAD_ONCE_INIT	0
 
-#define PTHREAD_MUTEX_NORMAL	1
 #define __LOCK_INITIALIZER	{ 0, 0 }
 
 #define PTHREAD_MUTEX_INITIALIZER	{0,0,0,PTHREAD_MUTEX_NORMAL,__LOCK_INITIALIZER}
@@ -40,6 +61,24 @@ typedef struct {
 		   sizeof(__pthread_cond_align_t)];
     __pthread_cond_align_t __align;
 } pthread_cond_t;
+
+typedef enum {
+ PTHREAD_MUTEX_NORMAL,
+ PTHREAD_MUTEX_ERRORCHECK,
+ PTHREAD_MUTEX_RECURSIVE,
+ PTHREAD_MUTEX_DEFAULT = PTHREAD_MUTEX_RECURSIVE,
+} pthread_attr_kind;
+
+typedef struct
+{
+//  unsigned long   mattr_flags;
+  int             mattr_kind;
+//  int             mattr_spare1;
+//  int             mattr_prioceiling;
+//  int             mattr_protocol;
+//  int             mattr_spares2[6];
+//  char            mattr_name[31+1];
+} pthread_mutexattr_t;
 
 int sched_yield();
 int pthread_mutex_lock(pthread_mutex_t *);
