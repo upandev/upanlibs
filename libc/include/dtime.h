@@ -68,13 +68,26 @@ struct timeval
 //  unsigned uimSec ;
 } PACKED ;
 
+struct timespec {
+  time_t tv_sec;   // whole seconds
+  time_t tv_nsec;  // nanoseconds [0 .. 999999999]
+};
+
+struct timezone {
+  int tz_minuteswest; /* minutes west of Greenwich */
+  int tz_dsttime;     /* daylight savings time type */
+};
+
 #define HRS_IN_DAY (86400)
 
-int gettimeofday(struct timeval*) ;
+int gettimeofday(struct timeval*, struct timezone *tz) ;
 //time since boot
 uint32_t btime();
 void dtime(RTCDateTime*);
 char* dtime_str();
+int sleep(uint32_t s);
+int sleepms(uint32_t ms);
+int nanosleep(const struct timespec* req, struct timespec* rem);
 
 // As per POSIX...
 #define CLOCKS_PER_SEC 1000000

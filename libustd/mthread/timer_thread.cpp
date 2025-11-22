@@ -21,6 +21,7 @@
  */
 
 #include <timer_thread.h>
+#include <time.h>
 
 namespace upan {
   timer_thread::timer_thread(uint32_t interval_ms) : _timer_interval_ms(interval_ms) {

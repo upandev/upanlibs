@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <mosstd.h>
 #include <string.h>
+#include <sys/auxv.h>
 
 static process_init_fini_t* _process_init_fini_list = NULL;
 
@@ -121,14 +122,6 @@ int isprocessalive(int pid) {
 
 int iskernel() {
   return SysProcess_IsKernel();
-}
-
-int sleep(uint32_t seconds) {
-  return SysProcess_Sleep(seconds * 1000);
-}
-
-int sleepms(uint32_t milliseconds) {
-  return SysProcess_Sleep(milliseconds);
 }
 
 int getpid() {
@@ -264,4 +257,12 @@ int chdir(const char* dirPath) {
 
 int setsid() {
   return SysProcess_SetSID();
+}
+
+uint64_t getauxval(uint64_t type) {
+  static const char PLATFORM[] = "x86_64";
+  if (type == AT_PLATFORM) {
+    return (uint64_t)PLATFORM;
+  }
+  return 0;
 }

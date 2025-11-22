@@ -107,8 +107,6 @@ extern void SysUtil_Reboot() ;
 
 #define reboot() SysUtil_Reboot()
 
-int sleep(uint32_t s);
-int sleepms(uint32_t ms);
 void exit(int rv) ;
 /******************/
 

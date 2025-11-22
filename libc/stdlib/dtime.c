@@ -28,7 +28,7 @@ time_t time(time_t * t)
 	time_t result;
 	struct timeval tv;
 
-	if (gettimeofday(&tv))	{
+	if (gettimeofday(&tv, NULL))	{
 		result = (time_t) - 1;
 	} else {
 		result = (time_t) tv.tv_sec;
@@ -47,7 +47,7 @@ clock_t clock()
 	return 0 ;
 }
 
-int gettimeofday(struct timeval* pTV)
+int gettimeofday(struct timeval* pTV, struct timezone* pTZ)
 {
   return SysUtil_GetTimeOfDay(pTV) ;
 }
@@ -74,4 +74,24 @@ char* dtime_str() {
   return _dtime_str_buf;
 }
 
+int sleep(uint32_t s) {
+  return SysProcess_Sleep(s * 1000);
+}
+
+int sleepms(uint32_t ms) {
+  return SysProcess_Sleep(ms);
+}
+
+int nanosleep(const struct timespec* req, struct timespec* rem) {
+  if (!req) {
+    return 0;
+  }
+  time_t ms = req->tv_sec * 1000 + req->tv_nsec / 1000000;
+  int r = sleepms(ms);
+  if (r && rem) {
+    rem->tv_sec = r / 1000;
+    rem->tv_nsec = (r % 1000) * 1000000;
+  }
+  return r >= 0 ? 0 : -1;
+}
 
