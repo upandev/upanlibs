@@ -85,9 +85,11 @@ void exit(int rv) {
    * unbuffer all writable files, or close them outright.
    * Check the stdio routines for details. */
   //if (_stdio_term)
-  _stdio_term();
+  if (!isthread()) {
+    _stdio_term();
+  }
 
-  if (!iskernel()) {
+  if (!iskernel() && !isthread()) {
     __cxa_finalize(NULL);
 
     //the last entry is for the main executable
@@ -122,6 +124,10 @@ int isprocessalive(int pid) {
 
 int iskernel() {
   return SysProcess_IsKernel();
+}
+
+int isthread() {
+  return THREAD_LOCAL_META_DATA->_is_thread;
 }
 
 int getpid() {

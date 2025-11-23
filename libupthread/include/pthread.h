@@ -23,6 +23,8 @@
 #ifndef _PTHREAD_H_
 #define _PTHREAD_H_
 
+#include <stdlib.h>
+
 #define PTHREAD_ONCE_INIT	0
 
 #define __LOCK_INITIALIZER	{ 0, 0 }
@@ -76,6 +78,14 @@ typedef struct {
 //  char            mattr_name[31+1];
 } pthread_mutexattr_t;
 
+#define PTHREAD_CREATE_JOINABLE  0
+#define PTHREAD_CREATE_DETACHED  1
+
+typedef struct {
+  size_t _stack_size;
+  int _detach_state;  // 0 = joinable, 1 = detached
+} pthread_attr_t;
+
 void pthread_mutexattr_init(pthread_mutexattr_t*);
 int pthread_mutexattr_settype(pthread_mutexattr_t* attr, int kind);
 void pthread_mutexattr_destroy(pthread_mutexattr_t*);
@@ -83,6 +93,10 @@ int pthread_mutex_init(pthread_mutex_t* mutex, const pthread_mutexattr_t* attr);
 void pthread_mutex_destroy(pthread_mutex_t*);
 int pthread_mutex_lock(pthread_mutex_t *);
 int pthread_mutex_unlock(pthread_mutex_t *);
+
+void pthread_attr_init(pthread_attr_t*);
+void pthread_attr_destroy(pthread_attr_t*);
+int pthread_attr_setdetachstate(pthread_attr_t*, int detach_state);
 
 int sched_yield();
 int pthread_key_create(pthread_key_t *, void (*destr_func) (void *));

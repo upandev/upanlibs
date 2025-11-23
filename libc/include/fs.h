@@ -58,6 +58,7 @@
 #define FILE_TYPE(attr) (attr & FILE_TYPE_MASK)
 
 #define S_ISDIR(attr) (FILE_TYPE(attr) == S_IFDIR)
+#define S_ISREG(attr) (FILE_TYPE(attr) == S_IFDIR)
 #define S_ISFILE(attr) (FILE_TYPE(attr) == S_IFREG)
 #define S_ISSOCK(attr) (FILE_TYPE(attr) == S_IFSOCK)
 #define S_ISCHR(attr) (FILE_TYPE(attr) == S_IFCHR)

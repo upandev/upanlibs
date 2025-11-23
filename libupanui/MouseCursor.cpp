@@ -24,7 +24,7 @@
 #include <ImageResource.h>
 
 namespace upanui {
-  MouseCursor::MouseCursor() : _x(0), _y(0), _xoffset(0), _yoffset(0), _type(MouseCursorType::NORMAL) {
+  MouseCursor::MouseCursor() : _x(0), _y(0), _xoffset(0), _yoffset(0), _type(MouseCursorType::MOUSECURSOR_NORMAL) {
     _pointerImg.reset(&upanui::PngImageResource::MOUSE_POINTER_CURSOR.create());
     _pointerImg->resize(12, 18);
 
@@ -46,7 +46,7 @@ namespace upanui {
   void MouseCursor::type(MouseCursorType t) {
     if (t != _type) {
       switch (t) {
-        case MouseCursorType::NORMAL:
+        case MouseCursorType::MOUSECURSOR_NORMAL:
           _image = _pointerImg.get();
           break;
 
@@ -67,7 +67,7 @@ namespace upanui {
           break;
       }
       _type = t;
-      if (_type != MouseCursorType::NORMAL) {
+      if (_type != MouseCursorType::MOUSECURSOR_NORMAL) {
         _xoffset = -(width() / 2);
         _yoffset = -(height() / 2);
       } else {

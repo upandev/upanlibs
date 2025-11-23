@@ -37,6 +37,7 @@ typedef int uid_t;
 
 typedef struct {
   pid_t _pid;
+  int _is_thread;
 } PACKED _thread_local_meta_space;
 
 #define THREAD_LOCAL_META_DATA ((_thread_local_meta_space*)(THREAD_LOCAL_META_SPACE_ADDRESS + sizeof(uintptr_t)))
@@ -104,6 +105,7 @@ int exect(thread_entry_func_p entryPoint, void* arg);
 int childalive(int pid) ;
 int isprocessalive(int pid);
 int iskernel();
+int isthread();
 int getpid();
 void yield();
 void waitpid(int pid);

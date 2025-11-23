@@ -37,6 +37,24 @@ int pthread_mutexattr_settype(pthread_mutexattr_t* attr, int kind) {
 void pthread_mutexattr_destroy(pthread_mutexattr_t* attr) {
 }
 
+void pthread_attr_init(pthread_attr_t* attr) {
+  attr->_stack_size = 0;
+  attr->_detach_state = PTHREAD_CREATE_JOINABLE;
+}
+
+void pthread_attr_destroy(pthread_attr_t* attr) {
+}
+
+int pthread_attr_setdetachstate(pthread_attr_t* attr, int detach_state) {
+  if (attr) {
+    if (detach_state == PTHREAD_CREATE_JOINABLE && detach_state == PTHREAD_CREATE_DETACHED) {
+      attr->_detach_state = detach_state;
+      return 0;
+    }
+  }
+  return -1;
+}
+
 int sched_yield()
 {
 	return 0;

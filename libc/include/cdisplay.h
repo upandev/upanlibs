@@ -53,7 +53,7 @@ typedef struct {
 } ViewportInfo;
 
 typedef enum {
-  NORMAL,
+  MOUSECURSOR_NORMAL,
   HRESIZER, VRESIZER, DHVRESIZER, UHVRESIZER
 } MouseCursorType;
 

@@ -36,8 +36,8 @@ static struct atexit_handler {
 //static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 int __cxa_atexit(void (*destructor)(void*), void* arg, void* dso) {
-	//No need for atexit in kernel
-	if (iskernel()) {
+	//No need for atexit in kernel or inside thread
+	if (iskernel() || isthread()) {
     return 0;
   }
 
@@ -59,7 +59,7 @@ int __cxa_atexit(void (*destructor)(void*), void* arg, void* dso) {
 
 void __cxa_finalize(void *dso) {
 	//No auto-object cleanup when os is shutdown
-	if (iskernel()) {
+	if (iskernel() || isthread()) {
     return;
   }
   //pthread_mutex_lock(&lock);

@@ -126,7 +126,7 @@ namespace upanui {
         break;
 
       case ResizeMode::NA:
-        set_mouse_cursor_type(MouseCursorType::NORMAL);
+        set_mouse_cursor_type(MouseCursorType::MOUSECURSOR_NORMAL);
         break;
     }
   }
