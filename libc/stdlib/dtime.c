@@ -23,33 +23,113 @@
 # include <syscalldefs.h>
 # include <stdio.h>
 
-time_t time(time_t * t)
-{
+#define SECONDS_IN_NON_LEAP_YEAR 31536000L
+#define SECONDS_IN_LEAP_YEAR 31622400L
+#define SECONDS_IN_DAY 86400L
+
+static const int DAYS_IN_A_MONTH[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+time_t time(time_t *t) {
 	time_t result;
 	struct timeval tv;
 
 	if (gettimeofday(&tv, NULL))	{
-		result = (time_t) - 1;
+		result = (time_t)-1;
 	} else {
 		result = (time_t) tv.tv_sec;
 	}
 
-	if (t != NULL) 
-	{
+	if (t != NULL) {
 		*t = result;
 	}
 	return result;
 }
 
-clock_t clock()
-{
+clock_t clock() {
 	//stub
 	return 0 ;
 }
 
-int gettimeofday(struct timeval* pTV, struct timezone* pTZ)
-{
+int gettimeofday(struct timeval* pTV, struct timezone* pTZ) {
   return SysUtil_GetTimeOfDay(pTV) ;
+}
+
+struct tm* gmtime_r(const time_t *timep, struct tm *result) {
+  if (result == NULL || timep == NULL) {
+    return NULL;
+  }
+
+  time_t t = *timep;
+  int year = 1970;
+  int totalDays = 0;
+  const bool negativeTime = t < 0;
+
+  if (negativeTime) {
+    t = -t;
+    year = 1969;
+  }
+
+  while (true) {
+    bool isLeapYear = year % 4 == 0 ? true : false;
+    if ((isLeapYear && t < SECONDS_IN_LEAP_YEAR) || (!isLeapYear && t < SECONDS_IN_NON_LEAP_YEAR)) {
+      break;
+    }
+    t -= isLeapYear ? SECONDS_IN_LEAP_YEAR : SECONDS_IN_NON_LEAP_YEAR;
+    if (negativeTime) {
+      --year;
+    } else {
+      ++year;
+    }
+    totalDays += isLeapYear ? 366 : 365;
+  }
+
+  const bool isLeapYear = year % 4 == 0 ? true : false;
+  if (negativeTime) {
+    t = (isLeapYear ? SECONDS_IN_LEAP_YEAR : SECONDS_IN_NON_LEAP_YEAR) - t;
+  }
+
+  int month = 0;
+  int dayOfTheYear = 0;
+  for (; month < 12; ++month) {
+    int days = DAYS_IN_A_MONTH[month];
+    if (isLeapYear && month == 1) {
+      days++;
+    }
+
+    const long secondsInMonth = days * SECONDS_IN_DAY;
+    if (t < secondsInMonth) {
+      break;
+    }
+    t -= secondsInMonth;
+    dayOfTheYear += days;
+  }
+
+  int dayOfTheMonth = 1;
+  while (t >= SECONDS_IN_DAY) {
+    t -= SECONDS_IN_DAY;
+    dayOfTheMonth++;
+    dayOfTheYear++;
+  }
+
+  totalDays += (negativeTime ? (isLeapYear ? 366 : 365) - dayOfTheYear : dayOfTheYear);
+
+  int hour = t / 3600;
+  int minute = (t % 3600) / 60;
+  int second = t % 60;
+  result->tm_sec = second;
+  result->tm_min = minute;
+  result->tm_hour = hour;
+  result->tm_mday = dayOfTheMonth;
+  result->tm_mon = month;
+  result->tm_year = year - 1900;
+  if (negativeTime) {
+    int w = (4 - totalDays) % 7;
+    result->tm_wday = (w < 0 ? w + 7 : w);
+  } else {
+    result->tm_wday = (totalDays + 4) % 7;
+  }
+  result->tm_yday = dayOfTheYear;
+  return result;
 }
 
 //in milliseconds

@@ -28,6 +28,8 @@ SECTIONS
 /*  PROVIDE (__executable_start = SEGMENT_START("text-segment", 0x40000000)); . = SEGMENT_START("text-segment", 0x40000000) + SIZEOF_HEADERS; */
 /*  . = 0x40000000;*/
 
+  . = 0x0;
+
   .text : ALIGN(4K)
   {
     *(.text)

@@ -58,15 +58,12 @@ struct tm
 //	int tm_isdst;       /* daylight saving time */
 } ;
 
-time_t time(time_t * t) ;
-int localtime(struct tm* t, const time_t* time) ;
-
 struct timeval
 {
 	time_t tv_sec; //seconds
   time_t tv_usec; //microseconds
 //  unsigned uimSec ;
-} PACKED ;
+};
 
 struct timespec {
   time_t tv_sec;   // whole seconds
@@ -80,7 +77,10 @@ struct timezone {
 
 #define HRS_IN_DAY (86400)
 
-int gettimeofday(struct timeval*, struct timezone *tz) ;
+time_t time(time_t * t);
+int localtime(struct tm* t, const time_t* time);
+struct tm* gmtime_r(const time_t *timep, struct tm *result);
+int gettimeofday(struct timeval*, struct timezone *tz);
 //time since boot
 uint32_t btime();
 void dtime(RTCDateTime*);

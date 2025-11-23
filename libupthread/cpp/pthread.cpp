@@ -20,6 +20,23 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include <assert.h>
-#include "pthread.h"
+#include <pthread.h>
+#include <mutex.h>
 
+int pthread_mutex_init(pthread_mutex_t* mtx, const pthread_mutexattr_t* attr) {
+  mtx->_kind = attr->_kind;
+  mtx->_impl_mutex = new upan::mutex();
+}
+
+void pthread_mutex_destroy(pthread_mutex_t* mtx) {
+  delete (upan::mutex*)mtx->_impl_mutex;
+}
+int pthread_mutex_lock(pthread_mutex_t* mtx) {
+  ((upan::mutex*)(mtx->_impl_mutex))->lock();
+  return 0;
+}
+
+int pthread_mutex_unlock(pthread_mutex_t* mtx) {
+  ((upan::mutex*)(mtx->_impl_mutex))->unlock();
+  return 0;
+}

@@ -27,7 +27,7 @@
 
 #define __LOCK_INITIALIZER	{ 0, 0 }
 
-#define PTHREAD_MUTEX_INITIALIZER	{0,0,0,PTHREAD_MUTEX_NORMAL,__LOCK_INITIALIZER}
+#define PTHREAD_MUTEX_INITIALIZER	{ PTHREAD_MUTEX_NORMAL }
 #define PTHREAD_COND_INITIALIZER	{__LOCK_INITIALIZER,0}
 
 #if defined (__cplusplus)
@@ -46,11 +46,8 @@ struct _pthread_fastlock {
 };
 
 typedef struct {
-    int __m_reserved;
-    int __m_count;
-    _pthread_descr __m_owner;
-    int __m_kind;
-    struct _pthread_fastlock __m_lock;
+  int _kind;
+  void* _impl_mutex;
 } pthread_mutex_t;
 
 typedef struct {
@@ -66,13 +63,12 @@ typedef enum {
  PTHREAD_MUTEX_NORMAL,
  PTHREAD_MUTEX_ERRORCHECK,
  PTHREAD_MUTEX_RECURSIVE,
- PTHREAD_MUTEX_DEFAULT = PTHREAD_MUTEX_RECURSIVE,
+ PTHREAD_MUTEX_DEFAULT = PTHREAD_MUTEX_NORMAL,
 } pthread_attr_kind;
 
-typedef struct
-{
+typedef struct {
 //  unsigned long   mattr_flags;
-  int             mattr_kind;
+  int             _kind;
 //  int             mattr_spare1;
 //  int             mattr_prioceiling;
 //  int             mattr_protocol;
@@ -80,9 +76,15 @@ typedef struct
 //  char            mattr_name[31+1];
 } pthread_mutexattr_t;
 
-int sched_yield();
+void pthread_mutexattr_init(pthread_mutexattr_t*);
+int pthread_mutexattr_settype(pthread_mutexattr_t* attr, int kind);
+void pthread_mutexattr_destroy(pthread_mutexattr_t*);
+int pthread_mutex_init(pthread_mutex_t* mutex, const pthread_mutexattr_t* attr);
+void pthread_mutex_destroy(pthread_mutex_t*);
 int pthread_mutex_lock(pthread_mutex_t *);
 int pthread_mutex_unlock(pthread_mutex_t *);
+
+int sched_yield();
 int pthread_key_create(pthread_key_t *, void (*destr_func) (void *));
 void *pthread_getspecific(pthread_key_t);
 int pthread_setspecific(pthread_key_t, const void *);

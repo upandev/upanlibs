@@ -21,6 +21,21 @@
  */
 #include <assert.h>
 #include "pthread.h"
+#include <string.h>
+
+void pthread_mutexattr_init(pthread_mutexattr_t* attr) {
+  memset(attr, 0, sizeof(pthread_mutexattr_t));
+  attr->_kind = PTHREAD_MUTEX_DEFAULT;
+}
+
+int pthread_mutexattr_settype(pthread_mutexattr_t* attr, int kind) {
+  int pv = attr->_kind;
+  attr->_kind = kind;
+  return pv;
+}
+
+void pthread_mutexattr_destroy(pthread_mutexattr_t* attr) {
+}
 
 int sched_yield()
 {
@@ -58,27 +73,7 @@ int pthread_setspecific(pthread_key_t key, const void* data)
 	threadDataTable[key] = (void*)data;
 	return 0;
 }
- 
-int pthread_mutex_init(pthread_mutex_t* mutex, const pthread_mutexattr_t* t)  
-{
-	mutex->__m_count = 0;
-	return 0;
-}
- 
-int pthread_mutex_lock(pthread_mutex_t* mutex) 
-{
-	assert(mutex->__m_count == 0);
-	mutex->__m_count = 1;
-	return 0;
-}
- 
-int pthread_mutex_unlock(pthread_mutex_t* mutex) 
-{
-	assert(mutex->__m_count != 0);
-	mutex->__m_count = 0;
-	return 0;
-}
- 
+
 int pthread_cond_wait(pthread_cond_t* c, pthread_mutex_t* m) 
 {
 	return 0;
