@@ -46,6 +46,9 @@ namespace upan {
         return _state.get();
       }
 
+      void set_detach_state(bool detach);
+      bool is_joinable() const { return _joinable; }
+      int detach();
       void start();
       void pause();
       void stop();
@@ -67,6 +70,7 @@ namespace upan {
       mutex _t_mutex;
       upan::option<upan::error> _error;
       int _pid;
+      bool _joinable;
 
       friend class _thread_termination_guard;
     };

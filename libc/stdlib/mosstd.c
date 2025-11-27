@@ -110,8 +110,12 @@ static void thread_entry_caller(thread_entry_func_p tmain, void* arg) {
   exit(0);
 }
 
-int exect(thread_entry_func_p entryPoint, void* arg) {
-  return SysProcess_ThreadExec((uintptr_t)thread_entry_caller, (uintptr_t)entryPoint, arg);
+int exect(thread_entry_func_p entryPoint, void* arg, bool joinable) {
+  return SysProcess_ThreadExec((uintptr_t)thread_entry_caller, (uintptr_t)entryPoint, arg, joinable);
+}
+
+int detach_thread(int pid) {
+  return SysProcess_ThreadDetach(pid);
 }
 
 int childalive(int pid) {
@@ -138,8 +142,8 @@ void yield() {
   SysProcess_Yield();
 }
 
-void waitpid(int pid) {
-  SysProcess_WaitPID(pid);
+int waitpid(pid_t pid, int *status, int options) {
+  return SysProcess_WaitPID(pid, status, options);
 }
 
 void waitonlock(uint64_t lockAddress, int oldVal, int newVal) {

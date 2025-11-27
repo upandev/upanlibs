@@ -29,12 +29,16 @@ int SysProcess_Exec(const char* szFileName, const char *const argv[], const char
   return (int)_upanix_syscall(SYS_CALL_PROCESS_EXEC, (uint64_t)szFileName, (uint64_t)argv, (uint64_t)envp, 4, 5);
 }
 
-int SysProcess_ThreadExec(uintptr_t threadCaller, uintptr_t entryAddress, void* arg) {
-  return (int)_upanix_syscall(SYS_CALL_THREAD_EXEC, (uint64_t)threadCaller, (uint64_t)entryAddress, (uint64_t)arg, 4, 5);
+int SysProcess_ThreadExec(uintptr_t threadCaller, uintptr_t entryAddress, void* arg, bool joinable) {
+  return (int)_upanix_syscall(SYS_CALL_THREAD_EXEC, (uint64_t)threadCaller, (uint64_t)entryAddress, (uint64_t)arg, (uint64_t)joinable, 5);
 }
 
-void SysProcess_WaitPID(int iProcessID) {
-  _upanix_syscall(SYS_CALL_PROCESS_WAIT_PID, (uint64_t)iProcessID, 2, 3, 4, 5);
+int SysProcess_ThreadDetach(int pid) {
+  return (int)_upanix_syscall(SYS_CALL_THREAD_DETACH, (uint64_t)pid, 2, 3, 4, 5);
+}
+
+int SysProcess_WaitPID(pid_t pid, int *status, int options) {
+  return (int)_upanix_syscall(SYS_CALL_PROCESS_WAIT_PID, (uint64_t)pid, (uint64_t)status, (uint64_t)options, 4, 5);
 }
 
 void SysProcess_WaitOnLock(uint64_t lockAddress, int oldVal, int newVal) {

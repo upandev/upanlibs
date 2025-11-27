@@ -109,6 +109,7 @@ typedef enum
     SYS_CALL_PROCESS_INIT_RELOCATE,
 		SYS_CALL_PROCESS_EXEC,
 		SYS_CALL_THREAD_EXEC,
+    SYS_CALL_THREAD_DETACH,
 		SYS_CALL_PROCESS_WAIT_PID,
     SYS_CALL_PROCESS_WAIT_ON_LOCK,
     SYS_CALL_PROCESS_WAIT_QUEUE,
@@ -211,8 +212,9 @@ int SysMemory_Free(void* uiAddress);
 int SysMemory_GetAllocSize(void* address, size_t* size);
 process_init_fini_t* SysProcess_InitRelocate();
 int SysProcess_Exec(const char* szFileName, const char *const argv[], const char *const envp[]);
-int SysProcess_ThreadExec(uintptr_t threadCaller, uintptr_t entryAddress, void* arg);
-void SysProcess_WaitPID(int iProcessID);
+int SysProcess_ThreadExec(uintptr_t threadCaller, uintptr_t entryAddress, void* arg, bool joinable);
+int SysProcess_ThreadDetach(int pid);
+int SysProcess_WaitPID(pid_t pid, int *status, int options);
 void SysProcess_WaitOnLock(uint64_t lockAddress, int newVal, int curVal);
 int SysProcess_WaitQueue(int id, void* mutex, const struct timeval* timeout);
 void SysProcess_WaitDequeue(int id, bool all);

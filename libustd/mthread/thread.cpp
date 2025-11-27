@@ -25,7 +25,7 @@
 #include <exception.h>
 
 namespace upan {
-  thread::thread() : _state(not_running), _error(upan::option<upan::error>::empty()), _pid(-1) {
+  thread::thread() : _state(not_running), _error(upan::option<upan::error>::empty()), _pid(-1), _joinable(false) {
   }
 
   thread::~thread() {
@@ -53,12 +53,27 @@ namespace upan {
     }
   }
 
+  void thread::set_detach_state(bool detach) {
+    if (_pid == -1) {
+      _joinable = !detach;
+    } else {
+      throw upan::exception(XLOC, "can't change detach state after thread is started");
+    }
+  }
+
+  int thread::detach() {
+    if (_pid == -1) {
+      throw upan::exception(XLOC, "can't detach thread before it is started");
+    }
+    return detach_thread(_pid);
+  }
+
   void thread::start() {
     mutex_guard g(_t_mutex);
     switch(_state.get()) {
       case not_running:
         _state.set(running);
-        _pid = exect(thread_callback, this);
+        _pid = exect(thread_callback, this, _joinable);
         break;
       case paused:
         _state.set(running);
