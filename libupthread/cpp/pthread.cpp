@@ -22,6 +22,37 @@
 
 #include <pthread.h>
 #include <mutex.h>
+#include <mutex.h>
+#include <map.h>
+#include <mosstd.h>
+
+class thread_manager {
+private:
+  thread_manager() {}
+
+public:
+  static thread_manager& instance() {
+    static thread_manager tm;
+    return tm;
+  }
+
+  void add(pthread_t tid, void* data) {
+    upan::mutex_guard g(_m);
+    _threadDataMap[tid] = data;
+  }
+
+  void* consume(pthread_t tid) {
+    upan::mutex_guard g(_m);
+    auto i = _threadDataMap.find(tid);
+    if (i == _threadDataMap.end()) return nullptr;
+    return i->second;
+  }
+
+private:
+  typedef upan::map<pthread_t, void*> ThreadDataMap;
+  ThreadDataMap _threadDataMap;
+  upan::mutex _m;
+};
 
 int pthread_mutex_init(pthread_mutex_t* mtx, const pthread_mutexattr_t* attr) {
   mtx->_kind = attr->_kind;
@@ -38,5 +69,34 @@ int pthread_mutex_lock(pthread_mutex_t* mtx) {
 
 int pthread_mutex_unlock(pthread_mutex_t* mtx) {
   ((upan::mutex*)(mtx->_impl_mutex))->unlock();
+  return 0;
+}
+
+void pthread_start_routine_wrapper(void* (*start_routine)(void *), void *arg) {
+  start_routine(arg);
+}
+
+void pthread_exit(void* ret) {
+  thread_manager::instance().add(getpid(), ret);
+  exit(0);
+}
+
+int pthread_join(pthread_t tid, void** ret) {
+  int es;
+  if (waitpid(tid, &es, 0)) {
+    return -1;
+  }
+  *ret = thread_manager::instance().consume(tid);
+  return es;
+}
+
+static void upthread_entry_caller(thread_entry_func_with_ret_t tmain, void* arg) {
+  void* re = tmain(arg);
+  pthread_exit(re);
+}
+
+int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void* (*start_routine)(void *), void *arg) {
+  bool joinable = attr ? attr->_detach_state == PTHREAD_CREATE_JOINABLE : true;
+  *thread = (pthread_t)exectp(upthread_entry_caller, start_routine, arg, joinable);
   return 0;
 }

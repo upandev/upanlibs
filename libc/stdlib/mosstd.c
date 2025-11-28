@@ -105,13 +105,17 @@ void exit(int rv) {
   _exit(rv);
 }
 
-static void thread_entry_caller(thread_entry_func_p tmain, void* arg) {
+static void thread_entry_caller_with_noret(thread_entry_func_with_noret_t tmain, void* arg) {
   tmain(arg);
   exit(0);
 }
 
-int exect(thread_entry_func_p entryPoint, void* arg, bool joinable) {
+int exectp(thread_entry_caller_with_ret_t thread_entry_caller, thread_entry_func_with_ret_t entryPoint, void* arg, bool joinable) {
   return SysProcess_ThreadExec((uintptr_t)thread_entry_caller, (uintptr_t)entryPoint, arg, joinable);
+}
+
+int exect(thread_entry_func_with_noret_t entryPoint, void* arg, bool joinable) {
+  return SysProcess_ThreadExec((uintptr_t)thread_entry_caller_with_noret, (uintptr_t)entryPoint, arg, joinable);
 }
 
 int detach_thread(int pid) {

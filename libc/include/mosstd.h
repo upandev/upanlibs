@@ -89,7 +89,9 @@ typedef struct {
 	int iUserID ;
 } PS ;
 
-typedef void (*thread_entry_func_p)(void*);
+typedef void (*thread_entry_func_with_noret_t)(void*);
+typedef void* (*thread_entry_func_with_ret_t)(void*);
+typedef void (*thread_entry_caller_with_ret_t)(thread_entry_func_with_ret_t, void*);
 
 typedef struct {
   void (*_init)();
@@ -101,7 +103,8 @@ int execl(const char* szFileName, const char* arg, ...);
 int execle(const char* szFileName, const char* arg, ...);
 int execv(const char* szFileName, const char* const argv[]);
 int execve(const char* szFileName, const char* const argv[], const char* const envp[]) ;
-int exect(thread_entry_func_p entryPoint, void* arg, bool joinable);
+int exectp(thread_entry_caller_with_ret_t thread_entry_caller_p, thread_entry_func_with_ret_t entryPoint, void* arg, bool joinable);
+int exect(thread_entry_func_with_noret_t entryPoint, void* arg, bool joinable);
 int detach_thread(int pid);
 int childalive(int pid) ;
 int isprocessalive(int pid);

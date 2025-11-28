@@ -20,8 +20,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 #include <assert.h>
-#include "pthread.h"
+#include <pthread.h>
 #include <string.h>
+#include <mosstd.h>
 
 void pthread_mutexattr_init(pthread_mutexattr_t* attr) {
   memset(attr, 0, sizeof(pthread_mutexattr_t));
@@ -100,4 +101,12 @@ int pthread_cond_wait(pthread_cond_t* c, pthread_mutex_t* m)
 int pthread_cond_signal(pthread_cond_t* c) 
 {
 	return 0;
+}
+
+int pthread_equal(pthread_t t1, pthread_t t2) {
+	return t1 == t2;
+}
+
+int pthread_self() {
+  return getpid();
 }
