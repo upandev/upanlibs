@@ -161,6 +161,7 @@ typedef enum
     SYS_CALL_GET_HOST_BY_NAME,
     SYS_CALL_GET_HOST_BY_ADDR,
     SYS_CALL_FREE_HOST_INFO,
+    SYS_CALL_SOCKET_PAIR,
   SYS_CALL_NETWORK_END,
 } SYS_CALL_NUMBERS ;
 
@@ -252,6 +253,7 @@ int SysNet_Shutdown(int fd, SOCKET_SHUTDOWN_TYPE type);
 int SysNet_GetHostByName(const char* name, struct hostent** hostinfo);
 int SysNet_GetHostByAddr(const void* addr, socklen_t len, int type, struct hostent** hostinfo);
 void SysNet_FreeHostInfo(struct hostent* hostinfo);
+int SysNet_SocketPair(SA_FAMILY_TYPE domain, SOCKET_TYPE type, int protocol, int sv[2]);
 int SysIO_TCGetAttr(int fd, struct termios *termios_p);
 int SysIO_TCSetAttr(int fd, termios_actions action, const struct termios *termios_p);
 

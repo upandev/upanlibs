@@ -100,3 +100,7 @@ int accept(int fd, struct sockaddr* addr, socklen_t* len) {
 int shutdown(int fd, SOCKET_SHUTDOWN_TYPE type) {
   return SysNet_Shutdown(fd, type);
 }
+
+int socketpair(SA_FAMILY_TYPE domain, SOCKET_TYPE type, int protocol, int sv[2]) {
+  return SysNet_SocketPair(domain, type, protocol, sv);
+}

@@ -47,7 +47,7 @@
 static int direxists (const char *dir)
 {
     struct stat buf;
-    return stat(dir, &buf) == 0 && S_ISDIR (buf.st_mode);
+    return stat(dir, &buf) == 0 && S_ISDIR(buf.st_mode);
 }
 
 /* Path search algorithm, for tmpnam, tmpfile, etc.  If DIR is

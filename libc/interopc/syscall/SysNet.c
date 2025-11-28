@@ -75,3 +75,7 @@ int SysNet_GetHostByAddr(const void* addr, socklen_t len, int type, struct hoste
 void SysNet_FreeHostInfo(struct hostent* hostinfo) {
   _upanix_syscall(SYS_CALL_FREE_HOST_INFO, (uint64_t)hostinfo, 2, 3, 4, 5);
 }
+
+int SysNet_SocketPair(SA_FAMILY_TYPE domain, SOCKET_TYPE type, int protocol, int sv[2]) {
+  return (int)_upanix_syscall(SYS_CALL_SOCKET_PAIR, (uint64_t)domain, (uint64_t)type, (uint64_t)protocol, (uint64_t)sv, 5);
+}

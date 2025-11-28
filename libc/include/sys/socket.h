@@ -123,6 +123,7 @@ int connect(int fd, const struct sockaddr *addr, socklen_t len);
 int listen(int fd, int backlog);
 int accept(int fd, struct sockaddr* addr, socklen_t* len);
 int shutdown(int fd, SOCKET_SHUTDOWN_TYPE type);
+int socketpair(SA_FAMILY_TYPE domain, SOCKET_TYPE type, int protocol, int sv[2]);
 
 #if defined __cplusplus
 }

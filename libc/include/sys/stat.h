@@ -28,6 +28,26 @@
 extern "C" {
 #endif
 
+/* User (owner) permissions */
+#define S_IRUSR  00400   /* read */
+#define S_IWUSR  00200   /* write */
+#define S_IXUSR  00100   /* execute */
+
+/* Group permissions */
+#define S_IRGRP  00040
+#define S_IWGRP  00020
+#define S_IXGRP  00010
+
+/* Other (world) permissions */
+#define S_IROTH  00004
+#define S_IWOTH  00002
+#define S_IXOTH  00001
+
+/* Combined macros */
+#define S_IRWXU  (S_IRUSR | S_IWUSR | S_IXUSR)   /* 0700 */
+#define S_IRWXG  (S_IRGRP | S_IWGRP | S_IXGRP)   /* 0070 */
+#define S_IRWXO  (S_IROTH | S_IWOTH | S_IXOTH)   /* 0007 */
+
 /* This is same as FileSystem_FileStat in Upanix Source and must be maintained in consistent with that */
 struct stat {
   int 	    st_dev;     /* ID of device containing file */
