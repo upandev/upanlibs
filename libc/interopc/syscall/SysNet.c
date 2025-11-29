@@ -38,6 +38,14 @@ int SysNet_GetSockOpt(sock_t fd, int level, SOCKET_OPTION option, void* optval, 
   return (int)_upanix_syscall(SYS_CALL_SOCKET_GET_OPT, (uint64_t)fd, (uint64_t)level, (uint64_t)option, (uint64_t)optval, (uint64_t)len);
 }
 
+int SysNet_GetSockName(sock_t fd, struct sockaddr *addr, socklen_t *addrlen) {
+  return (int)_upanix_syscall(SYS_CALL_SOCKET_GET_NAME, (uint64_t)fd, (uint64_t)addr, (uint64_t)addrlen, 4, 5);
+}
+
+int SysNet_GetPeerName(sock_t fd, struct sockaddr *addr, socklen_t *addrlen) {
+  return (int)_upanix_syscall(SYS_CALL_SOCKET_PEER_NAME, (uint64_t)fd, (uint64_t)addr, (uint64_t)addrlen, 4, 5);
+}
+
 int SysNet_SendTo(int fd, const void *buf, size_t n, int flags, const struct sockaddr* addr, socklen_t len) {
   uint64_t ext_param[] = { (uint64_t)addr, (uint64_t)len };
   return (int)_upanix_syscall(SYS_CALL_SOCKET_SEND_TO, (uint64_t)fd, (uint64_t)buf, (uint64_t)n, (uint64_t)flags, (uint64_t)&ext_param);

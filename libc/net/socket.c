@@ -69,6 +69,14 @@ int getsockopt(sock_t fd, int level, SOCKET_OPTION option, void* optval, socklen
   return SysNet_GetSockOpt(fd, level, option, optval, len);
 }
 
+int getsockname(sock_t fd, struct sockaddr *addr, socklen_t *addrlen) {
+  return SysNet_GetSockName(fd, addr, addrlen);
+}
+
+int getpeername(sock_t fd, struct sockaddr *addr, socklen_t *addrlen) {
+  return SysNet_GetPeerName(fd, addr, addrlen);
+}
+
 ssize_t sendto(int fd, const void *buf, size_t n, int flags, const struct sockaddr* addr, socklen_t len) {
   return SysNet_SendTo(fd, buf, n, flags, addr, len);
 }

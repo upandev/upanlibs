@@ -152,6 +152,8 @@ typedef enum
     SYS_CALL_SOCKET_BIND,
     SYS_CALL_SOCKET_SET_OPT,
     SYS_CALL_SOCKET_GET_OPT,
+    SYS_CALL_SOCKET_GET_NAME,
+    SYS_CALL_SOCKET_PEER_NAME,
     SYS_CALL_SOCKET_SEND_TO,
     SYS_CALL_SOCKET_RECV_FROM,
     SYS_CALL_SOCKET_CONNECT,
@@ -244,6 +246,8 @@ sock_t SysNet_CreateSocket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, in
 int SysNet_Bind(sock_t fd, const struct sockaddr* client_addr, socklen_t len);
 int SysNet_SetSockOpt(sock_t fd, int level, SOCKET_OPTION option, const void* optval, socklen_t len);
 int SysNet_GetSockOpt(sock_t fd, int level, SOCKET_OPTION option, void* optval, socklen_t* len);
+int SysNet_GetSockName(sock_t fd, struct sockaddr *addr, socklen_t *addrlen);
+int SysNet_GetPeerName(sock_t fd, struct sockaddr *addr, socklen_t *addrlen);
 int SysNet_SendTo(int fd, const void *buf, size_t n, int flags, const struct sockaddr* addr, socklen_t len);
 int SysNet_RecvFrom(int fd, void *buf, size_t n, int flags, struct sockaddr* addr, socklen_t* len);
 int SysNet_Connect(int fd, const struct sockaddr *addr, socklen_t len);

@@ -30,6 +30,13 @@
 
 static process_init_fini_t* _process_init_fini_list = NULL;
 
+struct atexit_handler {
+  void (*_handler)(void);
+  struct atexit_handler* _next;
+};
+
+static struct atexit_handler* atexit_handler_list_head = NULL;
+
 extern void load_environ(const char** environ);
 
 __thread int _lib_data1_thread_local = 1000;
@@ -84,25 +91,44 @@ void exit(int rv) {
    * this will attempt to commit all buffered writes.  It may also
    * unbuffer all writable files, or close them outright.
    * Check the stdio routines for details. */
-  //if (_stdio_term)
+
   if (!isthread()) {
+    struct atexit_handler* h = atexit_handler_list_head;
+    while (h) {
+      struct atexit_handler* next = h->_next;
+      h->_handler();
+      free(h);
+      h = next;
+    }
+
     _stdio_term();
-  }
 
-  if (!iskernel() && !isthread()) {
-    __cxa_finalize(NULL);
+    if (!iskernel()) {
+      __cxa_finalize(NULL);
 
-    //the last entry is for the main executable
-    process_init_fini_t* i = _process_init_fini_list;
-    while (!i->_end) {
-      if (i->_fini) {
-        i->_fini();
+      //the last entry is for the main executable
+      process_init_fini_t* i = _process_init_fini_list;
+      while (!i->_end) {
+        if (i->_fini) {
+          i->_fini();
+        }
+        i++;
       }
-      i++;
     }
   }
 
   _exit(rv);
+}
+
+int atexit(void (*handler)(void)) {
+  struct atexit_handler* h = malloc(sizeof(struct atexit_handler));
+  if (!h) {
+    return 1;
+  }
+  h->_handler = handler;
+  h->_next = atexit_handler_list_head;
+  atexit_handler_list_head = h;
+  return 0;
 }
 
 static void thread_entry_caller_with_noret(thread_entry_func_with_noret_t tmain, void* arg) {

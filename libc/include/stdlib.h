@@ -158,6 +158,7 @@ int rand();
 
 int ptsname_r(int fd, char* name, int len);
 char *ptsname(int fd);
+int atexit(void (*handler)(void));
 
 #if defined __cplusplus
 }
