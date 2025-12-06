@@ -35,6 +35,9 @@ void* calloc(size_t n, size_t s)
 }
 
 void* aligned_alloc(size_t alignment, size_t sizeInBytes) {
+  if (!sizeInBytes) {
+    return NULL;
+  }
   void* addr;
   if(SysMemory_AlignedAlloc(&addr, alignment, sizeInBytes) < 0)
     return NULL;
@@ -56,24 +59,23 @@ int get_alloc_size(void* address, size_t* size)
 	return SysMemory_GetAllocSize(address, size) ;
 }
 
-void* realloc(void* ptr, size_t s)
-{
-	void* new_ptr = NULL ;
+void* realloc(void* ptr, size_t s) {
+  if (!s) {
+    free (ptr);
+    return NULL;
+  }
 
-	if(s)
-		new_ptr = (void*)malloc(s) ;
+	void* new_ptr = (void*)malloc(s) ;
 
-	if(ptr)
-	{
+	if(ptr) {
 		size_t old_size ;
 
-		if(get_alloc_size(ptr, &old_size) < 0)
-			return (void*)NULL ;
+		if(get_alloc_size(ptr, &old_size) < 0) {
+      return (void*) NULL;
+    }
 
-		int copy_size = (old_size < s) ? old_size : s ;
-
+		size_t copy_size = (old_size < s) ? old_size : s ;
 		memcpy(new_ptr, ptr, copy_size) ;
-	
 		free(ptr) ;
 	}
 
