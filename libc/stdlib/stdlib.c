@@ -853,3 +853,35 @@ char* ptsname(int fd) {
     return __pts_name_buffer;
   }
 }
+
+uid_t getuid() {
+  return 0;
+}
+
+int setuid(uid_t uid) {
+  return 0;
+}
+
+uid_t geteuid() {
+  return 0;
+}
+
+int seteuid(uid_t euid) {
+  return 0;
+}
+
+uid_t getgid() {
+  return 0;
+}
+
+int setgid(uid_t gid) {
+  return 0;
+}
+
+uid_t getegid() {
+  return 0;
+}
+
+int setegid(uid_t egid) {
+  return 0;
+}

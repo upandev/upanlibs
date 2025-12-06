@@ -26,9 +26,6 @@
 #include <time.h>
 #include <stdbool.h>
 
-typedef int pid_t;
-typedef int uid_t;
-
 #define GB * 1024UL * 1024 * 1024
 #define MB * 1024 * 1024
 #define KB * 1024

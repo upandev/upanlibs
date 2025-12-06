@@ -71,6 +71,9 @@ typedef unsigned char byte ;
 #define _LIBC
 #endif
 
+typedef int pid_t;
+typedef int uid_t;
+
 int abs(int j) ;
 long int labs(long int j) ;
 
@@ -159,6 +162,18 @@ int rand();
 int ptsname_r(int fd, char* name, int len);
 char *ptsname(int fd);
 int atexit(void (*handler)(void));
+
+uid_t getuid();
+int setuid(uid_t);
+
+uid_t geteuid();
+int seteuid(uid_t);
+
+uid_t getgid();
+int setgid(uid_t);
+
+uid_t getegid();
+int setegid(uid_t);
 
 #if defined __cplusplus
 }
