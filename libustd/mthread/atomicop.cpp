@@ -29,20 +29,11 @@ namespace upan {
     }
 
     uint32_t op::swap(volatile uint32_t &iLock, uint32_t val) {
-      __asm__ __volatile__ ("lock xchgl %0, %1"
-      : "=r" ( val )
-      : "m"( iLock ), "0" (val)
-      : "memory" );
-
-      return val;
+      return __atomic_exchange_n(&iLock, val, __ATOMIC_SEQ_CST);
     }
 
     uint32_t op::add(volatile uint32_t &var, uint32_t val) {
-      __asm__ __volatile__ ("lock xaddl %0, %1"
-      : "=r"(val)
-      : "m"( var ), "0" (val)
-      : "memory", "cc");
-      return val;
+      return __atomic_fetch_add(&var, val, __ATOMIC_SEQ_CST);
     }
 
     uint32_t op::bit_and(volatile uint32_t& var, uint32_t mask) {
