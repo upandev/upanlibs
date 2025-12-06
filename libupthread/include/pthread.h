@@ -23,29 +23,21 @@
 #ifndef _PTHREAD_H_
 #define _PTHREAD_H_
 
+#include <time.h>
 #include <stdlib.h>
 
 #define PTHREAD_ONCE_INIT	0
 
-#define __LOCK_INITIALIZER	{ 0, 0 }
-
-#define PTHREAD_MUTEX_INITIALIZER	{ PTHREAD_MUTEX_NORMAL }
-#define PTHREAD_COND_INITIALIZER	{__LOCK_INITIALIZER,0}
+#define PTHREAD_MUTEX_INITIALIZER	{ PTHREAD_MUTEX_NORMAL, 0 }
+#define PTHREAD_COND_INITIALIZER	{ 0 }
 
 #if defined (__cplusplus)
 extern "C" {
 #endif
 
-typedef struct _pthread_descr_struct *_pthread_descr;
-typedef unsigned int pthread_key_t;
-typedef int pthread_once_t;
+typedef uint32_t pthread_key_t;
+typedef uint32_t pthread_once_t;
 typedef unsigned long int pthread_t;
-typedef long long int __pthread_cond_align_t;
-
-struct _pthread_fastlock {
-    long int __status;
-    int __spinlock;
-};
 
 typedef struct {
   int _kind;
@@ -53,13 +45,12 @@ typedef struct {
 } pthread_mutex_t;
 
 typedef struct {
-    struct _pthread_fastlock __c_lock;
-    _pthread_descr __c_waiting;
-    char __padding[48 - sizeof(struct _pthread_fastlock) -
-		   sizeof(_pthread_descr) -
-		   sizeof(__pthread_cond_align_t)];
-    __pthread_cond_align_t __align;
+  void* _impl_cv;
 } pthread_cond_t;
+
+typedef struct {
+  uint32_t _attr;
+} pthread_condattr_t;
 
 typedef enum {
  PTHREAD_MUTEX_NORMAL,
@@ -92,6 +83,7 @@ void pthread_mutexattr_destroy(pthread_mutexattr_t*);
 int pthread_mutex_init(pthread_mutex_t* mutex, const pthread_mutexattr_t* attr);
 void pthread_mutex_destroy(pthread_mutex_t*);
 int pthread_mutex_lock(pthread_mutex_t *);
+int pthread_mutex_trylock(pthread_mutex_t *);
 int pthread_mutex_unlock(pthread_mutex_t *);
 void pthread_attr_init(pthread_attr_t*);
 void pthread_attr_destroy(pthread_attr_t*);
@@ -103,12 +95,19 @@ int pthread_equal(pthread_t, pthread_t);
 int pthread_self();
 
 int sched_yield();
+int pthread_once(pthread_once_t *, void (*init)());
+
 int pthread_key_create(pthread_key_t *, void (*destr_func) (void *));
-void *pthread_getspecific(pthread_key_t);
+void* pthread_getspecific(pthread_key_t);
 int pthread_setspecific(pthread_key_t, const void *);
-int pthread_once(pthread_once_t *, void (*init_routine) (void));
-int pthread_cond_wait(pthread_cond_t *, pthread_mutex_t *);
-int pthread_cond_signal(pthread_cond_t *);
+int pthread_key_delete(pthread_key_t key);
+
+int pthread_cond_init(pthread_cond_t* cond, const pthread_condattr_t* attr);
+int pthread_cond_wait(pthread_cond_t*, pthread_mutex_t*);
+int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *time);
+int pthread_cond_signal(pthread_cond_t*);
+int pthread_cond_broadcast(pthread_cond_t*);
+int pthread_cond_destroy(pthread_cond_t*);
 
 #if defined (__cplusplus)
 }

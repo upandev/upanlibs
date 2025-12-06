@@ -56,51 +56,9 @@ int pthread_attr_setdetachstate(pthread_attr_t* attr, int detach_state) {
   return -1;
 }
 
-int sched_yield()
-{
-	return 0;
-}
-
-static void* threadDataTable[64]; 
-static int freeEntry = 0;
-
-int pthread_key_create(pthread_key_t* key, void (*f)(void*)) 
-{
-	assert(freeEntry < 64);
- 
-	*key = freeEntry;
-	freeEntry++;
-	return 0;
-}
- 
-int pthread_once(pthread_once_t* control, void (*init)(void)) 
-{
-	if (*control == 0) {
-		(*init)();
-		*control = 1;
-	}
-	return 0;
-}
- 
-void* pthread_getspecific(pthread_key_t key) 
-{
-	return threadDataTable[key];
-}
- 
-int pthread_setspecific(pthread_key_t key, const void* data) 
-{
-	threadDataTable[key] = (void*)data;
-	return 0;
-}
-
-int pthread_cond_wait(pthread_cond_t* c, pthread_mutex_t* m) 
-{
-	return 0;
-}
- 
-int pthread_cond_signal(pthread_cond_t* c) 
-{
-	return 0;
+int sched_yield() {
+	yield();
+  return 0;
 }
 
 int pthread_equal(pthread_t t1, pthread_t t2) {
