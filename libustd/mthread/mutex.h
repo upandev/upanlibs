@@ -43,6 +43,7 @@ namespace upan{
       mutex& operator=(mutex&) = delete;
 
       void lock();
+      int trylock();
       bool unlock();
       bool unlock(int pid);
     };

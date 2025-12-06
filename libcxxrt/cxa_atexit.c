@@ -21,8 +21,6 @@
  *
  */
 
-#include <pthread.h>
-#include <stdlib.h>
 #include <malloc.h>
 #include <mosstd.h>
 

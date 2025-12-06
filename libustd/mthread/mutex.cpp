@@ -41,6 +41,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
+#include <errno_values.h>
 #include <mutex.h>
 #include <atomicop.h>
 #include <stdlib.h>
@@ -72,6 +73,23 @@ namespace upan {
       waitonlock((uint64_t)_lock, FREE_MUTEX, newVal);
       _lockCount = 1;
     }
+  }
+
+  int mutex::trylock() {
+    if (iskernel()) {
+      return 0;
+    }
+
+    const int newVal = getpid();
+    const int oldVal = _lock->compare_set(FREE_MUTEX, newVal);
+    if (oldVal == FREE_MUTEX) {
+      _lockCount = 1;
+    } else if (oldVal == newVal) {
+      ++_lockCount;
+    } else {
+      return EBUSY;
+    }
+    return 0;
   }
 
   bool mutex::unlock() {
