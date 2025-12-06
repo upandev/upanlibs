@@ -306,3 +306,7 @@ uint64_t getauxval(uint64_t type) {
   }
   return 0;
 }
+
+int getentropy(void *buffer, size_t length) {
+  return SysUtil_GetEntropy(buffer, length);
+}

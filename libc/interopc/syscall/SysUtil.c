@@ -37,3 +37,7 @@ int SysUtil_GetTimeOfDay(struct timeval* pTV) {
 uint32_t SysUtil_GetTimeSinceBoot() {
   return _upanix_syscall(SYS_CALL_UTIL_BTIME, 1, 2, 3, 4, 5);
 }
+
+int SysUtil_GetEntropy(void *buffer, size_t length) {
+  return _upanix_syscall(SYS_CALL_UTIL_GET_ENTROPY, (uint64_t)buffer, (uint64_t)length, 3, 4, 5);
+}
