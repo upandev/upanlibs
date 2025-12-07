@@ -220,8 +220,8 @@ vector<T>::vector(std::initializer_list<T> l) : _size(l.size()), _capacity(0), _
 }
 
 template <typename T>
-vector<T>::~vector()
-{
+vector<T>::~vector() {
+  clear();
   delete[] _buffer;
 }
 
