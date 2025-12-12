@@ -225,8 +225,8 @@ int write(int fd, const void* buf, int len) {
   return SysFS_FileWrite(fd, buf, len) ;
 }
 
-void select(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors) {
-  SysFS_FileSelect(waitIODescriptors, readyIODescriptors);
+int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout) {
+  return SysFS_FileSelect(nfds, readfds, writefds, exceptfds, timeout);
 }
 
 int lseek(int fd, int offset, int seekType) {
@@ -309,4 +309,13 @@ uint64_t getauxval(uint64_t type) {
 
 int getentropy(void *buffer, size_t length) {
   return SysUtil_GetEntropy(buffer, length);
+}
+
+int getrusage(RUSAGE_ID who, struct rusage* ru) {
+  return SysUtil_GetResourceUsage(who, ru);
+}
+
+int mlock(const void *addr, size_t len) {
+  //TODO
+  return 0;
 }

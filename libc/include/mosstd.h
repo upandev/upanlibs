@@ -67,16 +67,6 @@ typedef enum
   TOTAL_PROC_STATUS
 } PROCESS_STATUS ;
 
-typedef enum {
-  IO_Read,
-  IO_Write
-} IO_OP_TYPES ;
-
-typedef struct {
-  int _fd;
-  IO_OP_TYPES _ioType;
-} io_descriptor;
-
 typedef struct {
 	int pid ;
 	char* pname ;
@@ -109,7 +99,7 @@ int iskernel();
 int isthread();
 int getpid();
 void yield();
-int waitpid(pid_t pid, int *status, int options);
+
 int setsid();
 void waitonlock(uint64_t lockAddress, int oldVal, int newVal);
 int waitqueue(int id, void* mutex, const struct timeval* timeout);

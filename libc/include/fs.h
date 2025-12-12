@@ -95,7 +95,6 @@ int mkdir(const char* dirPath, uint16_t attr);
 
 int read(int fd, void* buf, int len) ;
 int write(int fd, const void* buf, int len) ;
-void select(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors);
 int lseek(int fd, int offset, int seekType) ;
 unsigned tell(int fd) ;
 int getomode(int fd) ;

@@ -38,6 +38,8 @@ extern "C" {
 # include <signal.h>
 # include <termios.h>
 # include <dirent.h>
+# include <sys/resource.h>
+# include <sys/select.h>
 
 uint64_t _upanix_syscall(uint64_t sysCallId, uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4, uint64_t p5);
 
@@ -145,6 +147,7 @@ typedef enum
     SYS_CALL_UTIL_BTIME,
     SYS_CALL_UTIL_TOD,
     SYS_CALL_UTIL_GET_ENTROPY,
+    SYS_CALL_UTIL_GET_RUSAGE,
 		SYS_CALL_UTIL_REBOOT,
 	SYS_CALL_UTIL_END,
 
@@ -204,7 +207,7 @@ int SysFS_FileStatFD(int iFD, struct stat* pFileStat);
 int SysFS_Dup2(int oldFD, int newFD);
 int SysFS_CWD(char* uiReturnDirPathAddress, int len);
 int SysFS_FileAccess(const char* szFileName, int mode);
-void SysFS_FileSelect(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors);
+int SysFS_FileSelect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
 
 int SysIO_Close(int fd);
 int SysIO_Ctl(int fd, uint64_t cmd, uint64_t arg);
@@ -239,6 +242,7 @@ void SysUtil_Reboot();
 int SysUtil_GetTimeOfDay(struct timeval* pTV);
 uint32_t SysUtil_GetTimeSinceBoot();
 int SysUtil_GetEntropy(void *buffer, size_t length);
+int SysUtil_GetResourceUsage(RUSAGE_ID who, struct rusage* ru);
 
 int SysProcess_IsProcessAlive(int iProcessID);
 int SysProcess_IsKernel();

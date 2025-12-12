@@ -41,3 +41,7 @@ uint32_t SysUtil_GetTimeSinceBoot() {
 int SysUtil_GetEntropy(void *buffer, size_t length) {
   return _upanix_syscall(SYS_CALL_UTIL_GET_ENTROPY, (uint64_t)buffer, (uint64_t)length, 3, 4, 5);
 }
+
+int SysUtil_GetResourceUsage(RUSAGE_ID who, struct rusage* ru) {
+  return _upanix_syscall(SYS_CALL_UTIL_GET_RUSAGE, (uint64_t)who, (uint64_t)ru, 3, 4, 5);
+}

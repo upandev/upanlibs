@@ -22,6 +22,8 @@
 #ifndef _FCNTL_H_
 #define _FCNTL_H_
 
+#include <fs.h>
+
 #if defined __cplusplus
 extern "C" {
 #endif

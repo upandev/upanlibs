@@ -21,6 +21,7 @@
  */
 # include <syscalldefs.h>
 # include <fs.h>
+# include <sys/select.h>
 
 int SysFS_ChangeDirectory(const char* szDirPath, char** retPwd) {
   return _upanix_syscall(SYS_CALL_CHANGE_DIR, (uint64_t)szDirPath, (uint64_t)retPwd, 3, 4, 5);
@@ -70,8 +71,8 @@ int SysFS_FileWrite(int fd, const void* buf, int len) {
   return _upanix_syscall(SYS_CALL_FILE_WRITE, (uint64_t)fd, (uint64_t)buf, (uint64_t)len, 4, 5);
 }
 
-void SysFS_FileSelect(io_descriptor* waitIODescriptors, io_descriptor* readyIODescriptors) {
-  _upanix_syscall(SYS_CALL_FILE_SELECT, (uint64_t)waitIODescriptors, (uint64_t)readyIODescriptors, 3, 4, 5);
+int SysFS_FileSelect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout) {
+  return (int)_upanix_syscall(SYS_CALL_FILE_SELECT, (uint64_t)nfds, (uint64_t)readfds, (uint64_t)writefds, (uint64_t)exceptfds, (uint64_t)timeout);
 }
 
 int SysFS_FileSeek(int fd, int offSet, int seekType) {

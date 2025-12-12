@@ -27,6 +27,7 @@
 #include <fs.h>
 #include <mosstd.h>
 #include <MouseData.h>
+#include <sys/select.h>
 
 namespace upanui {
   EventManager::EventManager() {
@@ -43,33 +44,26 @@ namespace upanui {
   void EventManager::startEventLoop(bool readFromTerminal) {
     init_gui_event_stream(_eventStreamFDs);
 
-    io_descriptor waitFDs[4];
-    waitFDs[0]._fd = _eventStreamFDs[0];
-    waitFDs[0]._ioType = IO_OP_TYPES::IO_Read;
-
-    waitFDs[1]._fd = _eventStreamFDs[1];
-    waitFDs[1]._ioType = IO_OP_TYPES::IO_Read;
-
-    waitFDs[2]._fd = -1;
-    waitFDs[3]._fd = -1;
-    if (readFromTerminal) {
-      waitFDs[2]._fd = STDIN_FD;
-      waitFDs[2]._ioType = IO_OP_TYPES::IO_Read;
-    }
-
-    io_descriptor readyFDs[4];
-    readyFDs[0]._fd = -1;
+    fd_set readfds;
+    const int nfds = upan::max(_eventStreamFDs[0], upan::max(_eventStreamFDs[1], STDIN_FD)) + 1;
 
     try {
       while (true) {
-        select(waitFDs, readyFDs);
+        FD_ZERO(&readfds);
+        FD_SET(_eventStreamFDs[0], &readfds);
+        FD_SET(_eventStreamFDs[1], &readfds);
+        if (readFromTerminal) {
+          FD_SET(STDIN_FD, &readfds);
+        }
 
-        for(int i = 0; readyFDs[i]._fd >= 0; ++i) {
-          if (readyFDs[i]._fd == _eventStreamFDs[0]) { //Keyboard
+        if (select(nfds, &readfds, NULL, NULL, NULL) >= 1) {
+          if (FD_ISSET(_eventStreamFDs[0], &readfds)) {
             handleKeyboardEvent(_eventStreamFDs[0]);
-          } else if (readyFDs[i]._fd == _eventStreamFDs[1]) { //Mouse
+          }
+          if (FD_ISSET(_eventStreamFDs[1], &readfds)) {
             handleMouseEvent(_eventStreamFDs[1]);
-          } else if(readyFDs[i]._fd == STDIN_FD) {
+          }
+          if (readFromTerminal && FD_ISSET(STDIN_FD, &readfds)) {
             handleTerminalInput(STDIN_FD);
           }
         }
@@ -80,23 +74,17 @@ namespace upanui {
   }
 
   KeyboardData EventManager::getCh() {
-    io_descriptor waitFDs[2];
-    waitFDs[0]._fd = _eventStreamFDs[0];
-    waitFDs[0]._ioType = IO_OP_TYPES::IO_Read;
+    fd_set readfds;
+    const int nfds = _eventStreamFDs[0] + 1;
+    FD_ZERO(&readfds);
+    FD_SET(_eventStreamFDs[0], &readfds);
 
-    waitFDs[1]._fd = -1;
-
-    io_descriptor readyFDs[2];
-    readyFDs[0]._fd = -1;
-
-    select(waitFDs, readyFDs);
-
+    while (select(nfds, &readfds, NULL, NULL, NULL) < 1);
     KeyboardData data;
-    auto n = read(_eventStreamFDs[0], (void*)&data, sizeof(KeyboardData));
+    auto n = read(_eventStreamFDs[0], (void*) &data, sizeof(KeyboardData));
     if (n != sizeof(KeyboardData)) {
       throw upan::exception(XLOC, "read event data size (%d) < RawKeyboardData size (%d)", n, sizeof(KeyboardData));
     }
-
     return data;
   }
 

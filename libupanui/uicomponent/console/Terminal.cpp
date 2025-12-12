@@ -23,6 +23,7 @@
 #include <Terminal.h>
 #include <fcntl.h>
 #include <fs.h>
+#include <sys/select.h>
 #include <KeyboardEvent.h>
 
 namespace upanui {
@@ -150,25 +151,19 @@ namespace upanui {
   Terminal::TerminalOutputHandler::TerminalOutputHandler(upanui::Terminal& terminal) : _terminal(terminal) {}
 
   void Terminal::TerminalOutputHandler::run() {
-    io_descriptor waitFDs[2];
-    waitFDs[0]._fd = _terminal.terminalMasterFD();
-    waitFDs[0]._ioType = IO_OP_TYPES::IO_Read;
-
-    waitFDs[1]._fd = -1;
-
-    io_descriptor readyFDs[2];
-    readyFDs[0]._fd = -1;
+    fd_set readfds;
+    const int nfds = _terminal.terminalMasterFD() + 1;
 
     const int MAX_BUFFER_SIZE = 1024;
     char buffer[MAX_BUFFER_SIZE];
 
     try {
       while (true) {
-        select(waitFDs, readyFDs);
-
-        for(int i = 0; readyFDs[i]._fd >= 0; ++i) {
-          if (readyFDs[i]._fd == _terminal.terminalMasterFD()) {
-            int n = read(readyFDs[i]._fd, buffer, MAX_BUFFER_SIZE);
+        FD_ZERO(&readfds);
+        FD_SET(_terminal.terminalMasterFD(), &readfds);
+        if (select(nfds, &readfds, NULL, NULL, NULL) >= 1) {
+          if (FD_ISSET(_terminal.terminalMasterFD(), &readfds)) {
+            int n = read(_terminal.terminalMasterFD(), buffer, MAX_BUFFER_SIZE);
             for (int j = 0; j < n; ++j) {
               _terminal.handleInput(buffer[j], false);
             }

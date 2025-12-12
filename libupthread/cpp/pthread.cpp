@@ -23,7 +23,7 @@
 #include <pthread.h>
 #include <mutex.h>
 #include <map.h>
-#include <mosstd.h>
+#include <sys/wait.h>
 #include <condition_variable.h>
 #include <errno_values.h>
 

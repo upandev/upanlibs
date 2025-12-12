@@ -24,6 +24,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <time.h>
 
 #if defined __cplusplus
 extern "C" {
@@ -51,6 +52,8 @@ typedef struct {
 
 #define FD_ZERO(fdsetp) \
     (memset(fdsetp, 0, sizeof(*(fdsetp))))
+
+int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
 
 #if defined __cplusplus
 }
