@@ -128,6 +128,7 @@ typedef enum
     SYS_CALL_PROCESS_SET_SIGNAL_ACTION,
     SYS_CALL_PROCESS_SET_SIGNAL_RETURN,
     SYS_CALL_PROCESS_SET_SID,
+    SYS_CALL_PROCESS_SET_ALARM,
 	SYS_CALL_PROC_END,
 
 	SYS_CALL_KB_START = 800,
@@ -194,8 +195,8 @@ int SysFS_DeleteDirectory(const char* szDirPath);
 DIR* SysFS_OpenDir(const char* szDirPath);
 struct dirent* SysFS_ReadDir(DIR* dirp);
 int SysFS_CloseDir(DIR* dirp);
-int SysFS_CreateFile(const char* szDirPath, unsigned short usAttribute);
-int SysFS_FileOpen(const char* szFileName, uint32_t mode);
+int SysFS_CreateFile(const char* szDirPath, mode_t mode);
+int SysFS_FileOpen(const char* szFileName, int flags, mode_t mode);
 int SysFS_FileOpenStream(uint32_t mode);
 int SysFS_FileRead(int fd, void* buf, int len);
 int SysFS_FileWrite(int fd, const void* buf, int len);
@@ -235,6 +236,7 @@ int SysProcess_SendSignal(pid_t pid, SIGNAL signo, const union sigval* value);
 int SysProcess_SetSignalAction(int signo, const struct sigaction *act, struct sigaction *oldact);
 void SysProcess_SignalReturn(void* signalContext);
 int SysProcess_SetSID();
+uint32_t SysProcess_SetAlarm(uint32_t seconds);
 
 void SysUtil_GetDateTime(RTCDateTime* rtcDateTime);
 void SysUtil_Reboot();

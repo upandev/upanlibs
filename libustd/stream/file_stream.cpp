@@ -27,8 +27,8 @@ namespace upan {
   file_stream::file_stream() : _fd(-1) {
   }
 
-  file_stream::file_stream(const upan::string& fileName, uint8_t mode) : file_stream() {
-    open(fileName, mode);
+  file_stream::file_stream(const upan::string& fileName, int flags, mode_t mode) : file_stream() {
+    open(fileName, flags, mode);
   }
 
   file_stream::file_stream(int fd) : _fd(fd) {
@@ -46,9 +46,9 @@ namespace upan {
     _line_buffer.close();
   }
 
-  bool file_stream::open(const upan::string& fileName, uint8_t mode) {
+  bool file_stream::open(const upan::string& fileName, int flags, mode_t mode) {
     close();
-    return (_fd = ::open(fileName.c_str(), mode)) >= 0;
+    return (_fd = ::open(fileName.c_str(), flags, mode)) >= 0;
   }
 
   int file_stream::read(uint8_t *buf, int n) const {

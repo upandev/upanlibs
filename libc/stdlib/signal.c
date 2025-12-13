@@ -87,6 +87,19 @@ __attribute__((naked)) void signal_restorer() {
           "call SysProcess_SignalReturn;");
 }
 
+sa_handler_t signal(int signo, sa_handler_t handler) {
+  struct sigaction sa;
+  memset(&sa, 0, sizeof(struct sigaction));
+  sa.sa_handler = handler;
+
+  struct sigaction old_sa;
+  memset(&sa, 0, sizeof(struct sigaction));
+  if (!SysProcess_SetSignalAction(signo, &sa, &old_sa)) {
+    return old_sa.sa_handler;
+  }
+  return NULL;
+}
+
 int sigaction(int signo, const struct sigaction *act, struct sigaction *oldact) {
   if (act) {
     ((struct sigaction*)act)->sa_restorer = &signal_restorer;
@@ -106,4 +119,8 @@ bool isdefaultaction(const struct sigaction *act) {
   if (act->sa_flags & SA_SIGINFO && (uintptr_t)act->sa_sigaction == SIG_DFL) return true;
   if (!(act->sa_flags & SA_SIGINFO) && (uintptr_t)act->sa_handler == SIG_DFL) return true;
   return false;
+}
+
+uint32_t alarm(uint32_t seconds) {
+  return SysProcess_SetAlarm(seconds);
 }

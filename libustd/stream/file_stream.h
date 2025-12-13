@@ -30,12 +30,12 @@ namespace upan {
   class file_stream final {
   public:
     file_stream();
-    file_stream(const upan::string& fileName, uint8_t mode);
-    file_stream(int fd);
+    file_stream(const upan::string& fileName, int flags, mode_t mode);
+    explicit file_stream(int fd);
     ~file_stream();
 
     bool is_good() const { return _fd >= 0; }
-    bool open(const upan::string& fileName, uint8_t mode);
+    bool open(const upan::string& fileName, int flags, mode_t mode);
     void close();
     int read(uint8_t* buf, int n) const;
     bool read_line(upan::string& line);

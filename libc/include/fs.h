@@ -85,8 +85,8 @@ typedef enum
   O_WR_NONBLOCK = 1024,
 } FileModes ;
 
-int create(const char* file_path, unsigned short file_attr) ;
-int open(const char* file_name, uint32_t mode) ;
+int create(const char* file_path, mode_t mode) ;
+int open(const char* file_name, int flags, ...) ;
 int openstream(uint32_t mode);
 int close(int fd) ;
 int unlink(const char* filePath);

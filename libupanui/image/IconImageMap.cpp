@@ -36,7 +36,7 @@ namespace upanui {
     TYPE_UNKNOWN("unknown"),
     TYPE_DEFAULT_EXE("exe"),
     TYPE_DEFAULT_FILE("file") {
-    upan::file_stream rstream("/icons/imap.cfg", O_RDONLY);
+    upan::file_stream rstream("/icons/imap.cfg", O_RDONLY, 0);
 
     ImageMap* _curImageMap = nullptr;
     upan::string line;

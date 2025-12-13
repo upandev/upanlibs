@@ -71,7 +71,7 @@ void ServentDB::load() {
     return;
   }
 
-  upan::file_stream servicesFile(SERVICES_FILE_PATH, O_RDONLY);
+  upan::file_stream servicesFile(SERVICES_FILE_PATH, O_RDONLY, 0);
   if (!servicesFile.is_good()) {
     syslog(LOG_ERR, "%s doesn't exist", SERVICES_FILE_PATH);
     return;

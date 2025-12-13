@@ -34,7 +34,7 @@ logger::logger(const upan::string& ident, int option, LOG_CATEGORY facility) :
 
 logger::logger(const upan::string& filePath, const upan::string& ident, int option, LOG_CATEGORY facility) :
         logger(ident, option, facility) {
-  _writer.open(filePath, O_RDWR | O_APPEND);
+  _writer.open(filePath, O_RDWR | O_APPEND, ATTR_FILE_DEFAULT);
 }
 
 logger::logger(const upan::string& filePath) : logger(filePath, "", LOG_PID | LOG_CONS, LOG_USER) {
@@ -44,7 +44,7 @@ logger::logger() : logger("", LOG_PID | LOG_CONS, LOG_USER) {
 }
 
 void logger::openFile(const upan::string& filePath) {
-  _writer.open(filePath, O_RDWR | O_APPEND);
+  _writer.open(filePath, O_RDWR | O_APPEND, ATTR_FILE_DEFAULT);
 }
 
 void logger::closeFile() {

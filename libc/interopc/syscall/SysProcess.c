@@ -101,6 +101,10 @@ int SysProcess_SetSID() {
   return (int)_upanix_syscall(SYS_CALL_PROCESS_SET_SID, 1, 2, 3, 4, 5);
 }
 
+uint32_t SysProcess_SetAlarm(uint32_t seconds) {
+  return (uint32_t)_upanix_syscall(SYS_CALL_PROCESS_SET_ALARM, (uint64_t)seconds, 2, 3, 4, 5);
+}
+
 int exec(const char* szFileName, bool hasEnv, const char* arg, va_list argl) {
   const int MAX_ARGS = 128;
   char* argv[MAX_ARGS];

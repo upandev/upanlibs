@@ -39,13 +39,16 @@ typedef enum {
   SIGFPE = 8, /* Floating point exception */
   SIGKILL = 9,
   SIGSEGV = 11,
-  SIGALRM = 14,
+  SIGALARM = 14,
   SIGTERM = 15,
   SIGCHLD = 17,
   SIGCONT = 18,
   SIGSTOP = 19,
   SIGTSTP = 20,
 } SIGNAL;
+
+//required in external library/app code which does compile time checks to see if SIGALRM is defined
+#define SIGALRM 14
 
 typedef enum {
   SA_NOCLDSTOP = 1u,        /* Don't send SIGCHLD when children stop */
@@ -141,9 +144,11 @@ int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 
 int kill(pid_t pid, SIGNAL signo);
 int sigqueue(pid_t pid, SIGNAL signo, union sigval value);
+sa_handler_t signal(int signo, sa_handler_t handler);
 int sigaction(int signo, const struct sigaction *act, struct sigaction *oldact);
 bool isignoreaction(const struct sigaction *act);
 bool isdefaultaction(const struct sigaction *act);
+uint32_t alarm(uint32_t seconds);
 
 #if defined __cplusplus
 }

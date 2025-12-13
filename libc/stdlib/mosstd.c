@@ -241,12 +241,17 @@ int getomode(int fd) {
   return SysFS_FileOpenMode(fd) ;
 }
 
-int create(const char* file_path, unsigned short file_attr) {
-  return SysFS_CreateFile(file_path, file_attr) ;
+int create(const char* file_path, mode_t mode) {
+  return SysFS_CreateFile(file_path, mode) ;
 }
 
-int open(const char* file_name, uint32_t mode) {
-  return SysFS_FileOpen(file_name, mode) ;
+int open(const char* file_name, int flags, ...) {
+  va_list arg;
+  va_start(arg, flags);
+  bool hasMode = flags & O_CREAT || flags & O_TRUNC || flags & O_APPEND;
+  mode_t mode = (mode_t)(hasMode ? va_arg(arg, int) : 0);
+  va_end(arg);
+  return SysFS_FileOpen(file_name, flags, mode);
 }
 
 int openstream(uint32_t mode) {

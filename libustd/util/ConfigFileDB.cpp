@@ -24,7 +24,7 @@
 
 namespace upan {
   ConfigFileDB::ConfigFileDB(const upan::string& filePath, upan::ConfigFileDB::OpType opType) : _filePath(filePath), _opType(opType), _batchWrite(false) {
-    upan::file_stream rstream(filePath, (opType == OpType::RDONLY ? O_RDONLY : (O_RDWR | O_CREAT)));
+    upan::file_stream rstream(filePath, (opType == OpType::RDONLY ? O_RDONLY : (O_RDWR | O_CREAT)), 0);
 
     if (!rstream.is_good()) {
       upan::exception(XLOC, "failed to open/load config-file %s", filePath.c_str());
@@ -127,7 +127,7 @@ namespace upan {
 
   void ConfigFileDB::writeToConfigFile() {
     if (_opType == OpType::RDWR && _batchWrite == false) {
-      upan::file_stream wstream(_filePath, O_RDWR | O_TRUNC);
+      upan::file_stream wstream(_filePath, O_RDWR | O_TRUNC, 0);
       if (!wstream.is_good()) {
         throw upan::exception(XLOC, "failed to open config-file %s for writing", _filePath.c_str());
       }

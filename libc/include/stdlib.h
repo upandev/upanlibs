@@ -73,6 +73,7 @@ typedef unsigned char byte ;
 
 typedef int pid_t;
 typedef int uid_t;
+typedef unsigned int mode_t;
 
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
