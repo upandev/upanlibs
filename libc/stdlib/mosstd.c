@@ -278,6 +278,18 @@ int fstat(int iFD, struct stat* pFileStat) {
   return SysFS_FileStatFD(iFD, pFileStat) ;
 }
 
+int tofileaccessmode(int flags) {
+  int mode = F_OK;
+  if (flags & O_WRONLY || flags & O_APPEND || flags & O_TRUNC || flags & O_CREAT) {
+    mode = W_OK;
+  } else if (flags & O_RDONLY || flags & O_RD_NONBLOCK) {
+    mode = R_OK;
+  } else if (flags & O_RDWR) {
+    mode = R_OK | W_OK;
+  }
+  return mode;
+}
+
 int access(const char* szFileName, int mode) {
   return SysFS_FileAccess(szFileName, mode);
 }

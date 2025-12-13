@@ -39,7 +39,7 @@ namespace upan {
 
       for(const auto& path : pathTokens) {
         const auto filePath = path + "/" + fileName;
-        if (!access(filePath.c_str(), O_RDONLY)) {
+        if (!access(filePath.c_str(), R_OK)) {
           return upan::option<upan::string>(filePath);
         }
       }

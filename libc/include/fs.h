@@ -85,6 +85,13 @@ typedef enum
   O_WR_NONBLOCK = 1024,
 } FileModes ;
 
+typedef enum {
+  F_OK = 0,   // existence check
+  X_OK = 1,   // executable
+  W_OK = 2,   // writable
+  R_OK = 4,   // readable
+} AccessModes;
+
 int create(const char* file_path, mode_t mode) ;
 int open(const char* file_name, int flags, ...) ;
 int openstream(uint32_t mode);
@@ -98,6 +105,7 @@ int write(int fd, const void* buf, int len) ;
 int lseek(int fd, int offset, int seekType) ;
 unsigned tell(int fd) ;
 int getomode(int fd) ;
+int tofileaccessmode(int flags);
 int access(const char* szFileName, int mode) ;
 int dup2(int oldFD, int newFD) ;
 int getcwd(char* buf, size_t size);
