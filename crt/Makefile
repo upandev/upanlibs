@@ -19,9 +19,12 @@
 #	 along with this program.  If not, see <http://www.gnu.org/licenses/
 CC = ${HOME}/opt/cross/bin/x86_64-elf-gcc
 
-OUTPUTS := crti.o crtn.o
+OUTPUTS := crt0.o crti.o crtn.o
 
 crt: ${OUTPUTS}
+
+crt0.o: crt0.s
+	${CC} -c crt0.s
 
 crti.o: crti.s
 	${CC} -c crti.s
@@ -36,4 +39,3 @@ clean:
 distclean:
 	rm -f *.o
 	rm -f ${OUTPUTS}
-
