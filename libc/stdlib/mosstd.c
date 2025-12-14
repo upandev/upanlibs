@@ -176,6 +176,10 @@ int waitpid(pid_t pid, int *status, int options) {
   return SysProcess_WaitPID(pid, status, options);
 }
 
+int wait(int* status) {
+  return waitpid(0, status, 0);
+}
+
 void waitonlock(uint64_t lockAddress, int oldVal, int newVal) {
   SysProcess_WaitOnLock(lockAddress, oldVal, newVal);
 }

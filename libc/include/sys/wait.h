@@ -29,6 +29,7 @@ extern "C" {
 #endif
 
 int waitpid(pid_t pid, int *status, int options);
+int wait(int *status);
 
 #if defined __cplusplus
 }
