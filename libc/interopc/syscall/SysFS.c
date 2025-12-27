@@ -23,6 +23,10 @@
 # include <fs.h>
 # include <sys/select.h>
 
+int SysFS_Rename(const char* oldPath, const char* newPath) {
+  return _upanix_syscall(SYS_CALL_FILE_RENAME, (uint64_t)oldPath, (uint64_t)newPath, 3, 4, 5);
+}
+
 int SysFS_ChangeDirectory(const char* szDirPath, char** retPwd) {
   return _upanix_syscall(SYS_CALL_CHANGE_DIR, (uint64_t)szDirPath, (uint64_t)retPwd, 3, 4, 5);
 }

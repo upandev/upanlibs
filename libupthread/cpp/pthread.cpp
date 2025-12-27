@@ -169,7 +169,7 @@ int pthread_key_delete(pthread_key_t key) {
 
 int pthread_join(pthread_t tid, void** ret) {
   int es;
-  if (waitpid(tid, &es, 0)) {
+  if (waitpid(tid, &es, 0) != tid) {
     return -1;
   }
   *ret = thread_manager::instance().consume(tid);

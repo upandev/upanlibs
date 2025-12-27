@@ -316,6 +316,10 @@ int chdir(const char* dirPath) {
   return r;
 }
 
+int rename(const char* oldPath, const char* newPath) {
+  return SysFS_Rename(oldPath, newPath);
+}
+
 int setsid() {
   return SysProcess_SetSID();
 }

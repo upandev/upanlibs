@@ -110,6 +110,7 @@ int access(const char* szFileName, int mode) ;
 int dup2(int oldFD, int newFD) ;
 int getcwd(char* buf, size_t size);
 int chdir(const char* dirPath);
+int rename(const char* oldPath, const char* newPath);
 
 #if defined __cplusplus
 }

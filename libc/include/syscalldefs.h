@@ -73,6 +73,7 @@ typedef enum
 		SYS_CALL_CWD,
 		SYS_CALL_MKDIR,
 		SYS_CALL_RMDIR,
+    SYS_CALL_FILE_RENAME,
     SYS_CALL_FILE_OPEN_DIR,
     SYS_CALL_FILE_READ_DIR,
     SYS_CALL_FILE_CLOSE_DIR,
@@ -189,6 +190,7 @@ int SysDrive_UnMount(const char* szDriveName);
 int SysDrive_Format(const char* szDriveName);
 int SysDrive_GetCurrentDriveStat(DriveStat* pDriveStat);
 
+int SysFS_Rename(const char* oldPath, const char* newPath);
 int SysFS_ChangeDirectory(const char* szDirPath, char** retPwd);
 int SysFS_CreateDirectory(const char* szDirPath, unsigned short usAttribute);
 int SysFS_DeleteDirectory(const char* szDirPath);
