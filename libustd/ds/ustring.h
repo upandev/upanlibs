@@ -193,7 +193,14 @@ public:
     }
   }
 
+  template <typename... Args>
+  void concat(const upan::string& first, Args... r) {
+    this->operator+=(first);
+    concat(r...);
+  }
+
 private:
+  void concat() {}
   void init()
   {
     _capacity = 8;
