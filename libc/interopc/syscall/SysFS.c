@@ -23,6 +23,14 @@
 # include <fs.h>
 # include <sys/select.h>
 
+int SysFS_ReadLink(const char *link, char *buf, size_t bufsize) {
+  return _upanix_syscall(SYS_CALL_FILE_READLINK, (uint64_t)link, (uint64_t)buf, (uint64_t)bufsize, 4, 5);
+}
+
+int SysFS_SymLink(const char *target, const char *link) {
+  return _upanix_syscall(SYS_CALL_FILE_SYMLINK, (uint64_t)target, (uint64_t)link, 3, 4, 5);
+}
+
 int SysFS_Rename(const char* oldPath, const char* newPath) {
   return _upanix_syscall(SYS_CALL_FILE_RENAME, (uint64_t)oldPath, (uint64_t)newPath, 3, 4, 5);
 }
@@ -101,6 +109,10 @@ int SysFS_FileStatFD(int iFD, struct stat* pFileStat) {
 
 int SysFS_FileAccess(const char* szFileName, int mode) {
   return _upanix_syscall(SYS_CALL_FILE_ACCESS, (uint64_t)szFileName, (uint64_t)mode, 3, 4, 5);
+}
+
+int SysFS_Dup(int oldFD) {
+  return _upanix_syscall(SYS_CALL_FILE_DUP, (uint64_t)oldFD, 2, 3, 4, 5);
 }
 
 int SysFS_Dup2(int oldFD, int newFD) {

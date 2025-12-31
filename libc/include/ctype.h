@@ -89,6 +89,7 @@ int iscntrl(int ch) ;
 int isxdigit(int ch) ;
 int toascii(int c) ;
 int tolower(int c) ;
+int islower(int c) ;
 int toupper(int c) ;
 
 //void memset(char* dest, int ch, int len) ;

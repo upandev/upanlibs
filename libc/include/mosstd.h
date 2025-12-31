@@ -99,6 +99,7 @@ int iskernel();
 int isthread();
 int getpid();
 void yield();
+int isatty(int fd);
 
 int setsid();
 void waitonlock(uint64_t lockAddress, int oldVal, int newVal);

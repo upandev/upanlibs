@@ -30,6 +30,7 @@
 #define S_IFDIR		0x4000
 #define S_IFCHR   0x2000
 #define S_IFSOCK  0xC000
+#define S_IFLNK   0xA000
 
 #define ATTR_DIR_DEFAULT	(0755 | S_IFDIR)  //0000 0001 1110 1101 => 0000(Rsv) 000(Dir) 111(u:rwx) 101(g:r-x) 101(o:r-x)
 #define ATTR_FILE_DEFAULT	(0644 | S_IFREG) //0000(Rsv) 001(File) 110(u:rw-) 100(g:r--) 100(o:r--)
@@ -58,10 +59,11 @@
 #define FILE_TYPE(attr) (attr & FILE_TYPE_MASK)
 
 #define S_ISDIR(attr) (FILE_TYPE(attr) == S_IFDIR)
-#define S_ISREG(attr) (FILE_TYPE(attr) == S_IFDIR)
-#define S_ISFILE(attr) (FILE_TYPE(attr) == S_IFREG)
+#define S_ISREG(attr) (FILE_TYPE(attr) == S_IFREG)
 #define S_ISSOCK(attr) (FILE_TYPE(attr) == S_IFSOCK)
 #define S_ISCHR(attr) (FILE_TYPE(attr) == S_IFCHR)
+#define S_ISLNK(attr) (FILE_TYPE(attr) == S_IFLNK)
+
 #define	SEEK_SET 0
 #define	SEEK_CUR 1
 #define	SEEK_END 2
@@ -107,10 +109,13 @@ unsigned tell(int fd) ;
 int getomode(int fd) ;
 int tofileaccessmode(int flags);
 int access(const char* szFileName, int mode) ;
+int dup(int oldFD);
 int dup2(int oldFD, int newFD) ;
 int getcwd(char* buf, size_t size);
 int chdir(const char* dirPath);
 int rename(const char* oldPath, const char* newPath);
+int symlink(const char *target, const char *link);
+int readlink(const char *link, char *buf, size_t bufsize);
 
 #if defined __cplusplus
 }

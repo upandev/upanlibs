@@ -172,6 +172,10 @@ void yield() {
   SysProcess_Yield();
 }
 
+int isatty(int fd) {
+  return SysIO_IsTTY(fd);
+}
+
 int waitpid(pid_t pid, int *status, int options) {
   return SysProcess_WaitPID(pid, status, options);
 }
@@ -298,6 +302,10 @@ int access(const char* szFileName, int mode) {
   return SysFS_FileAccess(szFileName, mode);
 }
 
+int dup(int oldFD) {
+  return SysFS_Dup(oldFD);
+}
+
 int dup2(int oldFD, int newFD) {
   return SysFS_Dup2(oldFD, newFD) ;
 }
@@ -318,6 +326,14 @@ int chdir(const char* dirPath) {
 
 int rename(const char* oldPath, const char* newPath) {
   return SysFS_Rename(oldPath, newPath);
+}
+
+int symlink(const char *target, const char *link) {
+  return SysFS_SymLink(target, link);
+}
+
+int readlink(const char *link, char *buf, size_t bufsize) {
+  return SysFS_ReadLink(link, buf, bufsize);
 }
 
 int setsid() {

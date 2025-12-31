@@ -45,3 +45,7 @@ int SysIO_TCGetAttr(int fd, struct termios *termios_p) {
 int SysIO_TCSetAttr(int fd, termios_actions action, const struct termios *termios_p) {
   return _upanix_syscall(SYS_CALL_IO_TC_SET_ATTR, (uint64_t)fd, (uint64_t)action, (uint64_t)termios_p, 4 ,5);
 }
+
+int SysIO_IsTTY(int fd) {
+  return _upanix_syscall(SYS_CALL_IO_IS_TTY, (uint64_t)fd, 2, 3, 4 ,5);
+}

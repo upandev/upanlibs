@@ -102,9 +102,9 @@ protected:
   option() : _isEmpty(true), _value(nullptr) {}
 
 public:
-  explicit option(T& value) : _isEmpty(false), _value(&value) {}
+  option(T& value) : _isEmpty(false), _value(&value) {}
 
-  explicit option(T* value) : _isEmpty(value == nullptr), _value(value) {}
+  option(T* value) : _isEmpty(value == nullptr), _value(value) {}
 
   static option<T&> empty() {
     return option<T&>();

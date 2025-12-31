@@ -74,6 +74,8 @@ typedef enum
 		SYS_CALL_MKDIR,
 		SYS_CALL_RMDIR,
     SYS_CALL_FILE_RENAME,
+    SYS_CALL_FILE_SYMLINK,
+    SYS_CALL_FILE_READLINK,
     SYS_CALL_FILE_OPEN_DIR,
     SYS_CALL_FILE_READ_DIR,
     SYS_CALL_FILE_CLOSE_DIR,
@@ -89,6 +91,7 @@ typedef enum
 		SYS_CALL_FILE_STAT,
 		SYS_CALL_FILE_STAT_FD,
 		SYS_CALL_FILE_ACCESS,
+    SYS_CALL_FILE_DUP,
 		SYS_CALL_FILE_DUP2,
 	SYS_CALL_FILE_END,
 
@@ -99,6 +102,7 @@ typedef enum
     SYS_CALL_IO_PTS_NAME,
     SYS_CALL_IO_TC_GET_ATTR,
     SYS_CALL_IO_TC_SET_ATTR,
+    SYS_CALL_IO_IS_TTY,
   SYS_CALL_IO_END,
 
 	SYS_CALL_MEM_START = 400,
@@ -190,6 +194,8 @@ int SysDrive_UnMount(const char* szDriveName);
 int SysDrive_Format(const char* szDriveName);
 int SysDrive_GetCurrentDriveStat(DriveStat* pDriveStat);
 
+int SysFS_ReadLink(const char *link, char *buf, size_t bufsize);
+int SysFS_SymLink(const char *target, const char *link);
 int SysFS_Rename(const char* oldPath, const char* newPath);
 int SysFS_ChangeDirectory(const char* szDirPath, char** retPwd);
 int SysFS_CreateDirectory(const char* szDirPath, unsigned short usAttribute);
@@ -207,6 +213,7 @@ int SysFS_FileTell(int fd);
 int SysFS_FileOpenMode(int fd);
 int SysFS_FileStat(const char* szFileName, struct stat* pFileStat);
 int SysFS_FileStatFD(int iFD, struct stat* pFileStat);
+int SysFS_Dup(int oldFD);
 int SysFS_Dup2(int oldFD, int newFD);
 int SysFS_CWD(char* uiReturnDirPathAddress, int len);
 int SysFS_FileAccess(const char* szFileName, int mode);
@@ -270,6 +277,7 @@ void SysNet_FreeHostInfo(struct hostent* hostinfo);
 int SysNet_SocketPair(SA_FAMILY_TYPE domain, SOCKET_TYPE type, int protocol, int sv[2]);
 int SysIO_TCGetAttr(int fd, struct termios *termios_p);
 int SysIO_TCSetAttr(int fd, termios_actions action, const struct termios *termios_p);
+int SysIO_IsTTY(int fd);
 
 #if defined __cplusplus
 }

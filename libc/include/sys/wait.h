@@ -31,6 +31,14 @@ extern "C" {
 int waitpid(pid_t pid, int *status, int options);
 int wait(int *status);
 
+#define WIFEXITED(s) ((((s) >> 7) & 1) == 1)
+#define WEXITSTATUS(s) (((s) >> 8) & 0xFF)
+#define WIFSIGNALED(s) (((s) & 0x7F) != 0)
+#define WTERMSIG(s) ((s) & 0x7F)
+#define WIFSTOPPED(s) ((((s) >> 16) & 0x7F) != 0)
+#define WSTOPSIG(s) (((s) >> 16) & 0x7F)
+#define WIFCONTINUED(s) ((((s) >> 23) & 1) == 1)
+
 #if defined __cplusplus
 }
 #endif

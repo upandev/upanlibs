@@ -82,6 +82,8 @@ int tolower(int c)
     return __C_tolower(c);
 }
 
+int islower(int c) __attribute__((weak, alias("tolower")));
+
 int toupper(int c)
 {
     return __C_toupper(c);
