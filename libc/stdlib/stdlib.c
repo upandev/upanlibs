@@ -885,3 +885,7 @@ uid_t getegid() {
 int setegid(uid_t egid) {
   return 0;
 }
+
+int pipe(int fd[2]) {
+  return SysIO_CreatePipe(fd);
+}

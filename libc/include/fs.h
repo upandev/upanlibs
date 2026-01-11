@@ -26,11 +26,12 @@
 #include <mosstd.h>
 #include <sys/stat.h>
 
-#define S_IFREG		0x8000
-#define S_IFDIR		0x4000
+#define S_IFIFO   0x1000
 #define S_IFCHR   0x2000
-#define S_IFSOCK  0xC000
+#define S_IFDIR		0x4000
+#define S_IFREG		0x8000
 #define S_IFLNK   0xA000
+#define S_IFSOCK  0xC000
 
 #define ATTR_DIR_DEFAULT	(0755 | S_IFDIR)  //0000 0001 1110 1101 => 0000(Rsv) 000(Dir) 111(u:rwx) 101(g:r-x) 101(o:r-x)
 #define ATTR_FILE_DEFAULT	(0644 | S_IFREG) //0000(Rsv) 001(File) 110(u:rw-) 100(g:r--) 100(o:r--)
@@ -63,6 +64,7 @@
 #define S_ISSOCK(attr) (FILE_TYPE(attr) == S_IFSOCK)
 #define S_ISCHR(attr) (FILE_TYPE(attr) == S_IFCHR)
 #define S_ISLNK(attr) (FILE_TYPE(attr) == S_IFLNK)
+#define S_ISFIFO(attr) (FILE_TYPE(attr) == S_IFIFO)
 
 #define	SEEK_SET 0
 #define	SEEK_CUR 1

@@ -49,3 +49,7 @@ int SysIO_TCSetAttr(int fd, termios_actions action, const struct termios *termio
 int SysIO_IsTTY(int fd) {
   return _upanix_syscall(SYS_CALL_IO_IS_TTY, (uint64_t)fd, 2, 3, 4 ,5);
 }
+
+int SysIO_CreatePipe(int fd[2]) {
+  return _upanix_syscall(SYS_CALL_IO_CREATE_PIPE, (uint64_t)fd, 2, 3, 4 ,5);
+}

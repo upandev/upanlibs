@@ -22,6 +22,7 @@
 #pragma once
 
 #include <utility.h>
+#include <uniq_ptr.h>
 
 namespace upan {
   template <typename RT, typename... Args>

@@ -103,6 +103,7 @@ typedef enum
     SYS_CALL_IO_TC_GET_ATTR,
     SYS_CALL_IO_TC_SET_ATTR,
     SYS_CALL_IO_IS_TTY,
+    SYS_CALL_IO_CREATE_PIPE,
   SYS_CALL_IO_END,
 
 	SYS_CALL_MEM_START = 400,
@@ -278,6 +279,7 @@ int SysNet_SocketPair(SA_FAMILY_TYPE domain, SOCKET_TYPE type, int protocol, int
 int SysIO_TCGetAttr(int fd, struct termios *termios_p);
 int SysIO_TCSetAttr(int fd, termios_actions action, const struct termios *termios_p);
 int SysIO_IsTTY(int fd);
+int SysIO_CreatePipe(int fd[2]);
 
 #if defined __cplusplus
 }
