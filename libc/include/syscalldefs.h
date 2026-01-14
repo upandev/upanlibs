@@ -280,6 +280,7 @@ int SysIO_TCGetAttr(int fd, struct termios *termios_p);
 int SysIO_TCSetAttr(int fd, termios_actions action, const struct termios *termios_p);
 int SysIO_IsTTY(int fd);
 int SysIO_CreatePipe(int fd[2]);
+int SysIO_CreateNamedPipe(const char* path, int fd[2]);
 
 #if defined __cplusplus
 }

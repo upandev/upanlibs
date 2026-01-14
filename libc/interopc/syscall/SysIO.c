@@ -51,5 +51,9 @@ int SysIO_IsTTY(int fd) {
 }
 
 int SysIO_CreatePipe(int fd[2]) {
-  return _upanix_syscall(SYS_CALL_IO_CREATE_PIPE, (uint64_t)fd, 2, 3, 4 ,5);
+  return _upanix_syscall(SYS_CALL_IO_CREATE_PIPE, (uint64_t)fd, (uint64_t)NULL, 3, 4 ,5);
+}
+
+int SysIO_CreateNamedPipe(const char* path, int fd[2]) {
+  return _upanix_syscall(SYS_CALL_IO_CREATE_PIPE, (uint64_t)fd, (uint64_t)path, 3, 4 ,5);
 }

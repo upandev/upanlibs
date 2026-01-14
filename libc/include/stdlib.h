@@ -180,6 +180,7 @@ uid_t getegid();
 int setegid(uid_t);
 
 int pipe(int fd[2]);
+int mkfifo(const char* path, int fd[2]);
 
 #if defined __cplusplus
 }

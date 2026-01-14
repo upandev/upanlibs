@@ -889,3 +889,7 @@ int setegid(uid_t egid) {
 int pipe(int fd[2]) {
   return SysIO_CreatePipe(fd);
 }
+
+int mkfifo(const char* path, int fd[2]) {
+  return SysIO_CreateNamedPipe(path, fd);
+}
