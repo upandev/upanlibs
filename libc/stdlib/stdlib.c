@@ -886,6 +886,14 @@ int setegid(uid_t egid) {
   return 0;
 }
 
+uid_t getpgid() {
+  return 0;
+}
+
+int setpgid(pid_t pid, uid_t pgid) {
+  return 0;
+}
+
 int pipe(int fd[2]) {
   return SysIO_CreatePipe(fd);
 }

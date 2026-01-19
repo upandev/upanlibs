@@ -90,6 +90,7 @@ typedef enum
 		SYS_CALL_FILE_MODE,
 		SYS_CALL_FILE_STAT,
 		SYS_CALL_FILE_STAT_FD,
+    SYS_CALL_FILE_SET_MODE,
 		SYS_CALL_FILE_ACCESS,
     SYS_CALL_FILE_DUP,
 		SYS_CALL_FILE_DUP2,
@@ -212,8 +213,9 @@ int SysFS_FileWrite(int fd, const void* buf, int len);
 int SysFS_FileSeek(int fd, int offSet, int seekType);
 int SysFS_FileTell(int fd);
 int SysFS_FileOpenMode(int fd);
-int SysFS_FileStat(const char* szFileName, struct stat* pFileStat);
+int SysFS_FileStat(const char* path, struct stat* st, bool followLink);
 int SysFS_FileStatFD(int iFD, struct stat* pFileStat);
+int SysFS_SetMode(const char *path, mode_t mode);
 int SysFS_Dup(int oldFD);
 int SysFS_Dup2(int oldFD, int newFD);
 int SysFS_CWD(char* uiReturnDirPathAddress, int len);

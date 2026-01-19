@@ -178,6 +178,8 @@ int setgid(uid_t);
 
 uid_t getegid();
 int setegid(uid_t);
+uid_t getpgid();
+int setpgid(pid_t pid, uid_t pgid);
 
 int pipe(int fd[2]);
 int mkfifo(const char* path, int fd[2]);

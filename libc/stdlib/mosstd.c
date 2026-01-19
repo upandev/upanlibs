@@ -278,12 +278,20 @@ int mkdir(const char* dirPath, uint16_t attr) {
   return SysFS_CreateDirectory(dirPath, attr);
 }
 
-int stat(const char* szFileName, struct stat* pFileStat) {
-  return SysFS_FileStat(szFileName, pFileStat) ;
+int stat(const char* path, struct stat* st) {
+  return SysFS_FileStat(path, st, true);
 }
 
-int fstat(int iFD, struct stat* pFileStat) {
-  return SysFS_FileStatFD(iFD, pFileStat) ;
+int lstat(const char* path, struct stat* st) {
+  return SysFS_FileStat(path, st, false);
+}
+
+int fstat(int fd, struct stat* st) {
+  return SysFS_FileStatFD(fd, st) ;
+}
+
+int chmod(const char *path, mode_t mode) {
+  return SysFS_SetMode(path, mode);
 }
 
 int tofileaccessmode(int flags) {

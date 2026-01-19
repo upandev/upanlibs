@@ -99,12 +99,16 @@ int SysFS_FileOpenMode(int fd) {
   return _upanix_syscall(SYS_CALL_FILE_MODE, (uint64_t)fd, 2, 3, 4, 5);
 }
 
-int SysFS_FileStat(const char* szFileName, struct stat* pFileStat) {
-  return _upanix_syscall(SYS_CALL_FILE_STAT, (uint64_t)szFileName, (uint64_t)pFileStat, 3, 4, 5);
+int SysFS_FileStat(const char* path, struct stat* st, bool followLink) {
+  return _upanix_syscall(SYS_CALL_FILE_STAT, (uint64_t)path, (uint64_t)st, (uint64_t)followLink, 4, 5);
 }
 
 int SysFS_FileStatFD(int iFD, struct stat* pFileStat) {
   return _upanix_syscall(SYS_CALL_FILE_STAT_FD, (uint64_t)iFD, (uint64_t)pFileStat, 3, 4, 5);
+}
+
+int SysFS_SetMode(const char *path, mode_t mode) {
+  return _upanix_syscall(SYS_CALL_FILE_SET_MODE, (uint64_t)path, (uint64_t)mode, 3, 4, 5);
 }
 
 int SysFS_FileAccess(const char* szFileName, int mode) {

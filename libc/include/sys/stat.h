@@ -43,6 +43,10 @@ extern "C" {
 #define S_IWOTH  00002
 #define S_IXOTH  00001
 
+#define S_ISUID	04000
+#define S_ISGID	02000
+#define S_ISVTX 01000
+
 /* Combined macros */
 #define S_IRWXU  (S_IRUSR | S_IWUSR | S_IXUSR)   /* 0700 */
 #define S_IRWXG  (S_IRGRP | S_IWGRP | S_IXGRP)   /* 0070 */
@@ -66,8 +70,10 @@ struct stat {
   struct timeval st_ctime;   /* time of last status change */
 };
 
-int stat(const char* szFileName, struct stat* pFileStat) ;
-int fstat(int iFD, struct stat* pFileStat) ;
+int stat(const char* path, struct stat* st);
+int lstat(const char* path, struct stat* st);
+int fstat(int fd, struct stat* st) ;
+int chmod(const char *path, mode_t mode);
 
 #if defined __cplusplus
 }
