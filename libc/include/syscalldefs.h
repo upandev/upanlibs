@@ -117,6 +117,7 @@ typedef enum
     SYS_CALL_DLL_RELOCATE, //do not change this, and retain the value 601 as this is used by dynamic symbol relocation in DLL resolver system call
     SYS_CALL_PROCESS_INIT_RELOCATE,
 		SYS_CALL_PROCESS_EXEC,
+    SYS_CALL_PROCESS_FORK,
 		SYS_CALL_THREAD_EXEC,
     SYS_CALL_THREAD_DETACH,
 		SYS_CALL_PROCESS_WAIT_PID,
@@ -249,6 +250,7 @@ int SysProcess_SetSignalAction(int signo, const struct sigaction *act, struct si
 void SysProcess_SignalReturn(void* signalContext);
 int SysProcess_SetSID();
 uint32_t SysProcess_SetAlarm(uint32_t seconds);
+pid_t SysProcess_Fork();
 
 void SysUtil_GetDateTime(RTCDateTime* rtcDateTime);
 void SysUtil_Reboot();

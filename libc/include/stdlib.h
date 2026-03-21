@@ -183,6 +183,7 @@ int setpgid(pid_t pid, uid_t pgid);
 
 int pipe(int fd[2]);
 int mkfifo(const char* path, int fd[2]);
+pid_t fork();
 
 #if defined __cplusplus
 }
