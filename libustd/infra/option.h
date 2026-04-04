@@ -46,7 +46,7 @@ public:
 
   T& value() {
     if (_isEmpty)
-      throw exception(XLOC, "Option is empty");
+      throw upan::exception(XLOC, "Option is empty");
     return _value;
   }
 
@@ -103,7 +103,6 @@ protected:
 
 public:
   option(T& value) : _isEmpty(false), _value(&value) {}
-
   option(T* value) : _isEmpty(value == nullptr), _value(value) {}
 
   static option<T&> empty() {
@@ -111,6 +110,10 @@ public:
   }
 
   bool isEmpty() const { return _isEmpty; }
+  void clear() {
+    _isEmpty = true;
+    _value = nullptr;
+  }
 
   T& value() const {
     if (_isEmpty)
