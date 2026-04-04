@@ -116,12 +116,20 @@ class _tree
     }
 
     _tree(const _tree<_c_type>& other) : _root(nullptr), _size(0) {
-      for(auto i = other.begin(); i != other.end(); ++i) {
-        insert(value_type(*i));
-      }
+      this->operator=(other);
     }
 
     _tree(const _tree<_c_type>&& other) noexcept : _root(other._root), _size(other._size) {
+    }
+
+    _tree& operator=(const _tree<_c_type>& other) {
+      if (&other != this) {
+        clear();
+        for (auto i = other.begin(); i != other.end(); ++i) {
+          insert(value_type(*i));
+        }
+      }
+      return *this;
     }
 
     ~_tree() {
