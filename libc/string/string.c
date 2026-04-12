@@ -142,7 +142,7 @@ char *strpbrk(const char *s1, const char *s2)
 
 char* strdup(const char* s)
 {
-	char* ns = (char*)malloc(strlen(s)) ;
+	char* ns = (char*)malloc(strlen(s) + 1) ;
 	strcpy(ns, s) ;
 	return ns ;
 }
