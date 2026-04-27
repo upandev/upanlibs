@@ -33,7 +33,7 @@ typedef enum {
   RUSAGE_CHILDREN = -1
 } RUSAGE_ID;
 
-  struct rusage {
+struct rusage {
   struct timeval ru_utime;
   struct timeval ru_stime;
   long ru_maxrss;
