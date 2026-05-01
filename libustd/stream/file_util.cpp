@@ -45,5 +45,24 @@ namespace upan {
       }
       return upan::option<upan::string>::empty();
     }
+
+    upan::string dirname(const upan::string& filePath) {
+      const char* slash = strrchr(filePath.c_str(), '/');
+      if (slash == nullptr) {
+        return ".";
+      }
+
+      const int dirLength = slash - filePath.c_str();
+      if (dirLength == 0) {
+        return "/";
+      }
+
+      return filePath.substr(0, dirLength);
+    }
+
+    upan::string basename(const upan::string& filePath) {
+      const char* slash = strrchr(filePath.c_str(), '/');
+      return slash == nullptr ? filePath : upan::string(slash + 1);
+    }
   }
 }

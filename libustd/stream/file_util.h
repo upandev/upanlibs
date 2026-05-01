@@ -28,5 +28,7 @@
 namespace upan {
   namespace file_path {
     upan::option<upan::string> resolve(const upan::string& fileName, const upan::string& pathEnvVar, const upan::string& defPath);
+    upan::string dirname(const upan::string& filePath);
+    upan::string basename(const upan::string& filePath);
   }
 }
