@@ -43,10 +43,9 @@ namespace upan {
     bool seek_set(int offset);
     bool seek_cur(int offset);
     bool seek_end(int offset);
+    size_t size();
 
   private:
-
-
     class line_buffer {
     public:
       static const int CHUNK_SIZE = 512;

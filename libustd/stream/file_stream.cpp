@@ -107,6 +107,16 @@ namespace upan {
     return lseek(_fd, offset, SEEK_END) >= 0;
   }
 
+  size_t file_stream::size() {
+    if (is_good()) {
+      struct stat st;
+      if (fstat(_fd, &st) == 0) {
+        return st.st_size;
+      }
+    }
+    return 0;
+  }
+
   file_stream::line_buffer::line_buffer() : _buf(nullptr), _size(0), _len(0) {
   }
 
