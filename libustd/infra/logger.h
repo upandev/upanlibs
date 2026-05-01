@@ -57,6 +57,7 @@ namespace upan {
     void _logarg(LOG_PRIORITY priority, const char * __restrict fmsg, va_list);
     void _log(const upan::string& msg);
     void _write(const upan::string& logline);
+    void rotate();
 
     file_stream _writer;
     char _messageBuffer[MAX_LOG_MESSAGE_SIZE];
@@ -66,6 +67,10 @@ namespace upan {
     upan::string _ident;
     int _option;
     LOG_CATEGORY _facility;
+    time_t _lastLogTime;
+    size_t _logSize;
+    int _maxRotationLogSequence;
+    upan::string _logFilePath;
     upan::mutex _logMutex;
   };
 }
