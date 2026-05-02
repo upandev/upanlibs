@@ -75,7 +75,7 @@ UNUSED void _process_init_relocate(int argc, char** argv) {
     i++;
   }
 
-  uint32_t argvSize = sizeof(uintptr_t) * argc;
+  uint32_t argvSize = sizeof(uintptr_t) * (argc + 1);
   int e;
   for(e = 0; e < argc; ++e) {
     argvSize += strlen(argv[e]) + 1;
