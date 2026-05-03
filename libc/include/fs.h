@@ -74,20 +74,17 @@
 extern "C" {
 #endif
 
-typedef enum
-{	
-	O_RDONLY = 1,
-	O_WRONLY = 2,
-	O_RDWR = 4,
-	O_APPEND = 8,
-	O_CREAT = 16,
-	O_EXCL = 32,
-	O_TRUNC = 64,
-  O_NONBLOCK = 128,
-  O_NOCTTY = 256,
-  O_RD_NONBLOCK = 512,
-  O_WR_NONBLOCK = 1024,
-} FileModes ;
+#define O_RDONLY 1
+#define O_WRONLY 2
+#define O_RDWR 4
+#define O_APPEND 8
+#define O_CREAT 16
+#define O_EXCL 32
+#define O_TRUNC 64
+#define O_NONBLOCK 128
+#define O_NOCTTY 256
+#define O_RD_NONBLOCK 512
+#define O_WR_NONBLOCK 1024
 
 typedef enum {
   F_OK = 0,   // existence check
