@@ -190,7 +190,7 @@ namespace upanui {
         _copyBuffer.push_back(line.characters(x));
       }
     } else {
-      const Character newLineCharacter(Keyboard_ENTER, _currentFontSize, _currentFontType, _currentStyle, _currentFGColor, _currentBGColor);
+      const Character newLineCharacter(Keyboard_CTRL_J, _currentFontSize, _currentFontType, _currentStyle, _currentFGColor, _currentBGColor);
       {
         auto& line1 = _lines.get(_selectedArea.p1().y());
         for (int x = _selectedArea.p1().x(); x < line1.size(); ++x) {

@@ -2300,6 +2300,7 @@ void read_input_till_char(cecho_func* cechoFunc, void* private_data, char* in_bu
 				break ;
 
 			case Keyboard_ENTER:
+      case Keyboard_CTRL_J:
 				if(cur_read_pos != max_read_len)
 				{
 					ch = '\n' ;
@@ -2334,7 +2335,7 @@ int vfscanf_cecho (cecho_func* cechoFunc, void* private_data, const char* scan_b
 	if(scan_buf)
 		memcpy(sc.input_buffer, scan_buf, strlen(scan_buf)) ;
 	else
-		read_input_till_char(cechoFunc, private_data, sc.input_buffer, MAX_READ_LEN - 1, true, Keyboard_ENTER) ;
+		read_input_till_char(cechoFunc, private_data, sc.input_buffer, MAX_READ_LEN - 1, true, Keyboard_CTRL_J) ;
 
 #define MAX_DIGITS 65			/* Allow one leading 0. */
 	unsigned char buf[MAX_DIGITS+2];
