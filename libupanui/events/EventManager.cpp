@@ -33,17 +33,24 @@ namespace upanui {
   EventManager::EventManager() {
   }
 
-  void EventManager::startEventLoop() {
+  int EventManager::startEventLoop() {
     init_gui_event_stream(_eventStreamFDs);
 
+    int exit_fds[2];
+    if (pipe(exit_fds) < 0) {
+      throw upan::exception(XLOC, "failed to create exit pipe");
+    }
+    _exitPipeFD = exit_fds[1];
+
     fd_set readfds;
-    const int nfds = upan::max(_eventStreamFDs[0], upan::max(_eventStreamFDs[1], STDIN_FD)) + 1;
+    const int nfds = upan::max(_eventStreamFDs[0], upan::max(_eventStreamFDs[1], exit_fds[0])) + 1;
 
     try {
       while (true) {
         FD_ZERO(&readfds);
         FD_SET(_eventStreamFDs[0], &readfds);
         FD_SET(_eventStreamFDs[1], &readfds);
+        FD_SET(exit_fds[0], &readfds);
 
         if (select(nfds, &readfds, NULL, NULL, NULL) >= 1) {
           if (FD_ISSET(_eventStreamFDs[0], &readfds)) {
@@ -51,6 +58,17 @@ namespace upanui {
           }
           if (FD_ISSET(_eventStreamFDs[1], &readfds)) {
             handleMouseEvent(_eventStreamFDs[1]);
+          }
+          if (FD_ISSET(exit_fds[0], &readfds)) {
+            int exitCode;
+            auto n = read(exit_fds[0], (void*)&exitCode, sizeof(int));
+            if (n == 0) {
+              continue;
+            }
+            if (n != sizeof(int)) {
+              return -1;
+            }
+            return exitCode;
           }
         }
       }
@@ -103,5 +121,9 @@ namespace upanui {
 
       GraphicsContext::Instance().uiObjectManager().dispatch(data);
     }
+  }
+
+  void EventManager::stopEventLoop(int exitCode) {
+    write(_exitPipeFD, (void*)&exitCode, sizeof(int));
   }
 }

@@ -37,8 +37,9 @@ private:
   EventManager();
 
 public:
-  void startEventLoop();
+  int startEventLoop();
   KeyboardData getCh();
+  void stopEventLoop(int exitCode);
 
 private:
   void handleKeyboardEvent(int fd);
@@ -46,6 +47,7 @@ private:
 
 private:
   int _eventStreamFDs[2];
+  int _exitPipeFD;
 
   friend class GraphicsContext;
 };
