@@ -48,7 +48,8 @@ namespace upanui {
 
     void initialize();
 
-    void onKeyboardEvent(const KeyboardEvent& event) override;
+    void handleKeyboardInput(const uint8_t ch);
+    void processInput(int fd, bool isOut);
     void moveup() override;
     void moveleft() override;
     void movehome() override;
@@ -61,10 +62,23 @@ namespace upanui {
 
     class TerminalOutputHandler : public upan::thread {
     public:
-      explicit TerminalOutputHandler(Terminal& terminal);
+      explicit TerminalOutputHandler(Terminal& terminal) : _terminal(terminal) {}
 
     private:
-      void run() override;
+      void run() override {
+        _terminal.processInput(_terminal.terminalMasterFD(), true);
+      }
+      Terminal& _terminal;
+    };
+
+    class TerminalInputHandler : public upan::thread {
+    public:
+      explicit TerminalInputHandler(Terminal& terminal) : _terminal(terminal) {}
+
+    private:
+      void run() override {
+        _terminal.processInput(STDIN_FD, false);
+      }
       Terminal& _terminal;
     };
 
@@ -79,6 +93,7 @@ namespace upanui {
     UIPosition _mouseSelectionCharacterPos;
     UIPosition _mouseSelectionCursorPos;
     CommandExecutor& _commandExecutor;
+    TerminalInputHandler _terminalInputHandler;
     TerminalOutputHandler _terminalOutputHandler;
     upan::string _commandLine;
 

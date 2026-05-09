@@ -25,6 +25,7 @@
 #include <fs.h>
 #include <sys/select.h>
 #include <KeyboardEvent.h>
+#include <GraphicsContext.h>
 
 namespace upanui {
   Terminal::Terminal(int x, int y, int width, int height,
@@ -32,7 +33,8 @@ namespace upanui {
                      CommandExecutor& commandExecutor,
                      HorizontalPlacementType horizontalPlacementType,
                      VerticalPlacementType verticalPlacementType) : TextArea(x, y, width, height, leftMargin, horizontalPlacementType, verticalPlacementType),
-                     _terminalMasterFD(-1), _terminalSlaveFD(-1), _commandExecutor(commandExecutor), _terminalOutputHandler(*this) {
+                     _terminalMasterFD(-1), _terminalSlaveFD(-1), _commandExecutor(commandExecutor),
+                     _terminalInputHandler(*this), _terminalOutputHandler(*this) {
     setPrompt(prompt);
   }
 
@@ -50,6 +52,7 @@ namespace upanui {
 
     displayCommandLine();
     _terminalOutputHandler.start();
+    _terminalInputHandler.start();
   }
 
   void Terminal::setPrompt(const upan::string& prompt) {
@@ -69,8 +72,7 @@ namespace upanui {
     printf("\n%s", _prompt.c_str());
   }
 
-  void Terminal::onKeyboardEvent(const KeyboardEvent& event) {
-    const auto ch = event.getData().getRch();
+  void Terminal::handleKeyboardInput(const uint8_t ch) {
     if (ch == Keyboard_BACKSPACE) {
       if (!_commandLine.empty()) {
         _commandLine.pop_back();
@@ -101,11 +103,11 @@ namespace upanui {
   }
 
   void Terminal::movehome() {
-    while(!isPrimaryCommandLine()) {
+    while (!isPrimaryCommandLine()) {
       TextArea::moveup();
     }
     TextArea::movehome();
-    for(int i = 0; i < _prompt.length(); ++i) {
+    for (int i = 0; i < _prompt.length(); ++i) {
       moveright();
     }
   }
@@ -139,7 +141,7 @@ namespace upanui {
 
     scrollToY(_mouseSelectionCursorPos.y(), _mouseSelectionCharacterPos.y());
 
-    updateSelectedArea( mouseHeld, true, prevCharPos, _mouseSelectionCharacterPos);
+    updateSelectedArea(mouseHeld, true, prevCharPos, _mouseSelectionCharacterPos);
 
     notifyChange(ChangeState::Content);
   }
@@ -148,29 +150,31 @@ namespace upanui {
     unselectArea();
   }
 
-  Terminal::TerminalOutputHandler::TerminalOutputHandler(upanui::Terminal& terminal) : _terminal(terminal) {}
-
-  void Terminal::TerminalOutputHandler::run() {
+  void Terminal::processInput(int fd, bool isOut) {
     fd_set readfds;
-    const int nfds = _terminal.terminalMasterFD() + 1;
+    const int nfds = fd + 1;
 
     const int MAX_BUFFER_SIZE = 1024;
-    char buffer[MAX_BUFFER_SIZE];
+    uint8_t buffer[MAX_BUFFER_SIZE];
 
     try {
       while (true) {
         FD_ZERO(&readfds);
-        FD_SET(_terminal.terminalMasterFD(), &readfds);
+        FD_SET(fd, &readfds);
         if (select(nfds, &readfds, NULL, NULL, NULL) >= 1) {
-          if (FD_ISSET(_terminal.terminalMasterFD(), &readfds)) {
-            int n = read(_terminal.terminalMasterFD(), buffer, MAX_BUFFER_SIZE);
+          if (FD_ISSET(fd, &readfds)) {
+            int n = read(fd, buffer, MAX_BUFFER_SIZE);
             for (int j = 0; j < n; ++j) {
-              _terminal.handleInput(buffer[j], false);
+              if (isOut) {
+                handleInput(buffer[j], false);
+              } else {
+                handleKeyboardInput(buffer[j]);
+              }
             }
           }
         }
       }
-    } catch(upan::exception& e) {
+    } catch (upan::exception& e) {
       e.Print();
     }
   }

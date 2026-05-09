@@ -30,7 +30,6 @@
 namespace upanui {
 class KeyboardEventHandler;
 class MouseEventHandler;
-class EventHandler;
 class UIObject;
 
 class EventManager {
@@ -39,14 +38,11 @@ private:
 
 public:
   void startEventLoop();
-  void startTerminalEventLoop();
   KeyboardData getCh();
 
 private:
-  void startEventLoop(bool readFromTerminal);
   void handleKeyboardEvent(int fd);
   void handleMouseEvent(int fd);
-  void handleTerminalInput(int fd);
 
 private:
   int _eventStreamFDs[2];

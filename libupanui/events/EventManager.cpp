@@ -34,14 +34,6 @@ namespace upanui {
   }
 
   void EventManager::startEventLoop() {
-    startEventLoop(false);
-  }
-
-  void EventManager::startTerminalEventLoop() {
-    startEventLoop(true);
-  }
-
-  void EventManager::startEventLoop(bool readFromTerminal) {
     init_gui_event_stream(_eventStreamFDs);
 
     fd_set readfds;
@@ -52,9 +44,6 @@ namespace upanui {
         FD_ZERO(&readfds);
         FD_SET(_eventStreamFDs[0], &readfds);
         FD_SET(_eventStreamFDs[1], &readfds);
-        if (readFromTerminal) {
-          FD_SET(STDIN_FD, &readfds);
-        }
 
         if (select(nfds, &readfds, NULL, NULL, NULL) >= 1) {
           if (FD_ISSET(_eventStreamFDs[0], &readfds)) {
@@ -62,9 +51,6 @@ namespace upanui {
           }
           if (FD_ISSET(_eventStreamFDs[1], &readfds)) {
             handleMouseEvent(_eventStreamFDs[1]);
-          }
-          if (readFromTerminal && FD_ISSET(STDIN_FD, &readfds)) {
-            handleTerminalInput(STDIN_FD);
           }
         }
       }
@@ -116,19 +102,6 @@ namespace upanui {
       }
 
       GraphicsContext::Instance().uiObjectManager().dispatch(data);
-    }
-  }
-
-  void EventManager::handleTerminalInput(int fd) {
-  	const int MAX_BUFFER_SIZE = 1024;
-    uint8_t buffer[MAX_BUFFER_SIZE];
-    int n = read(fd, buffer, MAX_BUFFER_SIZE);
-    if (n > 0) {
-      for (int i = 0; i < n; ++i) {
-        KeyboardData data(buffer[i], false, false, false);
-        KeyboardEvent keyboardEvent(data);
-        GraphicsContext::Instance().uiObjectManager().dispatch(keyboardEvent);
-      }
     }
   }
 }
