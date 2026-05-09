@@ -83,10 +83,23 @@ struct thread_local_key_value {
 };
 
 __thread thread_local_key_value _thread_local_data[MAX_THREAD_LOCAL_KEYS];
+__thread bool _thread_local_date_initialized = false;
+
 thread_manager thread_manager::_tm;
 
 thread_manager::thread_manager() {
   for(auto& i : _threadKeys) i = false;
+}
+
+thread_local_key_value* _get_thread_local_data() {
+  if (!_thread_local_date_initialized) {
+    for(int i = 0; i < MAX_THREAD_LOCAL_KEYS; ++i) {
+      _thread_local_data[i]._destructor = nullptr;
+      _thread_local_data[i]._value = nullptr;
+    }
+    _thread_local_date_initialized = true;
+  }
+  return _thread_local_data;
 }
 
 int pthread_mutex_init(pthread_mutex_t* mtx, const pthread_mutexattr_t* attr) {
@@ -132,8 +145,8 @@ int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void* (*start_
 
 void pthread_exit(void* ret) {
   for (int i = 0; i < MAX_THREAD_LOCAL_KEYS; ++i) {
-    if (_thread_local_data[i]._destructor) {
-      _thread_local_data[i]._destructor(_thread_local_data[i]._value);
+    if (_get_thread_local_data()[i]._destructor) {
+      _get_thread_local_data()[i]._destructor(_get_thread_local_data()[i]._value);
     }
   }
   thread_manager::instance().add(getpid(), ret);
@@ -143,8 +156,8 @@ void pthread_exit(void* ret) {
 int pthread_key_create(pthread_key_t *key, void (*destructor)(void*)) {
   if (!key) return 1;
   if (thread_manager::instance().create_key(*key)) {
-    _thread_local_data[*key]._destructor = destructor;
-    _thread_local_data[*key]._value = nullptr;
+    _get_thread_local_data()[*key]._destructor = destructor;
+    _get_thread_local_data()[*key]._value = nullptr;
     return 0;
   }
   return EAGAIN;
@@ -152,13 +165,13 @@ int pthread_key_create(pthread_key_t *key, void (*destructor)(void*)) {
 
 int pthread_setspecific(pthread_key_t key, const void* data) {
   if (key >= MAX_THREAD_LOCAL_KEYS) return EINVAL;
-  _thread_local_data[key]._value = (void*)data;
+  _get_thread_local_data()[key]._value = (void*)data;
   return 0;
 }
 
 void* pthread_getspecific(pthread_key_t key) {
   if (key >= MAX_THREAD_LOCAL_KEYS) return nullptr;
-  return _thread_local_data[key]._value;
+  return _get_thread_local_data()[key]._value;
 }
 
 int pthread_key_delete(pthread_key_t key) {
