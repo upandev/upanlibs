@@ -41,7 +41,7 @@ BTree::BTree(int iMaxElements) :
 	  iChunkSize = iMaxElements;
 	}
 
-	m_pElementMemPool = &MemPool<BTreeElement>::createMemPool(iMaxElements, iChunkSize) ;
+	m_pElementMemPool = new MemPool<BTreeElement>(iMaxElements, iChunkSize) ;
 }
 
 BTree::~BTree()

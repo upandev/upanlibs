@@ -31,9 +31,9 @@
 template <typename T>
 class MemPool {
 	private:
-		const uint32_t MAX_ELEMENTS;
-		const uint32_t CHUNK_SIZE;
-		const uint32_t MAX_CHUNKS;
+		const int _maxElements;
+		const int _chunkSize;
+		const uint32_t _maxChunks;
 		
 		upan::vector<uintptr_t> _freePool;
     upan::set<uintptr_t> _allocatedPool;
@@ -41,19 +41,15 @@ class MemPool {
     upan::vector<uintptr_t> _allocatedChunks;
 
 	private:
-		MemPool(uint32_t maxElements, uint32_t chunkSize) : MAX_ELEMENTS(maxElements), CHUNK_SIZE(chunkSize), MAX_CHUNKS(MAX_ELEMENTS / CHUNK_SIZE), _freePool(maxElements) {
-      _allocatedChunkCount = 0 ;
-		}
-
     bool allocateChunk() {
-			if(_allocatedChunkCount == MAX_CHUNKS) {
+			if(_maxElements > 0 && _allocatedChunkCount == _maxChunks) {
         return false;
       }
 
-			auto address = (uintptr_t)malloc(CHUNK_SIZE * sizeof(T));
+			auto address = (uintptr_t)malloc(_chunkSize * sizeof(T));
       _allocatedChunks.push_back(address);
 
-			for(uint32_t i = 0; i < CHUNK_SIZE; i++) {
+			for(int i = 0; i < _chunkSize; i++) {
 				_freePool.push_back(address + i * sizeof(T));
 			}
 
@@ -62,12 +58,12 @@ class MemPool {
 		}
 
 	public:
-		// Factory
-		static MemPool<T>& createMemPool(uint32_t size, uint32_t chunkSize) {
-			if((size % chunkSize) != 0)
-        throw upan::exception(XLOC, "MemPool creation failed. MemPool size: %u is not a multiple of chunk size: %u", size, chunkSize);
-			return *new MemPool<T>(size, chunkSize) ;
-		}
+    MemPool(int maxElements, int chunkSize) : _maxElements(maxElements),
+      _chunkSize(chunkSize), _maxChunks(_maxElements / _chunkSize),
+      _freePool(maxElements), _allocatedChunkCount(0) {
+      if((maxElements % chunkSize) != 0)
+        throw upan::exception(XLOC, "MemPool creation failed. MemPool size: %u is not a multiple of chunk size: %u", maxElements, chunkSize);
+    }
 
 		~MemPool() {
 			for(auto address : _allocatedChunks) {
@@ -75,7 +71,8 @@ class MemPool {
       }
 		}
 
-		upan::option<T&> allocate() {
+    template <typename CONSTRUCTOR_LAMBDA>
+    upan::option<T&> allocate(const CONSTRUCTOR_LAMBDA& factory) {
       //if pool is empty then populate pool
       if (_freePool.empty()) {
         allocateChunk();
@@ -86,12 +83,16 @@ class MemPool {
       }
 
       auto allocatedAddress = _freePool[_freePool.size() - 1];
-      T* object = new((void*)allocatedAddress)T();
+      T* object = factory((void*)allocatedAddress);
 
       _freePool.pop_back();
       _allocatedPool.insert(allocatedAddress);
 
       return upan::option<T&>(*object);
+    }
+
+		upan::option<T&> allocate() {
+      return allocate([] (void* address) { return new (address) T(); });
 		}
 
 		void release(T& object) {
