@@ -25,3 +25,7 @@
 bool is_command_key(int ch) {
   return ch < Keyboard_SPACE || ch > Keyboard_TILDE;
 }
+
+bool is_new_line(int ch) {
+  return ch == Keyboard_ENTER || ch == Keyboard_CTRL_J;
+}

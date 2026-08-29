@@ -45,6 +45,8 @@ namespace upanui {
     int maxColumns() const { return _maxColumns; }
 
     int getCurPos() const { return _cursorPos; }
+    int getCurPosX() const { return _cursorPos % _maxColumns; }
+    int getCurPosY() const { return _cursorPos / _maxColumns; }
     void setCurPos(int curPos, bool updateCursorOnScreen);
 
     byte getChar(int pos) { return _buffer[pos]; }

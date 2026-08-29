@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <termios.h>
 #include <TextArea.h>
 
 namespace upanui {
@@ -54,6 +55,7 @@ namespace upanui {
     void moveleft() override;
     void movehome() override;
     void moveend() override;
+    void enter() override;
     void backspace() override;
     void cutSelection() override;
     void moveCursor(bool shiftPressed, bool mouseHeld, int x, int y) override;
@@ -84,6 +86,7 @@ namespace upanui {
 
   private:
     bool isPrimaryCommandLine();
+    upan::string getCommandLine();
     int terminalMasterFD() const { return _terminalMasterFD; }
 
   private:
@@ -96,6 +99,7 @@ namespace upanui {
     TerminalInputHandler _terminalInputHandler;
     TerminalOutputHandler _terminalOutputHandler;
     upan::string _commandLine;
+    termios _termios;
 
     friend class UIObjectFactory;
   };

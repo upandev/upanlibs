@@ -82,13 +82,10 @@ namespace upanui {
   }
 
   upan::string TextLine::toString(int pos) const {
-    char* s = (char*)malloc(_characters.size() + 1 - pos);
+    upan::string line;
     for(int i = pos; i < _characters.size(); ++i) {
-      s[i - pos] = (char)_characters[i].getCh();
+      line += (char)_characters[i].getCh();
     }
-    s[_characters.size() - pos] = '\0';
-    upan::string line(s);
-    free(s);
     return line;
   }
 }

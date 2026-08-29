@@ -204,6 +204,7 @@ typedef enum {
 } KeyboardKeys ;
 
 bool is_command_key(int ch);
+bool is_new_line(int ch);
 
 #if defined __cplusplus
 }

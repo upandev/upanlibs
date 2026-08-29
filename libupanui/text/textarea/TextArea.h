@@ -94,7 +94,6 @@ namespace upanui {
     void scrollToY(int curPosY, int charPosY);
     void updateSelectedArea(bool isSelectionOn, bool isSelectKey, const UIPosition& prevCharPos, const UIPosition& newCharPos);
     void unselectArea();
-    bool isNewLine(uint16_t ch) const;
     bool isInsertableKey(uint16_t ch) const;
     Character createCharacter(uint16_t ch) const;
     void doInsert(const Character& ch);

@@ -46,6 +46,11 @@ namespace upanui {
 
     _terminalMasterFD = posix_openpt(O_RDWR);
     _terminalSlaveFD = open(ptsname(_terminalMasterFD), O_RDWR);
+
+    tcgetattr(_terminalSlaveFD, &_termios);
+    _termios.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(_terminalSlaveFD, termios_actions::TCSANOW, &_termios);
+
     dup2(_terminalSlaveFD, STDIN_FD);
     dup2(_terminalSlaveFD, STDOUT_FD);
     dup2(_terminalSlaveFD, STDERR_FD);
@@ -73,17 +78,24 @@ namespace upanui {
   }
 
   void Terminal::handleKeyboardInput(const uint8_t ch) {
-    if (ch == Keyboard_BACKSPACE) {
-      if (!_commandLine.empty()) {
-        _commandLine.pop_back();
-        putchar(Keyboard_BACKSPACE);
-      }
-    } else if (isNewLine(ch)) {
-      _commandExecutor.execute(_commandLine);
-      _commandLine.clear();
+    if (is_new_line(ch)) {
+      const upan::string commandLine = getCommandLine();
+      handleInput(ch, false);
+
+      termios v_termios {};
+      tcgetattr(_terminalSlaveFD, &v_termios);;
+      v_termios.c_lflag |= (ICANON | ECHO);
+      tcsetattr(_terminalSlaveFD, termios_actions::TCSANOW, &v_termios);
+
+      _commandExecutor.execute(commandLine);
+
+      tcsetattr(_terminalSlaveFD, termios_actions::TCSANOW, &_termios);
+
       displayCommandLine();
-    } else if (isInsertableKey(ch)) {
-      _commandLine += ch;
+      return;
+    } else {
+      handleInput(ch, false);
+      return;
     }
   }
 
@@ -117,6 +129,11 @@ namespace upanui {
       movedown();
     }
     TextArea::moveend();
+  }
+
+  void Terminal::enter() {
+    moveend();
+    TextArea::enter();
   }
 
   void Terminal::backspace() {
@@ -177,5 +194,20 @@ namespace upanui {
     } catch (upan::exception& e) {
       e.Print();
     }
+  }
+
+  upan::string Terminal::getCommandLine() {
+    int i = lines().size() - 1;
+    while (i >= 0) {
+      if (i == 0 || !lines().get(i - 1).wrapped()) {
+        break;
+      }
+      --i;
+    }
+    upan::string commandLine;
+    for (int j = i; j < lines().size(); ++j) {
+      commandLine += lines().get(j).toString(j == i ? _prompt.length() : 0);
+    }
+    return commandLine;
   }
 }

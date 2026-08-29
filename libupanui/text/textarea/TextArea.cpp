@@ -238,7 +238,7 @@ namespace upanui {
   }
 
   void TextArea::insert(const Character& ch) {
-    if (isNewLine(ch.getCh())) {
+    if (is_new_line(ch.getCh())) {
       enter();
       return;
     }
@@ -879,7 +879,7 @@ namespace upanui {
 
   bool TextArea::isTextModifyKey(uint8_t ch) const {
     return !is_command_key(ch)
-    || isNewLine(ch)
+    || is_new_line(ch)
     || ch == Keyboard_DEL
     || ch == Keyboard_KEY_DEL
     || ch == Keyboard_BACKSPACE
@@ -888,11 +888,7 @@ namespace upanui {
   }
 
   bool TextArea::isInsertableKey(uint16_t ch) const {
-    return !is_command_key(ch) || isNewLine(ch);
-  }
-
-  bool TextArea::isNewLine(uint16_t ch) const {
-    return ch == Keyboard_ENTER || ch == Keyboard_CTRL_J;
+    return !is_command_key(ch) || is_new_line(ch);
   }
 
   void TextArea::recalculateScrollYOnResize(int scrollYCharCount) {
