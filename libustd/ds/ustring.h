@@ -173,6 +173,9 @@ public:
   string substr(int start) const;
   bool split(char c, string& p1, string& p2) const;
   void pop_back();
+  void insert(int pos, const string& str);
+  void insert(int pos, char ch);
+  void erase(int pos, int len);
 
   template <typename Tokens>
   void tokenize(const upan::string& delim, bool filterEmpty, Tokens& tokens) const {

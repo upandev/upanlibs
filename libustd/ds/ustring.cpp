@@ -107,6 +107,38 @@ void string::pop_back() {
   }
 }
 
+void upan::string::insert(int pos, const upan::string& str) {
+  if (pos < 0 || pos > _len) {
+    throw upan::exception(XLOC, "invalid string insert position: %d", pos);
+  }
+  int remaining = _len - pos;
+  expandAndCopy(str.c_str(), str.length());
+  if (remaining > 0) {
+    memmove(_buffer + pos + str.length(), _buffer + pos, remaining);
+    memcpy(_buffer + pos, str.c_str(), str.length());
+  }
+}
+
+void upan::string::insert(int pos, char ch) {
+  char buf[2] = {ch, '\0'};
+  insert(pos, buf);
+}
+
+void upan::string::erase(int pos, int len) {
+  if (pos < 0 || len <= 0 || pos >= _len) {
+    throw upan::exception(XLOC, "invalid string erase position: %d", pos);
+  }
+
+  int remaining = _len - pos;
+  if (len > remaining) {
+    len = remaining;
+  }
+
+  memmove(_buffer + pos, _buffer + pos + len, remaining - len);
+  _len -= len;
+  _buffer[_len] = '\0';
+}
+
 upan::string upan::string::to_string(uint64_t uiNumber) {
   char strNumber[128];
   unsigned i = 0;
