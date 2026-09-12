@@ -28,8 +28,6 @@
 #include <string.h>
 #include <sys/auxv.h>
 
-static process_init_fini_t* _process_init_fini_list = NULL;
-
 struct atexit_handler {
   void (*_handler)(void);
   struct atexit_handler* _next;
@@ -37,7 +35,7 @@ struct atexit_handler {
 
 static struct atexit_handler* atexit_handler_list_head = NULL;
 
-extern void load_environ(const char** environ);
+extern void _user_process_exit();
 
 __thread int _lib_data1_thread_local = 1000;
 __thread int _lib_global1_thread_local;
@@ -62,30 +60,11 @@ UNUSED uint64_t __tls_get_addr(tls_index* ti) {
   return THREAD_CONTROL_BLOCK_DTV[ti->ti_module] + ti->ti_offset;
 }
 
-//this is used inside crt start-up code - called at first before transferring control to main()
-UNUSED void _process_init_relocate(int argc, char** argv) {
-  _process_init_fini_list = SysProcess_InitRelocate();
-  process_init_fini_t* i = _process_init_fini_list;
-
-  //the last entry is main executable
-  while (!i->_end) {
-    if (i->_init) {
-      i->_init();
-    }
-    i++;
-  }
-
-  uint32_t argvSize = sizeof(uintptr_t) * (argc + 1);
-  int e;
-  for(e = 0; e < argc; ++e) {
-    argvSize += strlen(argv[e]) + 1;
-  }
-  load_environ((const char**)((uintptr_t)argv + argvSize));
+static void thread_entry_caller_with_noret(thread_entry_func_with_noret_t tmain, void* arg) {
+  tmain(arg);
+  exit(0);
 }
 
-extern void __cxa_finalize(void*);
-
-extern void _stdio_term();
 void exit(int rv) {
   /* If we are using stdio, try to shut it down.  At the very least,
    * this will attempt to commit all buffered writes.  It may also
@@ -100,21 +79,7 @@ void exit(int rv) {
       free(h);
       h = next;
     }
-
-    _stdio_term();
-
-    if (!iskernel()) {
-      __cxa_finalize(NULL);
-
-      //the last entry is for the main executable
-      process_init_fini_t* i = _process_init_fini_list;
-      while (!i->_end) {
-        if (i->_fini) {
-          i->_fini();
-        }
-        i++;
-      }
-    }
+    _user_process_exit();
   }
 
   _exit(rv);
@@ -129,11 +94,6 @@ int atexit(void (*handler)(void)) {
   h->_next = atexit_handler_list_head;
   atexit_handler_list_head = h;
   return 0;
-}
-
-static void thread_entry_caller_with_noret(thread_entry_func_with_noret_t tmain, void* arg) {
-  tmain(arg);
-  exit(0);
 }
 
 int exectp(thread_entry_caller_with_ret_t thread_entry_caller, thread_entry_func_with_ret_t entryPoint, void* arg, bool joinable) {
