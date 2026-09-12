@@ -1,0 +1,77 @@
+/*
+ *	Upanix - An x86 based Operating System
+ *  Copyright (C) 2011 'Prajwala Prabhakar' 'srinivasa.prajwal@gmail.com'
+ *
+ *  I am making my contributions/submissions to this project solely in
+ *  my personal capacity and am not conveying any rights to any
+ *  intellectual property of any third parties.
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/
+ */
+
+#pragma once
+
+#include <vector.h>
+#include <UIPosition.h>
+
+namespace upanui {
+  class FixedTextArea;
+  class FixedTextLine;
+  class UIPosition;
+
+  class FixedTextLines {
+  public:
+    FixedTextLines(FixedTextArea& textArea) : _textArea(textArea) {}
+    ~FixedTextLines();
+
+    FixedTextLines(const FixedTextLines&) = delete;
+    FixedTextLines& operator=(const FixedTextLines&) = delete;
+
+    int size() const { return _lines.size(); }
+    bool empty() const { return _lines.empty(); }
+
+    void clear();
+    void realignOnWidthIncrease();
+    void realignOnWidthDecrease();
+    FixedTextLine& add(int index);
+    FixedTextLine& get(int index) const;
+    int wrapremovech(int x, int y, int maxLineChars);
+    int removeLine(int y, int fixedCharacterPosY, int scrollBaseY);
+
+    typedef struct {
+      int _lineIndex;
+      int _lineTopY;
+      int _lineBaseY;
+    } LineInfo;
+
+    typedef struct {
+      UIPosition _charPos;
+      UIPosition _curPos;
+    } LineCursorInfo;
+
+    int getLineBaseY(int lineIndex, int scrollBaseY);
+    int getLineBaseX(int charX, int lineIndex, int leftMargin);
+    LineCursorInfo getLineCursorPos(int x, int y, int baseY, int leftMargin);
+    LineInfo getLineInfo(int baseY, int rows);
+    void renderLineTopDown(int baseY, int rows, int height);
+    void renderLineBottomUp(int baseY, int rows);
+    void renderLineRange(const UIPosition& p1, const UIPosition& p2, int baseY);
+    int calculateCharCount(int x, int y);
+    int calculateHeight();
+
+  private:
+    upan::vector<FixedTextLine*> _lines;
+    FixedTextArea& _textArea;
+  };
+}

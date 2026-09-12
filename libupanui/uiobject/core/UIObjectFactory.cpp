@@ -30,6 +30,7 @@
 #include <VerticalScroller.h>
 #include <Image.h>
 #include <TextArea.h>
+#include <FixedTextArea.h>
 #include <typeinfo.h>
 #include <Terminal.h>
 #include <MenuEntry.h>
@@ -182,6 +183,20 @@ namespace upanui {
       actualHeight = parent.height();
     }
     auto& textArea = *new TextArea(x, y, width, actualHeight, TextArea::MIN_LEFT_MARGIN, horizontalPlacementType, verticalPlacementType);
+    parent.add(textArea);
+    textArea.init();
+    return textArea;
+  }
+
+  FixedTextArea& UIObjectFactory::createFixedTextArea(UIObject& parent, int x, int y, int width, int height,
+                                                 HorizontalPlacementType horizontalPlacementType,
+                                                 VerticalPlacementType verticalPlacementType) {
+    int actualHeight = height;
+    if (typeid(parent) == typeid(VerticalScroller)) {
+      actualHeight = parent.height();
+    }
+    auto& textArea = *new FixedTextArea(x, y, width, actualHeight,
+                                        FixedTextArea::MIN_LEFT_MARGIN, horizontalPlacementType, verticalPlacementType);
     parent.add(textArea);
     textArea.init();
     return textArea;

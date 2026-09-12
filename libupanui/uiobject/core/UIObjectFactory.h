@@ -45,6 +45,7 @@ namespace upanui {
 
   class VerticalScroller;
   class TextArea;
+  class FixedTextArea;
 
   class Menu;
   class MenuEntry;
@@ -106,6 +107,8 @@ namespace upanui {
                                                     VerticalPlacementType verticalPlacementType);
     static TextArea& createTextArea(UIObject& parent, int x, int y, int width, int height,
                                     HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
+    static FixedTextArea& createFixedTextArea(UIObject& parent, int x, int y, int width, int height,
+                                         HorizontalPlacementType horizontalPlacementType, VerticalPlacementType verticalPlacementType);
     static Terminal& createTerminal(UIObject& parent, int x, int y, int width, int height,
                                     const upan::string& prompt,
                                     Terminal::CommandExecutor& commandExecutor,

@@ -20,35 +20,31 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include <TextLines.h>
-#include <TextArea.h>
-#include <TextLine.h>
+#include <FixedTextLines.h>
+#include <FixedTextArea.h>
+#include <FixedTextLine.h>
 
 namespace upanui {
-  TextLines::~TextLines() {
+  FixedTextLines::~FixedTextLines() {
     clear();
   }
 
-  void TextLines::clear() {
+  void FixedTextLines::clear() {
     for(auto i : _lines) {
       delete i;
     }
     _lines.clear();
   }
 
-  void TextLines::realignOnWidthIncrease() {
+  void FixedTextLines::realignOnWidthIncrease() {
     for(int li = 0; li < _lines.size();) {
       auto line = _lines[li];
       if (line->wrapped()) {
-        int availableWidth = _textArea._maxLineCharWidth - line->width();
+        int availChars = _textArea._maxLineChars - line->size();
         auto nextLine = _lines[li + 1];
         int i;
-        for (i = 0; i < nextLine->size(); ++i) {
-          auto ch = nextLine->characters(i);
-          availableWidth -= ch.getChWidth();
-          if (availableWidth < 0) {
-            break;
-          }
+        for (i = 0; i < availChars && i < nextLine->size(); ++i) {
+          auto ch = nextLine->FixedCharacters(i);
           line->insert(line->size(), ch);
         }
 
@@ -70,43 +66,44 @@ namespace upanui {
     }
   }
 
-  void TextLines::realignOnWidthDecrease() {
-    Characters wrapCharacters;
+  void FixedTextLines::realignOnWidthDecrease() {
+    FixedCharacters wrapFixedCharacters;
     for (int li = 0; li < _lines.size(); ++li) {
       auto line = _lines[li];
 
-      for(int i = 0; i < wrapCharacters.size(); ++i) {
-        line->insert(i, wrapCharacters[i]);
+      for(int i = 0; i < wrapFixedCharacters.size(); ++i) {
+        line->insert(i, wrapFixedCharacters[i]);
       }
 
-      wrapCharacters.clear();
-      while(line->width() > _textArea._maxLineCharWidth) {
-        auto ch = line->characters(line->size() - 1);
-        line->remove(line->size() - 1, line->size());
-        wrapCharacters.insert(0, ch);
+      wrapFixedCharacters.clear();
+      if (line->size() > _textArea._maxLineChars) {
+        for (int i = _textArea._maxLineChars; i < line->size(); ++i) {
+          wrapFixedCharacters.push_back(line->FixedCharacters(i));
+        }
+        line->remove(_textArea._maxLineChars, line->size());
       }
 
-      if (!wrapCharacters.empty() && !line->wrapped()) {
+      if (!wrapFixedCharacters.empty() && !line->wrapped()) {
         line->wrapped(true);
         add(li + 1);
       }
     }
   }
 
-  TextLine& TextLines::add(int index) {
-    auto line = new TextLine(_textArea.currentFontSize(), _textArea);
+  FixedTextLine& FixedTextLines::add(int index) {
+    auto line = new FixedTextLine(_textArea);
     _lines.insert(index, line);
     return *line;
   }
 
-  TextLine& TextLines::get(int index) const {
+  FixedTextLine& FixedTextLines::get(int index) const {
     if (index >= size()) {
       throw upan::exception(XLOC, "invalid line index: %d", index);
     }
     return *_lines[index];
   }
 
-  int TextLines::wrapremovech(int x, int y, int maxLineChWidth) {
+  int FixedTextLines::wrapremovech(int x, int y, int maxLineChars) {
     int deletedLine = -1;
     auto& line = get(y);
     line.remove(x, x + 1);
@@ -118,22 +115,19 @@ namespace upanui {
     auto ny = y + 1;
     if (ny < _lines.size()) {
       auto& nextLine = *_lines[ny];
-      int availWidth = maxLineChWidth - line.width();
+      int availChars = maxLineChars - line.size();
       bool deletedFromNextLine = false;
-      while (nextLine.size() > 0) {
-        auto ch = nextLine.characters(0);
-        if (ch.getChWidth() < availWidth) {
-          line.insert(line.size(), ch);
-          availWidth -= ch.getChWidth();
-          deletedLine = wrapremovech(0, ny, maxLineChWidth);
-          deletedFromNextLine = true;
-        } else {
-          break;
-        }
+      while (nextLine.size() > 0 && availChars > 0) {
+        auto ch = nextLine.FixedCharacters(0);
+        line.insert(line.size(), ch);
+        --availChars;
+        deletedLine = wrapremovech(0, ny, maxLineChars);
+        deletedFromNextLine = true;
       }
+
       //deleting when cursor is at the end of current line which is full - then we need to remove the first char from next line
       if (!deletedFromNextLine && nextLine.size() > 0 && x == line.size()) {
-        deletedLine = wrapremovech(0, ny, maxLineChWidth);
+        deletedLine = wrapremovech(0, ny, maxLineChars);
       }
       if (nextLine.size() == 0) {
         line.wrapped(false);
@@ -143,12 +137,12 @@ namespace upanui {
     return deletedLine;
   }
 
-  int TextLines::removeLine(const int y, const int characterPosY, const int scrollBaseY) {
+  int FixedTextLines::removeLine(const int y, const int fixedCharacterPosY, const int scrollBaseY) {
     const int baseY = getLineBaseY(y, scrollBaseY);
     auto& line = get(y);
-    auto visibleBaseY = baseY - line.lineHeight() + 1;
+    auto visibleBaseY = baseY - _textArea.lineHeight() + 1;
     auto insideCanvas = visibleBaseY < _textArea.height();
-    const int deletedLineHeight = line.lineHeight();
+    const int deletedLineHeight = _textArea.lineHeight();
 
     if (y > 0) {
       auto& prevLine = get(y - 1);
@@ -163,7 +157,7 @@ namespace upanui {
       auto lastLineBaseCursorY = baseY;
 
       for (int i = y + 1; i < _lines.size(); ++i) {
-        const int lineHeight = get(i).lineHeight();
+        const int lineHeight = _textArea.lineHeight();
         lastLineBaseCursorY += lineHeight;
         if (lastLineBaseCursorY >= (_textArea.height() - 1)) {
           lastLineIndex = i;
@@ -181,17 +175,17 @@ namespace upanui {
 
       for (int lastLineTopY = destYOnCanvas; lastLineTopY < _textArea.height() && lastLineIndex != -1 && lastLineIndex < _lines.size();) {
         auto lastLine = _lines[lastLineIndex];
-        lastLine->render(0, lastLineIndex, lastLineTopY + lastLine->lineHeight() - 1);
-        lastLineTopY += lastLine->lineHeight();
+        lastLine->render(0, lastLineIndex, lastLineTopY + _textArea.lineHeight() - 1);
+        lastLineTopY += _textArea.lineHeight();
         ++lastLineIndex;
       }
 
       _lines.erase(y, y + 1);
       delete &line;
       return deletedLineHeight;
-    } else if (characterPosY < y) { //it's a no-op if deleting the line where character cursor is
+    } else if (fixedCharacterPosY < y) { //it's a no-op if deleting the line where FixedCharacter cursor is
       if (insideCanvas) {
-        _textArea.textBuffer().clear(0, visibleBaseY, _textArea.width(), line.lineHeight());
+        _textArea.textBuffer().clear(0, visibleBaseY, _textArea.width(), _textArea.lineHeight());
       }
       _lines.erase(y, y + 1);
       delete &line;
@@ -201,41 +195,34 @@ namespace upanui {
     }
   }
 
-  int TextLines::getLineBaseY(int lineIndex, int scrollBaseY) {
-    int baseY = -1;
-    for(int i = 0; i <= lineIndex && i < _lines.size(); ++i) {
-      baseY += _lines[i]->lineHeight();
+  int FixedTextLines::getLineBaseY(int lineIndex, int scrollBaseY) {
+    if (lineIndex >= _lines.size()) {
+      lineIndex = _lines.size() - 1;
     }
-    return baseY - scrollBaseY;
+    return (-1 + (lineIndex + 1) * _textArea.lineHeight() - scrollBaseY);
   }
 
-  int TextLines::getLineBaseX(int charX, int lineIndex, int leftMargin) {
+  int FixedTextLines::getLineBaseX(int charX, int lineIndex, int leftMargin) {
     const auto& line = get(lineIndex);
-    int baseX = leftMargin;
-    for(int i = 0; i < charX && i < line.size(); ++i) {
-      baseX += line.characters(i).getChWidth();
+
+    if (charX > line.size()) {
+      charX = line.size();
     }
-    return baseX;
+
+    return leftMargin + charX * _textArea.charWidth();
   }
 
-  TextLines::LineCursorInfo TextLines::getLineCursorPos(const int x, const int y, const int baseY, const int leftMargin) {
+  FixedTextLines::LineCursorInfo FixedTextLines::getLineCursorPos(const int x, const int y, const int baseY, const int leftMargin) {
     const auto& info = getLineInfo(baseY, y);
     const int charPosY = info._lineIndex;
     const int curPosY = info._lineBaseY;
 
     auto& line = get(charPosY);
-    int charPosX = 0;
-    int curPosX = leftMargin;
-
-    while (charPosX < line.characters().size()) {
-      auto ch = line.characters(charPosX);
-      int nposX = curPosX + ch.getChWidth();
-      if (nposX > x) {
-        break;
-      }
-      curPosX = nposX;
-      ++charPosX;
+    int charPosX = (x - leftMargin) / _textArea.charWidth();
+    if (charPosX > line.size()) {
+      charPosX = line.size();
     }
+    int curPosX = leftMargin + charPosX * _textArea.charWidth();
 
     LineCursorInfo lineCursorInfo;
     lineCursorInfo._charPos.set(charPosX, charPosY);
@@ -243,52 +230,47 @@ namespace upanui {
     return lineCursorInfo;
   }
 
-  TextLines::LineInfo TextLines::getLineInfo(const int baseY, const int rows) {
+  FixedTextLines::LineInfo FixedTextLines::getLineInfo(const int baseY, const int rows) {
     const int virtualY = baseY + rows;
-    int lineIndex;
-    int y;
-    for (lineIndex = 0, y = 0; lineIndex < _lines.size(); ++lineIndex) {
-      int ny = y + _lines[lineIndex]->lineHeight();
-      if (ny > virtualY || lineIndex == (_lines.size() - 1)) {
-        break;
-      }
-      y = ny;
-    }
+    int lineCount = virtualY / _textArea.lineHeight();
+    lineCount = lineCount > (_lines.size() - 1) ? (_lines.size() - 1) : lineCount;
+    const int y = lineCount * _textArea.lineHeight();
+
     LineInfo info;
-    info._lineIndex = lineIndex;
+    info._lineIndex = lineCount;
     info._lineTopY = y - baseY;
-    info._lineBaseY = info._lineTopY + _lines[lineIndex]->lineHeight() - 1;
+    info._lineBaseY = info._lineTopY + _textArea.lineHeight() - 1;
     return info;
   }
 
-  void TextLines::renderLineTopDown(int baseY, int rows, int height) {
+  void FixedTextLines::renderLineTopDown(int baseY, int rows, int height) {
     const LineInfo info = getLineInfo(baseY, rows);
     for(int ty = info._lineTopY, li = info._lineIndex; ty < height && li < _lines.size(); ++li) {
       auto line = _lines[li];
-      ty += line->lineHeight();
+      ty += _textArea.lineHeight();
       line->render(0, li, ty - 1);
     }
   }
 
-  void TextLines::renderLineBottomUp(int baseY, int rows) {
+  void FixedTextLines::renderLineBottomUp(int baseY, int rows) {
     const LineInfo info = getLineInfo(baseY, rows);
     for(int by = info._lineBaseY, li = info._lineIndex; by >= 0 && li >= 0; --li) {
       auto line = _lines[li];
       line->render(0, li, by);
-      by -= line->lineHeight();
+      by -= _textArea.lineHeight();
     }
   }
 
-  void TextLines::renderLineRange(const UIPosition& p1, const UIPosition& p2, int baseY) {
+  void FixedTextLines::renderLineRange(const UIPosition& p1, const UIPosition& p2, int baseY) {
     int lineBaseY = getLineBaseY(p1.y(), baseY);
     for (int y = p1.y(); y <= p2.y() && y < _lines.size(); ++y) {
       auto line = _lines[y];
       line->render(0, y, lineBaseY);
-      lineBaseY += line->lineHeight();
+      lineBaseY += _textArea.lineHeight();
     }
   }
 
-  int TextLines::calculateCharCount(int x, int y) {
+  int FixedTextLines::calculateCharCount(int x, int y) {
     int charCount = 0;
     for(int i = 0; i < _lines.size(); ++i) {
       const int lineSize = _lines[i]->size();
@@ -301,11 +283,7 @@ namespace upanui {
     return charCount;
   }
 
-  int TextLines::calculateHeight() {
-    int height = 0;
-    for(const auto line : _lines) {
-      height += line->lineHeight();
-    }
-    return height;
+  int FixedTextLines::calculateHeight() {
+    return _lines.size() * _textArea.lineHeight();
   }
 }
