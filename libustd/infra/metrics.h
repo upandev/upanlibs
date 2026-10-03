@@ -27,6 +27,7 @@
 #include <atomicop.h>
 #include <mutex.h>
 #include <vector.h>
+#include <time.h>
 
 namespace upan {
   class metrics {
@@ -40,15 +41,16 @@ namespace upan {
 
       void start();
       void end();
+      void add(int count);
 
-      uint32_t count() const;
-      uint32_t sum() const;
+      uint64_t count() const;
+      uint64_t sum() const;
       double avg() const;
 
     private:
-      uint32_t _tick;
-      uint32_t _count;
-      uint32_t _sum;
+      time_t _tick;
+      uint64_t _count;
+      uint64_t _sum;
     };
 
   public:
@@ -59,7 +61,7 @@ namespace upan {
     stats& get(const string& name);
     void remove(const string& name);
 
-    uint32_t count(const string& name);
+    uint64_t count(const string& name);
     double avg(const string& name);
 
     upan::vector<upan::string> kpis();

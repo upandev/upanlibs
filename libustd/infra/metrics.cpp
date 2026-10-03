@@ -56,9 +56,9 @@ namespace upan {
     _stats.erase(name);
   }
 
-  uint32_t metrics::count(const string &name) {
+  uint64_t metrics::count(const string &name) {
     mutex_guard g(_mutexStats);
-    uint32_t count = 0;
+    uint64_t count = 0;
     for(auto& s : _stats[name]) {
       count += s.second.count();
     }
@@ -67,8 +67,8 @@ namespace upan {
 
   double metrics::avg(const string &name) {
     mutex_guard g(_mutexStats);
-    uint32_t sum = 0;
-    uint32_t count = 0;
+    uint64_t sum = 0;
+    uint64_t count = 0;
     for(auto& s : _stats[name]) {
       count += s.second.count();
       sum += s.second.sum();
@@ -96,11 +96,16 @@ namespace upan {
     ++_count;
   }
 
-  uint32_t metrics::stats::count() const {
+  void metrics::stats::add(int count) {
+    _sum += count;
+    ++_count;
+  }
+
+  uint64_t metrics::stats::count() const {
     return _count;
   }
 
-  uint32_t metrics::stats::sum() const {
+  uint64_t metrics::stats::sum() const {
     return _sum;
   }
 
