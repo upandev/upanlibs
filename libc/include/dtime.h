@@ -81,12 +81,13 @@ time_t time(time_t * t);
 int localtime(struct tm* t, const time_t* time);
 struct tm* gmtime_r(const time_t *timep, struct tm *result);
 int gettimeofday(struct timeval*, struct timezone *tz);
-//time since boot
-uint32_t btime();
+//time since boot - microseconds
+time_t btime();
 void dtime(RTCDateTime*);
 char* dtime_str();
 int sleep(uint32_t s);
-int sleepms(uint32_t ms);
+time_t millisleep(uint32_t t);
+time_t microsleep(uint64_t t);
 int nanosleep(const struct timespec* req, struct timespec* rem);
 
 // As per POSIX...

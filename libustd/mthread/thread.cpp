@@ -115,7 +115,7 @@ namespace upan {
       _state.set(stopping);
 
       while(_state.get() != stopped && isprocessalive(_pid)) {
-        sleepms(10);
+        millisleep(10);
       }
     }
   }

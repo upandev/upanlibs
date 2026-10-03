@@ -132,8 +132,8 @@ struct tm* gmtime_r(const time_t *timep, struct tm *result) {
   return result;
 }
 
-//in milliseconds
-uint32_t btime() {
+//in microseconds
+time_t btime() {
   return SysUtil_GetTimeSinceBoot();
 }
 
@@ -155,22 +155,26 @@ char* dtime_str() {
 }
 
 int sleep(uint32_t s) {
-  return SysProcess_Sleep(s * 1000);
+  return SysProcess_Sleep(s * 1000000) / 1000000;
 }
 
-int sleepms(uint32_t ms) {
-  return SysProcess_Sleep(ms);
+time_t millisleep(uint32_t t) {
+  return SysProcess_Sleep(t * 1000) / 1000;
+}
+
+time_t microsleep(uint64_t t) {
+  return SysProcess_Sleep(t);
 }
 
 int nanosleep(const struct timespec* req, struct timespec* rem) {
   if (!req) {
     return 0;
   }
-  time_t ms = req->tv_sec * 1000 + req->tv_nsec / 1000000;
-  int r = sleepms(ms);
+  time_t ms = req->tv_sec * 1000000 + req->tv_nsec / 1000;
+  time_t r = microsleep(ms);
   if (r && rem) {
-    rem->tv_sec = r / 1000;
-    rem->tv_nsec = (r % 1000) * 1000000;
+    rem->tv_sec = r / 1000000;
+    rem->tv_nsec = (r % 1000000) * 1000;
   }
   return r >= 0 ? 0 : -1;
 }

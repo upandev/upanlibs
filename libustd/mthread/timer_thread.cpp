@@ -32,7 +32,7 @@ namespace upan {
       if (state() == thread::running) {
         on_timer_trigger();
       }
-      sleepms(interval());
+      millisleep(interval());
     }
   }
 }
