@@ -58,7 +58,7 @@ namespace upanui {
     for(unsigned f = 0; f < 8; ++y) {
       uintptr_t lfbp = (uintptr_t)drawBuffer.buffer() + y * pitch + x * bytesPerPixel;
       for(unsigned i = 0x80; i != 0; i >>= 1, lfbp += bytesPerPixel)
-        *(uintptr_t*)lfbp = font_data[f] & i ? fg : bg;
+        *(uint32_t*)lfbp = font_data[f] & i ? fg : bg;
 
       if(yr) ++f;
       yr = !yr;
