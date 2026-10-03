@@ -78,7 +78,6 @@ extern void SysDisplay_GetViewport(ViewportInfo*);
 #define set_cursor_val(pos)	SysDisplay_SetCursor(pos, false)
 #define get_cursor()		SysDisplay_GetCursor()
 #define console_size(mr, mc) SysDisplay_GetConsoleSize(mr, mc)
-#define clrscr()			SysDisplay_ClearScreen()
 
 void showprogress(int startCur, const char* msg, unsigned progNum) ;
 void init_gui_frame(FrameBufferInfo* frameBufferInfo);
@@ -90,6 +89,7 @@ void init_term_console();
 void init_gui_event_stream(int fdList[]);
 void set_viewport(const ViewportInfo*);
 void get_viewport(ViewportInfo*);
+void clrscr();
 
 #if defined __cplusplus
 }

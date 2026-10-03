@@ -21,6 +21,7 @@
  */
 #include <cdisplay.h>
 #include <stdio.h>
+#include <kb.h>
 
 void showprogress(int startCur, const char* msg, unsigned progNum)
 {
@@ -71,4 +72,8 @@ void set_viewport(const ViewportInfo* viewportInfo) {
 
 void get_viewport(ViewportInfo* viewportInfo) {
   SysDisplay_GetViewport(viewportInfo);
+}
+
+void clrscr() {
+  putchar(Keyboard_CTRL_L);
 }
