@@ -26,13 +26,14 @@
 #include <sys/select.h>
 #include <KeyboardEvent.h>
 #include <GraphicsContext.h>
+#include <FixedTextLine.h>
 
 namespace upanui {
   Terminal::Terminal(int x, int y, int width, int height,
                      int leftMargin, const upan::string& prompt,
                      CommandExecutor& commandExecutor,
                      HorizontalPlacementType horizontalPlacementType,
-                     VerticalPlacementType verticalPlacementType) : TextArea(x, y, width, height, leftMargin, horizontalPlacementType, verticalPlacementType),
+                     VerticalPlacementType verticalPlacementType) : FixedTextArea(x, y, width, height, leftMargin, horizontalPlacementType, verticalPlacementType),
                      _terminalMasterFD(-1), _terminalSlaveFD(-1), _commandExecutor(commandExecutor),
                      _terminalInputHandler(*this), _terminalOutputHandler(*this) {
     setPrompt(prompt);
@@ -42,7 +43,7 @@ namespace upanui {
   }
 
   void Terminal::initialize() {
-    TextArea::init();
+    FixedTextArea::init();
 
     _terminalMasterFD = posix_openpt(O_RDWR);
     _terminalSlaveFD = open(ptsname(_terminalMasterFD), O_RDWR);
@@ -66,7 +67,7 @@ namespace upanui {
   }
 
   bool Terminal::isPrimaryCommandLine() {
-    const int lineIndex = characterPos().y();
+    const int lineIndex = fixedCharacterPos().y();
     if (lineIndex == 0) {
       return true;
     }
@@ -103,44 +104,44 @@ namespace upanui {
   }
 
   void Terminal::moveleft() {
-    if (isPrimaryCommandLine() && characterPos().x() == _prompt.length()) {
+    if (isPrimaryCommandLine() && fixedCharacterPos().x() == _prompt.length()) {
       return;
     }
-    if (characterPos().x() == 0) {
-      TextArea::moveup();
-      TextArea::moveend();
+    if (fixedCharacterPos().x() == 0) {
+      FixedTextArea::moveup();
+      FixedTextArea::moveend();
     } else {
-      TextArea::moveleft();
+      FixedTextArea::moveleft();
     }
   }
 
   void Terminal::movehome() {
     while (!isPrimaryCommandLine()) {
-      TextArea::moveup();
+      FixedTextArea::moveup();
     }
-    TextArea::movehome();
+    FixedTextArea::movehome();
     for (int i = 0; i < _prompt.length(); ++i) {
       moveright();
     }
   }
 
   void Terminal::moveend() {
-    while ((characterPos().y() + 1) < lines().size()) {
+    while ((fixedCharacterPos().y() + 1) < lines().size()) {
       movedown();
     }
-    TextArea::moveend();
+    FixedTextArea::moveend();
   }
 
   void Terminal::enter() {
     moveend();
-    TextArea::enter();
+    FixedTextArea::enter();
   }
 
   void Terminal::backspace() {
-    if (isPrimaryCommandLine() && characterPos().x() == _prompt.length()) {
+    if (isPrimaryCommandLine() && fixedCharacterPos().x() == _prompt.length()) {
       return;
     }
-    TextArea::backspace();
+    FixedTextArea::backspace();
   }
 
   void Terminal::cutSelection() {

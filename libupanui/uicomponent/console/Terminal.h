@@ -23,10 +23,10 @@
 #pragma once
 
 #include <termios.h>
-#include <TextArea.h>
+#include <FixedTextArea.h>
 
 namespace upanui {
-  class Terminal : public TextArea {
+  class Terminal : public FixedTextArea {
   public:
     void setPrompt(const upan::string&);
 
