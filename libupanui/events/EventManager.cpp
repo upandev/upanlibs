@@ -75,6 +75,8 @@ namespace upanui {
     } catch(upan::exception& e) {
       e.Print();
     }
+
+    return -1;
   }
 
   KeyboardData EventManager::getCh() {

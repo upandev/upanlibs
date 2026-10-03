@@ -90,7 +90,7 @@ namespace upanui {
     void handleInput(uint8_t ch, bool isShiftPressed);
 
 
-    UIPosition& FixedCharacterPos() { return _characterPos; }
+    UIPosition& fixedCharacterPos() { return _characterPos; }
     upan::mutex& drawMutex() { return _drawMutex; }
     FixedTextLines::LineCursorInfo getLineCursorInfo(int x, int y);
     void scrollToY(int curPosY, int charPosY);
