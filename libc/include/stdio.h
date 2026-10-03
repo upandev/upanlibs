@@ -29,8 +29,6 @@
 extern "C" {
 #endif
 
-extern void SysDisplay_ClearScreen() ;
-
 #define __UCLIBC_HAS_FLOATS__ 1
 
 #define OFFSET_TYPE	long int

@@ -69,8 +69,8 @@ void SysProcess_Yield() {
   _upanix_syscall(SYS_CALL_PROCESS_YIELD, 1, 2, 3, 4, 5);
 }
 
-int SysProcess_Sleep(unsigned milisec) {
-  return (int)_upanix_syscall(SYS_CALL_PROCESS_SLEEP, (uint64_t)milisec, 2, 3, 4, 5);
+int SysProcess_Sleep(uint64_t microsec) {
+  return (int)_upanix_syscall(SYS_CALL_PROCESS_SLEEP, (uint64_t)microsec, 2, 3, 4, 5);
 }
 
 int SysProcess_GetProcList(PS** pProcList, unsigned* uiListSize) {

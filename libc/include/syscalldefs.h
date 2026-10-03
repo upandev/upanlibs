@@ -49,7 +49,6 @@ typedef enum
 {
 	SYS_CALL_DISPLAY_START = 0,
 		SYS_CALL_DISPLAY_MESSAGE,
-		SYS_CALL_DISPLAY_CLR_SCR,
 		SYS_CALL_DISPLAY_MOV_CURSOR,
 		SYS_CALL_DISPLAY_CLR_LINE,
 		SYS_CALL_DISPLAY_SET_CURSOR,
@@ -182,7 +181,6 @@ typedef enum
 
 /************************************************************************************/
 
-void SysDisplay_ClearScreen();
 void SysDisplay_MoveCursor(int n);
 void SysDisplay_ClearLine(int pos);
 void SysDisplay_SetCursor(__volatile__ int iCurPos, __volatile__ bool bUpdateCursorOnScreen);
@@ -241,7 +239,7 @@ int SysProcess_WaitQueue(int id, void* mutex, const struct timeval* timeout);
 void SysProcess_WaitDequeue(int id, bool all);
 void SysProcess_Exit(int iExitStatus);
 void SysProcess_Yield();
-int SysProcess_Sleep(unsigned milisec);
+int SysProcess_Sleep(uint64_t microsec);
 int SysProcess_GetProcList(PS** pProcList, unsigned* uiListSize);
 void SysProcess_FreeProcListMem(PS* pProcList, unsigned uiListSize);
 int SysProcess_MaskSignal(SIG_MASKING_TYPE how, const sigset_t *set, sigset_t *oldset);
@@ -256,7 +254,7 @@ void SysUtil_GetDateTime(RTCDateTime* rtcDateTime);
 void SysUtil_Reboot();
 
 int SysUtil_GetTimeOfDay(struct timeval* pTV);
-uint32_t SysUtil_GetTimeSinceBoot();
+time_t SysUtil_GetTimeSinceBoot();
 int SysUtil_GetEntropy(void *buffer, size_t length);
 int SysUtil_GetResourceUsage(RUSAGE_ID who, struct rusage* ru);
 

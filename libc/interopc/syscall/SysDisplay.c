@@ -27,10 +27,6 @@ void SysDisplay_Message(const char* szMessage, unsigned uiAttr) {
   _upanix_syscall(SYS_CALL_DISPLAY_MESSAGE, (uint64_t)szMessage, (uint64_t)uiAttr, 3, 4, 5);
 }
 
-void SysDisplay_ClearScreen() {
-  _upanix_syscall(SYS_CALL_DISPLAY_CLR_SCR, 1, 2, 3, 4, 5);
-}
-
 void SysDisplay_MoveCursor(int n) {
   _upanix_syscall(SYS_CALL_DISPLAY_MOV_CURSOR, (uint64_t)n, 2, 3, 4, 5);
 }
