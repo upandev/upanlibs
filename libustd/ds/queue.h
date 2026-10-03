@@ -43,8 +43,9 @@ class queue
     void clear();
     int read(T out[], int n);
     int write(const T in[], int n);
-    uint32_t size() const { return _size; }
-    uint32_t availableSize() const { return _size - _count.get(); }
+    uint32_t size() const { return _count.get(); }
+    uint32_t capacity() const { return _size; }
+    uint32_t availableCapacity() const { return _size - _count.get(); }
 
   private:
     uint32_t _readEnd;
@@ -128,7 +129,7 @@ int queue<T>::write(const T in[], int n) {
     return 0;
   }
 
-  auto remaining = availableSize();
+  auto remaining = availableCapacity();
 
   if (n > remaining) {
     n = remaining;
