@@ -31,6 +31,8 @@ namespace upan {
         static uint32_t compare_swap(volatile uint32_t &iLock, uint32_t oldVal, uint32_t newVal);
         static uint32_t swap(volatile uint32_t &iLock, uint32_t val);
         static uint32_t add(volatile uint32_t &var, uint32_t val);
+        static uint32_t get(volatile uint32_t& var);
+        static void set(volatile uint32_t& var, uint32_t val);
         static uint32_t bit_and(volatile uint32_t& var, uint32_t mask);
         static uint32_t bit_or(volatile uint32_t& var, uint32_t mask);
       };
@@ -44,12 +46,16 @@ namespace upan {
           return static_cast<T>(op::compare_swap(_val, static_cast<uint32_t>(oldVal), static_cast<uint32_t>(newVal)));
         }
 
-        T set(T val) {
+        T swap(T val) {
           return static_cast<T>(op::swap(_val, static_cast<uint32_t>(val)));
         }
 
+        void set(T val) {
+          op::set(_val, static_cast<uint32_t>(val));
+        }
+
         T get() {
-          return static_cast<T>(op::add(_val, 0));
+          return static_cast<T>(op::get(_val));
         }
 
         T inc() {
