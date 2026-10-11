@@ -136,6 +136,7 @@ typedef enum
     SYS_CALL_PROCESS_SET_SIGNAL_RETURN,
     SYS_CALL_PROCESS_SET_SID,
     SYS_CALL_PROCESS_SET_ALARM,
+    SYS_CALL_PROCESS_CPUID,
 	SYS_CALL_PROC_END,
 
 	SYS_CALL_KB_START = 800,
@@ -260,6 +261,8 @@ int SysUtil_GetResourceUsage(RUSAGE_ID who, struct rusage* ru);
 
 int SysProcess_IsProcessAlive(int iProcessID);
 int SysProcess_IsKernel();
+int SysProcess_CpuId();
+int SysProcess_LockOwnerId();
 int SysProcess_IsChildAlive(int iProcessID);
 
 sock_t SysNet_CreateSocket(SA_FAMILY_TYPE sa_family, SOCKET_TYPE socket_type, int protocol);

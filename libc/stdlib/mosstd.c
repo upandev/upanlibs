@@ -120,12 +120,20 @@ int iskernel() {
   return SysProcess_IsKernel();
 }
 
+int cpuid() {
+  return SysProcess_CpuId();
+}
+
 int isthread() {
   return THREAD_LOCAL_META_DATA->_is_thread;
 }
 
 int getpid() {
   return THREAD_LOCAL_META_DATA->_pid;
+}
+
+int getlockownerid() {
+  return SysProcess_LockOwnerId();
 }
 
 void yield() {

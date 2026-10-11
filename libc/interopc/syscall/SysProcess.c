@@ -175,6 +175,14 @@ int SysProcess_IsKernel() {
   return 0;
 }
 
+int SysProcess_CpuId() {
+  return (int)_upanix_syscall(SYS_CALL_PROCESS_CPUID, 1, 2, 3, 4, 5);
+}
+
+int SysProcess_LockOwnerId() {
+  return getpid();
+}
+
 process_init_fini_t* SysProcess_InitRelocate() {
   return (process_init_fini_t*)_upanix_syscall(SYS_CALL_PROCESS_INIT_RELOCATE, 1, 2, 3, 4, 5);
 }

@@ -97,8 +97,10 @@ int detach_thread(int pid);
 int childalive(int pid) ;
 int isprocessalive(int pid);
 int iskernel();
+int cpuid();
 int isthread();
 int getpid();
+int getlockownerid();
 void yield();
 int isatty(int fd);
 
