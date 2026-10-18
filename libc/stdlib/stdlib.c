@@ -51,8 +51,6 @@
 #include <locale.h>
 #include <string.h>
 
-int errno;
-
 /**********************************************************************/
 extern unsigned long
 _stdlib_strto_l_l(register const char * __restrict str,
@@ -827,6 +825,7 @@ const char* get_proc_status_desc(int iStatus)
 }
 
 void _initialize_standard_library() {
+  _stdio_init();
 }
 
 __thread uint32_t _rand_seed = 1;
