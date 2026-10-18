@@ -42,27 +42,22 @@
  */
 
 #include <spinmutex.h>
-#include <atomicop.h>
+#include <uatomic.h>
 #include <newalloc.h>
 #include <mosstd.h>
 
 namespace upan {
-  spinmutex::spinmutex(void* alloc_mem_lock) : _alloc_mem_lock(alloc_mem_lock), _lock(nullptr), _lockCount(0) {
-    _lock = new (_alloc_mem_lock)upan::atomic::integral<int>(FREE_MUTEX);
-  }
-
-  spinmutex::spinmutex() : spinmutex(aligned_alloc(4, LOCK_DATA_SIZE)) {
+  spinmutex::spinmutex() : _lock(FREE_MUTEX), _lockCount(0) {
   }
 
   spinmutex::~spinmutex() {
-    free(_alloc_mem_lock);
   }
 
   void spinmutex::lock() {
     const int newVal = getlockownerid();
 
     while (true) {
-      const int oldVal = _lock->compare_set(FREE_MUTEX, newVal);
+      const int oldVal = _lock.compare_set(FREE_MUTEX, newVal);
       if (oldVal == FREE_MUTEX) {
         _lockCount = 1;
         return;
@@ -70,7 +65,7 @@ namespace upan {
         ++_lockCount;
         return;
       } else {
-        while (_lock->get() != FREE_MUTEX) {
+        while (_lock.get() != FREE_MUTEX) {
           __asm__ __volatile__("pause");
         }
       }
@@ -80,7 +75,7 @@ namespace upan {
   bool spinmutex::unlock() {
     const int val = getlockownerid();
 
-    if (_lock->get() != val) {
+    if (_lock.get() != val) {
       return false;
     }
 
@@ -89,7 +84,7 @@ namespace upan {
     }
 
     if (!_lockCount) {
-      _lock->set(FREE_MUTEX);
+      _lock.set(FREE_MUTEX);
     }
 
     return true;

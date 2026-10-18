@@ -23,20 +23,16 @@
 #pragma once
 
 #include <stdint.h>
-#include <atomicop.h>
+#include <uatomic.h>
 
 namespace upan{
   class spinmutex {
   private:
-    void* _alloc_mem_lock;
-    atomic::integral<int>* _lock;
+    atomic::integral<int> _lock;
     int _lockCount;
 
     static const int FREE_MUTEX = -999;
   public:
-    constexpr static int LOCK_DATA_SIZE = sizeof(upan::atomic::integral<int>);
-
-    explicit spinmutex(void* alloc_mem_lock);
     spinmutex();
     ~spinmutex();
 
