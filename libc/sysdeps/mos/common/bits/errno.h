@@ -30,26 +30,18 @@
 # define ECANCELED	125
 #endif
 
-#if defined __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
-extern int errno;
-
-# ifndef __ASSEMBLER__
-
 /* Function to get address of global `errno' variable.  */
-extern int *__errno_location (void) __attribute__ ((__const__));
+int* __errno_location(void);
 
 /* We wouldn't need a special macro anymore but it is history.  */
-#   define __set_errno(val) ((errno) = (val))
+# define __set_errno(val) ((errno) = (val))
 
-#  if defined __UCLIBC_HAS_THREADS__
 /* When using threads, errno is a per-thread value.  */
-#   define errno (*__errno_location ())
-#  endif
-
-# endif /* !__ASSEMBLER__ */
+# define errno (*__errno_location ())
 
 #if defined __cplusplus
 }
