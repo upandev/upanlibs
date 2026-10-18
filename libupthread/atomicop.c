@@ -22,34 +22,30 @@
 
 #include <atomicop.h>
 
-namespace upan {
-  namespace atomic {
-    uint32_t op::compare_swap(volatile uint32_t &iLock, uint32_t oldVal, uint32_t newVal) {
-      return __sync_val_compare_and_swap(&iLock, oldVal, newVal);
-    }
+uint32_t atomic_compare_swap(void* lock, uint32_t oldVal, uint32_t newVal) {
+  return __sync_val_compare_and_swap((uint32_t*)lock, oldVal, newVal);
+}
 
-    uint32_t op::swap(volatile uint32_t &iLock, uint32_t val) {
-      return __atomic_exchange_n(&iLock, val, __ATOMIC_SEQ_CST);
-    }
+uint32_t atomic_swap(void* lock, uint32_t val) {
+  return __atomic_exchange_n((uint32_t*)lock, val, __ATOMIC_SEQ_CST);
+}
 
-    uint32_t op::add(volatile uint32_t &var, uint32_t val) {
-      return __atomic_fetch_add(&var, val, __ATOMIC_SEQ_CST);
-    }
+uint32_t atomic_add(void* var, uint32_t val) {
+  return __atomic_fetch_add((uint32_t*)var, val, __ATOMIC_SEQ_CST);
+}
 
-    uint32_t op::get(volatile uint32_t& var) {
-      return __atomic_load_n(&var, __ATOMIC_SEQ_CST);
-    }
+uint32_t atomic_get(void* var) {
+  return __atomic_load_n((uint32_t*)var, __ATOMIC_SEQ_CST);
+}
 
-    void op::set(volatile uint32_t& var, uint32_t val) {
-      __atomic_store_n(&var, val, __ATOMIC_SEQ_CST);
-    }
+void atomic_set(void* var, uint32_t val) {
+  __atomic_store_n((uint32_t*)var, val, __ATOMIC_SEQ_CST);
+}
 
-    uint32_t op::bit_and(volatile uint32_t& var, uint32_t mask) {
-      return __atomic_fetch_and(&var, mask, __ATOMIC_SEQ_CST);
-    }
+uint32_t atomic_bit_and(void* var, uint32_t mask) {
+  return __atomic_fetch_and((uint32_t*)var, mask, __ATOMIC_SEQ_CST);
+}
 
-    uint32_t op::bit_or(volatile uint32_t& var, uint32_t mask) {
-      return __atomic_fetch_or(&var, mask, __ATOMIC_SEQ_CST);
-    }
-  }
+uint32_t atomic_bit_or(void* var, uint32_t mask) {
+  return __atomic_fetch_or((uint32_t*)var, mask, __ATOMIC_SEQ_CST);
 }
