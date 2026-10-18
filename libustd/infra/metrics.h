@@ -24,7 +24,7 @@
 
 #include <map.h>
 #include <ustring.h>
-#include <atomicop.h>
+#include <uatomic.h>
 #include <mutex.h>
 #include <vector.h>
 #include <time.h>

@@ -23,7 +23,7 @@
 #define _QUEUE_H_
 
 #include <exception.h>
-#include <atomicop.h>
+#include <uatomic.h>
 
 namespace upan {
 

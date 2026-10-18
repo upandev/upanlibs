@@ -23,7 +23,7 @@
 #pragma once
 
 #include <ustring.h>
-#include <atomicop.h>
+#include <uatomic.h>
 #include <file_stream.h>
 #include <mutex.h>
 #include "syslog.h"

@@ -26,7 +26,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <option.h>
-#include <atomicop.h>
+#include <uatomic.h>
 
 namespace upan {
 

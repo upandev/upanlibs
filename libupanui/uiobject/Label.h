@@ -23,7 +23,7 @@
 #pragma once
 
 #include <RectangleCanvas.h>
-#include <atomicop.h>
+#include <uatomic.h>
 #include <mutex.h>
 
 namespace upanui {
