@@ -23,18 +23,17 @@
 #pragma once
 
 #include <stdint.h>
-#include <atomicop.h>
+#include <uatomic.h>
+#include <pthread.h>
 
 namespace upan{
     class mutex {
     private:
-      void* _alloc_mem_lock;
-      atomic::integral<int>* _lock;
-      int _lockCount;
+      pthread_mutex_t _m;
 
-      static const int FREE_MUTEX = -999;
     public:
       mutex();
+      explicit mutex(pthread_mutex_t& m);
       ~mutex();
 
       mutex(const mutex&) = delete;

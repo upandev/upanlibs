@@ -26,8 +26,7 @@
 #include <sys/wait.h>
 #include <condition_variable.h>
 #include <errno_values.h>
-
-#define MAX_THREAD_LOCAL_KEYS 128
+#include <atomicop.h>
 
 class thread_manager {
 private:
@@ -53,7 +52,7 @@ public:
 
   bool create_key(pthread_key_t& key) {
     upan::mutex_guard g(_m);
-    for(int i = 0; i < MAX_THREAD_LOCAL_KEYS; ++i) {
+    for(int i = 0; i < PTHREAD_MAX_LOCAL_KEYS; ++i) {
       if (!_threadKeys[i]) {
         _threadKeys[i] = true;
         key = i;
@@ -65,7 +64,7 @@ public:
 
   void delete_key(pthread_key_t key) {
     upan::mutex_guard g(_m);
-    if (key < MAX_THREAD_LOCAL_KEYS) {
+    if (key < PTHREAD_MAX_LOCAL_KEYS) {
       _threadKeys[key] = false;
     }
   }
@@ -73,17 +72,9 @@ public:
 private:
   typedef upan::map<pthread_t, void*> ThreadDataMap;
   ThreadDataMap _threadDataMap;
-  bool _threadKeys[MAX_THREAD_LOCAL_KEYS];
+  bool _threadKeys[PTHREAD_MAX_LOCAL_KEYS];
   upan::mutex _m;
 };
-
-struct thread_local_key_value {
-  void (*_destructor)(void*);
-  void* _value;
-};
-
-__thread thread_local_key_value _thread_local_data[MAX_THREAD_LOCAL_KEYS];
-__thread bool _thread_local_date_initialized = false;
 
 thread_manager thread_manager::_tm;
 
@@ -91,41 +82,23 @@ thread_manager::thread_manager() {
   for(auto& i : _threadKeys) i = false;
 }
 
+typedef struct {
+  void (*_destructor)(void*);
+  void* _value;
+} thread_local_key_value;
+
+__thread thread_local_key_value _thread_local_data[PTHREAD_MAX_LOCAL_KEYS];
+__thread bool _thread_local_data_initialized = false;
+
 thread_local_key_value* _get_thread_local_data() {
-  if (!_thread_local_date_initialized) {
-    for(int i = 0; i < MAX_THREAD_LOCAL_KEYS; ++i) {
-      _thread_local_data[i]._destructor = nullptr;
-      _thread_local_data[i]._value = nullptr;
+  if (!_thread_local_data_initialized) {
+    for(int i = 0; i < PTHREAD_MAX_LOCAL_KEYS; ++i) {
+      _thread_local_data[i]._destructor = NULL;
+      _thread_local_data[i]._value = NULL;
     }
-    _thread_local_date_initialized = true;
+    _thread_local_data_initialized = true;
   }
   return _thread_local_data;
-}
-
-int pthread_mutex_init(pthread_mutex_t* mtx, const pthread_mutexattr_t* attr) {
-  if (!mtx) return 1;
-  mtx->_kind = attr ? attr->_kind : PTHREAD_MUTEX_DEFAULT;
-  mtx->_impl_mutex = new upan::mutex();
-  return 0;
-}
-
-void pthread_mutex_destroy(pthread_mutex_t* mtx) {
-  delete (upan::mutex*)mtx->_impl_mutex;
-  mtx->_impl_mutex = nullptr;
-}
-
-int pthread_mutex_lock(pthread_mutex_t* mtx) {
-  ((upan::mutex*)(mtx->_impl_mutex))->lock();
-  return 0;
-}
-
-int pthread_mutex_trylock(pthread_mutex_t* mtx) {
-  return ((upan::mutex*)(mtx->_impl_mutex))->trylock();
-}
-
-int pthread_mutex_unlock(pthread_mutex_t* mtx) {
-  ((upan::mutex*)(mtx->_impl_mutex))->unlock();
-  return 0;
 }
 
 static void upthread_entry_caller(thread_entry_func_with_ret_t tmain, void* arg) {
@@ -144,7 +117,7 @@ int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void* (*start_
 }
 
 void pthread_exit(void* ret) {
-  for (int i = 0; i < MAX_THREAD_LOCAL_KEYS; ++i) {
+  for (int i = 0; i < PTHREAD_MAX_LOCAL_KEYS; ++i) {
     if (_get_thread_local_data()[i]._destructor) {
       _get_thread_local_data()[i]._destructor(_get_thread_local_data()[i]._value);
     }
@@ -164,18 +137,18 @@ int pthread_key_create(pthread_key_t *key, void (*destructor)(void*)) {
 }
 
 int pthread_setspecific(pthread_key_t key, const void* data) {
-  if (key >= MAX_THREAD_LOCAL_KEYS) return EINVAL;
+  if (key >= PTHREAD_MAX_LOCAL_KEYS) return EINVAL;
   _get_thread_local_data()[key]._value = (void*)data;
   return 0;
 }
 
 void* pthread_getspecific(pthread_key_t key) {
-  if (key >= MAX_THREAD_LOCAL_KEYS) return nullptr;
+  if (key >= PTHREAD_MAX_LOCAL_KEYS) return nullptr;
   return _get_thread_local_data()[key]._value;
 }
 
 int pthread_key_delete(pthread_key_t key) {
-  if (key >= MAX_THREAD_LOCAL_KEYS) return EINVAL;
+  if (key >= PTHREAD_MAX_LOCAL_KEYS) return EINVAL;
   thread_manager::instance().delete_key(key);
   return 0;
 }
@@ -200,25 +173,25 @@ int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr) {
 int pthread_cond_wait(pthread_cond_t* cond, pthread_mutex_t* mtx) {
   if (!cond || !mtx) return 1;
   auto cv = (upan::condition_variable*)cond->_impl_cv;
-  auto m = (upan::mutex*)mtx->_impl_mutex;
+  upan::mutex m(*mtx);
   try {
-    cv->wait(*m);
+    cv->wait(m);
   } catch(...) {
     return 1;
   }
   return 0;
 }
 
-int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *time) {
-  if (!cond || !mutex) return 1;
+int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mtx, const struct timespec *time) {
+  if (!cond || !mtx) return 1;
   auto cv = (upan::condition_variable*)cond->_impl_cv;
-  auto m = (upan::mutex*)mutex->_impl_mutex;
+  upan::mutex m(*mtx);
   struct timeval tv;
   tv.tv_sec = time->tv_sec;
   tv.tv_usec = time->tv_nsec / 1000;
 
   try {
-    cv->wait(*m, &tv);
+    cv->wait(m, &tv);
   } catch(...) {
     return 1;
   }
@@ -250,12 +223,12 @@ int pthread_cond_destroy(pthread_cond_t* cond) {
 int pthread_once(pthread_once_t* once, void (*init)(void)) {
   if (!once || !init) return EINVAL;
 
-  auto r = upan::atomic::op::compare_swap(*once, 0, 1);
+  auto r = atomic_compare_swap(once, 0, 1);
   if (r == 0) {
     init();
-    upan::atomic::op::swap(*once, 2);
+    atomic_swap(once, 2);
   } else if (r == 1) {
-    while (upan::atomic::op::add(*once, 0) != 2) {
+    while (atomic_add(once, 0) != 2) {
       yield();
     }
   }

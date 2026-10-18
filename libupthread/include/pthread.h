@@ -41,7 +41,12 @@ typedef unsigned long int pthread_t;
 
 typedef struct {
   int _kind;
-  void* _impl_mutex;
+  int _lock_count;
+  #if defined (__cplusplus)
+  alignas(4) int _lock;
+  #else
+  _Alignas(4) int _lock;
+  #endif
 } pthread_mutex_t;
 
 typedef struct {
@@ -71,6 +76,7 @@ typedef struct {
 
 #define PTHREAD_CREATE_JOINABLE  0
 #define PTHREAD_CREATE_DETACHED  1
+#define PTHREAD_MAX_LOCAL_KEYS 128
 
 typedef struct {
   size_t _stack_size;
@@ -85,6 +91,7 @@ void pthread_mutex_destroy(pthread_mutex_t*);
 int pthread_mutex_lock(pthread_mutex_t *);
 int pthread_mutex_trylock(pthread_mutex_t *);
 int pthread_mutex_unlock(pthread_mutex_t *);
+int pthread_mutex_unlock_owner(pthread_mutex_t *, int owner);
 void pthread_attr_init(pthread_attr_t*);
 void pthread_attr_destroy(pthread_attr_t*);
 int pthread_attr_setdetachstate(pthread_attr_t*, int detach_state);
@@ -104,7 +111,7 @@ int pthread_key_delete(pthread_key_t key);
 
 int pthread_cond_init(pthread_cond_t* cond, const pthread_condattr_t* attr);
 int pthread_cond_wait(pthread_cond_t*, pthread_mutex_t*);
-int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *time);
+int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mtx, const struct timespec *time);
 int pthread_cond_signal(pthread_cond_t*);
 int pthread_cond_broadcast(pthread_cond_t*);
 int pthread_cond_destroy(pthread_cond_t*);

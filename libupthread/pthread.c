@@ -24,20 +24,6 @@
 #include <string.h>
 #include <mosstd.h>
 
-void pthread_mutexattr_init(pthread_mutexattr_t* attr) {
-  memset(attr, 0, sizeof(pthread_mutexattr_t));
-  attr->_kind = PTHREAD_MUTEX_DEFAULT;
-}
-
-int pthread_mutexattr_settype(pthread_mutexattr_t* attr, int kind) {
-  int pv = attr->_kind;
-  attr->_kind = kind;
-  return pv;
-}
-
-void pthread_mutexattr_destroy(pthread_mutexattr_t* attr) {
-}
-
 void pthread_attr_init(pthread_attr_t* attr) {
   attr->_stack_size = 0;
   attr->_detach_state = PTHREAD_CREATE_JOINABLE;

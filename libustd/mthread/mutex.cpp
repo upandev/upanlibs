@@ -41,88 +41,32 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
 
-#include <errno_values.h>
 #include <mutex.h>
-#include <atomicop.h>
-#include <stdlib.h>
-#include <mosstd.h>
-#include <newalloc.h>
 
 namespace upan {
-  mutex::mutex() : _alloc_mem_lock(nullptr), _lock(nullptr), _lockCount(0) {
-    _alloc_mem_lock = aligned_alloc(4, sizeof(upan::atomic::integral<int>));
-    _lock = new (_alloc_mem_lock)upan::atomic::integral<int>(FREE_MUTEX);
+  mutex::mutex() {
+    pthread_mutex_init(&_m, nullptr);
+  }
+
+  mutex::mutex(pthread_mutex_t& m) : _m(m) {
   }
 
   mutex::~mutex() {
-    free(_alloc_mem_lock);
   }
 
   void mutex::lock() {
-    if (iskernel()) {
-      return;
-    }
-
-    const int newVal = getpid();
-    const int oldVal = _lock->compare_set(FREE_MUTEX, newVal);
-    if (oldVal == FREE_MUTEX) {
-      _lockCount = 1;
-    } else if (oldVal == newVal) {
-      ++_lockCount;
-    } else {
-      waitonlock((uint64_t)_lock, FREE_MUTEX, newVal);
-      _lockCount = 1;
-    }
+    pthread_mutex_lock(&_m);
   }
 
   int mutex::trylock() {
-    if (iskernel()) {
-      return 0;
-    }
-
-    const int newVal = getpid();
-    const int oldVal = _lock->compare_set(FREE_MUTEX, newVal);
-    if (oldVal == FREE_MUTEX) {
-      _lockCount = 1;
-    } else if (oldVal == newVal) {
-      ++_lockCount;
-    } else {
-      return EBUSY;
-    }
-    return 0;
+    return pthread_mutex_trylock(&_m);
   }
 
   bool mutex::unlock() {
-    if (iskernel()) {
-      return false;
-    }
-
-    if (_lock->get() != getpid()) {
-      return false;
-    }
-
-    if (_lockCount > 0) {
-      --_lockCount;
-    }
-
-    if (!_lockCount) {
-      _lock->set(FREE_MUTEX);
-    }
-
-    return true;
+    return pthread_mutex_unlock(&_m) ? false : true;
   }
 
   bool mutex::unlock(int pid) {
-    if (iskernel()) {
-      return false;
-    }
-
-    if (_lock->get() != pid) {
-      return false;
-    }
-
-    _lock->set(FREE_MUTEX);
-
-    return true;
+    return pthread_mutex_unlock_owner(&_m, pid) ? false : true;
   }
 }
