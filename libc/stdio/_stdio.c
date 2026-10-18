@@ -244,8 +244,8 @@ void _stdio_init(void)
 	_stdio_streams[1].__modeflags ^= (1-isatty(1)) * __FLAG_LBF;
 	* Currently, stdin, stdout is considered by default to be connnected to terminal */
 
-	_stdio_streams[0].__modeflags ^= (1-1) * __FLAG_LBF;
-	_stdio_streams[1].__modeflags ^= (1-1) * __FLAG_LBF;
+//	_stdio_streams[0].__modeflags ^= (1-1) * __FLAG_LBF;
+//	_stdio_streams[1].__modeflags ^= (1-1) * __FLAG_LBF;
 
 	// MOSE
 	
