@@ -26,8 +26,6 @@
 #include <mosstd.h>
 #include <errno_values.h>
 
-#define FREE_MUTEX (-999)
-
 int pthread_mutex_init(pthread_mutex_t* mtx, const pthread_mutexattr_t* attr) {
   if (!mtx) return 1;
   mtx->_kind = attr ? attr->_kind : PTHREAD_MUTEX_DEFAULT;
@@ -40,28 +38,50 @@ void pthread_mutex_destroy(pthread_mutex_t* mtx) {
   pthread_mutex_init(mtx, NULL);
 }
 
+int __pthread_mutex_lock(pthread_mutex_t* mtx) {
+  return pthread_mutex_lock(mtx);
+}
+
+int __pthread_mutex_trylock(pthread_mutex_t* mtx) {
+  return pthread_mutex_trylock(mtx);
+}
+
+int __pthread_mutex_unlock(pthread_mutex_t* mtx) {
+  return pthread_mutex_unlock(mtx);
+}
+
 int pthread_mutex_lock(pthread_mutex_t* mtx) {
   if (!mtx) return 1;
-  if (iskernel()) return 0;
-
-  const int newVal = getpid();
-  const int oldVal = (int)atomic_compare_swap(&mtx->_lock, FREE_MUTEX, newVal);
-  if (oldVal == FREE_MUTEX) {
-    mtx->_lock_count = 1;
-  } else if (oldVal == newVal) {
-    ++mtx->_lock_count;
-  } else {
-    waitonlock((uint64_t)&mtx->_lock, FREE_MUTEX, newVal);
-    mtx->_lock_count = 1;
+  //if (iskernel()) return 0;
+  const int newVal = getlockownerid();
+  //const int newVal = getpid();
+  while (true) {
+    const int oldVal = (int) atomic_compare_swap(&mtx->_lock, FREE_MUTEX, newVal);
+    if (oldVal == FREE_MUTEX) {
+      mtx->_lock_count = 1;
+      return 0;
+    } else if (oldVal == newVal) {
+      ++mtx->_lock_count;
+      return 0;
+    } else {
+      if (newVal < 0) { //cpu level lock - so, can't yield - has to spin lock
+        while (atomic_get(&mtx->_lock) != FREE_MUTEX) {
+          __asm__ __volatile__("pause");
+        }
+      } else {
+        waitonlock((uint64_t) &mtx->_lock, FREE_MUTEX, newVal);
+        mtx->_lock_count = 1;
+        return 0;
+      }
+    }
   }
-  return 0;
 }
 
 int pthread_mutex_trylock(pthread_mutex_t* mtx) {
   if (!mtx) return 1;
-  if (iskernel()) return 0;
-
-  const int newVal = getpid();
+  //if (iskernel()) return 0;
+  const int newVal = getlockownerid();
+  //const int newVal = getpid();
   const int oldVal = (int)atomic_compare_swap(&mtx->_lock, FREE_MUTEX, newVal);
   if (oldVal == FREE_MUTEX) {
     mtx->_lock_count = 1;
@@ -75,9 +95,9 @@ int pthread_mutex_trylock(pthread_mutex_t* mtx) {
 
 int pthread_mutex_unlock(pthread_mutex_t* mtx) {
   if (!mtx) return 1;
-  if (iskernel()) return 0;
-
-  if (atomic_get(&mtx->_lock) != getpid()) {
+  //if (iskernel()) return 0;
+  const int val = getlockownerid();
+  if (atomic_get(&mtx->_lock) != val) {
     return 1;
   }
 
@@ -94,7 +114,7 @@ int pthread_mutex_unlock(pthread_mutex_t* mtx) {
 
 int pthread_mutex_unlock_owner(pthread_mutex_t* mtx, int owner) {
   if (!mtx) return 1;
-  if (iskernel()) return 0;
+//  if (iskernel()) return 0;
 
   if (atomic_get(&mtx->_lock) != owner) {
     return 1;

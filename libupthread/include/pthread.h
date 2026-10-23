@@ -28,9 +28,6 @@
 
 #define PTHREAD_ONCE_INIT	0
 
-#define PTHREAD_MUTEX_INITIALIZER	{ PTHREAD_MUTEX_NORMAL, 0 }
-#define PTHREAD_COND_INITIALIZER	{ 0 }
-
 #if defined (__cplusplus)
 extern "C" {
 #endif
@@ -42,12 +39,22 @@ typedef unsigned long int pthread_t;
 typedef struct {
   int _kind;
   int _lock_count;
-  #if defined (__cplusplus)
+#if defined (__cplusplus)
   alignas(4) int _lock;
-  #else
+#else
   _Alignas(4) int _lock;
-  #endif
+#endif
 } pthread_mutex_t;
+
+typedef struct {
+  int _kind;
+  int _lock_count;
+#if defined (__cplusplus)
+  alignas(4) int _lock;
+#else
+  _Alignas(4) int _lock;
+#endif
+} pthread_spinlock_t;
 
 typedef struct {
   void* _impl_cv;
@@ -78,6 +85,11 @@ typedef struct {
 #define PTHREAD_CREATE_DETACHED  1
 #define PTHREAD_MAX_LOCAL_KEYS 128
 
+#define FREE_MUTEX (-999)
+#define PTHREAD_MUTEX_INITIALIZER	{ PTHREAD_MUTEX_NORMAL, 0, FREE_MUTEX }
+#define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP { PTHREAD_MUTEX_RECURSIVE, 0, FREE_MUTEX }
+#define PTHREAD_COND_INITIALIZER	{ 0 }
+
 typedef struct {
   size_t _stack_size;
   int _detach_state;  // 0 = joinable, 1 = detached
@@ -86,12 +98,24 @@ typedef struct {
 void pthread_mutexattr_init(pthread_mutexattr_t*);
 int pthread_mutexattr_settype(pthread_mutexattr_t* attr, int kind);
 void pthread_mutexattr_destroy(pthread_mutexattr_t*);
+
 int pthread_mutex_init(pthread_mutex_t* mutex, const pthread_mutexattr_t* attr);
 void pthread_mutex_destroy(pthread_mutex_t*);
+int __pthread_mutex_lock(pthread_mutex_t *);
+int __pthread_mutex_trylock(pthread_mutex_t *);
+int __pthread_mutex_unlock(pthread_mutex_t *);
 int pthread_mutex_lock(pthread_mutex_t *);
 int pthread_mutex_trylock(pthread_mutex_t *);
 int pthread_mutex_unlock(pthread_mutex_t *);
 int pthread_mutex_unlock_owner(pthread_mutex_t *, int owner);
+
+int pthread_spin_init(pthread_spinlock_t* mutex, const pthread_mutexattr_t* attr);
+void pthread_spin_destroy(pthread_spinlock_t*);
+int pthread_spin_lock(pthread_spinlock_t*);
+int pthread_spin_trylock(pthread_spinlock_t*);
+int pthread_spin_unlock(pthread_spinlock_t*);
+int pthread_spin_unlock_owner(pthread_spinlock_t* mtx, int owner);
+
 void pthread_attr_init(pthread_attr_t*);
 void pthread_attr_destroy(pthread_attr_t*);
 int pthread_attr_setdetachstate(pthread_attr_t*, int detach_state);

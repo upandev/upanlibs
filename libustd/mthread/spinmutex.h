@@ -23,15 +23,13 @@
 #pragma once
 
 #include <stdint.h>
-#include <uatomic.h>
+#include <pthread.h>
 
 namespace upan{
   class spinmutex {
   private:
-    atomic::integral<int> _lock;
-    int _lockCount;
+    pthread_spinlock_t _m;
 
-    static const int FREE_MUTEX = -999;
   public:
     spinmutex();
     ~spinmutex();
@@ -42,6 +40,8 @@ namespace upan{
     spinmutex& operator=(spinmutex&) = delete;
 
     void lock();
+    int trylock();
     bool unlock();
+    bool unlock(int owner);
   };
 }

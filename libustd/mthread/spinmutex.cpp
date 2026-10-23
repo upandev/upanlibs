@@ -42,51 +42,29 @@
  */
 
 #include <spinmutex.h>
-#include <uatomic.h>
-#include <newalloc.h>
-#include <mosstd.h>
 
 namespace upan {
-  spinmutex::spinmutex() : _lock(FREE_MUTEX), _lockCount(0) {
+  spinmutex::spinmutex() {
+    pthread_spin_init(&_m, nullptr);
   }
 
   spinmutex::~spinmutex() {
+    pthread_spin_destroy(&_m);
   }
 
   void spinmutex::lock() {
-    const int newVal = getlockownerid();
+    pthread_spin_lock(&_m);
+  }
 
-    while (true) {
-      const int oldVal = _lock.compare_set(FREE_MUTEX, newVal);
-      if (oldVal == FREE_MUTEX) {
-        _lockCount = 1;
-        return;
-      } else if (oldVal == newVal) {
-        ++_lockCount;
-        return;
-      } else {
-        while (_lock.get() != FREE_MUTEX) {
-          __asm__ __volatile__("pause");
-        }
-      }
-    }
+  int spinmutex::trylock() {
+    return pthread_spin_trylock(&_m);
   }
 
   bool spinmutex::unlock() {
-    const int val = getlockownerid();
+    return pthread_spin_unlock(&_m) ? false : true;
+  }
 
-    if (_lock.get() != val) {
-      return false;
-    }
-
-    if (_lockCount > 0) {
-      --_lockCount;
-    }
-
-    if (!_lockCount) {
-      _lock.set(FREE_MUTEX);
-    }
-
-    return true;
+  bool spinmutex::unlock(int owner) {
+    return pthread_spin_unlock_owner(&_m, owner) ? false : true;
   }
 }
