@@ -133,7 +133,9 @@ int __fflush_unlocked(register FILE *stream)
 #endif /* __STDIO_BUFFERS */
 }
 
-#elif defined __UCLIBC_HAS_THREADS__
+#endif
+
+#ifdef __UCLIBC_HAS_THREADS__
 
 int fflush(register FILE *stream)
 {

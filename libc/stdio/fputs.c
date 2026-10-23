@@ -27,7 +27,9 @@ int __fputs_unlocked(register const char * __restrict s,
 	return ((__fwrite_unlocked(s, 1, n, stream) == n) ? n : EOF);
 }
 
-#elif defined __UCLIBC_HAS_THREADS__
+#endif
+
+#ifdef __UCLIBC_HAS_THREADS__
 
 int fputs(const char * __restrict s, register FILE * __restrict stream)
 {

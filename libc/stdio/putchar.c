@@ -24,7 +24,9 @@ int __putchar_unlocked(int c)
 	return __PUTC_UNLOCKED_MACRO(c, stream);
 }
 
-#elif defined __UCLIBC_HAS_THREADS__
+#endif
+
+#ifdef __UCLIBC_HAS_THREADS__
 
 int putchar(int c)
 {

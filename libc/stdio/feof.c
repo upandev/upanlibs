@@ -21,7 +21,9 @@ int __feof_unlocked(register FILE *stream)
 	return __FEOF_UNLOCKED(stream);
 }
 
-#elif defined __UCLIBC_HAS_THREADS__
+#endif
+
+#ifdef __UCLIBC_HAS_THREADS__
 
 int feof(register FILE *stream)
 {

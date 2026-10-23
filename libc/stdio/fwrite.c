@@ -38,7 +38,9 @@ size_t __fwrite_unlocked(const void * __restrict ptr, size_t size,
 	return 0;
 }
 
-#elif defined __UCLIBC_HAS_THREADS__
+#endif
+
+#ifdef __UCLIBC_HAS_THREADS__
 
 size_t fwrite(const void * __restrict ptr, size_t size,
 			  size_t nmemb, register FILE * __restrict stream)

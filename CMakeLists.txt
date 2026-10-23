@@ -127,6 +127,7 @@ target_compile_options(c PRIVATE -O0 ${SO_COMPILE_FLAGS})
 set_target_properties(c PROPERTIES LINKER_LANGUAGE C)
 #LIBC static for kernel - so don't include sys-call code
 add_library(c_static STATIC ${LIBC_SRC} ${LIBCPP_SRC} ${LIBC_ASM_SRC})
+target_compile_options(c_static PRIVATE -O0)
 set_target_properties(c_static PROPERTIES OUTPUT_NAME c)
 
 #LIBUPTHREAD

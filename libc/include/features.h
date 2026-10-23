@@ -470,4 +470,8 @@ uClibc was built without large file support enabled.
 
 //#define __UCLIBC_HAS_GLIBC_CUSTOM_PRINTF__ 1
 
+#ifndef __UCLIBC_HAS_THREADS__
+#define __UCLIBC_HAS_THREADS__
+#endif
+
 #endif	/* features.h  */

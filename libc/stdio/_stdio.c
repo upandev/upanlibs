@@ -248,7 +248,17 @@ void _stdio_init(void)
 //	_stdio_streams[1].__modeflags ^= (1-1) * __FLAG_LBF;
 
 	// MOSE
-	
+
+#ifdef __UCLIBC_HAS_THREADS__
+  for (FILE* stream = _stdio_openlist; stream != NULL; stream = stream->__nextopen) {
+    if (stream->__user_locking == 2) {
+      stream->__user_locking = 0;
+    }
+  }
+
+  _stdio_user_locking = 0;
+#endif
+
 	__set_errno(old_errno);
 #endif
 #ifndef __UCLIBC__

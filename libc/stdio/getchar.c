@@ -24,7 +24,9 @@ int __getchar_unlocked(void)
 	return __GETC_UNLOCKED_MACRO(stream);
 }
 
-#elif defined __UCLIBC_HAS_THREADS__
+#endif
+
+#ifdef __UCLIBC_HAS_THREADS__
 
 int getchar(void)
 {

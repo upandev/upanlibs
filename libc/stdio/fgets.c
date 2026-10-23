@@ -64,7 +64,9 @@ char *__fgets_unlocked(char *__restrict s, int n,
 	return NULL;
 }
 
-#elif defined __UCLIBC_HAS_THREADS__
+#endif
+
+#ifdef __UCLIBC_HAS_THREADS__
 
 char *fgets(char *__restrict s, int n,
 			register FILE * __restrict stream)

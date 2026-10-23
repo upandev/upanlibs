@@ -17,7 +17,6 @@
 /* stdio defines */
 
 #undef __UCLIBC_HAS_WCHAR__
-#undef __UCLIBC_HAS_THREADS__
 #undef __BCC__
 #undef __UCLIBC_HAS_LFS__
 
