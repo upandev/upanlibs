@@ -176,6 +176,7 @@ class vector
 #else
   private:
 #endif
+    void destroy();
     void expandIfNeeded();
 
     int    _size;
@@ -198,10 +199,23 @@ vector<T>::vector(const int reserve) : vector() {
 }
 
 template <typename T>
-vector<T>::vector(const vector<T>& rhs) : _size(rhs._size), _capacity(rhs._capacity), _buffer(nullptr)
+vector<T>::vector(const vector<T>& rhs) : _size(0), _capacity(rhs._capacity), _buffer(nullptr)
 {
+  if (_capacity == 0) {
+    return;
+  }
+
   _buffer = new char[_capacity];
-  memcpy(_buffer, rhs._buffer, _size * sizeof(T));
+
+  try {
+    for ( ; _size < rhs._size; ++_size) {
+      new (_buffer + _size * sizeof(T)) T(rhs[_size]);
+    }
+  } catch (...) {
+    clear();
+    delete[] _buffer;
+    throw;
+  }
 }
 
 template <typename T>
@@ -214,16 +228,21 @@ vector<T>::vector(vector<T> &&rhs) : _size(rhs._size), _capacity(rhs._capacity),
 
 //TODO: not working - needs to be fixed
 template <typename T>
-vector<T>::vector(std::initializer_list<T> l) : _size(l.size()), _capacity(0), _buffer(nullptr) {
+vector<T>::vector(std::initializer_list<T> l) : vector() {
   for(const auto& e : l) {
     this->push_back(e);
   }
 }
 
 template <typename T>
-vector<T>::~vector() {
+void vector<T>::destroy() {
   clear();
   delete[] _buffer;
+}
+
+template <typename T>
+vector<T>::~vector() {
+  destroy();
 }
 
 template <typename T>
@@ -235,9 +254,9 @@ vector<T>& vector<T>::operator=(const vector<T>& rhs)
 }
 
 template <typename T>
-vector<T>& vector<T>::operator =(vector<T>&& rhs)
+vector<T>& vector<T>::operator=(vector<T>&& rhs)
 {
-  delete[] _buffer;
+  destroy();
 
   _size = rhs._size;
   _capacity = rhs._capacity;
@@ -271,10 +290,24 @@ void vector<T>::expandIfNeeded()
 {
   if((_size * (int)sizeof(T)) >= _capacity)
   {
-    const uint32_t newCapacity = sizeof(T) * (int)(_size == 0 ? 2 : _size * 1.5);
+    const uint32_t newCapacity = sizeof(T) * (int)(_size <= 1 ? 2 : _size * 1.5);
     char* tempBuffer = new char[newCapacity];
-    memcpy(tempBuffer, _buffer, _capacity);
-    delete[] _buffer;
+    int i = 0;
+    try {
+      for (; i < _size; ++i) {
+        new(tempBuffer + i * sizeof(T)) T(reinterpret_cast<T*>(_buffer)[i]);
+      }
+    } catch (...) {
+      while (i > 0) {
+        --i;
+        reinterpret_cast<T*>(tempBuffer)[i].~T();
+      }
+      delete[] tempBuffer;
+      throw;
+    }
+    int size = _size;
+    destroy();
+    _size = size;
     _buffer = tempBuffer;
     _capacity = newCapacity;
   }
@@ -283,13 +316,28 @@ void vector<T>::expandIfNeeded()
 template <typename T>
 void vector<T>::insert(const int index, const T& v)
 {
+  T saved(v);
   expandIfNeeded();
+
   if(index < 0 || index > _size)
     throw upan::exception(XLOC, "invalid index %d for insert", index);
-  if(index < _size)
-    memmove(_buffer + (index + 1) * sizeof(T), _buffer + index * sizeof(T), (_size - index) * sizeof(T));
-  new (_buffer + index * sizeof(T))T(v);
+
+  if (index == _size) {
+    new (_buffer + index * sizeof(T))T(saved);
+    ++_size;
+    return;
+  }
+
+  // Construct the extra tail element in uninitialized storage.
+  new (_buffer + _size * sizeof(T)) T(reinterpret_cast<T*>(_buffer)[_size - 1]);
+
   ++_size;
+
+  for (int i = _size - 2; i > index; --i) {
+    reinterpret_cast<T*>(_buffer)[i] = reinterpret_cast<T*>(_buffer)[i - 1];
+  }
+
+  reinterpret_cast<T*>(_buffer)[index] = saved;
 }
 
 template <typename T>
@@ -301,7 +349,6 @@ void vector<T>::insert(iterator pos, const T& v)
 template <typename T>
 void vector<T>::push_back(const T& value)
 {
-  expandIfNeeded();
   insert(_size, value);
 }
 
@@ -320,12 +367,25 @@ typename vector<T>::iterator vector<T>::erase(vector<T>::const_iterator& first, 
 template <typename T>
 typename vector<T>::iterator vector<T>::erase(const int first, const int last)
 {
-  if(first < 0 || first >= _size || last < 0 || last > _size || last <= first)
+  if (first < 0 || last < first || last > _size)
     throw upan::exception(XLOC, "vector index first:%d and last:%d out of bounds while deleting elements", first, last);
 
-  const int remaining = _size - last;
-  memcpy(_buffer + first * sizeof(T), _buffer + last * sizeof(T), remaining * sizeof(T));
-  _size -= (last - first);
+  const int count = last - first;
+  if (count == 0) {
+    return vector_iterator(*this, first);
+  }
+
+  for(int i = last; i < _size; ++i) {
+    reinterpret_cast<T*>(_buffer)[i - count] = reinterpret_cast<T*>(_buffer)[i];
+  }
+
+  const int newSize = _size - count;
+
+  for(int i = _size; i > newSize; --i) {
+    reinterpret_cast<T*>(_buffer)[i - 1].~T();
+  }
+
+  _size = newSize;
   return vector_iterator(*this, first);
 }
 
