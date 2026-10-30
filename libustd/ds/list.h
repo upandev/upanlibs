@@ -24,6 +24,7 @@
 #include <exception.h>
 #include <algorithm.h>
 #include <std_stuff.h>
+#include <uatomic.h>
 
 namespace upan {
 
@@ -56,8 +57,8 @@ class list
     bool erase(const_iterator& it);
     bool erase(const_reverse_iterator& it);
     bool erase(const T& v);
-    unsigned size() const { return _size; }
-    bool empty() const { return _size == 0; }
+    uint32_t size() const { return _size.get(); }
+    bool empty() const { return _size.get() == 0; }
     iterator begin() const;
     iterator end() const;
     iterator insert(iterator pos, const T& v);
@@ -231,7 +232,7 @@ class list
     friend class list_iterator;
     friend class list_reverese_iterator;
   private:
-    unsigned _size;
+    mutable upan::atomic::integral<uint32_t> _size;
     node*    _first;
 };
 
@@ -276,7 +277,7 @@ void list<T>::push_back(const T& value)
     n->next(_first);
     _first->prev(n);
   }
-  ++_size;
+  _size.inc();
 }
 
 template <typename T>
@@ -309,7 +310,7 @@ bool list<T>::erase(list<T>::const_reverse_iterator& it)
 template <typename T>
 bool list<T>::delete_node(node* cur)
 {
-  if(_size == 1)
+  if(_size.get() == 1)
   {
     if(_first == cur)
       _first = nullptr;
@@ -324,7 +325,7 @@ bool list<T>::delete_node(node* cur)
       _first = cur->next();
   }
   delete cur;
-  --_size;
+  _size.dec();
   return true;
 }
 
@@ -340,7 +341,7 @@ bool list<T>::pop(bool front)
   if(empty())
     return false;
   node* cur = front ? _first : _first->prev();
-  if(_size == 1)
+  if(_size.get() == 1)
   {
     _first = nullptr;
   }
@@ -352,7 +353,7 @@ bool list<T>::pop(bool front)
       _first = cur->next();
   }
   delete cur;
-  --_size;
+  _size.dec();
   return true;
 }
 
@@ -409,7 +410,7 @@ typename list<T>::iterator list<T>::insert(iterator pos, const T& v)
     push_front(v);
     return begin();
   }
-  ++_size;
+  _size.inc();
   node* new_node = new node(v);
   node* cur = pos._node;
   cur->prev()->next(new_node);
@@ -465,7 +466,6 @@ typename list<T>::iterator list<T>::end() const
 template <typename T>
 typename list<T>::reverse_iterator list<T>::insert(reverse_iterator pos, const T& v)
 {
-  ++_size;
   if(pos == rend())
   {
     push_front(v);
@@ -482,6 +482,7 @@ typename list<T>::reverse_iterator list<T>::insert(reverse_iterator pos, const T
   new_node->next(cur->next());
   new_node->prev(cur);
   cur->next(new_node);
+  _size.inc();
   return reverse_iterator(this, new_node);
 }
 
@@ -525,8 +526,8 @@ void list<T>::clear()
     auto dit = it++;
     delete dit._node;
   }
-  _size = 0;
   _first = nullptr;
+  _size.set(0);
 }
 
 template <typename T>
