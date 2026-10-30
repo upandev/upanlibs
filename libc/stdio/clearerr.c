@@ -21,7 +21,9 @@ void __clearerr_unlocked(register FILE *stream)
 	__CLEARERR_UNLOCKED(stream);
 }
 
-#elif defined __UCLIBC_HAS_THREADS__
+#endif
+
+#ifdef __UCLIBC_HAS_THREADS__
 
 void clearerr(register FILE *stream)
 {

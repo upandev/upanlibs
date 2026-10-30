@@ -85,7 +85,9 @@ int __fputc_unlocked(int c, register FILE *stream)
 	return EOF;
 }
 
-#elif defined __UCLIBC_HAS_THREADS__
+#endif
+
+#ifdef __UCLIBC_HAS_THREADS__
 
 weak_alias(fputc,putc);
 
