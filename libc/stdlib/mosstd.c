@@ -324,10 +324,6 @@ uint64_t getauxval(uint64_t type) {
   return 0;
 }
 
-int getentropy(void *buffer, size_t length) {
-  return SysUtil_GetEntropy(buffer, length);
-}
-
 int getrusage(RUSAGE_ID who, struct rusage* ru) {
   return SysUtil_GetResourceUsage(who, ru);
 }
@@ -335,4 +331,11 @@ int getrusage(RUSAGE_ID who, struct rusage* ru) {
 int mlock(const void *addr, size_t len) {
   //TODO
   return 0;
+}
+
+uint64_t rdtsc() {
+  uint32_t lo, hi;
+  __asm__ __volatile__("lfence\n\t"
+                       "rdtsc" : "=a"(lo), "=d"(hi) : : "memory");
+  return ((uint64_t)hi << 32) | lo;
 }

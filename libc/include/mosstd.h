@@ -108,6 +108,7 @@ int setsid();
 void waitonlock(uint64_t lockAddress, int oldVal, int newVal);
 int waitqueue(int id, void* mutex, const struct timeval* timeout);
 void waitdequeue(int id, bool all);
+uint64_t rdtsc();
 
 extern void SysProcess_Exit(int iExitStatus) ;
 extern int SysProcess_GetProcList(PS** pProcList, unsigned* uiListSize) ;

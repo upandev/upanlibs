@@ -155,7 +155,6 @@ typedef enum
 		SYS_CALL_UTIL_DTIME,
     SYS_CALL_UTIL_BTIME,
     SYS_CALL_UTIL_TOD,
-    SYS_CALL_UTIL_GET_ENTROPY,
     SYS_CALL_UTIL_GET_RUSAGE,
 		SYS_CALL_UTIL_REBOOT,
 	SYS_CALL_UTIL_END,
@@ -256,7 +255,6 @@ void SysUtil_Reboot();
 
 int SysUtil_GetTimeOfDay(struct timeval* pTV);
 time_t SysUtil_GetTimeSinceBoot();
-int SysUtil_GetEntropy(void *buffer, size_t length);
 int SysUtil_GetResourceUsage(RUSAGE_ID who, struct rusage* ru);
 
 int SysProcess_IsProcessAlive(int iProcessID);
