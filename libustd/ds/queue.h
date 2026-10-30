@@ -19,8 +19,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef _QUEUE_H_
-#define _QUEUE_H_
+
+#pragma once
 
 #include <exception.h>
 #include <uatomic.h>
@@ -50,7 +50,7 @@ class queue
   private:
     uint32_t _readEnd;
     uint32_t _writeEnd;
-    uint32_t _size;
+    const uint32_t _size;
     mutable atomic::integral<uint32_t> _count;
     T*       _buffer;
 };
@@ -70,13 +70,13 @@ queue<T>::~queue()
 template <typename T>
 bool queue<T>::empty() const
 {
-  return const_cast<queue<T>&>(*this)._count.get() == 0;
+  return _count.get() == 0;
 }
 
 template <typename T>
 bool queue<T>::full() const
 {
-  return const_cast<queue<T>&>(*this)._count.get() == _size;
+  return _count.get() == _size;
 }
 
 template <typename T>
@@ -162,5 +162,3 @@ void queue<T>::clear() {
 }
 
 };
-
-#endif
