@@ -156,8 +156,8 @@ void waitonlock(uint64_t lockAddress, int oldVal, int newVal) {
   SysProcess_WaitOnLock(lockAddress, oldVal, newVal);
 }
 
-int waitqueue(int id, void* mutex, const struct timeval* timeout) {
-  return SysProcess_WaitQueue(id, mutex, timeout);
+int waitqueue(int id, void* mtx, const struct timespec* abstime) {
+  return SysProcess_WaitQueue(id, mtx, abstime);
 }
 
 void waitdequeue(int id, bool all) {
@@ -331,11 +331,4 @@ int getrusage(RUSAGE_ID who, struct rusage* ru) {
 int mlock(const void *addr, size_t len) {
   //TODO
   return 0;
-}
-
-uint64_t rdtsc() {
-  uint32_t lo, hi;
-  __asm__ __volatile__("lfence\n\t"
-                       "rdtsc" : "=a"(lo), "=d"(hi) : : "memory");
-  return ((uint64_t)hi << 32) | lo;
 }

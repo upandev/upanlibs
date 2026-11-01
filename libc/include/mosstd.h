@@ -35,6 +35,9 @@
 typedef struct {
   pid_t _pid;
   int _is_thread;
+  time_t _bootTime;
+  uint64_t _bootTsc;
+  uint64_t _tscFreq;
 } PACKED _thread_local_meta_space;
 
 #define THREAD_LOCAL_META_DATA ((_thread_local_meta_space*)(THREAD_LOCAL_META_SPACE_ADDRESS + sizeof(uintptr_t)))
@@ -106,7 +109,7 @@ int isatty(int fd);
 
 int setsid();
 void waitonlock(uint64_t lockAddress, int oldVal, int newVal);
-int waitqueue(int id, void* mutex, const struct timeval* timeout);
+int waitqueue(int id, void* mtx, const struct timespec* abstime);
 void waitdequeue(int id, bool all);
 uint64_t rdtsc();
 
