@@ -24,6 +24,7 @@
 
 #include <condition_variable.h>
 #include <map.h>
+#include <list.h>
 
 namespace upan {
   class rwlock {
@@ -41,6 +42,7 @@ namespace upan {
     upan::mutex _m;
     upan::condition_variable _cv;
     upan::map<int, int> _readers;
+    upan::list<int> _rwQueue;
     int _active_writer;
     int _active_writer_lock_count;
   };

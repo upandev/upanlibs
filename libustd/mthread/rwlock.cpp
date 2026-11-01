@@ -28,11 +28,35 @@ namespace upan {
 
     const auto pid = getpid();
 
-    _cv.waitc(_m, [&] {
-      return _active_writer == NO_ACTIVE_WRITER || _active_writer == pid;
-    });
+    auto i = upan::find(_rwQueue.begin(), _rwQueue.end(), pid);
+    if (i == _rwQueue.end()) {
+      _rwQueue.push_back(pid);
+    }
 
-    ++_readers[pid];
+    const auto& condition = [&] {
+      if (_active_writer == NO_ACTIVE_WRITER || _active_writer == pid) {
+
+        auto i = _readers.find(pid);
+        const bool recursiveReader = i != _readers.end() && i->second > 0;
+
+        return _rwQueue.empty() || _rwQueue.front() == pid || recursiveReader || _active_writer == pid;
+      } else {
+        return false;
+      }
+    };
+
+    try {
+      _cv.waitc(_m, condition);
+      _rwQueue.erase(pid);
+      ++_readers[pid];
+      if (!_rwQueue.empty()) {
+        _cv.notify_all(); //notify all readers - writers anyways will fail to acquire because readers are not empty
+      }
+    } catch (...) {
+      _rwQueue.erase(pid);
+      _cv.notify_all();
+      throw;
+    }
   }
 
   void rwlock::read_unlock() {
@@ -53,7 +77,7 @@ namespace upan {
     }
 
     if (_readers.empty() && _active_writer == NO_ACTIVE_WRITER) {
-      _cv.notify_one();
+      _cv.notify_all();
     }
   }
 
@@ -62,12 +86,29 @@ namespace upan {
 
     const auto pid = getpid();
 
-    _cv.waitc(_m, [&] {
-      return _active_writer == pid || (_active_writer == NO_ACTIVE_WRITER && _readers.empty());
-    });
+    auto i = upan::find(_rwQueue.begin(), _rwQueue.end(), pid);
+    if (i == _rwQueue.end()) {
+      _rwQueue.push_back(pid);
+    }
 
-    _active_writer = pid;
-    ++_active_writer_lock_count;
+    const auto& condition = [&] {
+      if (_active_writer == pid || (_active_writer == NO_ACTIVE_WRITER && _readers.empty())) {
+        return _rwQueue.empty() || _rwQueue.front() == pid || _active_writer == pid;
+      } else {
+        return false;
+      }
+    };
+
+    try {
+      _cv.waitc(_m, condition);
+      _rwQueue.erase(pid);
+      _active_writer = pid;
+      ++_active_writer_lock_count;
+    } catch (...) {
+      _rwQueue.erase(pid);
+      _cv.notify_all();
+      throw;
+    }
   }
 
   void rwlock::write_unlock() {
