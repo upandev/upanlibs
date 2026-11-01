@@ -48,10 +48,6 @@ namespace upan {
     pthread_mutex_init(&_m, nullptr);
   }
 
-  mutex::mutex(pthread_mutex_t& m) : _m(m) {
-    pthread_mutex_destroy(&_m);
-  }
-
   mutex::~mutex() {
   }
 

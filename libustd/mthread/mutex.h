@@ -33,7 +33,6 @@ namespace upan{
 
     public:
       mutex();
-      explicit mutex(pthread_mutex_t& m);
       ~mutex();
 
       mutex(const mutex&) = delete;
@@ -45,6 +44,8 @@ namespace upan{
       int trylock();
       bool unlock();
       bool unlock(int pid);
+
+      friend class condition_variable;
     };
 
     class mutex_guard {
