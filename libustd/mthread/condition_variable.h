@@ -27,15 +27,17 @@
 
 namespace upan {
   class condition_variable final {
-  private:
-    static atomic::integral<int> _global_cv_id_seq;
-
   public:
     condition_variable();
-    ~condition_variable() = default;
+    ~condition_variable();
+
+    condition_variable(const condition_variable&) = delete;
+    condition_variable& operator=(const condition_variable&) = delete;
+    condition_variable(condition_variable&&) = delete;
+    condition_variable& operator=(condition_variable&&) = delete;
 
     void wait(mutex &m);
-    void wait(mutex &m, const struct timeval* timeout);
+    void wait(mutex &m, const struct timespec* timeout);
 
     template<typename LAMBDA>
     void waitc(mutex &m, const LAMBDA &condition) {
@@ -49,6 +51,6 @@ namespace upan {
     void notify_all();
 
   private:
-    const int _id;
+    pthread_cond_t _cond;
   };
 }

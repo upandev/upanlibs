@@ -23,32 +23,31 @@
 #include "exception.h"
 
 namespace upan {
-  atomic::integral<int> condition_variable::_global_cv_id_seq(0);
+  condition_variable::condition_variable() {
+    pthread_cond_init(&_cond, nullptr);
+  }
 
-  condition_variable::condition_variable() : _id(_global_cv_id_seq.inc()) {
+  condition_variable::~condition_variable() {
+    pthread_cond_destroy(&_cond);
   }
 
   void condition_variable::wait(mutex& m) {
-    if (!waitqueue(_id, &m, nullptr)) {
-      m.lock();
-    } else {
+    if (pthread_cond_wait(&_cond, &m._m)) {
       throw upan::exception(XLOC, "cv wait interrupted");
     }
   }
 
-  void condition_variable::wait(mutex& m, const struct timeval* timeout) {
-    if(!waitqueue(_id, &m, timeout)) {
-      m.lock();
-    } else {
+  void condition_variable::wait(mutex& m, const struct timespec* abstime) {
+    if (pthread_cond_timedwait(&_cond, &m._m, abstime)) {
       throw upan::exception(XLOC, "cv wait timeout/interrupted");
     }
   }
 
   void condition_variable::notify_one() {
-    waitdequeue(_id, false);
+    pthread_cond_signal(&_cond);
   }
 
   void condition_variable::notify_all() {
-    waitdequeue(_id, true);
+    pthread_cond_broadcast(&_cond);
   }
 }
