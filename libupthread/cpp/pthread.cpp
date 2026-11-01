@@ -162,64 +162,6 @@ int pthread_join(pthread_t tid, void** ret) {
   return es;
 }
 
-int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr) {
-  if (!cond) {
-    return 1;
-  }
-  cond->_impl_cv = new upan::condition_variable();
-  return 0;
-}
-
-int pthread_cond_wait(pthread_cond_t* cond, pthread_mutex_t* mtx) {
-  if (!cond || !mtx) return 1;
-  auto cv = (upan::condition_variable*)cond->_impl_cv;
-  upan::mutex m(*mtx);
-  try {
-    cv->wait(m);
-  } catch(...) {
-    return 1;
-  }
-  return 0;
-}
-
-int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mtx, const struct timespec *time) {
-  if (!cond || !mtx) return 1;
-  auto cv = (upan::condition_variable*)cond->_impl_cv;
-  upan::mutex m(*mtx);
-  struct timeval tv;
-  tv.tv_sec = time->tv_sec;
-  tv.tv_usec = time->tv_nsec / 1000;
-
-  try {
-    cv->wait(m, &tv);
-  } catch(...) {
-    return 1;
-  }
-  return 0;
-}
-
-int pthread_cond_signal(pthread_cond_t* cond) {
-  if (!cond) return 1;
-  auto cv = (upan::condition_variable*)cond->_impl_cv;
-  cv->notify_one();
-  return 0;
-}
-
-int pthread_cond_broadcast(pthread_cond_t* cond) {
-  if (!cond) return 1;
-  auto cv = (upan::condition_variable*)cond->_impl_cv;
-  cv->notify_all();
-  return 0;
-}
-
-int pthread_cond_destroy(pthread_cond_t* cond) {
-  if (!cond) return 1;
-  //ideally, the condition variable should return EBUSY if there are active waiters on this condition variable
-  //but in this particular implementation, the onus is on the application/caller to ensure it's safe to destroy condition variable
-  delete (upan::condition_variable*)cond->_impl_cv;
-  return 0;
-}
-
 int pthread_once(pthread_once_t* once, void (*init)(void)) {
   if (!once || !init) return EINVAL;
 

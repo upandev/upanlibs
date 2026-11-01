@@ -57,7 +57,7 @@ typedef struct {
 } pthread_spinlock_t;
 
 typedef struct {
-  void* _impl_cv;
+  int _id;
 } pthread_cond_t;
 
 typedef struct {
@@ -135,7 +135,7 @@ int pthread_key_delete(pthread_key_t key);
 
 int pthread_cond_init(pthread_cond_t* cond, const pthread_condattr_t* attr);
 int pthread_cond_wait(pthread_cond_t*, pthread_mutex_t*);
-int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mtx, const struct timespec *time);
+int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mtx, const struct timespec *abstime);
 int pthread_cond_signal(pthread_cond_t*);
 int pthread_cond_broadcast(pthread_cond_t*);
 int pthread_cond_destroy(pthread_cond_t*);
