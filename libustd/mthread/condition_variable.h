@@ -29,6 +29,7 @@ namespace upan {
   class condition_variable final {
   public:
     condition_variable();
+    condition_variable(const pthread_condattr_t& attr);
     ~condition_variable();
 
     condition_variable(const condition_variable&) = delete;
@@ -36,6 +37,7 @@ namespace upan {
     condition_variable(condition_variable&&) = delete;
     condition_variable& operator=(condition_variable&&) = delete;
 
+    int id() const { return _cond._id; }
     void wait(mutex &m);
     void wait(mutex &m, const struct timespec* timeout);
 

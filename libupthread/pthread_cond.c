@@ -48,19 +48,22 @@ int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr) {
     return 1;
   }
   atomic_set(&cond->_id, atomic_add(&_global_cv_id_seq._val, 1));
+  if (attr) {
+    cond->_attr = *attr;
+  } else {
+    cond->_attr._kind = PTHREAD_COND_NORMAL;
+  }
   return 0;
 }
 
 int pthread_cond_wait(pthread_cond_t* cond, pthread_mutex_t* mtx) {
-  if (!cond || !mtx) return 1;
-  int ret = waitqueue(get_cond_id(cond), mtx, NULL);
-  pthread_mutex_lock(mtx);
-  return ret;
+  return pthread_cond_timedwait(cond, mtx, NULL);
 }
 
 int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mtx, const struct timespec *abstime) {
   if (!cond || !mtx) return 1;
-  int ret = waitqueue(get_cond_id(cond), mtx, abstime);
+  bool periodicWakeup = cond->_attr._kind == PTHREAD_COND_RW_LOCK;
+  int ret = waitqueue(get_cond_id(cond), mtx, abstime, periodicWakeup);
   pthread_mutex_lock(mtx);
   return ret;
 }

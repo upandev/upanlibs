@@ -27,6 +27,10 @@ namespace upan {
     pthread_cond_init(&_cond, nullptr);
   }
 
+  condition_variable::condition_variable(const pthread_condattr_t& attr) {
+    pthread_cond_init(&_cond, &attr);
+  }
+
   condition_variable::~condition_variable() {
     pthread_cond_destroy(&_cond);
   }
