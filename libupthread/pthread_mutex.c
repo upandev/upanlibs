@@ -95,7 +95,7 @@ int pthread_mutex_trylock(pthread_mutex_t* mtx) {
 
 int pthread_mutex_unlock(pthread_mutex_t* mtx) {
   if (!mtx) return 1;
-  //if (iskernel()) return 0;
+
   const int val = getlockownerid();
   if (atomic_get(&mtx->_lock) != val) {
     return 1;
@@ -112,22 +112,17 @@ int pthread_mutex_unlock(pthread_mutex_t* mtx) {
   return 0;
 }
 
-int pthread_mutex_unlock_owner(pthread_mutex_t* mtx, int owner) {
+int pthread_mutex_release_owner(pthread_mutex_t* mtx, int owner) {
   if (!mtx) return 1;
-//  if (iskernel()) return 0;
 
   if (atomic_get(&mtx->_lock) != owner) {
     return 1;
   }
 
-  if (mtx->_lock_count > 0) {
-    --mtx->_lock_count;
-  }
-
-  if (!mtx->_lock_count) {
-    atomic_set(&mtx->_lock, FREE_MUTEX);
-  }
-
+  atomic_compare_swap(&mtx->_lock, owner, FREE_MUTEX);
+  //it's fine to leave _lock_count untouched - because the next lock owner will set this value to 1
+  //changing lock_count here will potentially lead to race condition as setting lock to FREE and lock_count to 0 can't happen atomically
+  //while another process might just go ahead and acquire the lock given this process is already dead
   return 0;
 }
 

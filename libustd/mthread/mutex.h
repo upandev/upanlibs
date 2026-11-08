@@ -43,7 +43,7 @@ namespace upan{
       void lock();
       int trylock();
       bool unlock();
-      bool unlock(int pid);
+      bool release(int pid);
 
       friend class condition_variable;
     };

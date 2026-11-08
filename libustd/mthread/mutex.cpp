@@ -63,7 +63,7 @@ namespace upan {
     return pthread_mutex_unlock(&_m) ? false : true;
   }
 
-  bool mutex::unlock(int pid) {
-    return pthread_mutex_unlock_owner(&_m, pid) ? false : true;
+  bool mutex::release(int pid) {
+    return pthread_mutex_release_owner(&_m, pid) ? false : true;
   }
 }
