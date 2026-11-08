@@ -120,7 +120,7 @@ const char** Env::environ() {
   upan::mutex_guard g(_mutex);
   if (_environ == nullptr || _environUpdatedTime != _envModifiedTime) {
     freeEnviron();
-    _environ = (char**)malloc(_envMap.size() + 1);
+    _environ = (char**)malloc((_envMap.size() + 1) * sizeof(char*));
     int i = 0;
     for(const auto& e : _envMap) {
       _environ[i] = (char*)malloc(e.first.length() + e.second.length() + 2);
