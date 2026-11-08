@@ -156,8 +156,8 @@ void waitonlock(uint64_t lockAddress, int oldVal, int newVal) {
   SysProcess_WaitOnLock(lockAddress, oldVal, newVal);
 }
 
-int waitqueue(int id, void* mtx, const struct timespec* abstime) {
-  return SysProcess_WaitQueue(id, mtx, abstime);
+int waitqueue(int id, void* mtx, const struct timespec* abstime, bool periodicWakeup) {
+  return SysProcess_WaitQueue(id, mtx, abstime, periodicWakeup);
 }
 
 void waitdequeue(int id, bool all) {

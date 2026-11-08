@@ -56,13 +56,19 @@ typedef struct {
 #endif
 } pthread_spinlock_t;
 
-typedef struct {
-  int _id;
-} pthread_cond_t;
+typedef enum {
+  PTHREAD_COND_NORMAL,
+  PTHREAD_COND_RW_LOCK,
+} pthread_condattr_kind;
 
 typedef struct {
-  uint32_t _attr;
+  uint32_t _kind;
 } pthread_condattr_t;
+
+typedef struct {
+  int _id;
+  pthread_condattr_t _attr;
+} pthread_cond_t;
 
 typedef enum {
  PTHREAD_MUTEX_NORMAL,
@@ -88,7 +94,7 @@ typedef struct {
 #define FREE_MUTEX (-999)
 #define PTHREAD_MUTEX_INITIALIZER	{ PTHREAD_MUTEX_NORMAL, 0, FREE_MUTEX }
 #define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP { PTHREAD_MUTEX_RECURSIVE, 0, FREE_MUTEX }
-#define PTHREAD_COND_INITIALIZER	{ 0 }
+#define PTHREAD_COND_INITIALIZER	{ 0, 0 }
 
 typedef struct {
   size_t _stack_size;
@@ -107,7 +113,7 @@ int __pthread_mutex_unlock(pthread_mutex_t *);
 int pthread_mutex_lock(pthread_mutex_t *);
 int pthread_mutex_trylock(pthread_mutex_t *);
 int pthread_mutex_unlock(pthread_mutex_t *);
-int pthread_mutex_unlock_owner(pthread_mutex_t *, int owner);
+int pthread_mutex_release_owner(pthread_mutex_t *, int owner);
 
 int pthread_spin_init(pthread_spinlock_t* mutex, const pthread_mutexattr_t* attr);
 void pthread_spin_destroy(pthread_spinlock_t*);

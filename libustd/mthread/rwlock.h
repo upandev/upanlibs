@@ -31,12 +31,16 @@ namespace upan {
   private:
     static const int NO_ACTIVE_WRITER = -1;
   public:
-    rwlock() : _active_writer(NO_ACTIVE_WRITER), _active_writer_lock_count(0) {}
+    rwlock() : _cv( { PTHREAD_COND_RW_LOCK } ), _active_writer(NO_ACTIVE_WRITER), _active_writer_lock_count(0) {}
 
     void read_lock();
     void read_unlock();
     void write_lock();
     void write_unlock();
+
+  private:
+    void add_rwqueue(int pid);
+    void cleanup_dead_owners(int skipPid);
 
   private:
     upan::mutex _m;

@@ -28,14 +28,12 @@ namespace upan {
 
     const auto pid = getpid();
 
-    auto i = upan::find(_rwQueue.begin(), _rwQueue.end(), pid);
-    if (i == _rwQueue.end()) {
-      _rwQueue.push_back(pid);
-    }
+    add_rwqueue(pid);
 
     const auto& condition = [&] {
-      if (_active_writer == NO_ACTIVE_WRITER || _active_writer == pid) {
+      cleanup_dead_owners(pid);
 
+      if (_active_writer == NO_ACTIVE_WRITER || _active_writer == pid) {
         auto i = _readers.find(pid);
         const bool recursiveReader = i != _readers.end() && i->second > 0;
 
@@ -86,12 +84,10 @@ namespace upan {
 
     const auto pid = getpid();
 
-    auto i = upan::find(_rwQueue.begin(), _rwQueue.end(), pid);
-    if (i == _rwQueue.end()) {
-      _rwQueue.push_back(pid);
-    }
-
+    add_rwqueue(pid);
     const auto& condition = [&] {
+      cleanup_dead_owners(pid);
+
       if (_active_writer == pid || (_active_writer == NO_ACTIVE_WRITER && _readers.empty())) {
         return _rwQueue.empty() || _rwQueue.front() == pid || _active_writer == pid;
       } else {
@@ -124,6 +120,41 @@ namespace upan {
     if (_active_writer_lock_count == 0) {
       _active_writer = NO_ACTIVE_WRITER;
       _cv.notify_all();
+    }
+  }
+
+  void rwlock::add_rwqueue(int pid) {
+    auto i = upan::find(_rwQueue.begin(), _rwQueue.end(), pid);
+    if (i == _rwQueue.end()) {
+      _rwQueue.push_back(pid);
+    }
+  }
+
+  void rwlock::cleanup_dead_owners(int skipPid) {
+    //remove dead read lock owners
+    for (auto i = _readers.begin(); i != _readers.end();) {
+      if (i->first != skipPid && !isprocessalive(i->first)) {
+        _rwQueue.erase(i->first);
+        _readers.erase(i++);
+      } else {
+        i++;
+      }
+    }
+
+    //remove dead write lock owners
+    if (_active_writer != NO_ACTIVE_WRITER && !isprocessalive(_active_writer)) {
+      _rwQueue.erase(_active_writer);
+      _active_writer = NO_ACTIVE_WRITER;
+      _active_writer_lock_count = 0;
+    }
+
+    //remove dead entries in rwQueue
+    for (auto i = _rwQueue.begin(); i != _rwQueue.end();) {
+      if (!isprocessalive(*i)) {
+        _rwQueue.erase(i++);
+      } else {
+        ++i;
+      }
     }
   }
 }

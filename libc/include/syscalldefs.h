@@ -235,7 +235,7 @@ int SysProcess_ThreadExec(uintptr_t threadCaller, uintptr_t entryAddress, void* 
 int SysProcess_ThreadDetach(int pid);
 int SysProcess_WaitPID(pid_t pid, int *status, int options);
 void SysProcess_WaitOnLock(uint64_t lockAddress, int newVal, int curVal);
-int SysProcess_WaitQueue(int id, void* mtx, const struct timespec* timeout);
+int SysProcess_WaitQueue(int id, void* mtx, const struct timespec* timeout, bool periodicWakeup);
 void SysProcess_WaitDequeue(int id, bool all);
 void SysProcess_Exit(int iExitStatus);
 void SysProcess_Yield();

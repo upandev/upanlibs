@@ -109,8 +109,9 @@ int isatty(int fd);
 
 int setsid();
 void waitonlock(uint64_t lockAddress, int oldVal, int newVal);
-int waitqueue(int id, void* mtx, const struct timespec* abstime);
+int waitqueue(int id, void* mtx, const struct timespec* abstime, bool periodicWakeup);
 void waitdequeue(int id, bool all);
+
 uint64_t rdtsc();
 
 extern void SysProcess_Exit(int iExitStatus) ;
